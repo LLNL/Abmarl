@@ -5,7 +5,7 @@ from gym.spaces import Dict, Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from amber.envs import Agent
+from admiral.envs import Agent
 
 class World:
     def __init__(self, region=None, agents=None, **kwargs):
