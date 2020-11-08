@@ -84,6 +84,11 @@ class GridWorldEnv(WorldEnv):
             fig = plt.gcf()
 
         ax = fig.gca()
+        ax.set(xlim=(0, self.region), ylim=(0, self.region))
+        ax.set_xticks(np.arange(0, self.region, 1))
+        ax.set_yticks(np.arange(0, self.region, 1))
+        ax.grid()
+
         if render_condition is None:
             agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
             agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values()]
