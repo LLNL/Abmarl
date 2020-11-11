@@ -2,8 +2,8 @@
 import numpy as np
 import pytest
 
-from admiral.component_envs import GridWorldEnv
-from admiral.component_envs import WorldAgent
+from admiral.component_envs.world import GridWorldEnv
+from admiral.component_envs.world import WorldAgent
 
 def test_no_region():
     with pytest.raises(AssertionError):
@@ -54,5 +54,3 @@ def test_agents_with_random_positions():
     np.testing.assert_array_equal(env.agents['agent1'].position, np.array([0, 7]))
     np.testing.assert_array_equal(env.agents['agent2'].position, np.array([1, 1]))
     np.testing.assert_array_equal(env.agents['agent3'].position, np.array([1, 4]))
-    
-test_agents_with_random_positions()
