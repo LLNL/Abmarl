@@ -21,10 +21,7 @@ class ResourceManagementEnv:
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if 'move' in action:
-                new_position = self.movement.process_move(agent.position, action['move'])
-                if 0 <= new_position[0] < self.world.region and \
-                    0 <= new_position[1] < self.world.region: # Still inside the boundary, good move
-                    agent.position = new_position
+                agent.position = self.movement.process_move(agent.position, action['move'])
             if 'harvest' in action:
                 amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
         
@@ -42,7 +39,7 @@ env = ResourceManagementEnv(
         region=10,
         agents={f'agent{i}': WorldAgent(id=f'agent{i}') for i in range(4)}
     ),
-    movement=GridMovementEnv(),
+    movement=GridMovementEnv(region=10),
     resource=GridResourceEnv(region=10)
 )
 env.reset()

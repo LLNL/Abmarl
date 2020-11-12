@@ -6,7 +6,9 @@ import numpy as np
 class ResourceEnv(ABC):
     """
     ResourceEnv contains resources that can regrow over time and that agents can
-    harvest. Provides the process_harvst and regrow api.
+    harvest.
+    
+    Provides the process_harvst and regrow api.
 
     Each resource is valued between the min_value and the max_value, and some coverage
     of the region is covered by this resource. The resources grow back at some
