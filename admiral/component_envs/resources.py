@@ -1,0 +1,91 @@
+
+from abc import ABC, abstractmethod
+
+import numpy as np
+
+class ResourceEnv(ABC):
+    """
+    ResourceEnv contains resources that can regrow over time and that agents can
+    harvest. Provides the process_harvst and regrow api.
+
+    Each resource is valued between the min_value and the max_value, and some coverage
+    of the region is covered by this resource. The resources grow back at some
+    regrow_rate.
+
+    At reset this environment has populated the world with resources.
+    """
+    def __init__(self, region=None, coverage=0.75, min_value=0.1, max_value=1.0, regrow_rate=0.04, **kwargs):
+        assert type(region) is int, "Region must be an integer."
+        self.region = region
+        self.min_value = min_value
+        self.max_value = max_value
+        self.regrow_rate = regrow_rate
+        self.coverage = coverage
+    
+    @abstractmethod
+    def reset(self, **kwargs):
+        """
+        Reset the resources.
+        """
+        pass
+
+    @abstractmethod
+    def process_harvest(self, location, amount, **kwargs):
+        """
+        Harvest some amount of resource at this location. Return the amount that
+        was actually harvested.
+        """
+        pass
+
+    @abstractmethod
+    def regrow(self, **kwargs):
+        """
+        Regrow the resources some amount.
+        """
+        pass
+
+class GridResourceEnv(ResourceEnv):
+    """
+    Resources exist in the cells of the grid. The grid is populated with resources
+    between the min and max value on some coverae of the region.
+
+    This environment support resource depletion: if a resource falls below the
+    minimum value, it will not regrow.
+    """
+    def reset(self, **kwargs):  
+        coverage_filter = np.zeros((self.region, self.region))
+        coverage_filter[np.random.uniform(0, 1, (self.region, self.region)) < self.coverage] = 1.
+        self.resources = np.multiply(
+            np.random.uniform(self.min_value, self.max_value, (self.region, self.region)),
+            coverage_filter
+        )
+
+    def process_harvest(self, location, amount, **kwargs):
+        if self.resources[location] - amount >= 0.:
+            actual_amount_harvested = amount
+        else:
+            actual_amount_harvested = self.resources[location]
+        self.resources[location] = max([0., self.resources[location] - amount])
+
+        return actual_amount_harvested
+
+    def regrow(self, **kwargs):
+        self.resources[self.resources >= self.min_value] += self.regrow_rate
+        self.resources[self.resources >= self.max_value] = self.max_value
+
+    def render(self, fig=None, **kwargs):
+        draw_now = fig is None
+        if draw_now:
+            from matplotlib import pyplot as plt
+            fig = plt.gcf()
+        import seaborn as sns
+
+        ax = fig.gca()
+        ax = sns.heatmap(np.flipud(self.resources), ax=ax, cmap='Greens')
+
+        if draw_now:
+            plt.plot()
+            plt.pause(1e-17)
+
+        return ax
+
