@@ -12,11 +12,18 @@ class ResourceEnv(ABC):
     of the region is covered by this resource. The resources grow back at some
     regrow_rate.
 
+    For replication, you can also provide a premade 2x2 array of resources.
+
     At reset this environment has populated the world with resources.
     """
-    def __init__(self, region=None, coverage=0.75, min_value=0.1, max_value=1.0, regrow_rate=0.04, **kwargs):
-        assert type(region) is int, "Region must be an integer."
-        self.region = region
+    def __init__(self, region=None, coverage=0.75, min_value=0.1, max_value=1.0,
+            regrow_rate=0.04, original_resources=None, **kwargs):
+        self.original_resources = original_resources
+        if self.original_resources is None:
+            assert type(region) is int, "Region must be an integer."
+            self.region = region
+        else:
+            self.region = self.original_resources.shape[0]
         self.min_value = min_value
         self.max_value = max_value
         self.regrow_rate = regrow_rate
@@ -47,18 +54,21 @@ class ResourceEnv(ABC):
 class GridResourceEnv(ResourceEnv):
     """
     Resources exist in the cells of the grid. The grid is populated with resources
-    between the min and max value on some coverae of the region.
+    between the min and max value on some coverage of the region.
 
     This environment support resource depletion: if a resource falls below the
     minimum value, it will not regrow.
     """
-    def reset(self, **kwargs):  
-        coverage_filter = np.zeros((self.region, self.region))
-        coverage_filter[np.random.uniform(0, 1, (self.region, self.region)) < self.coverage] = 1.
-        self.resources = np.multiply(
-            np.random.uniform(self.min_value, self.max_value, (self.region, self.region)),
-            coverage_filter
-        )
+    def reset(self, **kwargs):
+        if self.original_resources is not None:
+            self.resources = self.original_resources
+        else:
+            coverage_filter = np.zeros((self.region, self.region))
+            coverage_filter[np.random.uniform(0, 1, (self.region, self.region)) < self.coverage] = 1.
+            self.resources = np.multiply(
+                np.random.uniform(self.min_value, self.max_value, (self.region, self.region)),
+                coverage_filter
+            )
 
     def process_harvest(self, location, amount, **kwargs):
         if self.resources[location] - amount >= 0.:
