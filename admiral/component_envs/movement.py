@@ -6,7 +6,7 @@ import numpy as np
 from admiral.envs import Agent
 from admiral.component_envs.world import WorldEnv, GridWorldEnv
 
-class MovementEnv(WorldEnv):
+class MovementEnv(ABC):
     """
     MovementEnv processes agent movement in the WorldEnv in which they live. Provides
     the process_move api.
