@@ -21,13 +21,19 @@ class AttackingEnv(ABC):
     AttackingEnv processes attack action, where agents can attack other agents.
     The attack is based on the agents' positions.
     """
-    def __init__(self, agents=None):
+    def __init__(self, region=None, agents=None):
+        assert type(region) is int, "region must be an int"
+        self.region = region
         assert type(agents) is dict, "agents must be a dictionary"
-        for agent in self.agents.values():
+        for agent in agents.values():
             assert isinstance(agent, AttackingTeamAgent)
+        self.agents = agents
 
     @abstractmethod
     def process_attack(self, attacking_agent, **kwargs):
+        """
+        Process the attack from the attacking agent.
+        """
         pass
 
 class GridAttackingEnv(AttackingEnv):
