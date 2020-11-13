@@ -17,9 +17,9 @@ class MovementEnv(ABC):
         self.region = region
 
     @abstractmethod
-    def process_move(self, agent, move, **kwargs):
+    def process_move(self, position, move, **kwargs):
         """
-        Move the agent some amount.
+        Update the position by the movement action.
         """
         pass
 
