@@ -37,7 +37,7 @@ class ResourceManagementEnv:
         self.resource.regrow()
     
     def render(self, fig=None, **kwargs):
-        fig.clear(DyingAgent)
+        fig.clear()
         self.resource.render(fig=fig, **kwargs)
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
         self.world.render(fig=fig, render_condition=render_condition, **kwargs)

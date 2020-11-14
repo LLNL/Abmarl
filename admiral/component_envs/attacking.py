@@ -4,17 +4,18 @@ from abc import ABC, abstractmethod
 from .world import WorldAgent
 
 class AttackingTeamAgent(WorldAgent):
-    def __init__(self, team=None, attack_range=None, **kwargs):
+    def __init__(self, team=None, attack_range=None, attack_strength=None, **kwargs):
         super().__init__(**kwargs)
         self.team = team
         self.attack_range = attack_range
+        self.attack_strength = attack_strength
     
     @property
     def configured(self):
         """
         Determine if the agent has been successfully configured.
         """
-        return super().configured and self.team is not None and self.attack_range is not None
+        return super().configured and self.team is not None and self.attack_range is not None and self.attack_strength is not None
 
 class AttackingEnv(ABC):
     """
