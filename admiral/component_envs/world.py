@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from admiral.envs import Agent
+from admiral.tools.matplotlib_utils import mscatter
 
 class WorldAgent(Agent):
     """
@@ -74,9 +75,10 @@ class GridWorldEnv(WorldEnv):
         """
         agent.position = np.random.randint(0, self.region, 2)
 
-    def render(self, fig=None, render_condition=None, **kwargs):
+    def render(self, fig=None, render_condition={}, shape_dict={}, **kwargs):
         """
-        Draw the agents are gray circles in the grid.
+        Draw the agents in the grid. The shape of each agent is dictated by shape_dict.
+        If that is empty, then the agents are drawn as circles.
         """
         draw_now = fig is None
         if draw_now:
@@ -89,14 +91,19 @@ class GridWorldEnv(WorldEnv):
         ax.set_yticks(np.arange(0, self.region, 1))
         ax.grid()
 
-        if render_condition is None:
-            agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
-            agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values()]
-        else:
+        if render_condition:
             agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
             agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+        else:
+            agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
+            agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values()]
+            render_condition = {agent_id: True for agent_id in self.agents}
 
-        ax.scatter(agents_x, agents_y, marker='o', s=200,  edgecolor='black', facecolor='gray')
+        if shape_dict:
+            shape = [shape_dict[agent_id] for agent_id in shape_dict if render_condition[agent_id]]
+        else:
+            shape = 'o'
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
 
         if draw_now:
             plt.plot()

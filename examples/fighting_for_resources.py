@@ -57,7 +57,8 @@ class FightForResourcesEnv:
         fig.clear()
         self.resource.render(fig=fig, **kwargs)
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
-        self.world.render(fig=fig, render_condition=render_condition, **kwargs)
+        shape = {agent.id: 'o' if agent.team == 0 else 's' for agent in self.agents.values()}
+        self.world.render(fig=fig, render_condition=render_condition, shape_dict=shape, **kwargs)
         for record in self.attacking_record:
             print(record)
         self.attacking_record.clear()
