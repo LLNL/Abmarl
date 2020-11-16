@@ -3,12 +3,12 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.world import GridWorldEnv
-from admiral.component_envs.movement import GridMovementEnv
+from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.resources import GridResourceEnv
 from admiral.component_envs.attacking import GridAttackingEnv, AttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class FightForResourcesAgent(DyingAgent, AttackingTeamAgent):
+class FightForResourcesAgent(DyingAgent, AttackingTeamAgent, GridMovementAgent):
     pass
 
 class FightForResourcesEnv:
@@ -66,14 +66,12 @@ class FightForResourcesEnv:
         plt.plot()
         plt.pause(1e-6)
 
+agents = {f'agent{i}': FightForResourcesAgent(
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move=1
+) for i in range(6)}
 env = FightForResourcesEnv(
     region=10,
-    agents={f'agent{i}': FightForResourcesAgent(
-        id=f'agent{i}',
-        attack_range=1,
-        attack_strength=0.4,
-        team=i%2
-    ) for i in range(6)}
+    agents=agents
 )
 env.reset()
 fig = plt.gcf()

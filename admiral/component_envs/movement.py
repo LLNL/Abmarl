@@ -12,7 +12,7 @@ class MovementEnv(ABC):
     
     Provides the process_move api.
     """
-    def __init__(self, region=None, **kwargs):
+    def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer."
         self.region = region
 
@@ -23,10 +23,29 @@ class MovementEnv(ABC):
         """
         pass
 
+class GridMovementAgent(Agent):
+    def __init__(self, move=None, **kwargs):
+        super().__init__(**kwargs)
+        self.move = move
+    
+    @property
+    def configured(self):
+        return super().configured and self.move
+
 class GridMovementEnv(MovementEnv):
     """
     Agents in the GridWorld can move around.
     """
+    def __init__(self, agents=None, **kwargs):
+        super().__init__(**kwargs)
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridMovementAgent)
+        # Append action space
+        from gym.spaces import Box
+        for agent in agents.values():
+            agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
+
     def process_move(self, position, move, **kwargs):
         """
         Move the agent according to the move action. Returns the proposed new position.

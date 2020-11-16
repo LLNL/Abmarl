@@ -3,8 +3,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.world import GridWorldEnv
-from admiral.component_envs.movement import GridMovementEnv
+from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.observer import GridObserver, ObservingTeamAgent
+
+class ObservingTeamMovementAgent(ObservingTeamAgent, GridMovementAgent):
+    pass
 
 class SimpleGridObservations:
     def __init__(self, **kwargs):
@@ -40,12 +43,12 @@ team_shapes = {
 }
 
 agents = {
-    'agent0': ObservingTeamAgent(id='agent0', team=1, view=1, starting_position=np.array([2, 1])),
-    'agent1': ObservingTeamAgent(id='agent1', team=1, view=1, starting_position=np.array([2, 2])),
-    'agent2': ObservingTeamAgent(id='agent2', team=2, view=1, starting_position=np.array([0, 4])),
-    'agent3': ObservingTeamAgent(id='agent3', team=2, view=1, starting_position=np.array([0, 0])),
-    'agent4': ObservingTeamAgent(id='agent4', team=3, view=1, starting_position=np.array([4, 0])),
-    'agent5': ObservingTeamAgent(id='agent5', team=3, view=1, starting_position=np.array([4, 4])),
+    'agent0': ObservingTeamMovementAgent(id='agent0', team=1, view=1, move=1, starting_position=np.array([2, 1])),
+    'agent1': ObservingTeamMovementAgent(id='agent1', team=1, view=1, move=0, starting_position=np.array([2, 2])),
+    'agent2': ObservingTeamMovementAgent(id='agent2', team=2, view=1, move=0, starting_position=np.array([0, 4])),
+    'agent3': ObservingTeamMovementAgent(id='agent3', team=2, view=1, move=0, starting_position=np.array([0, 0])),
+    'agent4': ObservingTeamMovementAgent(id='agent4', team=3, view=1, move=0, starting_position=np.array([4, 0])),
+    'agent5': ObservingTeamMovementAgent(id='agent5', team=3, view=1, move=0, starting_position=np.array([4, 4])),
 }
 env = SimpleGridObservations(
     region=5,

@@ -3,11 +3,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.world import WorldAgent, GridWorldEnv
-from admiral.component_envs.movement import GridMovementEnv
+from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.resources import GridResourceEnv
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class ResourceManagementAgent(WorldAgent, DyingAgent):
+class ResourceManagementAgent(WorldAgent, DyingAgent, GridMovementAgent):
     pass
 
 class ResourceManagementEnv:
@@ -45,9 +45,10 @@ class ResourceManagementEnv:
         plt.pause(1e-6)
         self.dying.render()
 
+agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', move=1) for i in range(4)}
 env = ResourceManagementEnv(
     region=10,
-    agents={f'agent{i}': ResourceManagementAgent(id=f'agent{i}') for i in range(4)}
+    agents=agents
 )
 env.reset()
 fig = plt.gcf()
