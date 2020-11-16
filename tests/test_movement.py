@@ -54,3 +54,21 @@ def test_agents_moving_in_grid():
     np.testing.assert_array_equal(env.agents['agent1'].position, np.array([0, 4]))
     np.testing.assert_array_equal(env.agents['agent2'].position, np.array([0, 0]))
     np.testing.assert_array_equal(env.agents['agent3'].position, np.array([9, 4]))
+
+def test_some_agents_cannot_move():
+    region = 5
+    agents = {
+        'agent0': WorldAgent(id='agent0', starting_position=np.array([4, 4])),
+        'agent1': WorldAgent(id='agent1', starting_position=np.array([0, 4])),
+        'agent2': WorldAgent(id='agent2', starting_position=np.array([0, 0])),
+        'agent3': WorldAgent(id='agent3', starting_position=np.array([4, 0])),
+        'agent4': WorldAgent(id='agent4', starting_position=np.array([2, 2])),
+        'agent5': GridWorldMovementAgent(id='agent5', starting_position=np.array([2, 1]), move = 1),
+    }
+    env = GridWorldMovementEnv(region=region, agents=agents)
+    assert 'move'     in env.agents['agent5'].action_space and     isinstance(env.agents['agent5'], GridMovementAgent)
+    assert 'move' not in env.agents['agent0'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
+    assert 'move' not in env.agents['agent1'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
+    assert 'move' not in env.agents['agent2'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
+    assert 'move' not in env.agents['agent3'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
+    assert 'move' not in env.agents['agent4'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
