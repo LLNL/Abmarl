@@ -70,7 +70,7 @@ class GridObserver(Observer):
 
         # --- Determine the positions of all the other alive agents --- #
         for other_id, other_agent in self.agents.items():
-            # if other_id == my_id or other_id in self.cemetery: continue
+            if other_id == my_id: continue
             r_diff = other_agent.position[0] - my_agent.position[0]
             c_diff = other_agent.position[1] - my_agent.position[1]
             if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:

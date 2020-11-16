@@ -28,16 +28,6 @@ class SimpleGridObservations:
     
     def render(self, fig=None, **kwargs):
         fig.clear()
-        self.world.render(fig=fig, **kwargs)
-        for record in self.attacking_record:
-            print(record)
-        self.attacking_record.clear()
-        # self.dying.render()
-        plt.plot()
-        plt.pause(1e-6)
-    
-    def render(self, fig=None, **kwargs):
-        fig.clear()
         shape = {agent.id: team_shapes[agent.team] for agent in self.agents.values()}
         self.world.render(fig=fig, shape_dict=shape, **kwargs)
         plt.plot()
