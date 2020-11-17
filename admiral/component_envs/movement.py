@@ -25,8 +25,12 @@ class MovementEnv(ABC):
 
 class GridMovementAgent(Agent):
     def __init__(self, move=None, **kwargs):
-        super().__init__(**kwargs)
+        assert move is not None, "move must be an integer"
         self.move = move
+        super().__init__(**kwargs)
+
+        from gym.spaces import Box
+        self.action_space['move'] = Box(-move, move, (2,), np.int)
     
     @property
     def configured(self):
@@ -39,11 +43,6 @@ class GridMovementEnv(MovementEnv):
     def __init__(self, agents=None, **kwargs):
         super().__init__(**kwargs)
         assert type(agents) is dict, "agents must be a dict"
-        # Append action space where relevant
-        from gym.spaces import Box
-        for agent in agents.values():
-            if isinstance(agent, GridMovementAgent):
-                agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
         self.agents = agents
 
     def process_move(self, position, move, **kwargs):

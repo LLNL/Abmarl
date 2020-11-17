@@ -5,13 +5,13 @@ class Agent:
     id in in order to even be constructed. Agents must also have an observation
     space and action space to be considered successfully configured.
     """
-    def __init__(self, id=None, observation_space={}, action_space={}, **kwargs):
+    def __init__(self, id=None, observation_space=None, action_space=None, **kwargs):
         if id is None:
             raise TypeError("Agents must be constructed with an id.")
         else:
             self.id = id
-        self.observation_space = observation_space
-        self.action_space = action_space
+        self.observation_space = {} if observation_space is None else observation_space
+        self.action_space = {} if action_space is None else action_space
     
     @property
     def configured(self):

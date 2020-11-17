@@ -67,8 +67,8 @@ def test_some_agents_cannot_move():
     }
     env = GridWorldMovementEnv(region=region, agents=agents)
     assert 'move'     in env.agents['agent5'].action_space and     isinstance(env.agents['agent5'], GridMovementAgent)
-    assert 'move' not in env.agents['agent0'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
-    assert 'move' not in env.agents['agent1'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
-    assert 'move' not in env.agents['agent2'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
-    assert 'move' not in env.agents['agent3'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
-    assert 'move' not in env.agents['agent4'].action_space and not isinstance(env.agents['agent5'], GridMovementAgent)
+    assert 'move' not in env.agents['agent0'].action_space and not isinstance(env.agents['agent0'], GridMovementAgent)
+    assert 'move' not in env.agents['agent1'].action_space and not isinstance(env.agents['agent1'], GridMovementAgent)
+    assert 'move' not in env.agents['agent2'].action_space and not isinstance(env.agents['agent2'], GridMovementAgent)
+    assert 'move' not in env.agents['agent3'].action_space and not isinstance(env.agents['agent3'], GridMovementAgent)
+    assert 'move' not in env.agents['agent4'].action_space and not isinstance(env.agents['agent4'], GridMovementAgent)
