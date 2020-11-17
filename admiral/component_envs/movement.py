@@ -28,9 +28,6 @@ class GridMovementAgent(Agent):
         assert move is not None, "move must be an integer"
         self.move = move
         super().__init__(**kwargs)
-
-        from gym.spaces import Box
-        self.action_space['move'] = Box(-move, move, (2,), np.int)
     
     @property
     def configured(self):
@@ -40,6 +37,17 @@ class GridMovementEnv(MovementEnv):
     """
     Agents in the GridWorld can move around.
     """
+    def __init__(self, agents=None, **kwargs):
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridMovementAgent)
+        self.agents = agents
+        super().__init__(**kwargs)
+
+        from gym.spaces import Box
+        for agent in self.agents.values():
+            agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
+
     def process_move(self, position, move, **kwargs):
         """
         Move the agent according to the move action. Returns the proposed new position.
