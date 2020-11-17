@@ -4,19 +4,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from admiral.component_envs.world import WorldEnv, WorldAgent
+from admiral.component_envs.team import TeamAgent
 from admiral.envs import Agent
-
-class TeamAgent(Agent):
-    """
-    Team should be an integer.
-    """
-    def __init__(self, team=None, **kwargs):
-        super().__init__(**kwargs)
-        self.team = team
-    
-    @property
-    def configured(self):
-        return super().configured and self.team is not None
 
 class ObservingAgent(Agent):
     def __init__(self, view=None, **kwargs):
