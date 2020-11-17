@@ -9,8 +9,21 @@ from admiral.envs import Agent
 
 class ObservingAgent(Agent):
     def __init__(self, view=None, **kwargs):
-        super().__init__(**kwargs)
+        assert view is not None, "view must be nonnegative integer"
         self.view = view
+        super().__init__(**kwargs)
+
+        from gym.spaces import Box
+        #TODO: num_teams = ...
+        # self.observation_space['agents'] = Box(-1, num_teams, (view*2+1, view*2+1), np.int)
+        # Alternatively, we can leave it unbounded...
+        self.observation_space['agents'] = Box(-1, np.inf, (view*2+1, view*2+1), np.int)
+        # TODO: What about channel observing agent? The parameters would be the
+        # same: just view. But the observation space would be different. Do I make
+        # a different type of agent or do I allow the channel environment set
+        # the observation space of the agents?
+        # I think the environment should take part in constructing this because
+        # we have to know if the environment is Grid-based.
     
     @property
     def configured(self):
@@ -19,7 +32,7 @@ class ObservingAgent(Agent):
 class ObservingTeamAgent(ObservingAgent, TeamAgent, WorldAgent):
     pass
 
-class Observer(ABC):
+class ObserverEnv(ABC):
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
         # assert that the agents are observing agents
@@ -28,7 +41,7 @@ class Observer(ABC):
     def get_obs(self, my_id, **kwargs):
         pass
 
-class GridObserver(Observer):
+class GridObserverEnv(ObserverEnv):
     def __init__(self, region=None, agents=None, **kwargs):
         self.region = region
         self.agents = agents
@@ -73,7 +86,7 @@ class GridObserver(Observer):
         
         return signal
 
-class GridChannelObserver(Observer):
+class GridChannelObserverEnv(ObserverEnv):
     def __init__(self, region=None, agents=None, **kwargs):
         super().__init__(**kwargs)
         self.agents = agents
