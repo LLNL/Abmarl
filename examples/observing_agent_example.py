@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.component_envs.world import GridWorldEnv
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.observer import GridObserverEnv, ObservingTeamAgent
+from admiral.component_envs.observer import GridObservingAgentEnv, ObservingTeamAgent
 
 class ObservingTeamMovementAgent(ObservingTeamAgent, GridMovementAgent):
     pass
@@ -14,7 +14,7 @@ class SimpleGridObservations:
         self.agents = kwargs['agents']
         self.world = GridWorldEnv(**kwargs)
         self.movement = GridMovementEnv(**kwargs)
-        self.observer = GridObserverEnv(**kwargs)
+        self.observer = GridObservingAgentEnv(**kwargs)
 
     def reset(self, **kwargs):
         self.world.reset(**kwargs)

@@ -13,39 +13,38 @@ class ObservingAgent(Agent):
         self.view = view
         super().__init__(**kwargs)
 
-        from gym.spaces import Box
-        #TODO: num_teams = ...
-        # self.observation_space['agents'] = Box(-1, num_teams, (view*2+1, view*2+1), np.int)
-        # Alternatively, we can leave it unbounded...
-        self.observation_space['agents'] = Box(-1, np.inf, (view*2+1, view*2+1), np.int)
-        # TODO: What about channel observing agent? The parameters would be the
-        # same: just view. But the observation space would be different. Do I make
-        # a different type of agent or do I allow the channel environment set
-        # the observation space of the agents?
-        # I think the environment should take part in constructing this because
-        # we have to know if the environment is Grid-based.
-    
     @property
     def configured(self):
         return super().configured and self.view is not None
-
-class ObservingTeamAgent(ObservingAgent, TeamAgent, WorldAgent):
-    pass
-
-class ObserverEnv(ABC):
+    
+class ObservingEnv(ABC):
     def __init__(self, agents=None, **kwargs):
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, ObservingAgent), "agents must be ObservingAgents"
         self.agents = agents
-        # assert that the agents are observing agents
     
     @abstractmethod
     def get_obs(self, my_id, **kwargs):
         pass
 
-class GridObserverEnv(ObserverEnv):
+class ObservingTeamAgent(ObservingAgent, TeamAgent, WorldAgent):
+    """ view, team, position """
+    pass
+
+class GridObservingAgentEnv(ObservingEnv):
     def __init__(self, region=None, agents=None, **kwargs):
+        assert region is not None, "region must be positive integer"
         self.region = region
+
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, ObservingTeamAgent), "agents must be ObservingTeamAgents"
         self.agents = agents
-        # Agents must have teams, views, and positions.
+
+        from gym.spaces import Box
+        for agent in self.agents.values():
+            agent.observation_space['agents'] =  Box(-1, np.inf, (agent.view*2+1, agent.view*2+1), np.int)
     
     def get_obs(self, my_id, **kwargs):
         """
@@ -86,7 +85,7 @@ class GridObserverEnv(ObserverEnv):
         
         return signal
 
-class GridChannelObserverEnv(ObserverEnv):
+class GridChannelObserverEnv(ObservingEnv):
     def __init__(self, region=None, agents=None, **kwargs):
         super().__init__(**kwargs)
         self.agents = agents
