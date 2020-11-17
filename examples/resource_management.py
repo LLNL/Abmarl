@@ -4,10 +4,10 @@ import numpy as np
 
 from admiral.component_envs.world import WorldAgent, GridWorldEnv
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.resources import GridResourceEnv
+from admiral.component_envs.resources import GridResourceEnv, GridResourceAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class ResourceManagementAgent(WorldAgent, DyingAgent, GridMovementAgent):
+class ResourceManagementAgent(WorldAgent, DyingAgent, GridMovementAgent, GridResourceAgent):
     pass
 
 class ResourceManagementEnv:
@@ -45,7 +45,7 @@ class ResourceManagementEnv:
         plt.pause(1e-6)
         self.dying.render()
 
-agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', move=1) for i in range(4)}
+agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', move=1, max_harvest=1.0) for i in range(4)}
 env = ResourceManagementEnv(
     region=10,
     agents=agents
@@ -58,8 +58,8 @@ for _ in range(50):
     action_dict = {agent_id: {} for agent_id in env.agents}
     for agent_id, agent in env.agents.items():
         action_dict[agent_id] = {
-            'move': np.random.randint(-1, 2, size=(2,)),
-            'harvest': np.random.uniform(0, 1)
+            'move': agent.action_space['move'].sample(),
+            'harvest': agent.action_space['harvest'].sample()
         }
     env.step(action_dict)
     env.render(fig=fig)

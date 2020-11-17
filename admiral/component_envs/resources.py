@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from admiral.envs import Agent
+
 class ResourceEnv(ABC):
     """
     ResourceEnv contains resources that can regrow over time and that agents can
@@ -52,6 +54,19 @@ class ResourceEnv(ABC):
         Regrow the resources some amount.
         """
         pass
+
+class GridResourceAgent(Agent):
+    def __init__(self, max_harvest=None, **kwargs):
+        assert max_harvest is not None, "max_harvest must be nonnegative number"
+        self.max_harvest = max_harvest
+        super().__init__(**kwargs)
+
+        from gym.spaces import Box
+        self.action_space['harvest'] = Box(0, max_harvest, (1,), np.float)
+    
+    @property
+    def configured(self):
+        return super().configured and self.max_harvest is not None
 
 class GridResourceEnv(ResourceEnv):
     """

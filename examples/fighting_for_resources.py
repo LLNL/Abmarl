@@ -4,11 +4,11 @@ import numpy as np
 
 from admiral.component_envs.world import GridWorldEnv
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.resources import GridResourceEnv
+from admiral.component_envs.resources import GridResourceEnv, GridResourceAgent
 from admiral.component_envs.attacking import GridAttackingEnv, AttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class FightForResourcesAgent(DyingAgent, AttackingTeamAgent, GridMovementAgent):
+class FightForResourcesAgent(DyingAgent, AttackingTeamAgent, GridMovementAgent, GridResourceAgent):
     pass
 
 class FightForResourcesEnv:
@@ -62,12 +62,11 @@ class FightForResourcesEnv:
         for record in self.attacking_record:
             print(record)
         self.attacking_record.clear()
-        # self.dying.render()
         plt.plot()
         plt.pause(1e-6)
 
 agents = {f'agent{i}': FightForResourcesAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move=1
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move=1, max_harvest=1.0
 ) for i in range(6)}
 env = FightForResourcesEnv(
     region=10,
@@ -81,8 +80,8 @@ for _ in range(20):
     action_dict = {agent_id: {} for agent_id in env.agents}
     for agent_id, agent in env.agents.items():
         action_dict[agent_id] = {
-            'move': np.random.randint(-1, 2, size=(2,)),
-            'harvest': np.random.uniform(0, 1),
+            'move': agent.action_space['move'].sample(),
+            'harvest': agent.action_space['harvest'].sample(),
             'attack': np.random.randint(0, 2)
         }
     env.step(action_dict)

@@ -34,17 +34,12 @@ class GridMovementAgent(Agent):
     
     @property
     def configured(self):
-        return super().configured and self.move
+        return super().configured and self.move is not None
 
 class GridMovementEnv(MovementEnv):
     """
     Agents in the GridWorld can move around.
     """
-    def __init__(self, agents=None, **kwargs):
-        super().__init__(**kwargs)
-        assert type(agents) is dict, "agents must be a dict"
-        self.agents = agents
-
     def process_move(self, position, move, **kwargs):
         """
         Move the agent according to the move action. Returns the proposed new position.
