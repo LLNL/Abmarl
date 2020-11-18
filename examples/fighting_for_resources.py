@@ -2,14 +2,13 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv, WorldAgent
+from admiral.component_envs.world import GridWorldEnv
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceAgent
-from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttackingAgent
+from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
-from admiral.component_envs.team import TeamAgent
 
-class FightForResourcesAgent(WorldAgent, DyingAgent, GridAttackingAgent, GridMovementAgent, GridResourceAgent, TeamAgent):
+class FightForResourcesAgent(DyingAgent, GridAttackingTeamAgent, GridMovementAgent, GridResourceAgent):
     pass
 
 class FightForResourcesEnv:

@@ -2,16 +2,14 @@
 from abc import ABC, abstractmethod
 
 from admiral.envs import Agent
+from admiral.component_envs.world import WorldAgent
+from admiral.component_envs.team import TeamAgent
 
 class AttackingEnv(ABC):
     """
     AttackingEnv processes attack action, where agents can attack other agents.
     The attack is based on the agents' positions.
     """
-    def __init__(self, agents=None, **kwargs):
-        assert type(agents) is dict, "agents must be a dictionary"
-        self.agents = agents
-
     @abstractmethod
     def process_attack(self, attacking_agent, **kwargs):
         """
@@ -19,17 +17,13 @@ class AttackingEnv(ABC):
         """
         pass
 
-class GridAttackingAgent(Agent):
-    # TODO: Still exploring whether we should assert agent type...
+class GridAttackingAgent(WorldAgent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
         assert attack_range is not None, "attack_range must be a nonnegative integer"
         self.attack_range = attack_range
         assert attack_strength is not None, "attack_strength must be a nonnegative number"
         self.attack_strength = attack_strength
         super().__init__(**kwargs)
-
-        from gym.spaces import MultiBinary
-        self.action_space['attack'] = MultiBinary(1)
     
     @property
     def configured(self):
@@ -39,17 +33,42 @@ class GridAttackingAgent(Agent):
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
 class GridAttackingEnv(AttackingEnv):
+    def __init__(self, agents=None, **kwargs):
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridAttackingAgent), "agents must be GridAttackingAgent"
+        self.agents = agents
+
+        from gym.spaces import MultiBinary
+        for agent in self.agents.values():
+            agent.action_space['attack'] = MultiBinary(1)
+
     def process_attack(self, attacking_agent, **kwargs):
         for agent in self.agents.values():
+            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
             if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                 return agent.id
 
+class GridAttackingTeamAgent(GridAttackingAgent, TeamAgent):
+    pass
+
 class GridAttackingTeamEnv(AttackingEnv):
     # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
     # attacks that cannot happen?
+    def __init__(self, agents=None, **kwargs):
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridAttackingTeamAgent), "agents must be GridAttackingAgent"
+        self.agents = agents
+
+        from gym.spaces import MultiBinary
+        for agent in self.agents.values():
+            agent.action_space['attack'] = MultiBinary(1)
+
     def process_attack(self, attacking_agent, **kwargs):
         for agent in self.agents.values():
+            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
             if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
             if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
