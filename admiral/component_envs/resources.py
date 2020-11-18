@@ -60,9 +60,6 @@ class GridResourceAgent(Agent):
         assert max_harvest is not None, "max_harvest must be nonnegative number"
         self.max_harvest = max_harvest
         super().__init__(**kwargs)
-
-        from gym.spaces import Box
-        self.action_space['harvest'] = Box(0, max_harvest, (1,), np.float)
     
     @property
     def configured(self):
@@ -76,6 +73,18 @@ class GridResourceEnv(ResourceEnv):
     This environment support resource depletion: if a resource falls below the
     minimum value, it will not regrow.
     """
+    def __init__(self, agents=None, **kwargs):
+        assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridResourceAgent)
+        self.agents = agents
+        super().__init__(**kwargs)
+
+        from gym.spaces import Box
+        for agent in self.agents.values():
+            agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
+            agent.observation_space['resources'] = None # TODO: Create a resource observation channel
+
     def reset(self, **kwargs):
         if self.original_resources is not None:
             self.resources = self.original_resources
