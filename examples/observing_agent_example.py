@@ -2,9 +2,8 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv
+from admiral.component_envs.world import GridWorldEnv, WorldAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.observer import GridObservingAgentEnv, ObservingTeamAgent
 
 class ObservingTeamMovementAgent(ObservingTeamAgent, GridMovementAgent):
     pass
