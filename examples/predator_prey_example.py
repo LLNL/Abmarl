@@ -6,10 +6,7 @@ from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldTeamAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttackingTeamAgent
 
-class PreyAgent(GridWorldTeamAgent, GridMovementAgent):
-    pass
-
-class PredatorAgent(GridMovementAgent, GridAttackingTeamAgent):
+class PredatorPreyAgent(GridMovementAgent, GridAttackingTeamAgent):
     pass
 # TODO: Resolve the Method resolution bug between world and attacking agents
 
@@ -53,8 +50,8 @@ class PredatorPreyEnv:
         return {'agents': self.world.get_obs(agent_id)}
 
 
-prey = {f'prey{i}': PreyAgent(id=f'prey{i}', view=5, team=1, move=1) for i in range(7)}
-predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24) for i in range(2)}
+prey = {f'prey{i}': PredatorPreyAgent(id=f'prey{i}', view=5, team=1, move=1, attack_range=-1, attack_strength=0.0) for i in range(7)}
+predators = {f'predator{i}': PredatorPreyAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24) for i in range(2)}
 agents = {**prey, **predators}
 region = 10
 env = PredatorPreyEnv(
@@ -70,15 +67,10 @@ env.render(fig=fig)
 for _ in range(100):
     action_dict = {}
     for agent_id, agent in env.agents.items():
-        if isinstance(agent, PreyAgent):
-            action_dict[agent_id] = {
-                'move': agent.action_space['move'].sample(),
-            }
-        elif isinstance(agent, PredatorAgent):
-            action_dict[agent_id] = {
-                'move': agent.action_space['move'].sample(),
-                'attack': agent.action_space['attack'].sample(),
-            }
+        action_dict[agent_id] = {
+            'move': agent.action_space['move'].sample(),
+            'attack': agent.action_space['attack'].sample(),
+        }
     env.step(action_dict)
     env.render(fig=fig)
     x = []
