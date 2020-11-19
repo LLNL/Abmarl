@@ -15,6 +15,12 @@ class SimpleGridObservations:
         self.world = GridWorldEnv(**kwargs)
         self.movement = GridMovementEnv(**kwargs)
         self.observer = GridObservingAgentEnv(**kwargs)
+        # TODO: Observer is too broad of a handler. That would be the equivalent
+        # of having actor trying to process all the actions. What we want instead
+        # is an agent observer, a resource_observer, etc. Basically, world should
+        # observe agents and resources should observe resources. We can add other
+        # observations from the other parts, like observing the agent's health
+        # and team.
 
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
