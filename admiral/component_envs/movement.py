@@ -24,7 +24,6 @@ class GridMovementEnv:
         for agent in agents.values():
             assert isinstance(agent, GridMovementAgent)
         self.agents = agents
-        super().__init__(**kwargs)
 
         from gym.spaces import Box
         for agent in self.agents.values():

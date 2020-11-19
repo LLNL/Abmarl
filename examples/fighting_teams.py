@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv
+from admiral.component_envs.world import GridWorldTeamsEnv
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
@@ -13,7 +13,7 @@ class FightingTeamsAgent(DyingAgent, GridAttackingTeamAgent, GridMovementAgent):
 class FightingTeamsEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldEnv(**kwargs)
+        self.world = GridWorldTeamsEnv(**kwargs)
         self.movement = GridMovementEnv(**kwargs)
         self.attacking = GridAttackingTeamEnv(**kwargs)
         self.dying = DyingEnv(**kwargs)
@@ -48,22 +48,27 @@ class FightingTeamsEnv:
     def render(self, fig=None, **kwargs):
         fig.clear()
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
-        shape = {agent.id: 'o' if agent.team == 0 else 's' for agent in self.agents.values()}
+        shape = {agent.id: 'o' if agent.team == 1 else 's' for agent in self.agents.values()}
         self.world.render(fig=fig, render_condition=render_condition, shape_dict=shape, **kwargs)
         for record in self.attacking_record:
             print(record)
         self.attacking_record.clear()
         plt.plot()
         plt.pause(1e-6)
+    
+    def get_obs(self, agent_id, **kwargs):
+        return {'agents': self.world.get_obs(agent_id)}
 
 agents = {f'agent{i}': FightingTeamsAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move=1
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2+1, move=1, view=11
 ) for i in range(24)}
 env = FightingTeamsEnv(
     region=12,
-    agents=agents
+    agents=agents,
+    number_of_teams=2
 )
 env.reset()
+print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
 fig = plt.gcf()
 env.render(fig=fig)
 

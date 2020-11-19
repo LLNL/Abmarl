@@ -1,7 +1,6 @@
 
 from admiral.envs import Agent
-from admiral.component_envs.world import GridWorldAgent
-from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.world import GridWorldAgent, GridWorldTeamAgent
 
 class GridAttackingAgent(GridWorldAgent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
@@ -36,7 +35,7 @@ class GridAttackingEnv:
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                 return agent.id
 
-class GridAttackingTeamAgent(GridAttackingAgent, TeamAgent):
+class GridAttackingTeamAgent(GridAttackingAgent, GridWorldTeamAgent):
     pass
 
 class GridAttackingTeamEnv:
@@ -56,7 +55,6 @@ class GridAttackingTeamEnv:
         for agent in self.agents.values():
             if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
             if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
-            # TODO: Should probably OBSERVE the agent's team....
             if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                 return agent.id

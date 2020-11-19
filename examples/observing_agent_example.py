@@ -2,18 +2,17 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv, WorldAgent
+from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldTeamAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 
-class ObservingTeamMovementAgent(ObservingTeamAgent, GridMovementAgent):
+class ObservingTeamMovementAgent(GridWorldTeamAgent, GridMovementAgent):
     pass
 
 class SimpleGridObservations:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldEnv(**kwargs)
+        self.world = GridWorldTeamsEnv(**kwargs)
         self.movement = GridMovementEnv(**kwargs)
-        self.observer = GridObservingAgentEnv(**kwargs)
         # TODO: Observer is too broad of a handler. That would be the equivalent
         # of having actor trying to process all the actions. What we want instead
         # is an agent observer, a resource_observer, etc. Basically, world should
@@ -24,7 +23,7 @@ class SimpleGridObservations:
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
 
-        return {'agent0': self.observer.get_obs('agent0')}
+        return {'agent0': self.world.get_obs('agent0')}
     
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
@@ -32,7 +31,7 @@ class SimpleGridObservations:
             if 'move' in action:
                 agent.position = self.movement.process_move(agent.position, action['move'])
 
-        return {'agent0': self.observer.get_obs('agent0')}
+        return {'agent0': self.world.get_obs('agent0')}
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -57,7 +56,8 @@ agents = {
 }
 env = SimpleGridObservations(
     region=5,
-    agents=agents
+    agents=agents,
+    number_of_teams=3
 )
 obs = env.reset()
 fig = plt.gcf()

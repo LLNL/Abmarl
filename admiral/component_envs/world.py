@@ -115,3 +115,51 @@ class GridWorldEnv:
 
         return signal
 
+from admiral.component_envs.team import TeamAgent
+
+class GridWorldTeamAgent(TeamAgent, GridWorldAgent):
+    pass
+
+class GridWorldTeamsEnv(GridWorldEnv):
+    def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
+        self.region = region
+        self.agents = agents
+        self.number_of_teams = number_of_teams
+
+        from gym.spaces import Box
+        for agent in self.agents.values():
+            agent.observation_space['agents'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
+    
+    def get_obs(self, my_id, **kwargs):
+        my_agent = self.agents[my_id]
+        signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
+
+        # --- Determine the boundaries of the agents' grids --- #
+        # For left and top, we just do: view - x,y >= 0
+        # For the right and bottom, we just do region - x,y - 1 - view > 0
+        if my_agent.view - my_agent.position[0] >= 0: # Top end
+            signal[0:my_agent.view - my_agent.position[0], :] = -1
+        if my_agent.view - my_agent.position[1] >= 0: # Left end
+            signal[:, 0:my_agent.view - my_agent.position[1]] = -1
+        if self.region - my_agent.position[0] - my_agent.view - 1 < 0: # Bottom end
+            signal[self.region - my_agent.position[0] - my_agent.view - 1:,:] = -1
+        if self.region - my_agent.position[1] - my_agent.view - 1 < 0: # Right end
+            signal[:, self.region - my_agent.position[1] - my_agent.view - 1:] = -1
+
+        # Repeat the boundaries signal for all agents
+        signal = np.repeat(signal[:, :, np.newaxis], self.number_of_teams, axis=2)
+
+        # --- Determine the positions of all the other alive agents --- #
+        for other_id, other_agent in self.agents.items():
+            if other_id == my_id: continue # Don't observe yourself
+            r_diff = other_agent.position[0] - my_agent.position[0]
+            c_diff = other_agent.position[1] - my_agent.position[1]
+            if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
+                r_diff += my_agent.view
+                c_diff += my_agent.view
+                signal[r_diff, c_diff, other_agent.team-1] += 1
+
+        return signal
+
+
+
