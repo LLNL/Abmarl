@@ -2,12 +2,12 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import WorldAgent, GridWorldEnv
+from admiral.component_envs.world import GridWorldEnv, GridWorldAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class ResourceManagementAgent(WorldAgent, DyingAgent, GridMovementAgent, GridResourceAgent):
+class ResourceManagementAgent(GridWorldAgent, DyingAgent, GridMovementAgent, GridResourceAgent):
     pass
 
 class ResourceManagementEnv:
@@ -44,13 +44,17 @@ class ResourceManagementEnv:
         plt.plot()
         plt.pause(1e-6)
         self.dying.render()
+    
+    def get_obs(self, agent_id, **kwargs):
+        return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
 
-agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', move=1, max_harvest=1.0) for i in range(4)}
+agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', view=2, move=1, max_harvest=1.0) for i in range(4)}
 env = ResourceManagementEnv(
     region=10,
     agents=agents
 )
 env.reset()
+print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
 fig = plt.gcf()
 env.render(fig=fig)
 

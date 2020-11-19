@@ -84,4 +84,24 @@ class GridResourceEnv:
             plt.pause(1e-17)
 
         return ax
+    
+    def get_obs(self, agent_id, **kwargs):
+        """
+        These cells are filled with the values of the resources surrounding the
+        agent.
+        """
+        agent = self.agents[agent_id]
+        signal = -np.ones((agent.view*2+1, agent.view*2+1))
+
+        # Derived by considering each square in the resources as an "agent" and
+        # then applied the agent diff logic from above. The resulting for-loop
+        # can be written in the below vectorized form.
+        (r,c) = agent.position
+        r_lower = max([0, r-agent.view])
+        r_upper = min([self.region-1, r+agent.view])+1
+        c_lower = max([0, c-agent.view])
+        c_upper = min([self.region-1, c+agent.view])+1
+        signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
+            self.resources[r_lower:r_upper, c_lower:c_upper]
+        return signal
 

@@ -63,6 +63,9 @@ class FightForResourcesEnv:
         self.attacking_record.clear()
         plt.plot()
         plt.pause(1e-6)
+    
+    def get_obs(self, agent_id, **kwargs):
+        return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
 
 agents = {f'agent{i}': FightForResourcesAgent(
     id=f'agent{i}', attack_range=1, attack_strength=0.4, move=1, max_harvest=1.0, view=3
@@ -72,6 +75,7 @@ env = FightForResourcesEnv(
     agents=agents
 )
 env.reset()
+print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
 fig = plt.gcf()
 env.render(fig=fig)
 
