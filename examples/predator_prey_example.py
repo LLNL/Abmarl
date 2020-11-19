@@ -5,8 +5,9 @@ import numpy as np
 from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldTeamAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttackingTeamAgent
+from admiral.component_envs.death_life import DyingEnv, DyingAgent
 
-class PredatorPreyAgent(GridMovementAgent, GridAttackingTeamAgent):
+class PredatorPreyAgent(GridMovementAgent, GridAttackingTeamAgent, DyingAgent):
     pass
 # TODO: Resolve the Method resolution bug between world and attacking agents
 
@@ -16,30 +17,40 @@ class PredatorPreyEnv:
         self.world = GridWorldTeamsEnv(**kwargs)
         self.movement = GridMovementEnv(**kwargs)
         self.attacking = GridAttackingTeamEnv(**kwargs)
+        self.dying = DyingEnv(**kwargs)
 
         self.attacking_record = []
     
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
+        self.dying.reset(**kwargs)
 
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            if 'move' in action:
-                agent.position = self.movement.process_move(agent.position, action['move'])
-            if action.get('attack', False):
-                attacked_agent = self.attacking.process_attack(agent)
-                if attacked_agent is not None:
-                #     self.agents[attacked_agent].health -= agent.attack_strength
-                #     agent.health += agent.attack_strength # Gain health from a good attack.
-                    self.attacking_record.append(agent.id + " attacked " + attacked_agent)
+            if agent.is_alive:
+                if 'move' in action:
+                    agent.position = self.movement.process_move(agent.position, action['move'])
+                if action.get('attack', False):
+                    attacked_agent = self.attacking.process_attack(agent)
+                    if attacked_agent is not None:
+                        self.agents[attacked_agent].health -= agent.attack_strength
+                        agent.health += agent.attack_strength # Gain health from a good attack.
+                        self.attacking_record.append(agent.id + " attacked " + attacked_agent)
+
+        for agent_id in action_dict:
+            agent = self.agents[agent_id]
+            if agent.is_alive:
+                self.dying.apply_entropy(agent)
+                self.dying.process_death(agent)
+        # TODO: There is likely a bug in the entropy or attack health because prey are getting attacked
+        # many more times then they should be alive...
     
     def render(self, fig=None, **kwargs):
         fig.clear()
-        # render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
+        render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
         shape = {agent.id: 'o' if agent.team == 1 else 's' for agent in self.agents.values()}
-        # self.world.render(fig=fig, render_condition=render_condition, shape_dict=shape, **kwargs)
-        self.world.render(fig=fig, shape_dict=shape, **kwargs)
+        self.world.render(fig=fig, render_condition=render_condition, shape_dict=shape, **kwargs)
         for record in self.attacking_record:
             print(record)
         self.attacking_record.clear()
@@ -57,14 +68,15 @@ region = 10
 env = PredatorPreyEnv(
     region=region,
     agents=agents,
-    number_of_teams=2
+    number_of_teams=2,
+    entropy=0.05
 )
 env.reset()
 print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
 fig = plt.gcf()
 env.render(fig=fig)
 
-for _ in range(100):
+for _ in range(30):
     action_dict = {}
     for agent_id, agent in env.agents.items():
         action_dict[agent_id] = {
