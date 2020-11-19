@@ -65,7 +65,7 @@ class FightForResourcesEnv:
         plt.pause(1e-6)
 
 agents = {f'agent{i}': FightForResourcesAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, move=1, max_harvest=1.0
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, move=1, max_harvest=1.0, view=3
 ) for i in range(6)}
 env = FightForResourcesEnv(
     region=10,

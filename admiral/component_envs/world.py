@@ -1,6 +1,4 @@
 
-from abc import ABC, abstractmethod
-
 import numpy as np
 
 from admiral.envs import Agent
@@ -25,7 +23,7 @@ class GridWorldAgent(Agent):
         """
         return super().configured and self.view is not None
 
-class GridWorldEnv(ABC):
+class GridWorldEnv:
     """
     WorldEnv is an abstract notion for some space in which agents exist. It is defined
     by the set of agents that exist in it and the bounds of the world. Agents in

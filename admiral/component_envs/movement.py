@@ -1,27 +1,7 @@
 
-from abc import ABC, abstractmethod
-
 import numpy as np
 
 from admiral.envs import Agent
-
-class MovementEnv(ABC):
-    """
-    MovementEnv processes agent movement in the world in which they live. Agent
-    movement is bounded by the size of the region.
-    
-    Provides the process_move api.
-    """
-    def __init__(self, region=None, agents=None, **kwargs):
-        assert type(region) is int, "Region must be an integer."
-        self.region = region
-
-    @abstractmethod
-    def process_move(self, position, move, **kwargs):
-        """
-        Update the position by the movement action.
-        """
-        pass
 
 class GridMovementAgent(Agent):
     def __init__(self, move=None, **kwargs):
@@ -33,11 +13,13 @@ class GridMovementAgent(Agent):
     def configured(self):
         return super().configured and self.move is not None
 
-class GridMovementEnv(MovementEnv):
+class GridMovementEnv:
     """
     Agents in the GridWorld can move around.
     """
-    def __init__(self, agents=None, **kwargs):
+    def __init__(self, region=None, agents=None, **kwargs):
+        assert type(region) is int, "Region must be an integer"
+        self.region = region
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
             assert isinstance(agent, GridMovementAgent)

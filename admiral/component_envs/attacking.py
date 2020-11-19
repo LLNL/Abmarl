@@ -1,23 +1,9 @@
 
-from abc import ABC, abstractmethod
-
 from admiral.envs import Agent
-from admiral.component_envs.world import WorldAgent
+from admiral.component_envs.world import GridWorldAgent
 from admiral.component_envs.team import TeamAgent
 
-class AttackingEnv(ABC):
-    """
-    AttackingEnv processes attack action, where agents can attack other agents.
-    The attack is based on the agents' positions.
-    """
-    @abstractmethod
-    def process_attack(self, attacking_agent, **kwargs):
-        """
-        Process the attack from the attacking agent.
-        """
-        pass
-
-class GridAttackingAgent(WorldAgent):
+class GridAttackingAgent(GridWorldAgent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
         assert attack_range is not None, "attack_range must be a nonnegative integer"
         self.attack_range = attack_range
@@ -32,7 +18,7 @@ class GridAttackingAgent(WorldAgent):
         """
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
-class GridAttackingEnv(AttackingEnv):
+class GridAttackingEnv:
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
@@ -53,7 +39,7 @@ class GridAttackingEnv(AttackingEnv):
 class GridAttackingTeamAgent(GridAttackingAgent, TeamAgent):
     pass
 
-class GridAttackingTeamEnv(AttackingEnv):
+class GridAttackingTeamEnv:
     # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
     # attacks that cannot happen?
     def __init__(self, agents=None, **kwargs):
@@ -70,6 +56,7 @@ class GridAttackingTeamEnv(AttackingEnv):
         for agent in self.agents.values():
             if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
             if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
+            # TODO: Should probably OBSERVE the agent's team....
             if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                 return agent.id
