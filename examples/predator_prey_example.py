@@ -77,7 +77,23 @@ class PredatorPreyEnv:
         plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
-        return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
+        # The observation that is returned actually depends on the agent type. Predators will just
+        # see agents, so only world will return. Prey will see agents and resources, so both will
+        # return.
+        # TODO: The bigger probem there is that I want the predators to observe
+        # the resources as well, I just don't want them to have the harvest action
+        # in their action space. This means that the resources module needs to
+        # know about the predators in its self.agents in order to give them the
+        # correct observation_space and to get the correct get_obs, but it must
+        # not consider it for the processing action.
+        # Hmm.... What if resources.get_obs didn't
+        # take the agent's id but just took the values it needed to know, namely
+        # position and view? That's fine for get obs, but it doesn't solve the
+        # problem because the agent's observation_space still needs the resources.
+        if isinstance(self.agents[agent_id], PredatorAgent):
+            return {'agents': self.world.get_obs(agent_id)}
+        elif isinstance(self.agents[agent_id], PreyAgent):
+            return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
 
 prey = {f'prey{i}': PreyAgent(id=f'prey{i}', view=5, team=1, move=1, attack_range=-1, attack_strength=0.0, max_harvest=0.5) for i in range(7)}
 predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24, max_harvest=0.0) for i in range(2)}

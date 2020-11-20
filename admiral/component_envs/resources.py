@@ -24,10 +24,11 @@ class GridResourceEnv:
     def __init__(self, region=None, agents=None, coverage=0.75, min_value=0.1, max_value=1.0,
             regrow_rate=0.04, original_resources=None, **kwargs):
         
-        assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, GridResourceAgent)
-        self.agents = agents
+        # assert type(agents) is dict, "agents must be a dict"
+        # for agent in agents.values():
+        #     assert isinstance(agent, GridResourceAgent)
+        # self.agents = agents
+        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridResourceAgent)}
         
         self.original_resources = original_resources
         if self.original_resources is None:
@@ -86,6 +87,7 @@ class GridResourceEnv:
         return ax
     
     def get_obs(self, agent_id, **kwargs):
+        # TODO: smart check the get obs on agent_id
         """
         These cells are filled with the values of the resources surrounding the
         agent.

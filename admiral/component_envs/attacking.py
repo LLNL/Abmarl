@@ -19,10 +19,11 @@ class GridAttackingAgent(GridWorldAgent):
 
 class GridAttackingEnv:
     def __init__(self, agents=None, **kwargs):
-        assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, GridAttackingAgent), "agents must be GridAttackingAgent"
-        self.agents = agents
+        # assert type(agents) is dict, "agents must be a dict"
+        # for agent in agents.values():
+        #     assert isinstance(agent, GridAttackingAgent), "agents must be GridAttackingAgent"
+        # self.agents = agents
+        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridAttackingAgent)}
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
@@ -42,10 +43,11 @@ class GridAttackingTeamEnv:
     # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
     # attacks that cannot happen?
     def __init__(self, agents=None, **kwargs):
-        assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, GridAttackingTeamAgent), "agents must be GridAttackingAgent"
-        self.agents = agents
+        # assert type(agents) is dict, "agents must be a dict"
+        # for agent in agents.values():
+        #     assert isinstance(agent, GridAttackingTeamAgent), "agents must be GridAttackingAgent"
+        # self.agents = agents
+        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridAttackingTeamAgent)}
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():

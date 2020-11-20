@@ -35,10 +35,11 @@ class DyingEnv:
     Provides the process_death and apply_entropy api.
     """
     def __init__(self, agents=None, entropy=0.1, **kwargs):
-        assert type(agents) is dict, "Agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, DyingAgent)
-        self.agents = agents
+        # assert type(agents) is dict, "Agents must be a dict"
+        # for agent in agents.values():
+        #     assert isinstance(agent, DyingAgent)
+        # self.agents = agents
+        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, DyingAgent)}
         self.entropy = entropy
     
     def reset(self, **kwargs):

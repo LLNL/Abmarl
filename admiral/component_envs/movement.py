@@ -20,10 +20,11 @@ class GridMovementEnv:
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer"
         self.region = region
-        assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, GridMovementAgent)
-        self.agents = agents
+        # assert type(agents) is dict, "agents must be a dict"
+        # for agent in agents.values():
+        #     assert isinstance(agent, GridMovementAgent)
+        # self.agents = agents
+        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridMovementAgent)}
 
         from gym.spaces import Box
         for agent in self.agents.values():
