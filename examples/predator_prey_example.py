@@ -8,7 +8,10 @@ from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttacking
 from admiral.component_envs.death_life import DyingEnv, DyingAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceAgent
 
-class PredatorPreyAgent(GridMovementAgent, GridAttackingTeamAgent, DyingAgent, GridResourceAgent):
+class PreyAgent(GridWorldTeamAgent, GridMovementAgent, DyingAgent, GridResourceAgent):
+    pass
+
+class PredatorAgent(GridMovementAgent, GridAttackingTeamAgent, DyingAgent):
     pass
 # TODO: Resolve the Method resolution bug between world and attacking agents
 
@@ -20,6 +23,13 @@ class PredatorPreyEnv:
         self.attacking = GridAttackingTeamEnv(**kwargs)
         self.dying = DyingEnv(**kwargs)
         self.resource = GridResourceEnv(**kwargs)
+
+        # This is good code to have after the observation and action space have been built by the
+        # modules, we put them all together into a Dict.
+        from gym.spaces import Dict
+        for agent in self.agents.values():
+            agent.action_space = Dict(agent.action_space)
+            agent.observation_space = Dict(agent.observation_space)
 
         self.attacking_record = []
     
@@ -69,8 +79,8 @@ class PredatorPreyEnv:
     def get_obs(self, agent_id, **kwargs):
         return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
 
-prey = {f'prey{i}': PredatorPreyAgent(id=f'prey{i}', view=5, team=1, move=1, attack_range=-1, attack_strength=0.0, max_harvest=0.5) for i in range(7)}
-predators = {f'predator{i}': PredatorPreyAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24, max_harvest=0.0) for i in range(2)}
+prey = {f'prey{i}': PreyAgent(id=f'prey{i}', view=5, team=1, move=1, attack_range=-1, attack_strength=0.0, max_harvest=0.5) for i in range(7)}
+predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24, max_harvest=0.0) for i in range(2)}
 agents = {**prey, **predators}
 region = 10
 env = PredatorPreyEnv(
@@ -85,13 +95,7 @@ fig = plt.gcf()
 env.render(fig=fig)
 
 for _ in range(30):
-    action_dict = {}
-    for agent_id, agent in env.agents.items():
-        action_dict[agent_id] = {
-            'move': agent.action_space['move'].sample(),
-            'attack': agent.action_space['attack'].sample(),
-            'harvest': agent.action_space['harvest'].sample(),
-        }
+    action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values()}
     env.step(action_dict)
     env.render(fig=fig)
     x = []
