@@ -25,6 +25,7 @@ class PredatorPreyEnv:
 
         # This is good code to have after the observation and action space have been built by the
         # modules, we put them all together into a Dict.
+        # TODO: Put this in the environment interface.
         from gym.spaces import Dict
         for agent in self.agents.values():
             agent.action_space = Dict(agent.action_space)

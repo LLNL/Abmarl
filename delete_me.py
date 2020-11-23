@@ -296,6 +296,7 @@ class ResourceModule:
 
 class MyEnvInterface:
     def __init__(self, **kwargs):
+        # TODO: Add this configured check to the environment interface.
         self.agents = kwargs['agents']
         for agent in self.agents.values():
             assert agent.configured
