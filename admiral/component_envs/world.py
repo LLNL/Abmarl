@@ -43,7 +43,7 @@ class GridWorldEnv:
         assert type(region) is int, "Region must be an integer."
         self.region = region
         assert type(agents) is dict, "agents must be a dict"
-        for agent in self.agents.values():
+        for agent in agents.values():
             assert isinstance(agent, GridWorldAgent)
         self.agents = agents
 
@@ -99,8 +99,8 @@ class GridWorldEnv:
         return ax
     
     def get_obs(self, my_id, **kwargs):
-        if isinstance(self.agents, GridWorldObservingAgent):
-            my_agent = self.agents[my_id]
+        my_agent = self.agents[my_id]
+        if isinstance(my_agent, GridWorldObservingAgent):
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
@@ -142,8 +142,8 @@ class GridWorldTeamsEnv(GridWorldEnv):
                 agent.observation_space['agents'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
     
     def get_obs(self, my_id, **kwargs):
-        if isinstance(self.agents, GridWorldObservingTeamAgent):
-            my_agent = self.agents[my_id]
+        my_agent = self.agents[my_id]
+        if isinstance(my_agent, GridWorldObservingTeamAgent):
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
@@ -169,6 +169,6 @@ class GridWorldTeamsEnv(GridWorldEnv):
                 if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
                     r_diff += my_agent.view
                     c_diff += my_agent.view
-                    signal[r_diff, c_diff, other_agent.team-1] += 1
+                    signal[other_agent.team-1, r_diff, c_diff] += 1
 
             return signal

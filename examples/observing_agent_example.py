@@ -2,10 +2,12 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldTeamAgent
+from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 
-class ObservingTeamMovementAgent(GridWorldTeamAgent, GridMovementAgent):
+# TODO: This is much better suited as a unit test.
+
+class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridMovementAgent):
     pass
 
 class SimpleGridObservations:
@@ -13,12 +15,6 @@ class SimpleGridObservations:
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsEnv(**kwargs)
         self.movement = GridMovementEnv(**kwargs)
-        # TODO: Observer is too broad of a handler. That would be the equivalent
-        # of having actor trying to process all the actions. What we want instead
-        # is an agent observer, a resource_observer, etc. Basically, world should
-        # observe agents and resources should observe resources. We can add other
-        # observations from the other parts, like observing the agent's health
-        # and team.
 
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
