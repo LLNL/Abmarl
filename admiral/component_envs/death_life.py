@@ -35,38 +35,41 @@ class DyingEnv:
     Provides the process_death and apply_entropy api.
     """
     def __init__(self, agents=None, entropy=0.1, **kwargs):
-        # assert type(agents) is dict, "Agents must be a dict"
-        # for agent in agents.values():
-        #     assert isinstance(agent, DyingAgent)
-        # self.agents = agents
-        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, DyingAgent)}
+        assert type(agents) is dict, "Agents must be a dict"
+        self.agents = agents
         self.entropy = entropy
     
     def reset(self, **kwargs):
         for agent in self.agents.values():
-            if agent.initial_health is not None:
-                agent.health = agent.initial_health
-            else:
-                agent.health = np.random.uniform(agent.min_health, agent.max_health)
-            agent.is_alive = True
+            if isinstance(agent, HealthAgent):
+                if agent.initial_health is not None:
+                    agent.health = agent.initial_health
+                else:
+                    agent.health = np.random.uniform(agent.min_health, agent.max_health)
+            if isinstance(agent, DyingAgent):
+                agent.is_alive = True
     
     def apply_entropy(self, agent, **kwargs):
         """
         All agents' health decreases by the entropy.
         """
-        agent.health -= self.entropy
+        if isinstance(agent, HealthAgent):
+            agent.health -= self.entropy
     
     def process_death(self, agent, **kwargs):
         """
         Process agent's death. If the health falls below the
         the minimal value, then the agent dies.
         """
-        if agent.health <= agent.min_health:
-            agent.health = agent.min_health
-            agent.is_alive = False
-        if agent.health > agent.max_health:
-            agent.health = agent.max_health
+        if isinstance(agent, DyingAgent):
+            if agent.health <= agent.min_health:
+                agent.health = agent.min_health
+                agent.is_alive = False
 
-    def render(self, **kwargs):
-        for agent in self.agents.values():
-            print(f'{agent.id}: {agent.health}, {agent.is_alive}')
+        # TODO: This should not be a part of proces death because it doesn't modify
+        # whether the agent is alive or not. Should be a function like update
+        # agent's health and handles the upper bound and can be called whenever
+        # we want to change the agent's health.
+        if isinstance(agent, HealthAgent):
+            if agent.health > agent.max_health:
+                agent.health = agent.max_health
