@@ -5,10 +5,10 @@ import numpy as np
 from admiral.component_envs.world import GridWorldEnv
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
-from admiral.component_envs.attacking import GridAttackingEnv, GridAttackingAgent
+from admiral.component_envs.attacking import GridAttackingEnv, GridWorldAttackingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class FightForResourcesAgent(DyingAgent, GridAttackingAgent, GridMovementAgent, GridResourceHarvestingAndObservingAgent):
+class FightForResourcesAgent(DyingAgent, GridWorldAttackingAgent, GridMovementAgent, GridResourceHarvestingAndObservingAgent):
     pass
 
 class FightForResourcesEnv:

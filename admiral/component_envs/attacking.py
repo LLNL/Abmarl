@@ -1,9 +1,8 @@
 
 from admiral.envs import Agent
-from admiral.component_envs.world import GridWorldAgent
-from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.world import GridWorldAgent, GridWorldTeamAgent
 
-class GridAttackingAgent(GridWorldAgent):
+class GridWorldAttackingAgent(GridWorldAgent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
         assert attack_range is not None, "attack_range must be a nonnegative integer"
         self.attack_range = attack_range
@@ -25,18 +24,18 @@ class GridAttackingEnv:
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
-            if isinstance(agent, GridAttackingAgent):
+            if isinstance(agent, GridWorldAttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
     def process_attack(self, attacking_agent, **kwargs):
-        if isinstance(attacking_agent, GridAttackingAgent):
+        if isinstance(attacking_agent, GridWorldAttackingAgent):
             for agent in self.agents.values():
                 if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
                 if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
                         and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                     return agent.id
 
-class GridAttackingTeamAgent(GridAttackingAgent, TeamAgent):
+class GridWorldAttackingTeamAgent(GridWorldAttackingAgent, GridWorldTeamAgent):
     pass
 
 class GridAttackingTeamEnv:
@@ -48,11 +47,11 @@ class GridAttackingTeamEnv:
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
-            if isinstance(agent, GridAttackingTeamAgent):
+            if isinstance(agent, GridWorldAttackingTeamAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
     def process_attack(self, attacking_agent, **kwargs):
-        if isinstance(attacking_agent, GridAttackingTeamAgent):
+        if isinstance(attacking_agent, GridWorldAttackingTeamAgent):
             for agent in self.agents.values():
                 if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
                 if agent.team == attacking_agent.team: continue # Cannot attack agents on same team

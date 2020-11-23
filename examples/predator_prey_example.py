@@ -4,14 +4,14 @@ import numpy as np
 
 from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldTeamAgent
 from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.attacking import GridAttackingTeamEnv, GridAttackingTeamAgent
+from admiral.component_envs.attacking import GridAttackingTeamEnv, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingEnv, DyingAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceAgent
 
 class PreyAgent(GridWorldTeamAgent, GridMovementAgent, DyingAgent, GridResourceAgent):
     pass
 
-class PredatorAgent(GridMovementAgent, GridAttackingTeamAgent, DyingAgent):
+class PredatorAgent(GridMovementAgent, GridWorldAttackingTeamAgent, DyingAgent):
     pass
 # TODO: Resolve the Method resolution bug between world and attacking agents
 
@@ -50,8 +50,7 @@ class PredatorPreyEnv:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
-                if action.get('harvest', False):
-                    amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
+                if action.get('harvest', GridWorldAttackingTeamAgent      amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
                     agent.health += amount_harvested
 
         for agent_id in action_dict:

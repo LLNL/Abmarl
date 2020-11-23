@@ -15,7 +15,7 @@ class HealthAgent(Agent):
     
     @property
     def configured(self):
-        return super().configured and self.health is not None
+        return super().configured and self.health is not None and self.min_health is not None and self.max_health is not None
 
 class DyingAgent(HealthAgent):
     def __init__(self, **kwargs):

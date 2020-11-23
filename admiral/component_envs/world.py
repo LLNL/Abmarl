@@ -2,9 +2,8 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.tools.matplotlib_utils import mscatter
-
 from admiral.component_envs.team import TeamAgent
+from admiral.tools.matplotlib_utils import mscatter
 
 class GridWorldAgent(Agent):
     """
@@ -22,6 +21,9 @@ class GridWorldAgent(Agent):
         Determine if the agent has been successfully configured.
         """
         return super().configured
+
+class GridWorldTeamAgent(GridWorldAgent, TeamAgent):
+    pass
 
 class GridWorldObservingAgent(GridWorldAgent):
     def __init__(self, view=None, **kwargs):
@@ -127,7 +129,7 @@ class GridWorldEnv:
 
             return signal
 
-class GridWorldObservingTeamAgent(TeamAgent, GridWorldObservingAgent):
+class GridWorldObservingTeamAgent(GridWorldObservingAgent, GridWorldTeamAgent):
     pass
 
 class GridWorldTeamsEnv(GridWorldEnv):
@@ -169,6 +171,7 @@ class GridWorldTeamsEnv(GridWorldEnv):
                 if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
                     r_diff += my_agent.view
                     c_diff += my_agent.view
-                    signal[other_agent.team-1, r_diff, c_diff] += 1
+                    # signal[other_agent.team-1, r_diff, c_diff] += 1
+                    signal[r_diff, c_diff, other_agent.team-1] += 1
 
             return signal
