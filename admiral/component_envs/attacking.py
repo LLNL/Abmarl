@@ -1,6 +1,7 @@
 
 from admiral.envs import Agent
-from admiral.component_envs.world import GridWorldAgent, GridWorldTeamAgent
+from admiral.component_envs.world import GridWorldAgent
+from admiral.component_envs.team import TeamAgent
 
 class GridAttackingAgent(GridWorldAgent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
@@ -19,44 +20,42 @@ class GridAttackingAgent(GridWorldAgent):
 
 class GridAttackingEnv:
     def __init__(self, agents=None, **kwargs):
-        # assert type(agents) is dict, "agents must be a dict"
-        # for agent in agents.values():
-        #     assert isinstance(agent, GridAttackingAgent), "agents must be GridAttackingAgent"
-        # self.agents = agents
-        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridAttackingAgent)}
+        assert type(agents) is dict, "agents must be a dict"
+        self.agents = agents
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
-            agent.action_space['attack'] = MultiBinary(1)
+            if isinstance(agent, GridAttackingAgent):
+                agent.action_space['attack'] = MultiBinary(1)
 
     def process_attack(self, attacking_agent, **kwargs):
-        for agent in self.agents.values():
-            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
-            if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
-                    and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
-                return agent.id
+        if isinstance(attacking_agent, GridAttackingAgent):
+            for agent in self.agents.values():
+                if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
+                if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
+                        and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
+                    return agent.id
 
-class GridAttackingTeamAgent(GridAttackingAgent, GridWorldTeamAgent):
+class GridAttackingTeamAgent(GridAttackingAgent, TeamAgent):
     pass
 
 class GridAttackingTeamEnv:
     # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
     # attacks that cannot happen?
     def __init__(self, agents=None, **kwargs):
-        # assert type(agents) is dict, "agents must be a dict"
-        # for agent in agents.values():
-        #     assert isinstance(agent, GridAttackingTeamAgent), "agents must be GridAttackingAgent"
-        # self.agents = agents
-        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridAttackingTeamAgent)}
+        assert type(agents) is dict, "agents must be a dict"
+        self.agents = agents
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
-            agent.action_space['attack'] = MultiBinary(1)
+            if isinstance(agent, GridAttackingTeamAgent):
+                agent.action_space['attack'] = MultiBinary(1)
 
     def process_attack(self, attacking_agent, **kwargs):
-        for agent in self.agents.values():
-            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
-            if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
-            if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
-                    and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
-                return agent.id
+        if isinstance(attacking_agent, GridAttackingTeamAgent):
+            for agent in self.agents.values():
+                if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
+                if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
+                if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
+                        and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
+                    return agent.id
