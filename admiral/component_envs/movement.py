@@ -3,6 +3,11 @@ import numpy as np
 
 from admiral.envs import Agent
 
+# TODO: Consider process_move will take the agent as input argument and output
+# the new position. This would mean that GridMovementAgents will inherit from
+# GridWorldAgent. The step function will then update and check that the agent is
+# of the right type before processing the move action? Right now, the environment
+# has to check if move is in the action.
 class GridMovementAgent(Agent):
     def __init__(self, move=None, **kwargs):
         assert move is not None, "move must be an integer"
@@ -20,15 +25,13 @@ class GridMovementEnv:
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer"
         self.region = region
-        # assert type(agents) is dict, "agents must be a dict"
-        # for agent in agents.values():
-        #     assert isinstance(agent, GridMovementAgent)
-        # self.agents = agents
-        self.agents = {agent.id: agent for agent in agents.values() if isinstance(agent, GridMovementAgent)}
+        assert type(agents) is dict, "agents must be a dict"
+        self.agents = agents
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
+            if isinstance(agent, GridMovementAgent):
+                agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
 
     def process_move(self, position, move, **kwargs):
         """
