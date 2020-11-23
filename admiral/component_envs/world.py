@@ -5,35 +5,23 @@ from admiral.envs import Agent
 from admiral.component_envs.team import TeamAgent
 from admiral.tools.matplotlib_utils import mscatter
 
-class GridWorldAgent(Agent):
-    """
-    WorldAgents have a position in the world. This position can given to the agent
-    as a starting position for each episode. If the position is None, then the environment
-    should assign the agent a random position.
-    """
-    def __init__(self, starting_position=None, **kwargs):
-        super().__init__(**kwargs)
-        self.starting_position = starting_position
-    
-    @property
-    def configured(self):
-        """
-        Determine if the agent has been successfully configured.
-        """
-        return super().configured
+def GridWorldAgent(starting_position=None, **kwargs):
+    return {
+        **Agent(**kwargs),
+        'starting_position': starting_position,
+    }
 
-class GridWorldTeamAgent(GridWorldAgent, TeamAgent):
-    pass
+def GridWorldTeamAgent(**kwargs):
+    return {
+        **GridWorldAgent(**kwargs),
+        **TeamAgent(**kwargs),
+    }
 
-class GridWorldObservingAgent(GridWorldAgent):
-    def __init__(self, view=None, **kwargs):
-        assert view is not None, "GridWorldObservationAgent must have a view"
-        self.view = view
-        super().__init__(**kwargs)
-    
-    @property
-    def configured(self):
-        return super().configured and self.view is not None
+def GridWorldObservingAgent(view=None, **kwargs):
+    return {
+        **GridWorldAgent(**kwargs),
+        'view': view,
+    }
 
 class GridWorldEnv:
     """
@@ -45,13 +33,13 @@ class GridWorldEnv:
         assert type(region) is int, "Region must be an integer."
         self.region = region
         assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, GridWorldAgent)
+        # for agent in agents.values():
+        #     assert isinstance(agent, GridWorldAgent)
         self.agents = agents
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridWorldObservingAgent):
+            if 'view' in agent:
                 agent.observation_space['agents'] = Box(-1, 1, (agent.view*2+1, agent.view*2+1), np.int)
 
     def reset(self, **kwargs):
@@ -102,7 +90,7 @@ class GridWorldEnv:
     
     def get_obs(self, my_id, **kwargs):
         my_agent = self.agents[my_id]
-        if isinstance(my_agent, GridWorldObservingAgent):
+        if 'view' in my_agent:
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
@@ -129,8 +117,11 @@ class GridWorldEnv:
 
             return signal
 
-class GridWorldObservingTeamAgent(GridWorldObservingAgent, GridWorldTeamAgent):
-    pass
+def GridWorldObservingTeamAgent(**kwargs):
+    return {
+        **GridWorldObservingAgent(**kwargs),
+        **GridWorldTeamAgent(**kwargs),
+    }
 
 class GridWorldTeamsEnv(GridWorldEnv):
     def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
@@ -140,12 +131,12 @@ class GridWorldTeamsEnv(GridWorldEnv):
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridWorldObservingTeamAgent):
+            if 'view' in agent and 'team' in agent:
                 agent.observation_space['agents'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
     
     def get_obs(self, my_id, **kwargs):
         my_agent = self.agents[my_id]
-        if isinstance(my_agent, GridWorldObservingTeamAgent):
+        if 'view' in my_agent and 'team' in my_agent:
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #

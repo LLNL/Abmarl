@@ -1,4 +1,5 @@
 
+from box import Box as DictObj
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -8,11 +9,22 @@ from admiral.component_envs.attacking import GridAttackingTeamEnv, GridWorldAtta
 from admiral.component_envs.death_life import DyingEnv, DyingAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
 
-class PreyAgent(GridWorldObservingTeamAgent, GridMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
-    pass
+def PreyAgent(**kwargs):
+    return DictObj({
+        **GridWorldObservingTeamAgent(**kwargs),
+        **GridMovementAgent(**kwargs),
+        **DyingAgent(**kwargs),
+        **GridResourceHarvestingAndObservingAgent(**kwargs)
+    })
 
-class PredatorAgent(GridWorldObservingTeamAgent, GridMovementAgent, GridWorldAttackingTeamAgent, DyingAgent, GridResourceObservingAgent):
-    pass
+def PredatorAgent(**kwargs):
+    return DictObj({
+        **GridWorldObservingTeamAgent(**kwargs),
+        **GridMovementAgent(**kwargs),
+        **GridWorldAttackingTeamAgent(**kwargs),
+        **DyingAgent(**kwargs),
+        **GridResourceObservingAgent(**kwargs)
+    })
 
 class PredatorPreyEnv:
     def __init__(self, **kwargs):

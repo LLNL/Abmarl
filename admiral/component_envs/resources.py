@@ -4,24 +4,28 @@ import numpy as np
 from admiral.envs import Agent
 from admiral.component_envs.world import GridWorldObservingAgent
 
-class GridResourceAgent(Agent):
-    pass
+def GridResourceAgent(**kwargs):
+    return {
+        **Agent(**kwargs)
+    }
 
-class GridResourceHarvestingAgent(GridResourceAgent):
-    def __init__(self, max_harvest=None, **kwargs):
-        assert max_harvest is not None, "max_harvest must be nonnegative number"
-        self.max_harvest = max_harvest
-        super().__init__(**kwargs)
-    
-    @property
-    def configured(self):
-        return super().configured and self.max_harvest is not None
-    
-class GridResourceObservingAgent(GridResourceAgent, GridWorldObservingAgent):
-    pass
+def GridResourceHarvestingAgent(max_harvest=None, **kwargs):
+    return {
+        **GridResourceAgent(**kwargs),
+        'max_harvest': max_harvest,
+    }
 
-class GridResourceHarvestingAndObservingAgent(GridResourceHarvestingAgent, GridResourceObservingAgent):
-    pass
+def GridResourceObservingAgent(**kwargs):
+    return {
+        **GridResourceAgent(**kwargs),
+        **GridWorldObservingAgent(**kwargs),
+    }
+
+def GridResourceHarvestingAndObservingAgent(**kwargs):
+    return {
+        **GridResourceHarvestingAgent(**kwargs),
+        **GridResourceObservingAgent(**kwargs),
+    }
 
 class GridResourceEnv:
     """
@@ -49,9 +53,9 @@ class GridResourceEnv:
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridResourceHarvestingAgent):
+            if 'max_harvest' in agent:
                 agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
-            if isinstance(agent, GridResourceObservingAgent):
+            if 'view' in agent:
                 agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
     def reset(self, **kwargs):
@@ -100,7 +104,7 @@ class GridResourceEnv:
         agent.
         """
         agent = self.agents[agent_id]
-        if isinstance(agent, GridResourceObservingAgent):
+        if 'view' in agent:
             signal = -np.ones((agent.view*2+1, agent.view*2+1))
 
             # Derived by considering each square in the resources as an "agent" and
@@ -114,4 +118,3 @@ class GridResourceEnv:
             signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
                 self.resources[r_lower:r_upper, c_lower:c_upper]
             return signal
-

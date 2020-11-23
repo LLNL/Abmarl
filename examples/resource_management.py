@@ -1,4 +1,5 @@
 
+from box import Box as DictObj
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -7,8 +8,12 @@ from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class ResourceManagementAgent(DyingAgent, GridMovementAgent, GridResourceHarvestingAndObservingAgent):
-    pass
+def ResourceManagementAgent(**kwargs):
+    return DictObj({
+        **DyingAgent(**kwargs),
+        **GridMovementAgent(**kwargs),
+        **GridResourceHarvestingAndObservingAgent(**kwargs),
+    })
 
 class ResourceManagementEnv:
     def __init__(self, **kwargs):

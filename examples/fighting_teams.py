@@ -1,4 +1,5 @@
 
+from box import Box as DictObj
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -27,8 +28,14 @@ from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
 
 
-class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridMovementAgent, GridWorldObservingTeamAgent):
-    pass
+
+def FightingTeamsAgent(**kwargs):
+    return DictObj({
+        **DyingAgent(**kwargs),
+        **GridWorldAttackingTeamAgent(**kwargs),
+        **GridMovementAgent(**kwargs),
+        **GridWorldObservingTeamAgent(**kwargs),
+    })
 
 class FightingTeamsEnv:
     def __init__(self, **kwargs):

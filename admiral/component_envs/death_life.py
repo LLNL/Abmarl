@@ -5,26 +5,19 @@ import numpy as np
 
 from admiral.envs import Agent
 
-class HealthAgent(Agent):
-    def __init__(self, min_health=0.0, max_health=1.0, initial_health=None, **kwargs):
-        super().__init__(**kwargs)
-        self.initial_health = initial_health
-        self.min_health = min_health
-        self.max_health = max_health
-        self.health = None
-    
-    @property
-    def configured(self):
-        return super().configured and self.health is not None and self.min_health is not None and self.max_health is not None
+def HealthAgent(min_health=0.0, max_health=1.0, initial_health=None, **kwargs):
+    return {
+        **Agent(**kwargs),
+        'min_health': min_health,
+        'max_health': max_health,
+        'initial_health': initial_health,
+    }
 
-class DyingAgent(HealthAgent):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.is_alive = True
-    
-    @property
-    def configured(self):
-        return super().configured and self.is_alive is not None
+def DyingAgent(**kwargs):
+    return {
+        **HealthAgent(**kwargs),
+        'is_alive': True,
+    }
 
 class DyingEnv:
     """
@@ -41,19 +34,19 @@ class DyingEnv:
     
     def reset(self, **kwargs):
         for agent in self.agents.values():
-            if isinstance(agent, HealthAgent):
+            if 'min_health' in agent and 'max_health' in agent and 'initial_health' in agent:
                 if agent.initial_health is not None:
                     agent.health = agent.initial_health
                 else:
                     agent.health = np.random.uniform(agent.min_health, agent.max_health)
-            if isinstance(agent, DyingAgent):
+            if 'min_health' in agent and 'max_health' in agent and 'initial_health' in agent and 'is_alive' in agent:
                 agent.is_alive = True
     
     def apply_entropy(self, agent, **kwargs):
         """
         All agents' health decreases by the entropy.
         """
-        if isinstance(agent, HealthAgent):
+        if 'min_health' in agent and 'max_health' in agent and 'initial_health' in agent:
             agent.health -= self.entropy
     
     def process_death(self, agent, **kwargs):
@@ -61,7 +54,7 @@ class DyingEnv:
         Process agent's death. If the health falls below the
         the minimal value, then the agent dies.
         """
-        if isinstance(agent, DyingAgent):
+        if 'min_health' in agent and 'max_health' in agent and 'initial_health' in agent and 'is_alive' in agent:
             if agent.health <= agent.min_health:
                 agent.health = agent.min_health
                 agent.is_alive = False
@@ -70,6 +63,6 @@ class DyingEnv:
         # whether the agent is alive or not. Should be a function like update
         # agent's health and handles the upper bound and can be called whenever
         # we want to change the agent's health.
-        if isinstance(agent, HealthAgent):
+        if 'min_health' in agent and 'max_health' in agent and 'initial_health' in agent:
             if agent.health > agent.max_health:
                 agent.health = agent.max_health

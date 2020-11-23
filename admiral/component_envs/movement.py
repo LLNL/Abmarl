@@ -8,15 +8,12 @@ from admiral.envs import Agent
 # GridWorldAgent. The step function will then update and check that the agent is
 # of the right type before processing the move action? Right now, the environment
 # has to check if move is in the action.
-class GridMovementAgent(Agent):
-    def __init__(self, move=None, **kwargs):
-        assert move is not None, "move must be an integer"
-        self.move = move
-        super().__init__(**kwargs)
-    
-    @property
-    def configured(self):
-        return super().configured and self.move is not None
+
+def GridMovementAgent(move=None, **kwargs):
+    return {
+        **Agent(**kwargs),
+        'move': move,
+    }
 
 class GridMovementEnv:
     """
@@ -30,7 +27,7 @@ class GridMovementEnv:
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridMovementAgent):
+            if 'move' in agent:
                 agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
 
     def process_move(self, position, move, **kwargs):

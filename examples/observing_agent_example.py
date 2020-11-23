@@ -1,4 +1,5 @@
 
+from box import Box as DictObj
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -7,8 +8,11 @@ from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
 
 # TODO: This is much better suited as a unit test.
 
-class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridMovementAgent):
-    pass
+def ObservingTeamMovementAgent(**kwargs):
+    return DictObj({
+        **GridWorldObservingTeamAgent(**kwargs),
+        **GridMovementAgent(**kwargs),
+    })
 
 class SimpleGridObservations:
     def __init__(self, **kwargs):
