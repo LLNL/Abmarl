@@ -2,7 +2,6 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.component_envs.world import GridWorldAgent
 from admiral.component_envs.component import Component
 
 class GridMovementAgent(Agent):

@@ -2,7 +2,6 @@
 from admiral.envs import Agent
 from admiral.component_envs.component import Component
 from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.world import GridWorldAgent
 
 class GridAttackingAgent(Agent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):

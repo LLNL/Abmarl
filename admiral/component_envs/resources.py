@@ -2,7 +2,7 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.component_envs.world import GridWorldObservingAgent
+from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.component import Component
 
 class GridResourceHarvestingAgent(Agent):
@@ -43,7 +43,7 @@ class GridResourceComponent(Component):
         for agent in self.agents.values():
             if isinstance(agent, GridResourceHarvestingAgent):
                 agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
-            if isinstance(agent, GridWorldObservingAgent):
+            if isinstance(agent, ObservingAgent):
                 agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
     def reset(self, **kwargs):
@@ -93,7 +93,7 @@ class GridResourceComponent(Component):
         agent.
         """
         agent = self.agents[agent_id]
-        if isinstance(agent, GridWorldObservingAgent):
+        if isinstance(agent, ObservingAgent):
             signal = -np.ones((agent.view*2+1, agent.view*2+1))
 
             # Derived by considering each square in the resources as an "agent" and
