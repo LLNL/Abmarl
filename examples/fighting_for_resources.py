@@ -2,16 +2,17 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldComponent
-from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
-from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent
-from admiral.component_envs.attacking import GridAttackingComponent, GridWorldAttackingAgent
+from admiral.component_envs.observer import ObservingAgent
+from admiral.component_envs.world import GridWorldComponent, GridWorldAgent
+from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
+from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
+from admiral.component_envs.attacking import GridAttackingComponent, GridAttackingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import DeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
-class FightForResourcesAgent(DyingAgent, GridWorldAttackingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
+class FightForResourcesAgent(DyingAgent, GridWorldAgent, GridAttackingAgent, GridMovementAgent, GridResourceHarvestingAgent, ObservingAgent):
     pass
 
 class FightForResourcesEnv(AgentBasedSimulation):
@@ -19,7 +20,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
         self.agents = kwargs['agents']
         self.world = GridWorldComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)
-        self.movement = GridWorldMovementComponent(**kwargs)
+        self.movement = GridMovementComponent(**kwargs)
         self.attacking = GridAttackingComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)

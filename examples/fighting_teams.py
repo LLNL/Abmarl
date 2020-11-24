@@ -2,42 +2,24 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
-from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
-from admiral.component_envs.death_life import DyingAgent, DyingComponent
+from admiral.component_envs.observer import ObservingAgent
+from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldAgent
+from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
+from admiral.component_envs.attacking import GridAttackingTeamComponent, GridAttackingAgent
+from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
-
-# TODO: Figure out a better way than multiple inheritance to share parameters,
-# becuase this is not working well for us. All we're really doing is giving the
-# agents attributes, which is like giving them key, value pairs in a dictionary.
-# Perhaps each class can just be a dictionary, and inheritance can be handled by
-# adding to that dictionary?
-# class FightingTeamsAgent:
-#     def __init__(self, min_health=0.0, max_health=1.0, attack_range=None, attack_strength=None,
-#             move=None, team=None, view=None):
-#         self.min_health = min_health
-#         self.max_health = max_health
-#         self.health = None
-#         self.is_alive = True
-#         self.team = team
-#         self.attack_range = attack_range
-#         self.attack_strength = attack_strength
-#         self.move = move
-
-
-
-class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridWorldMovementAgent, GridWorldObservingTeamAgent):
+class FightingTeamsAgent(DyingAgent, GridWorldAgent, GridAttackingAgent, TeamAgent, GridMovementAgent, ObservingAgent):
     pass
 
 class FightingTeamsEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)
-        self.movement = GridWorldMovementComponent(**kwargs)
+        self.movement = GridMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)

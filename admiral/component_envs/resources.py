@@ -1,13 +1,11 @@
 
 import numpy as np
 
-from admiral.component_envs.world import GridWorldAgent, GridWorldObservingAgent
+from admiral.envs import Agent
+from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.component import Component
 
-class GridResourceAgent(GridWorldAgent):
-    pass
-
-class GridResourceHarvestingAgent(GridResourceAgent):
+class GridResourceHarvestingAgent(Agent):
     def __init__(self, max_harvest=None, **kwargs):
         assert max_harvest is not None, "max_harvest must be nonnegative number"
         self.max_harvest = max_harvest
@@ -16,12 +14,6 @@ class GridResourceHarvestingAgent(GridResourceAgent):
     @property
     def configured(self):
         return super().configured and self.max_harvest is not None
-    
-class GridResourceObservingAgent(GridResourceAgent, GridWorldObservingAgent):
-    pass
-
-class GridResourceHarvestingAndObservingAgent(GridResourceHarvestingAgent, GridResourceObservingAgent):
-    pass
 
 class GridResourceComponent(Component):
     """
@@ -51,7 +43,7 @@ class GridResourceComponent(Component):
         for agent in self.agents.values():
             if isinstance(agent, GridResourceHarvestingAgent):
                 agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
-            if isinstance(agent, GridResourceObservingAgent):
+            if isinstance(agent, ObservingAgent):
                 agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
     def reset(self, **kwargs):
@@ -66,7 +58,6 @@ class GridResourceComponent(Component):
             )
 
     def act(self, agent, amount, **kwargs):
-        if isinstance(agent, GridResourceHarvestingAgent):
             location = tuple(agent.position)
             if self.resources[location] - amount >= 0.:
                 actual_amount_harvested = amount
@@ -102,7 +93,7 @@ class GridResourceComponent(Component):
         agent.
         """
         agent = self.agents[agent_id]
-        if isinstance(agent, GridResourceObservingAgent):
+        if isinstance(agent, ObservingAgent):
             signal = -np.ones((agent.view*2+1, agent.view*2+1))
 
             # Derived by considering each square in the resources as an "agent" and

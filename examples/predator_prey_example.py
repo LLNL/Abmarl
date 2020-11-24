@@ -2,26 +2,28 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
-from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
+from admiral.component_envs.observer import ObservingAgent
+from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldAgent
+from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
+from admiral.component_envs.attacking import GridAttackingTeamComponent, GridAttackingAgent
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
-from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
+from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
-class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
+class PreyAgent(GridWorldAgent, ObservingAgent, TeamAgent, GridMovementAgent, DyingAgent, GridResourceHarvestingAgent):
     pass
 
-class PredatorAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, GridWorldAttackingTeamAgent, DyingAgent, GridResourceObservingAgent):
+class PredatorAgent(GridWorldAgent, ObservingAgent, TeamAgent, GridMovementAgent, GridAttackingAgent, DyingAgent):
     pass
 
 class PredatorPreyEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)
-        self.movement = GridWorldMovementComponent(**kwargs)
+        self.movement = GridMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)

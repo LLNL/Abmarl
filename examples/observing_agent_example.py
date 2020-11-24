@@ -2,22 +2,24 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
+from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.observer import ObservingAgent
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldAgent
+from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import DoneConditioner
 from admiral.envs import AgentBasedSimulation
 
 # TODO: This is much better suited as a unit test.
 
-class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent):
+class ObservingTeamMovementAgent(ObservingAgent, TeamAgent, GridWorldAgent, GridMovementAgent):
     pass
 
 class SimpleGridObservations(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)
-        self.movement = GridWorldMovementComponent(**kwargs)
+        self.movement = GridMovementComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
         self.done_conditioner = DoneConditioner(**kwargs)
 
