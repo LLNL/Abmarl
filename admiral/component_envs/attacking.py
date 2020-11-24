@@ -1,8 +1,10 @@
 
+from admiral.envs import Agent
 from admiral.component_envs.component import Component
-from admiral.component_envs.world import GridWorldAgent, GridWorldTeamAgent
+from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.world import GridWorldAgent
 
-class GridWorldAttackingAgent(GridWorldAgent):
+class GridAttackingAgent(Agent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
         assert attack_range is not None, "attack_range must be a nonnegative integer"
         self.attack_range = attack_range
@@ -24,19 +26,15 @@ class GridAttackingComponent(Component):
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
-            if isinstance(agent, GridWorldAttackingAgent):
+            if isinstance(agent, GridAttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
     def act(self, attacking_agent, **kwargs):
-        if isinstance(attacking_agent, GridWorldAttackingAgent):
-            for agent in self.agents.values():
-                if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
-                if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
-                        and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
-                    return agent.id
-
-class GridWorldAttackingTeamAgent(GridWorldAttackingAgent, GridWorldTeamAgent):
-    pass
+        for agent in self.agents.values():
+            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
+            if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
+                    and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
+                return agent.id
 
 class GridAttackingTeamComponent(Component):
     # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
@@ -47,14 +45,13 @@ class GridAttackingTeamComponent(Component):
 
         from gym.spaces import MultiBinary
         for agent in self.agents.values():
-            if isinstance(agent, GridWorldAttackingTeamAgent):
+            if isinstance(agent, GridAttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
     def act(self, attacking_agent, **kwargs):
-        if isinstance(attacking_agent, GridWorldAttackingTeamAgent):
-            for agent in self.agents.values():
-                if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
-                if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
-                if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
-                        and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
-                    return agent.id
+        for agent in self.agents.values():
+            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
+            if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
+            if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
+                    and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
+                return agent.id
