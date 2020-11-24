@@ -3,6 +3,7 @@ import numpy as np
 
 from admiral.envs import Agent
 from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.observer import ObservingAgent
 from admiral.tools.matplotlib_utils import mscatter
 
 class GridWorldAgent(Agent):
@@ -14,6 +15,7 @@ class GridWorldAgent(Agent):
     def __init__(self, starting_position=None, **kwargs):
         super().__init__(**kwargs)
         self.starting_position = starting_position
+        self.position = None
     
     @property
     def configured(self):
@@ -21,19 +23,6 @@ class GridWorldAgent(Agent):
         Determine if the agent has been successfully configured.
         """
         return super().configured
-
-class GridWorldTeamAgent(GridWorldAgent, TeamAgent):
-    pass
-
-class GridWorldObservingAgent(GridWorldAgent):
-    def __init__(self, view=None, **kwargs):
-        assert view is not None, "GridWorldObservationAgent must have a view"
-        self.view = view
-        super().__init__(**kwargs)
-    
-    @property
-    def configured(self):
-        return super().configured and self.view is not None
 
 class GridWorldComponent:
     """
@@ -51,7 +40,7 @@ class GridWorldComponent:
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridWorldObservingAgent):
+            if isinstance(agent, ObservingAgent):
                 agent.observation_space['agents'] = Box(-1, 1, (agent.view*2+1, agent.view*2+1), np.int)
 
     def reset(self, **kwargs):
@@ -102,7 +91,7 @@ class GridWorldComponent:
     
     def get_obs(self, my_id, **kwargs):
         my_agent = self.agents[my_id]
-        if isinstance(my_agent, GridWorldObservingAgent):
+        if isinstance(my_agent, ObservingAgent):
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
@@ -129,9 +118,6 @@ class GridWorldComponent:
 
             return signal
 
-class GridWorldObservingTeamAgent(GridWorldObservingAgent, GridWorldTeamAgent):
-    pass
-
 class GridWorldTeamsComponent(GridWorldComponent):
     def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
         self.region = region
@@ -140,12 +126,12 @@ class GridWorldTeamsComponent(GridWorldComponent):
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridWorldObservingTeamAgent):
+            if isinstance(agent, ObservingAgent):
                 agent.observation_space['agents'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
     
     def get_obs(self, my_id, **kwargs):
         my_agent = self.agents[my_id]
-        if isinstance(my_agent, GridWorldObservingTeamAgent):
+        if isinstance(my_agent, ObservingAgent) and isinstance(my_agent, TeamAgent):
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
