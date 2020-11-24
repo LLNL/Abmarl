@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.observer import ObservingAgent
-from admiral.component_envs.world import GridWorldComponent, GridWorldAgent
+from admiral.component_envs.position import GridPositionComponent, GridPositionAgent
 from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
@@ -11,13 +11,13 @@ from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import DeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
-class ResourceManagementAgent(DyingAgent, GridMovementAgent, GridWorldAgent, ObservingAgent,  GridResourceHarvestingAgent):
+class ResourceManagementAgent(DyingAgent, GridMovementAgent, GridPositionAgent, ObservingAgent,  GridResourceHarvestingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldComponent(**kwargs)
+        self.position = GridPositionComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)
         self.movement = GridMovementComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
@@ -27,7 +27,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         self.finalize()
     
     def reset(self, **kwargs):
-        self.world.reset(**kwargs)
+        self.position.reset(**kwargs)
         self.resource.reset(**kwargs)
         self.dying.reset(**kwargs)
     
@@ -48,12 +48,12 @@ class ResourceManagementEnv(AgentBasedSimulation):
         fig.clear()
         self.resource.render(fig=fig, **kwargs)
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
-        self.world.render(fig=fig, render_condition=render_condition, **kwargs)
+        self.position.render(fig=fig, render_condition=render_condition, **kwargs)
         plt.plot()
         plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
-        return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
+        return {'agents': self.position.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
     
     def get_reward(self, agent_id, **kwargs):
         self.rewarder.get_reward(agent_id)

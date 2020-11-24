@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.component_envs.team import TeamAgent
 from admiral.component_envs.observer import ObservingAgent
-from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldAgent
+from admiral.component_envs.position import GridPositionTeamsComponent, GridPositionAgent
 from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import DoneConditioner
@@ -12,13 +12,13 @@ from admiral.envs import AgentBasedSimulation
 
 # TODO: This is much better suited as a unit test.
 
-class ObservingTeamMovementAgent(ObservingAgent, TeamAgent, GridWorldAgent, GridMovementAgent):
+class ObservingTeamMovementAgent(ObservingAgent, TeamAgent, GridPositionAgent, GridMovementAgent):
     pass
 
 class SimpleGridObservations(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldTeamsComponent(**kwargs)
+        self.position = GridPositionTeamsComponent(**kwargs)
         self.movement = GridMovementComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
         self.done_conditioner = DoneConditioner(**kwargs)
@@ -26,9 +26,9 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.finalize()
 
     def reset(self, **kwargs):
-        self.world.reset(**kwargs)
+        self.position.reset(**kwargs)
 
-        return {'agent0': self.world.get_obs('agent0')}
+        return {'agent0': self.position.get_obs('agent0')}
     
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
@@ -36,17 +36,17 @@ class SimpleGridObservations(AgentBasedSimulation):
             if 'move' in action:
                 self.movement.act(agent, action['move'])
 
-        return {'agent0': self.world.get_obs('agent0')}
+        return {'agent0': self.position.get_obs('agent0')}
     
     def render(self, fig=None, **kwargs):
         fig.clear()
         shape = {agent.id: team_shapes[agent.team] for agent in self.agents.values()}
-        self.world.render(fig=fig, shape_dict=shape, **kwargs)
+        self.position.render(fig=fig, shape_dict=shape, **kwargs)
         plt.plot()
         plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
-        return self.world.get_obs(agent_id, **kwargs)
+        return self.position.get_obs(agent_id, **kwargs)
     
     def get_reward(self, agent_id, **kwargs):
         return self.rewarder.get_reward(agent_id, **kwargs)

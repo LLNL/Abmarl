@@ -6,7 +6,7 @@ from admiral.component_envs.team import TeamAgent
 from admiral.component_envs.observer import ObservingAgent
 from admiral.tools.matplotlib_utils import mscatter
 
-class GridWorldAgent(Agent):
+class GridPositionAgent(Agent):
     """
     WorldAgents have a position in the world. This position can given to the agent
     as a starting position for each episode. If the position is None, then the environment
@@ -24,7 +24,7 @@ class GridWorldAgent(Agent):
         """
         return super().configured
 
-class GridWorldComponent:
+class GridPositionComponent:
     """
     WorldEnv is an abstract notion for some space in which agents exist. It is defined
     by the set of agents that exist in it and the bounds of the world. Agents in
@@ -35,7 +35,7 @@ class GridWorldComponent:
         self.region = region
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
-            assert isinstance(agent, GridWorldAgent)
+            assert isinstance(agent, GridPositionAgent)
         self.agents = agents
 
         from gym.spaces import Box
@@ -118,11 +118,11 @@ class GridWorldComponent:
 
             return signal
 
-class GridWorldTeamsComponent(GridWorldComponent):
+class GridPositionTeamsComponent(GridPositionComponent):
     def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
         self.region = region
         for agent in agents.values():
-            assert isinstance(agent, GridWorldAgent)
+            assert isinstance(agent, GridPositionAgent)
             assert isinstance(agent, TeamAgent)
         self.agents = agents
         self.number_of_teams = number_of_teams

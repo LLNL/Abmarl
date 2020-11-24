@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldAgent
+from admiral.component_envs.position import GridPositionTeamsComponent, GridPositionAgent
 from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamComponent, GridAttackingAgent
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
@@ -13,16 +13,16 @@ from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
-class PreyAgent(GridWorldAgent, ObservingAgent, TeamAgent, GridMovementAgent, DyingAgent, GridResourceHarvestingAgent):
+class PreyAgent(GridPositionAgent, ObservingAgent, TeamAgent, GridMovementAgent, DyingAgent, GridResourceHarvestingAgent):
     pass
 
-class PredatorAgent(GridWorldAgent, ObservingAgent, TeamAgent, GridMovementAgent, GridAttackingAgent, DyingAgent):
+class PredatorAgent(GridPositionAgent, ObservingAgent, TeamAgent, GridMovementAgent, GridAttackingAgent, DyingAgent):
     pass
 
 class PredatorPreyEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldTeamsComponent(**kwargs)
+        self.position = GridPositionTeamsComponent(**kwargs)
         self.movement = GridMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
@@ -35,7 +35,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         self.attacking_record = []
     
     def reset(self, **kwargs):
-        self.world.reset(**kwargs)
+        self.position.reset(**kwargs)
         self.dying.reset(**kwargs)
         self.resource.reset(**kwargs)
 
@@ -70,7 +70,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         self.resource.render(fig=fig, **kwargs)
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
         shape = {agent.id: 'o' if agent.team == 1 else 's' for agent in self.agents.values()}
-        self.world.render(fig=fig, render_condition=render_condition, shape_dict=shape, **kwargs)
+        self.position.render(fig=fig, render_condition=render_condition, shape_dict=shape, **kwargs)
         for record in self.attacking_record:
             print(record)
         self.attacking_record.clear()
@@ -78,7 +78,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
-            return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
+            return {'agents': self.position.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
     
     def get_reward(self, agent_id, **kwargs):
         self.rewarder.get_reward(agent_id)
