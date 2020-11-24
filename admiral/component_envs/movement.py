@@ -38,5 +38,5 @@ class GridWorldMovementComponent(Component):
         if isinstance(agent, GridWorldMovementAgent):
             new_position = agent.position + move
             if 0 <= new_position[0] < self.region and \
-            0 <= new_position[1] < self.region: # Still inside the boundary, good move
+               0 <= new_position[1] < self.region: # Still inside the boundary, good move
                 agent.position = new_position
