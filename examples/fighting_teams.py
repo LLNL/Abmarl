@@ -2,10 +2,10 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.attacking import GridAttackingTeamEnv, GridWorldAttackingTeamAgent
-from admiral.component_envs.death_life import DyingAgent, DyingEnv
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
+from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
+from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
+from admiral.component_envs.death_life import DyingAgent, DyingComponent
 
 
 # TODO: Figure out a better way than multiple inheritance to share parameters,
@@ -27,16 +27,16 @@ from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
 
 
-class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridMovementAgent, GridWorldObservingTeamAgent):
+class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridWorldMovementAgent, GridWorldObservingTeamAgent):
     pass
 
 class FightingTeamsEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldTeamsEnv(**kwargs)
-        self.movement = GridMovementEnv(**kwargs)
-        self.attacking = GridAttackingTeamEnv(**kwargs)
-        self.dying = DyingEnv(**kwargs)
+        self.world = GridWorldTeamsComponent(**kwargs)
+        self.movement = GridWorldMovementComponent(**kwargs)
+        self.attacking = GridAttackingTeamComponent(**kwargs)
+        self.dying = DyingComponent(**kwargs)
 
         self.attacking_record = []
     
@@ -49,13 +49,13 @@ class FightingTeamsEnv:
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if action.get('attack', False):
-                    attacked_agent = self.attacking.process_attack(agent)
+                    attacked_agent = self.attacking.act(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if 'move' in action:
-                    agent.position = self.movement.process_move(agent.position, action['move'])
+                    self.movement.act(agent, action['move'])
             
         # Because agents can affect each others' health, we process the dying
         # outside the loop at the end of all the moves. Note: this does not

@@ -35,7 +35,7 @@ class GridWorldObservingAgent(GridWorldAgent):
     def configured(self):
         return super().configured and self.view is not None
 
-class GridWorldEnv:
+class GridWorldComponent:
     """
     WorldEnv is an abstract notion for some space in which agents exist. It is defined
     by the set of agents that exist in it and the bounds of the world. Agents in
@@ -132,7 +132,7 @@ class GridWorldEnv:
 class GridWorldObservingTeamAgent(GridWorldObservingAgent, GridWorldTeamAgent):
     pass
 
-class GridWorldTeamsEnv(GridWorldEnv):
+class GridWorldTeamsComponent(GridWorldComponent):
     def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
         self.region = region
         self.agents = agents

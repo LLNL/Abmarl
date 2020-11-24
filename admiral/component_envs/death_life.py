@@ -26,7 +26,7 @@ class DyingAgent(HealthAgent):
     def configured(self):
         return super().configured and self.is_alive is not None
 
-class DyingEnv:
+class DyingComponent:
     """
     Agents can die if their health falls below their minimal health value. Health
     can decrease in a number of interactions. This environemnt provides an entropy

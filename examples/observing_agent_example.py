@@ -2,19 +2,19 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
+from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 
 # TODO: This is much better suited as a unit test.
 
-class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridMovementAgent):
+class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent):
     pass
 
 class SimpleGridObservations:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldTeamsEnv(**kwargs)
-        self.movement = GridMovementEnv(**kwargs)
+        self.world = GridWorldTeamsComponent(**kwargs)
+        self.movement = GridWorldMovementComponent(**kwargs)
 
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
@@ -25,7 +25,7 @@ class SimpleGridObservations:
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if 'move' in action:
-                agent.position = self.movement.process_move(agent.position, action['move'])
+                self.movement.act(agent, action['move'])
 
         return {'agent0': self.world.get_obs('agent0')}
     

@@ -1,5 +1,5 @@
 
-from admiral.envs import Agent
+from admiral.component_envs.component import Component
 from admiral.component_envs.world import GridWorldAgent, GridWorldTeamAgent
 
 class GridWorldAttackingAgent(GridWorldAgent):
@@ -17,7 +17,7 @@ class GridWorldAttackingAgent(GridWorldAgent):
         """
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
-class GridAttackingEnv:
+class GridAttackingComponent(Component):
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         self.agents = agents
@@ -27,7 +27,7 @@ class GridAttackingEnv:
             if isinstance(agent, GridWorldAttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
-    def process_attack(self, attacking_agent, **kwargs):
+    def act(self, attacking_agent, **kwargs):
         if isinstance(attacking_agent, GridWorldAttackingAgent):
             for agent in self.agents.values():
                 if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
@@ -38,7 +38,7 @@ class GridAttackingEnv:
 class GridWorldAttackingTeamAgent(GridWorldAttackingAgent, GridWorldTeamAgent):
     pass
 
-class GridAttackingTeamEnv:
+class GridAttackingTeamComponent(Component):
     # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
     # attacks that cannot happen?
     def __init__(self, agents=None, **kwargs):
@@ -50,7 +50,7 @@ class GridAttackingTeamEnv:
             if isinstance(agent, GridWorldAttackingTeamAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
-    def process_attack(self, attacking_agent, **kwargs):
+    def act(self, attacking_agent, **kwargs):
         if isinstance(attacking_agent, GridWorldAttackingTeamAgent):
             for agent in self.agents.values():
                 if agent.id == attacking_agent.id: continue # cannot attack yourself, lol

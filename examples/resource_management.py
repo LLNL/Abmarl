@@ -2,21 +2,21 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv, GridWorldObservingAgent
-from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
-from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
-from admiral.component_envs.death_life import DyingAgent, DyingEnv
+from admiral.component_envs.world import GridWorldComponent, GridWorldObservingAgent
+from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
+from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent
+from admiral.component_envs.death_life import DyingAgent, DyingComponent
 
-class ResourceManagementAgent(DyingAgent, GridMovementAgent, GridResourceHarvestingAndObservingAgent):
+class ResourceManagementAgent(DyingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
     pass
 
 class ResourceManagementEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldEnv(**kwargs)
-        self.resource = GridResourceEnv(**kwargs)
-        self.movement = GridMovementEnv(**kwargs)
-        self.dying = DyingEnv(**kwargs)
+        self.world = GridWorldComponent(**kwargs)
+        self.resource = GridResourceComponent(**kwargs)
+        self.movement = GridWorldMovementComponent(**kwargs)
+        self.dying = DyingComponent(**kwargs)
     
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
@@ -28,9 +28,9 @@ class ResourceManagementEnv:
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if 'move' in action:
-                    agent.position = self.movement.process_move(agent.position, action['move'])
+                    self.movement.act(agent, action['move'])
                 if 'harvest' in action:
-                    amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
+                    amount_harvested = self.resource.act(agent, action['harvest'])
                     agent.health += amount_harvested
                 self.dying.apply_entropy(agent)
                 self.dying.process_death(agent)
