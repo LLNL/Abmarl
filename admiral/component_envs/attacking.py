@@ -1,5 +1,7 @@
 
 from admiral.envs import Agent
+from admiral.component_envs.world import GridWorldAgent
+from admiral.component_envs.team import TeamAgent
 from admiral.component_envs.component import Component
 from admiral.component_envs.team import TeamAgent
 
@@ -21,6 +23,8 @@ class GridAttackingAgent(Agent):
 class GridAttackingComponent(Component):
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridWorldAgent)
         self.agents = agents
 
         from gym.spaces import MultiBinary
@@ -36,10 +40,11 @@ class GridAttackingComponent(Component):
                 return agent.id
 
 class GridAttackingTeamComponent(Component):
-    # TODO: Rough design. Perhaps in the kwargs we should include a combination matrix that dictates
-    # attacks that cannot happen?
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridWorldAgent)
+            assert isinstance(agent, TeamAgent)
         self.agents = agents
 
         from gym.spaces import MultiBinary

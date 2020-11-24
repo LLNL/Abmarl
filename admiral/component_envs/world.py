@@ -121,6 +121,9 @@ class GridWorldComponent:
 class GridWorldTeamsComponent(GridWorldComponent):
     def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
         self.region = region
+        for agent in agents.values():
+            assert isinstance(agent, GridWorldAgent)
+            assert isinstance(agent, TeamAgent)
         self.agents = agents
         self.number_of_teams = number_of_teams
 
@@ -157,7 +160,6 @@ class GridWorldTeamsComponent(GridWorldComponent):
                 if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
                     r_diff += my_agent.view
                     c_diff += my_agent.view
-                    # signal[other_agent.team-1, r_diff, c_diff] += 1
                     signal[r_diff, c_diff, other_agent.team-1] += 1
 
             return signal
