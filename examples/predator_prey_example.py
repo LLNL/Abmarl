@@ -7,6 +7,9 @@ from admiral.component_envs.movement import GridWorldMovementComponent, GridWorl
 from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
+from admiral.component_envs.rewarder import RewarderComponent
+from admiral.component_envs.done_conditioner import DoneConditioner
+from admiral.envs import AgentBasedSimulation
 
 class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
     pass
@@ -14,7 +17,7 @@ class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent,
 class PredatorAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, GridWorldAttackingTeamAgent, DyingAgent, GridResourceObservingAgent):
     pass
 
-class PredatorPreyEnv:
+class PredatorPreyEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)
@@ -22,14 +25,10 @@ class PredatorPreyEnv:
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)
-
-        # This is good code to have after the observation and action space have been built by the
-        # modules, we put them all together into a Dict.
-        # TODO: Put this in the environment interface.
-        from gym.spaces import Dict
-        for agent in self.agents.values():
-            agent.action_space = Dict(agent.action_space)
-            agent.observation_space = Dict(agent.observation_space)
+        self.rewarder = RewarderComponent(**kwargs)
+        self.done_conditioner = DoneConditioner(**kwargs)
+        
+        self.finalize()
 
         self.attacking_record = []
     
@@ -78,6 +77,18 @@ class PredatorPreyEnv:
     
     def get_obs(self, agent_id, **kwargs):
             return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
+    
+    def get_reward(self, agent_id, **kwargs):
+        self.rewarder.get_reward(agent_id)
+
+    def get_done(self, agent_id, **kwargs):
+        return self.done_conditioner.get_done(agent_id)
+    
+    def get_all_done(self, **kwargs):
+        self.done_conditioner.get_all_done(**kwargs)
+    
+    def get_info(self, **kwargs):
+        return {}
 
 prey = {f'prey{i}': PreyAgent(id=f'prey{i}', view=5, team=1, move=1, attack_range=-1, attack_strength=0.0, max_harvest=0.5) for i in range(7)}
 predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24, max_harvest=0.0) for i in range(2)}

@@ -6,6 +6,9 @@ from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObser
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
+from admiral.component_envs.rewarder import RewarderComponent
+from admiral.component_envs.done_conditioner import DoneConditioner
+from admiral.envs import AgentBasedSimulation
 
 
 # TODO: Figure out a better way than multiple inheritance to share parameters,
@@ -30,13 +33,17 @@ from admiral.component_envs.death_life import DyingAgent, DyingComponent
 class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridWorldMovementAgent, GridWorldObservingTeamAgent):
     pass
 
-class FightingTeamsEnv:
+class FightingTeamsEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
+        self.rewarder = RewarderComponent(**kwargs)
+        self.done_conditioner = DoneConditioner(**kwargs)
+
+        self.finalize()
 
         self.attacking_record = []
     
@@ -78,6 +85,18 @@ class FightingTeamsEnv:
     
     def get_obs(self, agent_id, **kwargs):
         return {'agents': self.world.get_obs(agent_id)}
+    
+    def get_reward(self, agent_id, **kwargs):
+        self.rewarder.get_reward(agent_id)
+
+    def get_done(self, agent_id, **kwargs):
+        return self.done_conditioner.get_done(agent_id)
+    
+    def get_all_done(self, **kwargs):
+        self.done_conditioner.get_all_done(**kwargs)
+    
+    def get_info(self, **kwargs):
+        return {}
 
 agents = {f'agent{i}': FightingTeamsAgent(
     id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2+1, move=1, view=11

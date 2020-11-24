@@ -4,6 +4,8 @@ import numpy as np
 
 from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
+from admiral.component_envs.rewarder import RewarderComponent
+from admiral.component_envs.done_conditioner import DoneConditioner
 from admiral.envs import AgentBasedSimulation
 
 # TODO: This is much better suited as a unit test.
@@ -16,6 +18,10 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
+        self.rewarder = RewarderComponent(**kwargs)
+        self.done_conditioner = DoneConditioner(**kwargs)
+
+        self.finalize()
 
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
@@ -36,6 +42,21 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.world.render(fig=fig, shape_dict=shape, **kwargs)
         plt.plot()
         plt.pause(1e-6)
+    
+    def get_obs(self, agent_id, **kwargs):
+        return self.world.get_obs(agent_id, **kwargs)
+    
+    def get_reward(self, agent_id, **kwargs):
+        return self.rewarder.get_reward(agent_id, **kwargs)
+    
+    def get_done(self, agent_id, **kwargs):
+        return self.done_conditioner.get_done(agent_id, **kwargs)
+    
+    def get_all_done(self, agent_id, **kwargs):
+        return self.done_conditioner.get_all_done(**kwargs)
+    
+    def get_info(self, agent_id, **kwargs):
+        return {}
 
 team_shapes = {
     1: 'o',

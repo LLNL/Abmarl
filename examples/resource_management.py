@@ -6,17 +6,24 @@ from admiral.component_envs.world import GridWorldComponent, GridWorldObservingA
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
+from admiral.component_envs.rewarder import RewarderComponent
+from admiral.component_envs.done_conditioner import DoneConditioner
+from admiral.envs import AgentBasedSimulation
 
 class ResourceManagementAgent(DyingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
     pass
 
-class ResourceManagementEnv:
+class ResourceManagementEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
+        self.rewarder = RewarderComponent(**kwargs)
+        self.done_conditioner = DoneConditioner(**kwargs)
+
+        self.finalize()
     
     def reset(self, **kwargs):
         self.world.reset(**kwargs)
@@ -46,6 +53,18 @@ class ResourceManagementEnv:
     
     def get_obs(self, agent_id, **kwargs):
         return {'agents': self.world.get_obs(agent_id), 'resources': self.resource.get_obs(agent_id)}
+    
+    def get_reward(self, agent_id, **kwargs):
+        self.rewarder.get_reward(agent_id)
+
+    def get_done(self, agent_id, **kwargs):
+        return self.done_conditioner.get_done(agent_id)
+    
+    def get_all_done(self, **kwargs):
+        self.done_conditioner.get_all_done(**kwargs)
+    
+    def get_info(self, **kwargs):
+        return {}
 
 agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', view=2, move=1, max_harvest=1.0) for i in range(4)}
 env = ResourceManagementEnv(
