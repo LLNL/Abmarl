@@ -7,7 +7,7 @@ from admiral.component_envs.movement import GridWorldMovementComponent, GridWorl
 from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
 from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_conditioner import DoneConditioner
+from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 
@@ -41,7 +41,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
-        self.done_conditioner = DoneConditioner(**kwargs)
+        self.done_conditioner = TeamDeadDoneComponent(**kwargs)
 
         self.finalize()
 
@@ -59,7 +59,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
                     attacked_agent = self.attacking.act(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
-                        agent.health += agent.attack_strength # Gain health from a good attack.
+                        # agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if 'move' in action:
                     self.movement.act(agent, action['move'])
@@ -93,7 +93,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         return self.done_conditioner.get_done(agent_id)
     
     def get_all_done(self, **kwargs):
-        self.done_conditioner.get_all_done(**kwargs)
+        return self.done_conditioner.get_all_done(**kwargs)
     
     def get_info(self, **kwargs):
         return {}
@@ -120,4 +120,6 @@ for _ in range(100):
         }
     env.step(action_dict)
     env.render(fig=fig)
+    print(env.get_all_done())
     x = []
+

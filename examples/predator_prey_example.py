@@ -8,7 +8,7 @@ from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWor
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
 from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_conditioner import DoneConditioner
+from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
@@ -26,7 +26,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         self.dying = DyingComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
-        self.done_conditioner = DoneConditioner(**kwargs)
+        self.done_conditioner = TeamDeadDoneComponent(**kwargs)
         
         self.finalize()
 
@@ -85,7 +85,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         return self.done_conditioner.get_done(agent_id)
     
     def get_all_done(self, **kwargs):
-        self.done_conditioner.get_all_done(**kwargs)
+        return self.done_conditioner.get_all_done(**kwargs)
     
     def get_info(self, **kwargs):
         return {}
@@ -109,5 +109,6 @@ for _ in range(50):
     action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values()}
     env.step(action_dict)
     env.render(fig=fig)
+    print(env.get_all_done())
     x = []
 

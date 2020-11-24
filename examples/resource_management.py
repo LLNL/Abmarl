@@ -7,7 +7,7 @@ from admiral.component_envs.movement import GridWorldMovementComponent, GridWorl
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
 from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_conditioner import DoneConditioner
+from admiral.component_envs.done_conditioner import DeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 class ResourceManagementAgent(DyingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
@@ -21,7 +21,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         self.movement = GridWorldMovementComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
-        self.done_conditioner = DoneConditioner(**kwargs)
+        self.done_conditioner = DeadDoneComponent(**kwargs)
 
         self.finalize()
     
@@ -61,7 +61,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         return self.done_conditioner.get_done(agent_id)
     
     def get_all_done(self, **kwargs):
-        self.done_conditioner.get_all_done(**kwargs)
+        return self.done_conditioner.get_all_done(**kwargs)
     
     def get_info(self, **kwargs):
         return {}
@@ -84,4 +84,7 @@ for _ in range(50):
             'harvest': agent.action_space['harvest'].sample()
         }
     env.step(action_dict)
+    print({agent_id: env.get_done(agent_id) for agent_id in env.agents})
     env.render(fig=fig)
+
+print(env.get_all_done())
