@@ -1,14 +1,15 @@
 
 import numpy as np
 
-from admiral.envs import Agent
+from admiral.component_envs.world import GridWorldAgent
+from admiral.component_envs.component import Component
 
 # TODO: Consider process_move will take the agent as input argument and output
 # the new position. This would mean that GridMovementAgents will inherit from
 # GridWorldAgent. The step function will then update and check that the agent is
 # of the right type before processing the move action? Right now, the environment
 # has to check if move is in the action.
-class GridMovementAgent(Agent):
+class GridWorldMovementAgent(GridWorldAgent):
     def __init__(self, move=None, **kwargs):
         assert move is not None, "move must be an integer"
         self.move = move
@@ -18,7 +19,7 @@ class GridMovementAgent(Agent):
     def configured(self):
         return super().configured and self.move is not None
 
-class GridMovementEnv:
+class GridWorldMovementComponent(Component):
     """
     Agents in the GridWorld can move around.
     """
@@ -30,16 +31,12 @@ class GridMovementEnv:
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, GridMovementAgent):
+            if isinstance(agent, GridWorldMovementAgent):
                 agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
 
-    def process_move(self, position, move, **kwargs):
-        """
-        Move the agent according to the move action. Returns the proposed new position.
-        """
-        new_position = position + move
-        if 0 <= new_position[0] < self.region and \
-           0 <= new_position[1] < self.region: # Still inside the boundary, good move
-            return new_position
-        else:
-            return position
+    def act(self, agent, move, **kwargs):
+        if isinstance(agent, GridWorldMovementAgent):
+            new_position = agent.position + move
+            if 0 <= new_position[0] < self.region and \
+            0 <= new_position[1] < self.region: # Still inside the boundary, good move
+                agent.position = new_position

@@ -3,22 +3,22 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
+from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamEnv, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingEnv, DyingAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
 
-class PreyAgent(GridWorldObservingTeamAgent, GridMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
+class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
     pass
 
-class PredatorAgent(GridWorldObservingTeamAgent, GridMovementAgent, GridWorldAttackingTeamAgent, DyingAgent, GridResourceObservingAgent):
+class PredatorAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, GridWorldAttackingTeamAgent, DyingAgent, GridResourceObservingAgent):
     pass
 
 class PredatorPreyEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsEnv(**kwargs)
-        self.movement = GridMovementEnv(**kwargs)
+        self.movement = GridWorldMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamEnv(**kwargs)
         self.dying = DyingEnv(**kwargs)
         self.resource = GridResourceEnv(**kwargs)
@@ -43,7 +43,7 @@ class PredatorPreyEnv:
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if 'move' in action:
-                    agent.position = self.movement.process_move(agent.position, action['move'])
+                    self.movement.act(agent, action['move'])
                 if action.get('attack', False):
                     attacked_agent = self.attacking.process_attack(agent)
                     if attacked_agent is not None:

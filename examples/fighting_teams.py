@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
-from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
+from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamEnv, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
@@ -27,14 +27,14 @@ from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
 
 
-class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridMovementAgent, GridWorldObservingTeamAgent):
+class FightingTeamsAgent(DyingAgent, GridWorldAttackingTeamAgent, GridWorldMovementAgent, GridWorldObservingTeamAgent):
     pass
 
 class FightingTeamsEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsEnv(**kwargs)
-        self.movement = GridMovementEnv(**kwargs)
+        self.movement = GridWorldMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamEnv(**kwargs)
         self.dying = DyingEnv(**kwargs)
 
@@ -55,7 +55,7 @@ class FightingTeamsEnv:
                         agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if 'move' in action:
-                    agent.position = self.movement.process_move(agent.position, action['move'])
+                    self.movement.act(agent, action['move'])
             
         # Because agents can affect each others' health, we process the dying
         # outside the loop at the end of all the moves. Note: this does not

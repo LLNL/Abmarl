@@ -3,12 +3,12 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.component_envs.world import GridWorldEnv
-from admiral.component_envs.movement import GridMovementEnv, GridMovementAgent
+from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
 from admiral.component_envs.attacking import GridAttackingEnv, GridWorldAttackingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingEnv
 
-class FightForResourcesAgent(DyingAgent, GridWorldAttackingAgent, GridMovementAgent, GridResourceHarvestingAndObservingAgent):
+class FightForResourcesAgent(DyingAgent, GridWorldAttackingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
     pass
 
 class FightForResourcesEnv:
@@ -16,7 +16,7 @@ class FightForResourcesEnv:
         self.agents = kwargs['agents']
         self.world = GridWorldEnv(**kwargs)
         self.resource = GridResourceEnv(**kwargs)
-        self.movement = GridMovementEnv(**kwargs)
+        self.movement = GridWorldMovementComponent(**kwargs)
         self.attacking = GridAttackingEnv(**kwargs)
         self.dying = DyingEnv(**kwargs)
 
@@ -37,7 +37,7 @@ class FightForResourcesEnv:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if 'move' in action:
-                    agent.position = self.movement.process_move(agent.position, action['move'])
+                    self.movement.act(agent, action['move'])
                 if 'harvest' in action:
                     amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
                     agent.health += amount_harvested
