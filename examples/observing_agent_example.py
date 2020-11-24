@@ -4,13 +4,14 @@ import numpy as np
 
 from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
+from admiral.envs import AgentBasedSimulation
 
 # TODO: This is much better suited as a unit test.
 
 class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent):
     pass
 
-class SimpleGridObservations:
+class SimpleGridObservations(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldTeamsComponent(**kwargs)

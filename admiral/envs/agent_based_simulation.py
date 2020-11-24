@@ -39,12 +39,19 @@ class AgentBasedSimulation(ABC):
     is only a single agent in the agents dictionary.
     """
     @abstractmethod
-    def __init__(self, config):
+    def __init__(self):
         """
         config: dict
             Environment parameters, including the dictionary of Agents.
         """
-        pass
+        self.agents = {}
+
+    def finalize(self):
+        from gym.spaces import Dict
+        for agent in self.agents.values():
+            assert agent.configured
+            agent.action_space = Dict(agent.action_space)
+            agent.observation_space = Dict(agent.observation_space)
     
     @abstractmethod
     def reset(self, **kwargs):
