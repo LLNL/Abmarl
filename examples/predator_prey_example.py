@@ -6,7 +6,7 @@ from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObser
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
-from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
+from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
 
 class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
     pass
@@ -21,7 +21,7 @@ class PredatorPreyEnv:
         self.movement = GridWorldMovementComponent(**kwargs)
         self.attacking = GridAttackingTeamComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
-        self.resource = GridResourceEnv(**kwargs)
+        self.resource = GridResourceComponent(**kwargs)
 
         # This is good code to have after the observation and action space have been built by the
         # modules, we put them all together into a Dict.
@@ -51,7 +51,7 @@ class PredatorPreyEnv:
                         agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if action.get('harvest', False):
-                    amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
+                    amount_harvested = self.resource.act(agent, action['harvest'])
                     agent.health += amount_harvested
 
         for agent_id in action_dict:

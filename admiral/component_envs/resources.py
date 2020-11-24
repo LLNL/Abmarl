@@ -1,10 +1,10 @@
 
 import numpy as np
 
-from admiral.envs import Agent
-from admiral.component_envs.world import GridWorldObservingAgent
+from admiral.component_envs.world import GridWorldAgent, GridWorldObservingAgent
+from admiral.component_envs.component import Component
 
-class GridResourceAgent(Agent):
+class GridResourceAgent(GridWorldAgent):
     pass
 
 class GridResourceHarvestingAgent(GridResourceAgent):
@@ -23,7 +23,7 @@ class GridResourceObservingAgent(GridResourceAgent, GridWorldObservingAgent):
 class GridResourceHarvestingAndObservingAgent(GridResourceHarvestingAgent, GridResourceObservingAgent):
     pass
 
-class GridResourceEnv:
+class GridResourceComponent(Component):
     """
     Resources exist in the cells of the grid. The grid is populated with resources
     between the min and max value on some coverage of the region.
@@ -65,14 +65,16 @@ class GridResourceEnv:
                 coverage_filter
             )
 
-    def process_harvest(self, location, amount, **kwargs):
-        if self.resources[location] - amount >= 0.:
-            actual_amount_harvested = amount
-        else:
-            actual_amount_harvested = self.resources[location]
-        self.resources[location] = max([0., self.resources[location] - amount])
+    def act(self, agent, amount, **kwargs):
+        if isinstance(agent, GridResourceHarvestingAgent):
+            location = tuple(agent.position)
+            if self.resources[location] - amount >= 0.:
+                actual_amount_harvested = amount
+            else:
+                actual_amount_harvested = self.resources[location]
+            self.resources[location] = max([0., self.resources[location] - amount])
 
-        return actual_amount_harvested
+            return actual_amount_harvested
 
     def regrow(self, **kwargs):
         self.resources[self.resources >= self.min_value] += self.regrow_rate

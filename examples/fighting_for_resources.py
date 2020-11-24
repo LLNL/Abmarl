@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.component_envs.world import GridWorldComponent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
-from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
+from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAndObservingAgent
 from admiral.component_envs.attacking import GridAttackingComponent, GridWorldAttackingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
 
@@ -15,7 +15,7 @@ class FightForResourcesEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.world = GridWorldComponent(**kwargs)
-        self.resource = GridResourceEnv(**kwargs)
+        self.resource = GridResourceComponent(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
         self.attacking = GridAttackingComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
@@ -39,7 +39,7 @@ class FightForResourcesEnv:
                 if 'move' in action:
                     self.movement.act(agent, action['move'])
                 if 'harvest' in action:
-                    amount_harvested = self.resource.process_harvest(tuple(agent.position), action['harvest'])
+                    amount_harvested = self.resource.act(agent, action['harvest'])
                     agent.health += amount_harvested
             
         # Because agents can affect each others' health, we process the dying
