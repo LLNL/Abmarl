@@ -2,10 +2,10 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
-from admiral.component_envs.attacking import GridAttackingTeamEnv, GridWorldAttackingTeamAgent
-from admiral.component_envs.death_life import DyingEnv, DyingAgent
+from admiral.component_envs.attacking import GridAttackingTeamComponent, GridWorldAttackingTeamAgent
+from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent, GridResourceObservingAgent
 
 class PreyAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, DyingAgent, GridResourceHarvestingAndObservingAgent):
@@ -17,10 +17,10 @@ class PredatorAgent(GridWorldObservingTeamAgent, GridWorldMovementAgent, GridWor
 class PredatorPreyEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldTeamsEnv(**kwargs)
+        self.world = GridWorldTeamsComponent(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
-        self.attacking = GridAttackingTeamEnv(**kwargs)
-        self.dying = DyingEnv(**kwargs)
+        self.attacking = GridAttackingTeamComponent(**kwargs)
+        self.dying = DyingComponent(**kwargs)
         self.resource = GridResourceEnv(**kwargs)
 
         # This is good code to have after the observation and action space have been built by the
@@ -45,7 +45,7 @@ class PredatorPreyEnv:
                 if 'move' in action:
                     self.movement.act(agent, action['move'])
                 if action.get('attack', False):
-                    attacked_agent = self.attacking.process_attack(agent)
+                    attacked_agent = self.attacking.act(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         agent.health += agent.attack_strength # Gain health from a good attack.

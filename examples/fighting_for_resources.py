@@ -2,11 +2,11 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv
+from admiral.component_envs.world import GridWorldComponent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
-from admiral.component_envs.attacking import GridAttackingEnv, GridWorldAttackingAgent
-from admiral.component_envs.death_life import DyingAgent, DyingEnv
+from admiral.component_envs.attacking import GridAttackingComponent, GridWorldAttackingAgent
+from admiral.component_envs.death_life import DyingAgent, DyingComponent
 
 class FightForResourcesAgent(DyingAgent, GridWorldAttackingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
     pass
@@ -14,11 +14,11 @@ class FightForResourcesAgent(DyingAgent, GridWorldAttackingAgent, GridWorldMovem
 class FightForResourcesEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldEnv(**kwargs)
+        self.world = GridWorldComponent(**kwargs)
         self.resource = GridResourceEnv(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
-        self.attacking = GridAttackingEnv(**kwargs)
-        self.dying = DyingEnv(**kwargs)
+        self.attacking = GridAttackingComponent(**kwargs)
+        self.dying = DyingComponent(**kwargs)
 
         self.attacking_record = []
     
@@ -32,7 +32,7 @@ class FightForResourcesEnv:
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if action.get('attack', False):
-                    attacked_agent = self.attacking.process_attack(agent)
+                    attacked_agent = self.attacking.act(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)

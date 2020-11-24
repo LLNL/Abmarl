@@ -2,10 +2,10 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldEnv, GridWorldObservingAgent
+from admiral.component_envs.world import GridWorldComponent, GridWorldObservingAgent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 from admiral.component_envs.resources import GridResourceEnv, GridResourceHarvestingAndObservingAgent
-from admiral.component_envs.death_life import DyingAgent, DyingEnv
+from admiral.component_envs.death_life import DyingAgent, DyingComponent
 
 class ResourceManagementAgent(DyingAgent, GridWorldMovementAgent, GridResourceHarvestingAndObservingAgent):
     pass
@@ -13,10 +13,10 @@ class ResourceManagementAgent(DyingAgent, GridWorldMovementAgent, GridResourceHa
 class ResourceManagementEnv:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldEnv(**kwargs)
+        self.world = GridWorldComponent(**kwargs)
         self.resource = GridResourceEnv(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
-        self.dying = DyingEnv(**kwargs)
+        self.dying = DyingComponent(**kwargs)
     
     def reset(self, **kwargs):
         self.world.reset(**kwargs)

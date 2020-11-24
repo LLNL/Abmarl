@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.world import GridWorldTeamsEnv, GridWorldObservingTeamAgent
+from admiral.component_envs.world import GridWorldTeamsComponent, GridWorldObservingTeamAgent
 from admiral.component_envs.movement import GridWorldMovementComponent, GridWorldMovementAgent
 
 # TODO: This is much better suited as a unit test.
@@ -13,7 +13,7 @@ class ObservingTeamMovementAgent(GridWorldObservingTeamAgent, GridWorldMovementA
 class SimpleGridObservations:
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
-        self.world = GridWorldTeamsEnv(**kwargs)
+        self.world = GridWorldTeamsComponent(**kwargs)
         self.movement = GridWorldMovementComponent(**kwargs)
 
     def reset(self, **kwargs):
