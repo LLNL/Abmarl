@@ -6,7 +6,7 @@ from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.team import TeamAgent
 from admiral.component_envs.position import GridPositionTeamsComponent, GridPositionAgent
 from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
-from admiral.component_envs.attacking import GridAttackingTeamComponent, GridAttackingAgent
+from admiral.component_envs.attacking import GridAttackingTeamAliveComponent, GridAttackingAgent
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
@@ -20,7 +20,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.agents = kwargs['agents']
         self.position = GridPositionTeamsComponent(**kwargs)
         self.movement = GridMovementComponent(**kwargs)
-        self.attacking = GridAttackingTeamComponent(**kwargs)
+        self.attacking = GridAttackingTeamAliveComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
         self.done_conditioner = TeamDeadDoneComponent(**kwargs)

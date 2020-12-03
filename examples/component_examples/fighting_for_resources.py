@@ -6,7 +6,7 @@ from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.position import GridPositionComponent, GridPositionAgent
 from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
-from admiral.component_envs.attacking import GridAttackingComponent, GridAttackingAgent
+from admiral.component_envs.attacking import GridAttackingAliveComponent, GridAttackingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_conditioner import DeadDoneComponent
@@ -21,7 +21,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
         self.position = GridPositionComponent(**kwargs)
         self.resource = GridResourceComponent(**kwargs)
         self.movement = GridMovementComponent(**kwargs)
-        self.attacking = GridAttackingComponent(**kwargs)
+        self.attacking = GridAttackingAliveComponent(**kwargs)
         self.dying = DyingComponent(**kwargs)
         self.rewarder = RewarderComponent(**kwargs)
         self.done_conditioner = DeadDoneComponent(**kwargs)

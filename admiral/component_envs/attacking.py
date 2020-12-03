@@ -3,7 +3,7 @@ from admiral.envs import Agent
 from admiral.component_envs.position import GridPositionAgent
 from admiral.component_envs.team import TeamAgent
 from admiral.component_envs.component import Component
-from admiral.component_envs.team import TeamAgent
+from admiral.component_envs.death_life import DyingAgent
 
 class GridAttackingAgent(Agent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
@@ -39,6 +39,26 @@ class GridAttackingComponent(Component):
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                 return agent.id
 
+class GridAttackingAliveComponent(Component):
+    def __init__(self, agents=None, **kwargs):
+        for agent in agents.values():
+            assert isinstance(agent, GridPositionAgent)
+            assert isinstance(agent, DyingAgent)
+        self.agents = agents
+
+        from gym.spaces import MultiBinary
+        for agent in self.agents.values():
+            if isinstance(agent, GridAttackingAgent):
+                agent.action_space['attack'] = MultiBinary(1)
+    
+    def act(self, attacking_agent, **kwargs):
+        for agent in self.agents.values():
+            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
+            if not agent.is_alive: continue # Cannot attack dead agents
+            if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
+                    and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
+                return agent.id
+
 class GridAttackingTeamComponent(Component):
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
@@ -56,6 +76,28 @@ class GridAttackingTeamComponent(Component):
         for agent in self.agents.values():
             if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
             if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
+            if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
+                    and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
+                return agent.id
+
+class GridAttackingTeamAliveComponent(Component):
+    def __init__(self, agents=None, **kwargs):
+        for agent in agents.values():
+            assert isinstance(agent, GridPositionAgent)
+            assert isinstance(agent, TeamAgent)
+            assert isinstance(agent, DyingAgent)
+        self.agents = agents
+
+        from gym.spaces import MultiBinary
+        for agent in self.agents.values():
+            if isinstance(agent, GridAttackingAgent):
+                agent.action_space['attack'] = MultiBinary(1)
+
+    def act(self, attacking_agent, **kwargs):
+        for agent in self.agents.values():
+            if agent.id == attacking_agent.id: continue # cannot attack yourself, lol
+            if agent.team == attacking_agent.team: continue # Cannot attack agents on same team
+            if not agent.is_alive: continue # cannot attack dead agents
             if abs(attacking_agent.position[0] - agent.position[0]) <= attacking_agent.attack_range \
                     and abs(attacking_agent.position[1] - agent.position[1]) <= attacking_agent.attack_range: # Agent within range
                 return agent.id
