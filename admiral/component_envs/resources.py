@@ -42,6 +42,8 @@ class GridResourceComponent(Component):
         from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, GridResourceHarvestingAgent):
+    for agent in agents.values():
+        agent.position = agent.starting_position
                 agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
             if isinstance(agent, ObservingAgent):
                 agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)

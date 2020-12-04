@@ -1,4 +1,6 @@
 
+from gym.spaces import Box
+
 import numpy as np
 
 from admiral.component_envs.position import GridPositionAgent, TeamAgent, ObservingAgent
@@ -16,10 +18,12 @@ def test_grid_position_component():
         'agent3': PositionTestAgent(id='agent3', starting_position=np.array([1, 4]), view=4),
         'agent4': GridPositionAgent(id='agent4', starting_position=np.array([1, 4])),
     }
-    for agent in agents.values():
-        agent.position = agent.starting_position
     
     component = GridPositionComponent(agents=agents, region=5)
+    for agent in agents.values():
+        agent.position = agent.starting_position
+        if isinstance(agent, ObservingAgent):
+            assert agent.observation_space['agents'] == Box(-1, 1, (agent.view*2+1, agent.view*2+1), np.int)
     np.testing.assert_array_equal(component.get_obs('agent0'), np.array([
         [-1., -1., -1.],
         [-1.,  0.,  0.],

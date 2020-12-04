@@ -1,4 +1,5 @@
 
+from gym.spaces import MultiBinary
 import numpy as np
 
 from admiral.component_envs.attacking import GridAttackingAgent, GridPositionAgent, TeamAgent, DyingAgent
@@ -39,9 +40,10 @@ def test_grid_attacking_component():
     assert agents['agent5'].attack_range == 2
     np.testing.assert_array_equal(agents['agent5'].starting_position, np.array([4, 0]))
 
+    component = GridAttackingComponent(agents=agents)
     for agent in agents.values():
         agent.position = agent.starting_position
-    component = GridAttackingComponent(agents=agents)
+        assert agent.action_space['attack'] == MultiBinary(1)
 
     assert component.act(agents['agent0']) == 'agent1'
     assert component.act(agents['agent1']) == 'agent0'
