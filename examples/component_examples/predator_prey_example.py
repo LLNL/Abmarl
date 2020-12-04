@@ -92,8 +92,8 @@ class PredatorPreyEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-prey = {f'prey{i}': PreyAgent(id=f'prey{i}', view=5, team=1, move=1, attack_range=-1, attack_strength=0.0, max_harvest=0.5) for i in range(7)}
-predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=2, move=1, attack_range=1, attack_strength=0.24, max_harvest=0.0) for i in range(2)}
+prey = {f'prey{i}': PreyAgent(id=f'prey{i}', view=5, team=0, move=1, attack_range=-1, attack_strength=0.0, max_harvest=0.5) for i in range(7)}
+predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=1, move=1, attack_range=1, attack_strength=0.24, max_harvest=0.0) for i in range(2)}
 agents = {**prey, **predators}
 region = 10
 env = PredatorPreyEnv(

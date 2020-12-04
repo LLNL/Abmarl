@@ -81,7 +81,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         return {}
 
 agents = {f'agent{i}': FightingTeamsAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2+1, move=1, view=11
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move=1, view=11
 ) for i in range(24)}
 env = FightingTeamsEnv(
     region=12,
