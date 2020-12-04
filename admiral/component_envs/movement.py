@@ -2,6 +2,7 @@
 import numpy as np
 
 from admiral.envs import Agent
+from admiral.component_envs.position import GridPositionAgent
 from admiral.component_envs.component import Component
 
 class GridMovementAgent(Agent):
@@ -22,6 +23,8 @@ class GridMovementComponent(Component):
         assert type(region) is int, "Region must be an integer"
         self.region = region
         assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridPositionAgent)
         self.agents = agents
 
         from gym.spaces import Box
