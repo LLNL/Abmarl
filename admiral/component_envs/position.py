@@ -160,6 +160,6 @@ class GridPositionTeamsComponent(GridPositionComponent):
                 if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
                     r_diff += my_agent.view
                     c_diff += my_agent.view
-                    signal[r_diff, c_diff, other_agent.team-1] += 1
+                    signal[r_diff, c_diff, other_agent.team] += 1
 
             return signal
