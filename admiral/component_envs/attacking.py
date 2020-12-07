@@ -2,7 +2,6 @@
 from admiral.envs import Agent
 from admiral.component_envs.position import GridPositionAgent
 from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.component import Component
 from admiral.component_envs.death_life import DyingAgent
 
 class GridAttackingAgent(Agent):
@@ -20,7 +19,7 @@ class GridAttackingAgent(Agent):
         """
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
-class GridAttackingComponent(Component):
+class GridAttackingComponent:
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
@@ -49,7 +48,7 @@ class GridAttackingComponent(Component):
                 # Agent was successfully attacked
                 return agent.id
 
-class GridAttackingTeamComponent(Component):
+class GridAttackingTeamComponent:
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():

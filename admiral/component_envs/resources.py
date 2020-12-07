@@ -3,7 +3,6 @@ import numpy as np
 
 from admiral.envs import Agent
 from admiral.component_envs.observer import ObservingAgent
-from admiral.component_envs.component import Component
 
 class GridResourceHarvestingAgent(Agent):
     def __init__(self, max_harvest=None, **kwargs):
@@ -15,7 +14,7 @@ class GridResourceHarvestingAgent(Agent):
     def configured(self):
         return super().configured and self.max_harvest is not None
 
-class GridResourceComponent(Component):
+class GridResourceComponent:
     """
     Resources exist in the cells of the grid. The grid is populated with resources
     between the min and max value on some coverage of the region.

@@ -3,7 +3,6 @@ import numpy as np
 
 from admiral.envs import Agent
 from admiral.component_envs.position import GridPositionAgent
-from admiral.component_envs.component import Component
 
 class GridMovementAgent(Agent):
     def __init__(self, move=None, **kwargs):
@@ -15,7 +14,7 @@ class GridMovementAgent(Agent):
     def configured(self):
         return super().configured and self.move is not None
 
-class GridMovementComponent(Component):
+class GridMovementComponent:
     """
     Agents in the GridWorld can move around.
     """
