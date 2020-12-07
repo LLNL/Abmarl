@@ -27,7 +27,7 @@ class DyingAgent(HealthAgent):
 class DyingComponent:
     """
     Agents can die if their health falls below their minimal health value. Health
-    can decrease in a number of interactions. This environemnt provides an entropy
+    can decrease in a number of interactions. This environment provides an entropy
     that indicates how much health the agent loses in each step.
 
     Provides the process_death and apply_entropy api.
