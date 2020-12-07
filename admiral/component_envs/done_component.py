@@ -35,5 +35,5 @@ class TeamDeadDoneComponent:
         team = np.zeros(self.number_of_teams)
         for agent in self.agents.values():
             if agent.is_alive:
-                team[agent.team-1] += 1
+                team[agent.team] += 1
         return False if sum(team != 0) > 1 else True
