@@ -26,6 +26,7 @@ class TeamDeadDoneComponent:
             assert isinstance(agent, TeamAgent)
             assert isinstance(agent, DyingAgent)
         self.agents = agents
+        assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
         self.number_of_teams = number_of_teams
     
     def get_done(self, agent_id, **kwargs):

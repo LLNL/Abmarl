@@ -1,6 +1,7 @@
 
 class RewarderComponent:
     def __init__(self, agents=None, **kwargs):
+        assert type(agents) is dict, "agents must be a dictionary"
         self.agents = agents
         self.rewards = {agent_id: 0.0 for agent_id in self.agents}
 
