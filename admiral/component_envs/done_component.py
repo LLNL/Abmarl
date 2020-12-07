@@ -6,24 +6,25 @@ from admiral.component_envs.team import TeamAgent
 
 class DeadDoneComponent:
     def __init__(self, agents=None, **kwargs):
+        for agent in agents.values():
+            assert isinstance(agent, DyingAgent)
         self.agents = agents
     
     def get_done(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
-        if isinstance(agent, DyingAgent):
-            return False if agent.is_alive else True
+        return False if agent.is_alive else True
 
     def get_all_done(self, **kwargs):
         for agent in self.agents.values():
-            if isinstance(agent, DyingAgent):
-                if agent.is_alive:
-                    return False
+            if agent.is_alive:
+                return False
         return True
 
 class TeamDeadDoneComponent:
     def __init__(self, agents=None, number_of_teams=None, **kwargs):
         for agent in agents.values():
-            assert isinstance(agent, TeamAgent) and isinstance(agent, DyingAgent)
+            assert isinstance(agent, TeamAgent)
+            assert isinstance(agent, DyingAgent)
         self.agents = agents
         self.number_of_teams = number_of_teams
     
