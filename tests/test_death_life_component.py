@@ -1,5 +1,5 @@
 
-from admiral.component_envs.death_life import HealthAgent, DyingAgent
+from admiral.component_envs.death_life import HealthAgent, LifeAgent
 from admiral.component_envs.death_life import DyingComponent
 
 def test_health_agents():
@@ -23,10 +23,10 @@ def test_health_agents():
 
 def test_dying_component():
     agents = {
-        'agent0': DyingAgent(id='agent0', min_health=0.0, max_health=5.0, initial_health=3.4),
-        'agent1': DyingAgent(id='agent1', min_health=0.0, max_health=5.0, initial_health=2.4),
-        'agent2': DyingAgent(id='agent2', min_health=0.0, max_health=5.0),
-        'agent3': DyingAgent(id='agent3', min_health=0.0, max_health=5.0),
+        'agent0': LifeAgent(id='agent0', min_health=0.0, max_health=5.0, initial_health=3.4),
+        'agent1': LifeAgent(id='agent1', min_health=0.0, max_health=5.0, initial_health=2.4),
+        'agent2': LifeAgent(id='agent2', min_health=0.0, max_health=5.0),
+        'agent3': LifeAgent(id='agent3', min_health=0.0, max_health=5.0),
     }
 
     assert agents['agent0'].min_health == 0.0

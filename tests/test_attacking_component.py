@@ -2,13 +2,13 @@
 from gym.spaces import MultiBinary
 import numpy as np
 
-from admiral.component_envs.attacking import GridAttackingAgent, GridPositionAgent, TeamAgent, DyingAgent
+from admiral.component_envs.attacking import GridAttackingAgent, GridPositionAgent, TeamAgent, LifeAgent
 from admiral.component_envs.attacking import GridAttackingComponent, GridAttackingTeamComponent
 
-class AttackTestAgent(GridAttackingAgent, GridPositionAgent, DyingAgent):
+class AttackTestAgent(GridAttackingAgent, GridPositionAgent, LifeAgent):
     pass
 
-class AttackTeamTestAgent(GridAttackingAgent, GridPositionAgent, DyingAgent, TeamAgent):
+class AttackTeamTestAgent(GridAttackingAgent, GridPositionAgent, LifeAgent, TeamAgent):
     pass
 
 def test_grid_attacking_component():

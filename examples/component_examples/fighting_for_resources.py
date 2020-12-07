@@ -6,12 +6,12 @@ from admiral.component_envs.position import GridPositionComponent, GridPositionA
 from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
 from admiral.component_envs.attacking import GridAttackingComponent, GridAttackingAgent
-from admiral.component_envs.death_life import DyingAgent, DyingComponent
+from admiral.component_envs.death_life import LifeAgent, DyingComponent
 from admiral.component_envs.rewarder import RewarderComponent
 from admiral.component_envs.done_component import DeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
-class FightForResourcesAgent(DyingAgent, GridPositionAgent, GridAttackingAgent, GridMovementAgent, GridResourceHarvestingAgent, ObservingAgent):
+class FightForResourcesAgent(LifeAgent, GridPositionAgent, GridAttackingAgent, GridMovementAgent, GridResourceHarvestingAgent, ObservingAgent):
     pass
 
 class FightForResourcesEnv(AgentBasedSimulation):

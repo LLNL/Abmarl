@@ -1,15 +1,15 @@
 
-from admiral.component_envs.done_component import DyingAgent, TeamAgent
+from admiral.component_envs.done_component import LifeAgent, TeamAgent
 from admiral.component_envs.done_component import DeadDoneComponent, TeamDeadDoneComponent
 
-class DoneTestAgent(DyingAgent, TeamAgent): pass
+class DoneTestAgent(LifeAgent, TeamAgent): pass
 
 def test_dead_done_condition():
     agents = {
-        'agent0': DyingAgent(id='agent0'),
-        'agent1': DyingAgent(id='agent1'),
-        'agent2': DyingAgent(id='agent2'),
-        'agent3': DyingAgent(id='agent3'),
+        'agent0': LifeAgent(id='agent0'),
+        'agent1': LifeAgent(id='agent1'),
+        'agent2': LifeAgent(id='agent2'),
+        'agent3': LifeAgent(id='agent3'),
     }
     component = DeadDoneComponent(agents=agents)
     assert component.get_done('agent0') is False

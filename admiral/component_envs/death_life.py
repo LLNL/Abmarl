@@ -15,7 +15,7 @@ class HealthAgent(Agent):
     def configured(self):
         return super().configured and self.min_health is not None and self.max_health is not None
 
-class DyingAgent(HealthAgent):
+class LifeAgent(HealthAgent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.is_alive = True
@@ -44,7 +44,7 @@ class DyingComponent:
                     agent.health = agent.initial_health
                 else:
                     agent.health = np.random.uniform(agent.min_health, agent.max_health)
-            if isinstance(agent, DyingAgent):
+            if isinstance(agent, LifeAgent):
                 agent.is_alive = True
     
     def apply_entropy(self, agent, **kwargs):
@@ -59,7 +59,7 @@ class DyingComponent:
         Process agent's death. If the health falls below the
         the minimal value, then the agent dies.
         """
-        if isinstance(agent, DyingAgent):
+        if isinstance(agent, LifeAgent):
             if agent.health <= agent.min_health:
                 agent.health = agent.min_health
                 agent.is_alive = False

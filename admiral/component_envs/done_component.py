@@ -1,13 +1,13 @@
 
 import numpy as np
 
-from admiral.component_envs.death_life import DyingAgent
+from admiral.component_envs.death_life import LifeAgent
 from admiral.component_envs.team import TeamAgent
 
 class DeadDoneComponent:
     def __init__(self, agents=None, **kwargs):
         for agent in agents.values():
-            assert isinstance(agent, DyingAgent)
+            assert isinstance(agent, LifeAgent)
         self.agents = agents
     
     def get_done(self, agent_id, **kwargs):
@@ -24,7 +24,7 @@ class TeamDeadDoneComponent:
     def __init__(self, agents=None, number_of_teams=None, **kwargs):
         for agent in agents.values():
             assert isinstance(agent, TeamAgent)
-            assert isinstance(agent, DyingAgent)
+            assert isinstance(agent, LifeAgent)
         self.agents = agents
         assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
         self.number_of_teams = number_of_teams

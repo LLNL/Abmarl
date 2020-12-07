@@ -2,7 +2,7 @@
 from admiral.envs import Agent
 from admiral.component_envs.position import GridPositionAgent
 from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.death_life import DyingAgent
+from admiral.component_envs.death_life import LifeAgent
 
 class GridAttackingAgent(Agent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
@@ -24,7 +24,7 @@ class GridAttackingComponent:
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
             assert isinstance(agent, GridPositionAgent)
-            assert isinstance(agent, DyingAgent)
+            assert isinstance(agent, LifeAgent)
         self.agents = agents
 
         from gym.spaces import MultiBinary
@@ -54,7 +54,7 @@ class GridAttackingTeamComponent:
         for agent in agents.values():
             assert isinstance(agent, GridPositionAgent)
             assert isinstance(agent, TeamAgent)
-            assert isinstance(agent, DyingAgent)
+            assert isinstance(agent, LifeAgent)
         self.agents = agents
 
         from gym.spaces import MultiBinary
