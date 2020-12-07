@@ -3,9 +3,9 @@ from admiral.envs import Agent
 
 class TeamAgent(Agent):
     def __init__(self, team=None, **kwargs):
+        super().__init__(**kwargs)
         assert team is not None, "team must be an integer"
         self.team = team
-        super().__init__(**kwargs)
     
     @property
     def configured(self):

@@ -6,9 +6,9 @@ from admiral.component_envs.position import GridPositionAgent
 
 class GridMovementAgent(Agent):
     def __init__(self, move=None, **kwargs):
+        super().__init__(**kwargs)
         assert move is not None, "move must be an integer"
         self.move = move
-        super().__init__(**kwargs)
     
     @property
     def configured(self):

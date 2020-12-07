@@ -6,11 +6,11 @@ from admiral.component_envs.death_life import DyingAgent
 
 class GridAttackingAgent(Agent):
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
+        super().__init__(**kwargs)
         assert attack_range is not None, "attack_range must be a nonnegative integer"
         self.attack_range = attack_range
         assert attack_strength is not None, "attack_strength must be a nonnegative number"
         self.attack_strength = attack_strength
-        super().__init__(**kwargs)
     
     @property
     def configured(self):

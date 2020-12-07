@@ -6,9 +6,9 @@ from admiral.component_envs.observer import ObservingAgent
 
 class GridResourceHarvestingAgent(Agent):
     def __init__(self, max_harvest=None, **kwargs):
+        super().__init__(**kwargs)
         assert max_harvest is not None, "max_harvest must be nonnegative number"
         self.max_harvest = max_harvest
-        super().__init__(**kwargs)
     
     @property
     def configured(self):
