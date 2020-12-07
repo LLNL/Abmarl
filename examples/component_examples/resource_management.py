@@ -36,9 +36,9 @@ class ResourceManagementEnv(AgentBasedSimulation):
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if 'move' in action:
-                    self.movement.act(agent, action['move'])
+                    self.movement.process_move(agent, action['move'])
                 if 'harvest' in action:
-                    amount_harvested = self.resource.act(agent, action['harvest'])
+                    amount_harvested = self.resource.process_harvest(agent, action['harvest'])
                     agent.health += amount_harvested
                 self.dying.apply_entropy(agent)
                 self.dying.process_death(agent)

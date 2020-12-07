@@ -32,7 +32,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if 'move' in action:
-                self.movement.act(agent, action['move'])
+                self.movement.process_move(agent, action['move'])
 
         return {'agent0': self.position.get_obs('agent0')}
     

@@ -44,15 +44,15 @@ class PredatorPreyEnv(AgentBasedSimulation):
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if 'move' in action:
-                    self.movement.act(agent, action['move'])
+                    self.movement.process_move(agent, action['move'])
                 if action.get('attack', False):
-                    attacked_agent = self.attacking.act(agent)
+                    attacked_agent = self.attacking.process_attack(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if action.get('harvest', False):
-                    amount_harvested = self.resource.act(agent, action['harvest'])
+                    amount_harvested = self.resource.process_harvest(agent, action['harvest'])
                     agent.health += amount_harvested
 
         for agent_id in action_dict:

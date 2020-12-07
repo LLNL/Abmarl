@@ -75,10 +75,10 @@ def test_grid_resources_component():
         [0.95379678, 0.72311497, 0.86094834, 0.52981774, 0.        ],
     ]))
     
-    assert component.act(agents['agent0'], 0.5) == 0.5
-    assert component.act(agents['agent1'], 0.5) == 0.
-    assert component.act(agents['agent2'], 0.5) == 0.5
-    assert component.act(agents['agent3'], 0.5) == 0.5
+    assert component.process_harvest(agents['agent0'], 0.5) == 0.5
+    assert component.process_harvest(agents['agent1'], 0.5) == 0.
+    assert component.process_harvest(agents['agent2'], 0.5) == 0.5
+    assert component.process_harvest(agents['agent3'], 0.5) == 0.5
     assert np.allclose(component.resources, np.array([
         [0.5, 0.87440489, 0.69693299, 0.9311798,  0.65446477],
         [0.98155565, 1., 0.93135774, 0.91300926, 0.5],
@@ -87,9 +87,9 @@ def test_grid_resources_component():
         [0.95379678, 0.72311497, 0.86094834, 0.52981774, 0.        ],
     ]))
     
-    assert component.act(agents['agent0'], 0.5) == 0.5
-    assert component.act(agents['agent2'], 0.5) == 0.26891643
-    assert component.act(agents['agent3'], 0.5) == 0.5
+    assert component.process_harvest(agents['agent0'], 0.5) == 0.5
+    assert component.process_harvest(agents['agent2'], 0.5) == 0.26891643
+    assert component.process_harvest(agents['agent3'], 0.5) == 0.5
     assert np.allclose(component.resources, np.array([
         [0., 0.87440489, 0.69693299, 0.9311798,  0.65446477],
         [0.98155565, 1., 0.93135774, 0.91300926, 0.],

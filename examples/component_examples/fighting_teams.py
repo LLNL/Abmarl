@@ -38,13 +38,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if action.get('attack', False):
-                    attacked_agent = self.attacking.act(agent)
+                    attacked_agent = self.attacking.process_attack(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         # agent.health += agent.attack_strength # Gain health from a good attack.
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if 'move' in action:
-                    self.movement.act(agent, action['move'])
+                    self.movement.process_move(agent, action['move'])
             
         # Because agents can affect each others' health, we process the dying
         # outside the loop at the end of all the moves. Note: this does not

@@ -31,7 +31,7 @@ class GridMovementComponent:
             if isinstance(agent, GridMovementAgent):
                 agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
 
-    def act(self, agent, move, **kwargs):
+    def process_move(self, agent, move, **kwargs):
         new_position = agent.position + move
         if 0 <= new_position[0] < self.region and \
             0 <= new_position[1] < self.region: # Still inside the boundary, good move

@@ -32,7 +32,7 @@ class GridAttackingComponent:
             if isinstance(agent, GridAttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
-    def act(self, attacking_agent, **kwargs):
+    def process_attack(self, attacking_agent, **kwargs):
         for agent in self.agents.values():
             if agent.id == attacking_agent.id:
                 # Cannot attack yourself
@@ -62,7 +62,7 @@ class GridAttackingTeamComponent:
             if isinstance(agent, GridAttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
-    def act(self, attacking_agent, **kwargs):
+    def process_attack(self, attacking_agent, **kwargs):
         for agent in self.agents.values():
             if agent.id == attacking_agent.id:
                 # Cannot attack yourself

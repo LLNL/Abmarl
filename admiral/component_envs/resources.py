@@ -56,7 +56,7 @@ class GridResourceComponent:
                 coverage_filter
             )
 
-    def act(self, agent, amount, **kwargs):
+    def process_harvest(self, agent, amount, **kwargs):
             location = tuple(agent.position)
             if self.resources[location] - amount >= 0.:
                 actual_amount_harvested = amount

@@ -40,14 +40,14 @@ class FightForResourcesEnv(AgentBasedSimulation):
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if action.get('attack', False):
-                    attacked_agent = self.attacking.act(agent)
+                    attacked_agent = self.attacking.process_attack(agent)
                     if attacked_agent is not None:
                         self.agents[attacked_agent].health -= agent.attack_strength
                         self.attacking_record.append(agent.id + " attacked " + attacked_agent)
                 if 'move' in action:
-                    self.movement.act(agent, action['move'])
+                    self.movement.process_move(agent, action['move'])
                 if 'harvest' in action:
-                    amount_harvested = self.resource.act(agent, action['harvest'])
+                    amount_harvested = self.resource.process_harvest(agent, action['harvest'])
                     agent.health += amount_harvested
             
         # Because agents can affect each others' health, we process the dying
