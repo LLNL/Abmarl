@@ -3,6 +3,7 @@ import numpy as np
 
 from admiral.envs import Agent
 from admiral.component_envs.observer import ObservingAgent
+from admiral.component_envs.position import GridPositionAgent
 
 class GridResourceHarvestingAgent(Agent):
     def __init__(self, max_harvest=None, **kwargs):
@@ -36,6 +37,8 @@ class GridResourceComponent:
         self.coverage = coverage
 
         assert type(agents) is dict, "agents must be a dict"
+        for agent in agents.values():
+            assert isinstance(agent, GridPositionAgent)
         self.agents = agents
 
         from gym.spaces import Box
