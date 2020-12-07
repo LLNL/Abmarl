@@ -7,7 +7,7 @@ from admiral.component_envs.movement import GridMovementComponent, GridMovementA
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
 from admiral.component_envs.death_life import DyingAgent, DyingComponent
 from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_conditioner import DeadDoneComponent
+from admiral.component_envs.done_component import DeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 class ResourceManagementAgent(DyingAgent, GridMovementAgent, GridPositionAgent, ObservingAgent,  GridResourceHarvestingAgent):

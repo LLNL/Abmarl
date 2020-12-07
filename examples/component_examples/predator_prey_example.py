@@ -9,7 +9,7 @@ from admiral.component_envs.attacking import GridAttackingTeamComponent, GridAtt
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
 from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
+from admiral.component_envs.done_component import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 class PreyAgent(GridPositionAgent, ObservingAgent, TeamAgent, GridMovementAgent, DyingAgent, GridResourceHarvestingAgent):

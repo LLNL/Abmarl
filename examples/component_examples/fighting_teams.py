@@ -8,7 +8,7 @@ from admiral.component_envs.movement import GridMovementComponent, GridMovementA
 from admiral.component_envs.attacking import GridAttackingTeamComponent, GridAttackingAgent
 from admiral.component_envs.death_life import DyingComponent, DyingAgent
 from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_conditioner import TeamDeadDoneComponent
+from admiral.component_envs.done_component import TeamDeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 class FightingTeamsAgent(DyingAgent, GridPositionAgent, GridAttackingAgent, TeamAgent, GridMovementAgent, ObservingAgent):
