@@ -38,9 +38,8 @@ class ResourceManagementEnv(AgentBasedSimulation):
                     self.movement.process_move(agent, action['move'])
                 if 'harvest' in action:
                     amount_harvested = self.resource.process_harvest(agent, action['harvest'])
-                    agent.health += amount_harvested
+                    agent.add_health(amount_harvested)
                 self.dying.apply_entropy(agent)
-                self.dying.process_death(agent)
         self.resource.regrow()
     
     def render(self, fig=None, **kwargs):

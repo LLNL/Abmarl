@@ -62,13 +62,9 @@ def test_dying_component():
         component.apply_entropy(agents['agent2'])
         component.apply_entropy(agents['agent3'])
 
-    component.process_death(agents['agent0'])
     assert agents['agent0'].is_alive is False
-    component.process_death(agents['agent1'])
     assert agents['agent1'].is_alive is False
-    component.process_death(agents['agent2'])
     assert agents['agent2'].is_alive is False
-    component.process_death(agents['agent3'])
     assert agents['agent3'].is_alive is False
 
     component.reset()
