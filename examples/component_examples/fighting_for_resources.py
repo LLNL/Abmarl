@@ -1,6 +1,5 @@
 
 from matplotlib import pyplot as plt
-import numpy as np
 
 from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.position import GridPositionComponent, GridPositionAgent
