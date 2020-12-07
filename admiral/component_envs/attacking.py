@@ -5,6 +5,17 @@ from admiral.component_envs.team import TeamAgent
 from admiral.component_envs.death_life import LifeAgent
 
 class GridAttackingAgent(Agent):
+    """
+    Agents that can attack other agents in the grid. Attack is based on the relative
+    positions of the agents and can affect the agents' health, if applicable.
+
+    attack_range (int):
+        The effective range of the attack.
+    
+    attack_strength (float):
+        How effective the agent's attack is. This is applicable in situations where
+        the agents' health is affected by attacks.
+    """
     def __init__(self, attack_range=None, attack_strength=None, **kwargs):
         super().__init__(**kwargs)
         assert attack_range is not None, "attack_range must be a nonnegative integer"
@@ -20,6 +31,17 @@ class GridAttackingAgent(Agent):
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
 class GridAttackingComponent:
+    """
+    Provide the necessary action space for agents who can attack and process such
+    attacks. The attack is successful if the attacked agent is alive and within
+    range. The action space is appended with a MultiBinary(1), allowing the agent
+    to attack or not attack.
+
+    agents (dict):
+        The dictionary of agents. Because attacks are grid-based, all agents must
+        be GridPositionAgents; becuase the attacked agent must be alive, all agents
+        must be LifeAgents.
+    """
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
@@ -33,6 +55,13 @@ class GridAttackingComponent:
                 agent.action_space['attack'] = MultiBinary(1)
 
     def process_attack(self, attacking_agent, **kwargs):
+        """
+        Determine which agent the attacking agent successfully attacks and return
+        that agent's id. If the attack fails, return None.
+
+        attacking_agent (agent):
+            The agent that has chosen to attack.
+        """
         for agent in self.agents.values():
             if agent.id == attacking_agent.id:
                 # Cannot attack yourself
@@ -49,6 +78,18 @@ class GridAttackingComponent:
                 return agent.id
 
 class GridAttackingTeamComponent:
+    """
+    Provide the necessary action space for agents who can attack and process such
+    attacks. The attack is successful if the attacked agent is alive, on a different
+    team, and within range. The action space is appended with a MultiBinary(1),
+    allowing the agent to attack or not attack.
+
+    agents (dict):
+        The dictionary of agents. Because attacks are grid-based, all agents must
+        be GridPositionAgents; becuase the attacked agent must be alive, all agents
+        must be LifeAgents; and because the attacked agent must be on a different
+        team, each agent must be a TeamAgent.
+    """
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
@@ -63,6 +104,13 @@ class GridAttackingTeamComponent:
                 agent.action_space['attack'] = MultiBinary(1)
 
     def process_attack(self, attacking_agent, **kwargs):
+        """
+        Determine which agent the attacking agent successfully attacks and return
+        that agent's id. If the attack fails, return None.
+
+        attacking_agent (agent):
+            The agent that has chosen to attack.
+        """
         for agent in self.agents.values():
             if agent.id == attacking_agent.id:
                 # Cannot attack yourself
