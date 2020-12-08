@@ -10,20 +10,15 @@ class Agent:
             raise TypeError("Agents must be constructed with an id.")
         else:
             self.id = id
-        self.observation_space = observation_space
-        self.action_space = action_space
+        self.observation_space = {} if observation_space is None else observation_space
+        self.action_space = {} if action_space is None else action_space
     
     @property
     def configured(self):
         """
         Determine if the agent has been successfully configured.
         """
-        if self.observation_space is not None and self.action_space is not None:
-            return True
-        else:
-            return False
+        return self.id is not None and self.action_space and self.observation_space
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
-
-    
