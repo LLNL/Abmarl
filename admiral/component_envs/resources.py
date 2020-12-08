@@ -6,6 +6,13 @@ from admiral.component_envs.observer import ObservingAgent
 from admiral.component_envs.position import GridPositionAgent
 
 class GridResourceHarvestingAgent(Agent):
+    """
+    Agents can harvest resources.
+
+    max_harvest (double):
+        The maximum amount of resources the agent can harvest from the cell it
+        occupies.
+    """
     def __init__(self, max_harvest=None, **kwargs):
         super().__init__(**kwargs)
         assert max_harvest is not None, "max_harvest must be nonnegative number"
@@ -13,17 +20,58 @@ class GridResourceHarvestingAgent(Agent):
     
     @property
     def configured(self):
+        """
+        Agents are configured if max_harvest is set.
+        """
         return super().configured and self.max_harvest is not None
 
 class GridResourceComponent:
     """
     Resources exist in the cells of the grid. The grid is populated with resources
-    between the min and max value on some coverage of the region.
+    between the min and max value on some coverage of the region at reset time.
+    If original resources is specified, then reset will set the resources back 
+    to that original value. This component supports resource depletion: if a resource falls below
+    the minimum value, it will not regrow. Agents can harvest resources from the cell they occupy.
+    Agents can observe the resources in a grid-like observation surrounding their positions.
 
-    This environment support resource depletion: if a resource falls below the
-    minimum value, it will not regrow.
+    The action space of GridResourcesHarvestingAgents is appended with
+    Box(0, agent.max_harvest, (1,), np.float), indicating that the agent can harvest
+    up to its max harvest value on the cell it occupies.
+
+    The observation space of ObservingAgents is appended with
+    Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float), indicating
+    that an agent can observe the resources in a grid surrounding its position,
+    up to its view distance.
+
+    agents (dict):
+        The dictionary of agents. Because agents harvest and observe resources
+        based on their positions, agents must be GridPositionAgents.
+
+    region (int):
+        The size of the region
+
+    coverage (float):
+        The ratio of the region that should start with resources.
+
+    min_value (float):
+        The minimum value a resource can have before it cannot grow back. This is
+        different from the absolute minimum value, 0, which indicates that there
+        are no resources in the cell.
+    
+    max_value (float):
+        The maximum value a resource can have.
+
+    regrow_rate (float):
+        The rate at which resources regrow.
+    
+    original_resources (np.array):
+        Instead of specifying the above resource-related parameters, we can provide
+        an initial state of the resources. At reset time, the resources will be
+        set to these original resources. Otherwise, the resources will be set
+        to random values between the min and max value up to some coverage of the
+        region.
     """
-    def __init__(self, region=None, agents=None, coverage=0.75, min_value=0.1, max_value=1.0,
+    def __init__(self, agents=None, region=None, coverage=0.75, min_value=0.1, max_value=1.0,
             regrow_rate=0.04, original_resources=None, **kwargs):        
         self.original_resources = original_resources
         if self.original_resources is None:
@@ -49,6 +97,12 @@ class GridResourceComponent:
                 agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
     def reset(self, **kwargs):
+        """
+        Reset the resources. If original resources is specified, then the resources
+        will be reset back to this original value. Otherwise, the resources will
+        be randomly generated values between the min and max value up to some coverage
+        of the region.
+        """
         if self.original_resources is not None:
             self.resources = self.original_resources
         else:
@@ -60,20 +114,32 @@ class GridResourceComponent:
             )
 
     def process_harvest(self, agent, amount, **kwargs):
-            location = tuple(agent.position)
-            if self.resources[location] - amount >= 0.:
-                actual_amount_harvested = amount
-            else:
-                actual_amount_harvested = self.resources[location]
-            self.resources[location] = max([0., self.resources[location] - amount])
+        """
+        Harvest some amount of resources at the agent's position.
 
-            return actual_amount_harvested
+        Return the amount of resources harvested. This can be less than the amount
+        of harvest if the cell does not have that many resources.
+        """
+        location = tuple(agent.position)
+        if self.resources[location] - amount >= 0.:
+            actual_amount_harvested = amount
+        else:
+            actual_amount_harvested = self.resources[location]
+        self.resources[location] = max([0., self.resources[location] - amount])
+
+        return actual_amount_harvested
 
     def regrow(self, **kwargs):
+        """
+        Regrow the resources according to the regrow_rate.
+        """
         self.resources[self.resources >= self.min_value] += self.regrow_rate
         self.resources[self.resources >= self.max_value] = self.max_value
 
     def render(self, fig=None, **kwargs):
+        """
+        Draw a heatmap of the resources on the figure.
+        """
         draw_now = fig is None
         if draw_now:
             from matplotlib import pyplot as plt
@@ -92,7 +158,7 @@ class GridResourceComponent:
     def get_obs(self, agent_id, **kwargs):
         """
         These cells are filled with the values of the resources surrounding the
-        agent.
+        agent's position.
         """
         agent = self.agents[agent_id]
         if isinstance(agent, ObservingAgent):
@@ -109,4 +175,3 @@ class GridResourceComponent:
             signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
                 self.resources[r_lower:r_upper, c_lower:c_upper]
             return signal
-
