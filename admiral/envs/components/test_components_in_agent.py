@@ -672,7 +672,7 @@ class MovementAgent(Agent):
         super().__init__(**kwargs)
         self.move_range = move_range
 
-class MovementPositionConverter:
+class MovementActor:
     """
     Processes the agents' movement actions into proposed positions.
 
@@ -749,7 +749,7 @@ class AttackingAgent(Agent):
         self.attack_range = attack_range
         self.attack_strength = attack_strength
 
-class AttackHealthConverter:
+class AttackActor:
     def __init__(self, agents=None, health_component=None, **kwargs):
         self.agents = agents
         for agent in agents.values():
@@ -784,8 +784,8 @@ class BattleEnv(AgentBasedSimulation):
         self.health = HealthComponent(**kwargs)
         self.team = TeamComponent(**kwargs)
 
-        self.move = MovementPositionConverter(position_component=self.position, **kwargs)
-        self.attack = AttackHealthConverter(health_component=self.health, **kwargs)
+        self.move = MovementActor(position_component=self.position, **kwargs)
+        self.attack = AttackActor(health_component=self.health, **kwargs)
 
         self.finalize()
     
