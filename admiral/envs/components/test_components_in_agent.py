@@ -680,13 +680,14 @@ class MovementPositionConverter:
     for more complicated movement physics. Currently, this just shows us the software
     design idea.
     """
-    def __init__(self, agents=None, **kwargs):
+    def __init__(self, position_component=None, agents=None, **kwargs):
+        self.position = position_component
         self.agents = agents
         for agent in agents.values():
             agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
     
-    def process_move(self, position, move, **kwargs):
-        return position + move
+    def process_move(self, agent_id, move, **kwargs):
+        self.position.modify_position(agent_id, move, **kwargs)
 
 
 
@@ -770,8 +771,8 @@ class AttackHealthConverter:
                     # Agent too far away
                     continue
                 else:
-                    self.health.modify_health(attacked_agent_id, -attacking_agent.attack_strength)
-                    self.health.modify_health(attacking_agent_id, attacking_agent.attack_strength)
+                    self.health.modify_health(attacked_agent_id, -attacking_agent.attack_strength, **kwargs)
+                    self.health.modify_health(attacking_agent_id, attacking_agent.attack_strength, **kwargs)
 
 
 class BattleAgent(GridPositionAgent, MovementAgent, AttackingAgent, HealthAgent, TeamAgent): pass
@@ -783,7 +784,7 @@ class BattleEnv(AgentBasedSimulation):
         self.health = HealthComponent(**kwargs)
         self.team = TeamComponent(**kwargs)
 
-        self.move = MovementPositionConverter(**kwargs)
+        self.move = MovementPositionConverter(position_component=self.position, **kwargs)
         self.attack = AttackHealthConverter(health_component=self.health, **kwargs)
 
         self.finalize()
@@ -798,9 +799,7 @@ class BattleEnv(AgentBasedSimulation):
             self.attack.process_attack(agent_id, action['attack'], **kwargs)
 
         for agent_id, action in action_dict.items():
-            current_position = self.agents[agent_id].position
-            proposed_position = self.move.process_move(current_position, action['move'])
-            self.position.set_position(agent_id, proposed_position)
+            self.move.process_move(agent_id, action['move'], **kwargs)
 
         for agent in self.agents.values():
             self.health.modify_health(agent_id, -1) # Some kind of entropy
