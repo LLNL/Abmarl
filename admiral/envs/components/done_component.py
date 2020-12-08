@@ -1,8 +1,8 @@
 
 import numpy as np
 
-from admiral.component_envs.death_life import LifeAgent
-from admiral.component_envs.team import TeamAgent
+from admiral.envs.components.death_life import LifeAgent
+from admiral.envs.components.team import TeamAgent
 
 class DeadDoneComponent:
     """

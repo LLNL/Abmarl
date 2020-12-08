@@ -1,14 +1,14 @@
 
 from matplotlib import pyplot as plt
 
-from admiral.component_envs.observer import ObservingAgent
-from admiral.component_envs.position import GridPositionComponent, GridPositionAgent
-from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
-from admiral.component_envs.resources import GridResourceComponent, GridResourceHarvestingAgent
-from admiral.component_envs.attacking import GridAttackingComponent, GridAttackingAgent
-from admiral.component_envs.death_life import LifeAgent, DyingComponent
-from admiral.component_envs.rewarder import RewarderComponent
-from admiral.component_envs.done_component import DeadDoneComponent
+from admiral.envs.components.observer import ObservingAgent
+from admiral.envs.components.position import GridPositionComponent, GridPositionAgent
+from admiral.envs.components.movement import GridMovementComponent, GridMovementAgent
+from admiral.envs.components.resources import GridResourceComponent, GridResourceHarvestingAgent
+from admiral.envs.components.attacking import GridAttackingComponent, GridAttackingAgent
+from admiral.envs.components.death_life import LifeAgent, DyingComponent
+from admiral.envs.components.rewarder import RewarderComponent
+from admiral.envs.components.done_component import DeadDoneComponent
 from admiral.envs import AgentBasedSimulation
 
 class FightForResourcesAgent(LifeAgent, GridPositionAgent, GridAttackingAgent, GridMovementAgent, GridResourceHarvestingAgent, ObservingAgent):

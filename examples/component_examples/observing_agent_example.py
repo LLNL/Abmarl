@@ -2,11 +2,11 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.observer import ObservingAgent
-from admiral.component_envs.position import GridPositionTeamsComponent, GridPositionAgent
-from admiral.component_envs.movement import GridMovementComponent, GridMovementAgent
-from admiral.component_envs.rewarder import RewarderComponent
+from admiral.envs.components.team import TeamAgent
+from admiral.envs.components.observer import ObservingAgent
+from admiral.envs.components.position import GridPositionTeamsComponent, GridPositionAgent
+from admiral.envs.components.movement import GridMovementComponent, GridMovementAgent
+from admiral.envs.components.rewarder import RewarderComponent
 from admiral.envs import AgentBasedSimulation
 
 # TODO: This is much better suited as a unit test.

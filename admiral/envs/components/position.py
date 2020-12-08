@@ -2,8 +2,8 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.observer import ObservingAgent
+from admiral.envs.components.team import TeamAgent
+from admiral.envs.components.observer import ObservingAgent
 from admiral.tools.matplotlib_utils import mscatter
 
 class GridPositionAgent(Agent):

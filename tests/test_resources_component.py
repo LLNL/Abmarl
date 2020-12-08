@@ -3,9 +3,9 @@ from gym.spaces import Box
 
 import numpy as np
 
-from admiral.component_envs.resources import ObservingAgent, GridResourceHarvestingAgent
-from admiral.component_envs.resources import GridResourceComponent
-from admiral.component_envs.position import GridPositionAgent
+from admiral.envs.components.resources import ObservingAgent, GridResourceHarvestingAgent
+from admiral.envs.components.resources import GridResourceComponent
+from admiral.envs.components.position import GridPositionAgent
 
 class ResourcesTestAgent(ObservingAgent, GridPositionAgent, GridResourceHarvestingAgent): pass
 

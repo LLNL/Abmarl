@@ -1,8 +1,8 @@
 
 from admiral.envs import Agent
-from admiral.component_envs.position import GridPositionAgent
-from admiral.component_envs.team import TeamAgent
-from admiral.component_envs.death_life import LifeAgent
+from admiral.envs.components.position import GridPositionAgent
+from admiral.envs.components.team import TeamAgent
+from admiral.envs.components.death_life import LifeAgent
 
 class GridAttackingAgent(Agent):
     """

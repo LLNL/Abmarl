@@ -2,8 +2,8 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.component_envs.observer import ObservingAgent
-from admiral.component_envs.position import GridPositionAgent
+from admiral.envs.components.observer import ObservingAgent
+from admiral.envs.components.position import GridPositionAgent
 
 class GridResourceHarvestingAgent(Agent):
     """

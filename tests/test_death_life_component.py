@@ -1,6 +1,6 @@
 
-from admiral.component_envs.death_life import HealthAgent, LifeAgent
-from admiral.component_envs.death_life import DyingComponent
+from admiral.envs.components.death_life import HealthAgent, LifeAgent
+from admiral.envs.components.death_life import DyingComponent
 
 def test_health_agents():
     agents = {

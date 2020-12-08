@@ -3,8 +3,8 @@ from gym.spaces import Box
 
 import numpy as np
 
-from admiral.component_envs.position import GridPositionAgent, TeamAgent, ObservingAgent
-from admiral.component_envs.position import GridPositionComponent, GridPositionTeamsComponent
+from admiral.envs.components.position import GridPositionAgent, TeamAgent, ObservingAgent
+from admiral.envs.components.position import GridPositionComponent, GridPositionTeamsComponent
 
 class PositionTestAgent(GridPositionAgent, ObservingAgent): pass
 class PositionTeamTestAgent(GridPositionAgent, ObservingAgent, TeamAgent): pass

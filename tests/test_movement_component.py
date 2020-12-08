@@ -2,8 +2,8 @@
 from gym.spaces import Box
 import numpy as np
 
-from admiral.component_envs.movement import GridMovementAgent, GridPositionAgent
-from admiral.component_envs.movement import GridMovementComponent
+from admiral.envs.components.movement import GridMovementAgent, GridPositionAgent
+from admiral.envs.components.movement import GridMovementComponent
 
 class MovementTestAgent(GridMovementAgent, GridPositionAgent): pass
 
