@@ -747,8 +747,32 @@ class AttackingAgent(Agent):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
-        
-        self.action_space['attack'] = MultiBinary(1)
+
+class AttackHealthConverter:
+    def __init__(self, agents=None, health_component=None, **kwargs):
+        self.agents = agents
+        for agent in agents.values():
+            agent.action_space['attack'] = MultiBinary(1)
+        self.health = health_component
+    
+    def process_attack(self, attacking_agent_id, attack, **kwargs):
+        if attack:
+            attacking_agent = self.agents[attacking_agent_id]
+            for attacked_agent_id, attacked_agent in self.agents.items():
+                if attacked_agent_id == attacking_agent_id:
+                    # Cannot attack yourself
+                    continue
+                elif attacking_agent.team == attacked_agent.team:
+                    # Cannot attack memebers of your own team
+                    continue
+                elif abs(attacking_agent.position[0] - attacked_agent.position[0]) > attacking_agent.attack_range or \
+                    abs(attacking_agent.position[1] - attacked_agent.position[1]) > attacking_agent.attack_range:
+                    # Agent too far away
+                    continue
+                else:
+                    self.health.modify_health(attacked_agent_id, -attacking_agent.attack_strength)
+                    self.health.modify_health(attacking_agent_id, attacking_agent.attack_strength)
+
 
 class BattleAgent(GridPositionAgent, MovementAgent, AttackingAgent, HealthAgent, TeamAgent): pass
 
@@ -756,9 +780,11 @@ class BattleEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.position = GridPositionComponent(**kwargs)
-        self.move = MovementPositionConverter(**kwargs)
         self.health = HealthComponent(**kwargs)
         self.team = TeamComponent(**kwargs)
+
+        self.move = MovementPositionConverter(**kwargs)
+        self.attack = AttackHealthConverter(health_component=self.health, **kwargs)
 
         self.finalize()
     
@@ -768,23 +794,8 @@ class BattleEnv(AgentBasedSimulation):
             self.health.reset(agent_id)
     
     def step(self, action_dict, **kwargs):
-        for my_id, action in action_dict.items():
-            if action['attack']:
-                attacking_agent = self.agents[my_id]
-                for other_id, other_agent in self.agents.items():
-                    if other_id == my_id:
-                        # Cannot attack yourself
-                        continue
-                    elif attacking_agent.team == other_agent.team:
-                        # Cannot attack memebers of your own team
-                        continue
-                    elif abs(attacking_agent.position[0] - other_agent.position[0]) > attacking_agent.attack_range or \
-                        abs(attacking_agent.position[1] - other_agent.position[1]) > attacking_agent.attack_range:
-                        # Agent too far away
-                        continue
-                    else:
-                        self.health.modify_health(other_id, -attacking_agent.attack_strength)
-                        self.health.modify_health(my_id, attacking_agent.attack_strength)
+        for agent_id, action in action_dict.items():
+            self.attack.process_attack(agent_id, action['attack'], **kwargs)
 
         for agent_id, action in action_dict.items():
             current_position = self.agents[agent_id].position
