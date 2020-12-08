@@ -8,8 +8,8 @@ from admiral.tools.matplotlib_utils import mscatter
 
 class GridPositionAgent(Agent):
     """
-    WorldAgents have a position in the world. This position can given to the agent
-    as a starting position for each episode. If the position is None, then the environment
+    GridPosition have a position in the world. This position can given to the agent
+    as a starting position for each episode. If the starting_position is None, then the environment
     should assign the agent a random position.
     """
     def __init__(self, starting_position=None, **kwargs):
@@ -19,16 +19,29 @@ class GridPositionAgent(Agent):
     
     @property
     def configured(self):
-        """
-        Determine if the agent has been successfully configured.
-        """
         return super().configured
 
 class GridPositionComponent:
     """
-    WorldEnv is an abstract notion for some space in which agents exist. It is defined
-    by the set of agents that exist in it and the bounds of the world. Agents in
-    this environment will have a position at reset.
+    GridPositionComponent assigns the agents positions at reset and can generate
+    observations of the other agents in a grid-based view centered around the agent.
+    If the agent was created with a starting position, then that starting position
+    is applied when the simulation resets. Otherwise, the agent is assigned some
+    random position in the region.
+
+    The agents observation space is appended with Box(-1, 1, (agent.view*2+1, agent.view*2+1), np.int),
+    indicating that the agents can see a grid of size view*2+1 surrounding its
+    current location.
+        Out of bounds  : -1
+        Empty          :  0
+        Agent occupied : 1
+    
+    region (int):
+        The size of the region. Agents' positions can be anywhere within this region.
+    
+    agents (dict):
+        The dictionary of agents. Any agent that is in the GridPositionComponent
+        must be a GridPositionAgent.
     """
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer."
@@ -45,7 +58,8 @@ class GridPositionComponent:
 
     def reset(self, **kwargs):
         """
-        Place agents throughout the world.
+        Reset the agents' positions. If the agents were created with a starting
+        position, then use that. Otherwise, randomly assign a position in the region.
         """
         for agent in self.agents.values():
             if agent.starting_position is not None:
@@ -55,8 +69,9 @@ class GridPositionComponent:
 
     def render(self, fig=None, render_condition={}, shape_dict={}, **kwargs):
         """
-        Draw the agents in the grid. The shape of each agent is dictated by shape_dict.
-        If that is empty, then the agents are drawn as circles.
+        Draw the agents in the grid in the specified fig. The shape of each agent
+        is dictated by shape_dict. render_condition determines whether or not the
+        agent should be drawn (e.g. don't draw dead agents).
         """
         draw_now = fig is None
         if draw_now:
@@ -90,6 +105,10 @@ class GridPositionComponent:
         return ax
     
     def get_obs(self, my_id, **kwargs):
+        """
+        Generate an observation of other agents in the grid surrounding this agent's
+        position.
+        """
         my_agent = self.agents[my_id]
         if isinstance(my_agent, ObservingAgent):
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
@@ -119,6 +138,31 @@ class GridPositionComponent:
             return signal
 
 class GridPositionTeamsComponent(GridPositionComponent):
+    """
+    GridPositionComponent assigns the agents positions at reset and can generate
+    observations of the other agents in a grid-based view centered around the agent.
+    If the agent was created with a starting position, then that starting position
+    is applied when the simulation resets. Otherwise, the agent is assigned some
+    random position in the region.
+
+    The agents observation space is appended with
+    Box(-1, inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int),
+    indicating that the agents can see a grid of size view*2+1 surrounding its
+    current location. The view contains one channel for each team, and the values
+    in those channels are -1 if out of bounds, 0 if empty, and otherwise it is
+    the number of agents of that team occupying that cell.
+    
+    region (int):
+        The size of the region. Agents' positions can be anywhere within this region.
+    
+    agents (dict):
+        The dictionary of agents. Any agent that is in the GridPositionComponent
+        must be a GridPositionAgent. Because the observations are channeled by
+        the agents' teams, every agent must be a TeamAgent.
+    
+    number_of_teams (int):
+        The fixed number of teams in this simulation.
+    """
     def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
         self.region = region
         for agent in agents.values():
@@ -133,6 +177,11 @@ class GridPositionTeamsComponent(GridPositionComponent):
                 agent.observation_space['agents'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
     
     def get_obs(self, my_id, **kwargs):
+        """
+        Generate an observation of other agents in the grid surrounding this agent's
+        position. Each team has its own channel and the value represents the number
+        of agents of that team occupying the same square.
+        """
         my_agent = self.agents[my_id]
         if isinstance(my_agent, ObservingAgent) and isinstance(my_agent, TeamAgent):
             signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
