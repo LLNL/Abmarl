@@ -86,10 +86,7 @@ env.render(fig=fig)
 for _ in range(100):
     action_dict = {}
     for agent_id, agent in env.agents.items():
-        action_dict[agent_id] = {
-            'move': agent.action_space['move'].sample(),
-            'attack': agent.action_space['attack'].sample(),
-        }
+        action_dict[agent_id] = agent.action_space.sample()
     env.step(action_dict)
     env.render(fig=fig)
     print(env.get_all_done())
