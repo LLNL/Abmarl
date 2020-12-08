@@ -26,7 +26,8 @@ class GridAttackingAgent(Agent):
     @property
     def configured(self):
         """
-        Determine if the agent has been successfully configured.
+        The agent is successfully configured if the attack range and strength is
+        specified.
         """
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
