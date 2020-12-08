@@ -1,5 +1,8 @@
 
 class RewarderComponent:
+    """
+    Tracks the rewards for each agent throughout the simulation.
+    """
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "agents must be a dictionary"
         self.agents = agents
