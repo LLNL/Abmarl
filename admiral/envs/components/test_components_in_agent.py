@@ -885,7 +885,7 @@ class GridPositionComponent:
         new_position = agent.position + _mod_value
         self.set_position(agent_id, new_position)
     
-    def get_obs(self, agent_id, **kwargs):
+    def get_state(self, agent_id, **kwargs):
         return self.agents[agent_id].position
 
 class PositionObserver:
@@ -898,8 +898,7 @@ class PositionObserver:
             })
     
     def get_obs(self, agent_id, **kwargs):
-        # TODO: get obs from the component should just be get state
-        return {id: self.position.get_obs(id, **kwargs) for id in self.agents}
+        return {id: self.position.get_state(id, **kwargs) for id in self.agents}
 
 
 
@@ -954,7 +953,7 @@ class HealthComponent:
     def modify_health(self, agent_id, _mod_value, **kwargs):
         self.set_health(agent_id, self.agents[agent_id].health + _mod_value)
     
-    def get_obs(self, agent_id, **kwargs):
+    def get_state(self, agent_id, **kwargs):
         return self.agents[agent_id].health
 
 class HealthObserver:
@@ -967,7 +966,7 @@ class HealthObserver:
             })
 
     def get_obs(self, agent_id, **kwargs):
-        return {id: self.health.get_obs(id, **kwargs) for id in self.agents}
+        return {id: self.health.get_state(id, **kwargs) for id in self.agents}
 
 
 class TeamAgent(Agent):
@@ -980,7 +979,7 @@ class TeamComponent:
         self.number_of_teams = number_of_teams
         self.agents = agents
     
-    def get_obs(self, agent_id, **kwargs):
+    def get_state(self, agent_id, **kwargs):
         return self.agents[agent_id].team
 
 class TeamObserver:
@@ -994,7 +993,7 @@ class TeamObserver:
             })
     
     def get_obs(self, agent_id, **kwargs):
-        return {id: self.team.get_obs(id, **kwargs) for id in self.agents}
+        return {id: self.team.get_state(id, **kwargs) for id in self.agents}
 
 
 
