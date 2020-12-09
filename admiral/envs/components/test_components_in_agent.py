@@ -862,13 +862,11 @@ class GridPositionComponent:
     Manages the agents' positions.
     """
     def __init__(self, agents=None, region=None, **kwargs):
-        for agent in agents.values():
-            assert isinstance(agent, GridPositionAgent)
         self.agents = agents
         self.region = region
 
-        for agent in agents.values():
-            agent.observation_space['position'] = Box(-region, region, (1,), np.int)
+        # for agent in agents.values():
+        #     agent.observation_space['position'] = Box(-region, region, (1,), np.int)
     
     def reset(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
@@ -889,6 +887,19 @@ class GridPositionComponent:
     
     def get_obs(self, agent_id, **kwargs):
         return self.agents[agent_id].position
+
+class PositionObserver:
+    def __init__(self, position_component=None, agents=None, **kwargs):
+        self.position = position_component
+        self.agents = agents
+        for agent in agents.values():
+            agent.observation_space['position'] = Dict({
+                agent_id: Box(0, self.position.region, (2,), np.int) for agent_id in agents
+            })
+    
+    def get_obs(self, agent_id, **kwargs):
+        # TODO: get obs from the component should just be get state
+        return {id: self.position.get_obs(id, **kwargs) for id in self.agents}
 
 
 
@@ -952,12 +963,11 @@ class HealthObserver:
         self.agents = agents
         for agent in self.agents.values():
             agent.observation_space['health'] = Dict({
-                agent_id: Box(agent.min_health, agent.max_health, (1,), np.float)
-                for agent_id in agents if agent_id != agent.id
+                agent_id: Box(agent.min_health, agent.max_health, (1,), np.float) for agent_id in agents
             })
 
     def get_obs(self, agent_id, **kwargs):
-        return {other_id: self.health.get_obs(other_id, **kwargs) for other_id in self.agents if other_id != agent_id}
+        return {id: self.health.get_obs(id, **kwargs) for id in self.agents}
 
 
 class TeamAgent(Agent):
@@ -969,12 +979,22 @@ class TeamComponent:
     def __init__(self, agents=None, number_of_teams=None, **kwargs):
         self.number_of_teams = number_of_teams
         self.agents = agents
-
-        for agent in agents.values():
-            agent.observation_space['team'] = Box(0, number_of_teams, (1,), np.int)
     
     def get_obs(self, agent_id, **kwargs):
         return self.agents[agent_id].team
+
+class TeamObserver:
+    def __init__(self, team_component=None, agents=None, **kwargs):
+        self.team = team_component
+        self.agents = agents
+
+        for agent in agents.values():
+            agent.observation_space['team'] = Dict({
+                agent_id: Box(0, self.team.number_of_teams, (1,), np.int) for agent_id in agents
+            })
+    
+    def get_obs(self, agent_id, **kwargs):
+        return {id: self.team.get_obs(id, **kwargs) for id in self.agents}
 
 
 
@@ -1024,6 +1044,8 @@ class BattleEnv(AgentBasedSimulation):
         self.attack = AttackActor(health_component=self.health, **kwargs)
 
         self.health_observer = HealthObserver(health_component=self.health, **kwargs)
+        self.position_observer = PositionObserver(position_component=self.position, **kwargs)
+        self.team_observer = TeamObserver(team_component=self.team, **kwargs)
 
         self.finalize()
     
@@ -1047,9 +1069,9 @@ class BattleEnv(AgentBasedSimulation):
 
     def get_obs(self, agent_id, **kwargs):
         return {
-            'position': self.position.get_obs(agent_id),
+            'position': self.position_observer.get_obs(agent_id),
             'health': self.health_observer.get_obs(agent_id),
-            'team': self.team.get_obs(agent_id)
+            'team': self.team_observer.get_obs(agent_id)
         }
 
     def get_reward(self, agent_id, **kwargs):
