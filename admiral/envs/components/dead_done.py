@@ -18,11 +18,11 @@ class DeadDone:
             assert isinstance(agent, LifeAgent)
         self.agents = agents
     
-    def get_done(self, agent_id, **kwargs):
+    def get_done(self, agent, **kwargs):
         """
         Return True if the agent is dead. Otherwise, return False.
         """
-        return not self.agents[agent_id].is_alive
+        return not agent.is_alive
 
     def get_all_done(self, **kwargs):
         """
@@ -54,11 +54,11 @@ class TeamDeadDone:
         assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
         self.number_of_teams = number_of_teams
     
-    def get_done(self, agent_id, **kwargs):
+    def get_done(self, agent, **kwargs):
         """
         Return True if the agent is dead. Otherwise, return False.
         """
-        return not self.agents[agent_id].is_alive
+        return not agent.is_alive
 
     def get_all_done(self, **kwargs):
         """

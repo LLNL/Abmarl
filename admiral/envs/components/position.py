@@ -12,7 +12,7 @@ class PositionAgent(Agent):
         self.starting_position = starting_position
         self.position = None
 
-class PositionComponent:
+class PositionState:
     """
     Manages the agents' positions.
     """
@@ -24,24 +24,22 @@ class PositionComponent:
             assert isinstance(agent, PositionAgent)
         self.agents = agents
 
-    def reset(self, agent_id, **kwargs):
+    def reset(self, agent, **kwargs):
         """
         Reset the agents' positions. If the agents were created with a starting
         position, then use that. Otherwise, randomly assign a position in the region.
         """
-        agent = self.agents[agent_id]
         if agent.starting_position is not None:
             agent.position = agent.starting_position
         else:
             agent.position = np.random.randint(0, self.region, 2)
     
-    def set_position(self, agent_id, _position, **kwargs):
-        agent = self.agents[agent_id]
+    def set_position(self, agent, _position, **kwargs):
         if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
             agent.position = _position
     
-    def modify_position(self, agent_id, value, **kwargs):
-        self.set_position(agent_id, self.agents[agent_id].position + value)
+    def modify_position(self, agent, value, **kwargs):
+        self.set_position(agent, agent.position + value)
 
 class PositionObserver:
     def __init__(self, position=None, agents=None, **kwargs):

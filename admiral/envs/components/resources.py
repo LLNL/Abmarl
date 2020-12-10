@@ -129,14 +129,14 @@ class GridResourcesActor:
         for agent in agents.values():
             agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
 
-    def process_harvest(self, agent_id, amount, **kwargs):
+    def process_harvest(self, agent, amount, **kwargs):
         """
         Harvest some amount of resources at the agent's position.
 
         Return the amount of resources harvested. This can be less than the amount
         of harvest if the cell does not have that many resources.
         """
-        location = tuple(self.agents[agent_id].position)
+        location = tuple(agent.position)
         resource_before = self.resources.resources[location]
         self.resources.modify_resources(location, -amount)
         return resource_before - self.resources.resources[location]
@@ -150,12 +150,11 @@ class GridResourceObserver:
         for agent in agents.values():
             agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
-    def get_obs(self, agent_id, **kwargs):
+    def get_obs(self, agent, **kwargs):
         """
         These cells are filled with the values of the resources surrounding the
         agent's position.
         """
-        agent = self.agents[agent_id]
         if isinstance(agent, ObservingAgent):
             signal = -np.ones((agent.view*2+1, agent.view*2+1))
 

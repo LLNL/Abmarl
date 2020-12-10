@@ -4,7 +4,7 @@ import numpy as np
 from admiral.envs import Agent
 from admiral.envs.components.position import PositionAgent
 
-class MovementAgent(Agent):
+class GridMovementAgent(Agent):
     """
     Agents can move in the grid up to some number of spaces away.
 
@@ -30,10 +30,10 @@ class GridMovementActor:
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, MovementAgent):
+            if isinstance(agent, GridMovementAgent):
                 agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
 
-    def process_move(self, agent_id, move, **kwargs):
-        position_before = self.agents[agent_id].position
-        self.position.modify_position(agent_id, move, **kwargs)
-        return position_before - self.agents[agent_id].position
+    def process_move(self, moving_agent, move, **kwargs):
+        position_before = moving_agent.position
+        self.position.modify_position(moving_agent, move, **kwargs)
+        return position_before - moving_agent.position

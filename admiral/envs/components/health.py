@@ -81,23 +81,23 @@ class LifeState:
                 agent.health = np.random.uniform(agent.min_health, agent.max_health)
             agent.is_alive = True
     
-    def set_health(self, agent_id, _health):
+    def set_health(self, agent, _health):
         if _health <= self.min_health:
-            self.health = self.min_health
-            self.is_alive = False
+            agent.health = agent.min_health
+            agent.is_alive = False
         elif _health >= self.max_health:
-            self.health = self.max_health
+            agent.health = agent.max_health
         else:
-            self.health = _health
+            agent.health = _health
     
-    def modify_health(self, agent_id, value):
-        self.set_health(agent_id, self.agents[agent_id].health + value)
+    def modify_health(self, agent, value):
+        self.set_health(agent, agent.health + value)
 
-    def apply_entropy(self, agent_id, **kwargs):
-        """
-        Apply entropy to the agent, decreasing its health by a small amount.
-        """
-        self.agents['agent_id'].add_health(-self.entropy)
+    # def apply_entropy(self, agent, **kwargs):
+    #     """
+    #     Apply entropy to the agent, decreasing its health by a small amount.
+    #     """
+    #     self.agents['agent_id'].add_health(-self.entropy)
 
 class HealthObserver:
     def __init__(self, agents=None, **kwargs):

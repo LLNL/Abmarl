@@ -33,7 +33,7 @@ class TeamObserver:
         from gym.spaces import Box, Dict
         for agent in agents.values():
             agent.observation_space['team'] = Dict({
-                agent_id: Box(0, self.team.number_of_teams, (1,), np.int) for agent_id in agents
+                id: Box(0, self.team.number_of_teams, (1,), np.int) for id in agents
             })
     
     def get_obs(self, *args, **kwargs):
