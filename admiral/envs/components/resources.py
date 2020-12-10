@@ -89,11 +89,6 @@ class GridResourceState:
             assert isinstance(agent, PositionAgent)
         self.agents = agents
 
-        # from gym.spaces import Box
-        # for agent in self.agents.values():
-        #     if isinstance(agent, ObservingAgent):
-        #         agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
-
     def reset(self, **kwargs):
         """
         Reset the resources. If original resources is specified, then the resources
@@ -122,12 +117,10 @@ class GridResourceState:
     
     def modify_resources(self, location, value, **kwargs):
         assert type(location) is tuple
-        resource_before = self.resources[location]
         self.set_resources(location, self.resources[location] + value, **kwargs)
-        return resource_before - self.resources[location]
 
-class GridResourcesHealthActor:
-    def __init__(self, resources=None, health=None, agents=None, **kwargs):
+class GridResourcesActor:
+    def __init__(self, resources=None, agents=None, **kwargs):
         self.resources = resources
         self.health = health
         self.agents = agents
@@ -144,8 +137,9 @@ class GridResourcesHealthActor:
         of harvest if the cell does not have that many resources.
         """
         location = tuple(self.agents[agent_id].position)
-        actual_amount = self.resources.modify_resources(location, -amount)
-        self.health.modify_health(agent_id, actual_amount)
+        resource_before = self.resources.resources[location]
+        self.resources.modify_resources(location, -amount)
+        return resource_before - self.resources.resources[location]
 
 class GridResourceObserver:
     def __init__(self, resources=None, agents=None, **kwargs):

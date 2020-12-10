@@ -1,6 +1,6 @@
 
 from admiral.envs import Agent
-from admiral.envs.components.position import GridPositionAgent
+from admiral.envs.components.position import PositionAgent
 from admiral.envs.components.team import TeamAgent
 from admiral.envs.components.health import LifeAgent
 
@@ -31,7 +31,7 @@ class AttackingAgent(Agent):
         """
         return super().configured and self.attack_range is not None and self.attack_strength is not None
 
-class PositionBasedHealthExchangeAttackActor:
+class PositionBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and processes such
     attacks. The attack is successful if the attacked agent is alive and within
@@ -51,8 +51,7 @@ class PositionBasedHealthExchangeAttackActor:
         be PositionAgents; becuase the attacked agent must be alive, all agents
         must be LifeAgents.
     """
-    def __init__(self, position_state=None, life_state=None, agents=None, **kwargs):
-        self.position_state = position_state
+    def __init__(self, life_state=None, agents=None, **kwargs):
         self.life_state = life_state
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
@@ -90,19 +89,12 @@ class PositionBasedHealthExchangeAttackActor:
                 elif not self.life_state.get_state(attacked_agent_id):
                     # Cannot attack dead agents
                     continue
-                elif abs(self.position_state.get_state(attacked_agent_id)[0] - self.position_state.get_state(attacking_agent_id)[0]) > attacking_agent.attack_range or \
-                     abs(self.position_state.get_state(attacked_agent_id)[1] - self.position_state.get_state(attacking_agent_id)[1]) > attacking_agent.attack_range:
+                elif abs(attacking_agent.position[0] - attacked_agent.position[0]) > attacking_agent.attack_range or \
+                     abs(attacking_agent.position[1] - attacked_agent.position[1]) > attacking_agent.attack_range:
                     # Agent too far away
                     continue
                 else:
-                    # Agent was successfully attacked
-                    # TODO: HealthExchangeActor can process the actual change of
-                    # health state in the agents. So then we can use the same AttackActor
-                    # but with a different HealthExchangeActor for different effects,
-                    # such as cases where we only want the health to decrease for
-                    # the attacked agent.
-                    self.life_state.modify_health(attacked_agent_id, -attacking_agent.attack_strength, **kwargs)
-                    self.life_state.modify_health(attacking_agent_id, attacking_agent.attack_strength, **kwargs)
+                    return attacked_agent
 
 # TODO: there is so much duplication between this and the above class... Is there
 # a way to use inheritance here to reduce duplication and still allow for the additional
@@ -166,5 +158,4 @@ class PositionTeamBasedHealthExchangeAttackActor:
                     # Agent too far away
                     continue
                 else:
-                    self.life_state.modify_health(attacked_agent.id, -attacking_agent.attack_strength, **kwargs)
-                    self.life_state.modify_health(attacking_agent_id, attacking_agent.attack_strength, **kwargs)
+                    return attacked_agent

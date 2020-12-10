@@ -34,4 +34,6 @@ class GridMovementActor:
                 agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
 
     def process_move(self, agent_id, move, **kwargs):
+        position_before = self.agents[agent_id].position
         self.position.modify_position(agent_id, move, **kwargs)
+        return position_before - self.agents[agent_id].position
