@@ -29,41 +29,6 @@ class HealthAgent(Agent):
         self.max_health = max_health
         self.health = None
 
-    def get_health(self):
-        """
-        Standard getter for the health parameter.
-        """
-        return self.health
-    
-    def set_health(self, health_in):
-        """
-        Set the agent's health to the incoming value. Ensures that the health is
-        between the minimum and maximum values at all times.
-        """
-        if health_in <= self.min_health:
-            self.health = self.min_health
-        elif health_in >= self.max_health:
-            self.health = self.max_health
-        else:
-            self.health = health_in
-    
-    def reset_health(self):
-        """
-        Reset the agent's health. If initial_health was specified when the agent
-        was created, then the health will be reset to that value. Otherwise, the
-        health is reset to a value between the min and max.
-        """
-        if self.initial_health is not None:
-            self.health = self.initial_health
-        else:
-            self.health = np.random.uniform(self.min_health, self.max_health)
-    
-    def add_health(self, add_health_amount):
-        """
-        Convenience function for incrementing the health by the incoming value.
-        """
-        self.set_health(self.health + add_health_amount)
-
     @property
     def configured(self):
         """
@@ -80,22 +45,6 @@ class LifeAgent(HealthAgent):
         super().__init__(**kwargs)
         self.is_alive = True
     
-    def set_health(self, health_in):
-        """
-        In addition to keeping the health between min and max value, we will update
-        the alive status of the agent here. If the health falls below the min_value,
-        the agent dies.
-        """
-        super().set_health(health_in)
-        if health_in <= self.min_health:
-            self.is_alive = False
-        
-    def reset_life(self):
-        """
-        Reset the agent to alive
-        """
-        self.is_alive = True
-    
     @property
     def configured(self):
         """
@@ -103,7 +52,7 @@ class LifeAgent(HealthAgent):
         """
         return super().configured and self.is_alive is not None
 
-class DyingComponent:
+class LifeState:
     """
     Agents can die if their health falls below their minimal health value. Health
     can decrease in a number of interactions. This environment provides an entropy
@@ -126,14 +75,26 @@ class DyingComponent:
         Reset the health and life state of all applicable agents.
         """
         for agent in self.agents.values():
-            if isinstance(agent, HealthAgent):
-                agent.reset_health()
-            if isinstance(agent, LifeAgent):
-                agent.reset_life()
+            if agent.initial_health is not None:
+                agent.health = agent.initial_health
+            else:
+                agent.health = np.random.uniform(agent.min_health, agent.max_health)
+            agent.is_alive = True
     
-    def apply_entropy(self, agent, **kwargs):
+    def set_health(self, agent_id, _health):
+        if _health <= self.min_health:
+            self.health = self.min_health
+            self.is_alive = False
+        elif _health >= self.max_health:
+            self.health = self.max_health
+        else:
+            self.health = _health
+    
+    def modify_health(self, agent_id, value):
+        self.set_health(agent_id, self.agents[agent_id].health + value)
+
+    def apply_entropy(self, agent_id, **kwargs):
         """
         Apply entropy to the agent, decreasing its health by a small amount.
         """
-        if isinstance(agent, HealthAgent):
-            agent.add_health(-self.entropy)
+        self.agents['agent_id'].add_health(-self.entropy)

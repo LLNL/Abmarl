@@ -2,7 +2,7 @@
 from admiral.envs import Agent
 from admiral.envs.components.position import GridPositionAgent
 from admiral.envs.components.team import TeamAgent
-from admiral.envs.components.death_life import LifeAgent
+from admiral.envs.components.health import LifeAgent
 
 class AttackingAgent(Agent):
     """
