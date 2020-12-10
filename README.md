@@ -31,11 +31,6 @@ demonstrates this workflow.
 
 ## Installation
 
-### Clone the repository
-1. Setup your ssh configuration according to [these instructions](https://lc.llnl.gov/confluence/display/GITLAB/GitLab+CI#GitLabCI-cloning)
-   * Note: You can only clone using ssh
-1. Clone the repository using the clone link above
-
 ### Simple Installation
 Install from requirements file. This uses tensorflow and installs all you need
 to run the examples.
