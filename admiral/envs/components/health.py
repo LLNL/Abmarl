@@ -98,3 +98,29 @@ class LifeState:
         Apply entropy to the agent, decreasing its health by a small amount.
         """
         self.agents['agent_id'].add_health(-self.entropy)
+
+class HealthObserver:
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+
+        from gym.spaces import Dict, Box
+        for agent in agent.values():
+            agent.observation_space['health'] = Dict({
+                other.id: Box(other.min_health, other.max_health, (1,), np.float) for other in self.agents
+            })
+    
+    def get_state(self, *args, **kwargs):
+        return {agent.id: self.agents[agent.id].health for agent in self.agents}
+
+class LifeObserver:
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+
+        from gym.spaces import Dict, Box
+        for agent in agent.values():
+            agent.observation_space['life'] = Dict({
+                other.id: Box(0, 1, (1,), np.int) for other in self.agents
+            })
+    
+    def get_state(self, *args, **kwargs):
+        return {agent.id: self.agents[agent.id].is_alive for agent in self.agents}

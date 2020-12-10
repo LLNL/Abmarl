@@ -1531,9 +1531,9 @@ class HealthObserver:
     def __init__(self, health_component=None, agents=None, **kwargs):
         self.health = health_component
         self.agents = agents
-        for agent in self.agents.values():
+        for agent in agent.values():
             agent.observation_space['health'] = Dict({
-                agent_id: Box(agent.min_health, agent.max_health, (1,), np.float) for agent_id in agents
+                other.id: Box(other.min_health, other.max_health, (1,), np.float) for other in self.agents
             })
 
     def get_obs(self, agent_id, **kwargs):
