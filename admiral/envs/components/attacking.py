@@ -104,6 +104,9 @@ class PositionBasedHealthExchangeAttackActor:
                     self.life_state.modify_health(attacked_agent_id, -attacking_agent.attack_strength, **kwargs)
                     self.life_state.modify_health(attacking_agent_id, attacking_agent.attack_strength, **kwargs)
 
+# TODO: there is so much duplication between this and the above class... Is there
+# a way to use inheritance here to reduce duplication and still allow for the additional
+# special case where the teams need to be the same?
 class PositionTeamBasedHealthExchangeAttackActor:
     """
     Provide the necessary action space for agents who can attack and process such
