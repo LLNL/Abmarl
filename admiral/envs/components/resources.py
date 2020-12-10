@@ -3,9 +3,9 @@ import numpy as np
 
 from admiral.envs import Agent
 from admiral.envs.components.observer import ObservingAgent
-from admiral.envs.components.position import GridPositionAgent
+from admiral.envs.components.position import PositionAgent
 
-class GridResourceHarvestingAgent(Agent):
+class HarvestingAgent(Agent):
     """
     Agents can harvest resources.
 
@@ -25,7 +25,7 @@ class GridResourceHarvestingAgent(Agent):
         """
         return super().configured and self.max_harvest is not None
 
-class GridResourceComponent:
+class GridResourceState:
     """
     Resources exist in the cells of the grid. The grid is populated with resources
     between the min and max value on some coverage of the region at reset time.
@@ -86,15 +86,13 @@ class GridResourceComponent:
 
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
-            assert isinstance(agent, GridPositionAgent)
+            assert isinstance(agent, PositionAgent)
         self.agents = agents
 
-        from gym.spaces import Box
-        for agent in self.agents.values():
-            if isinstance(agent, GridResourceHarvestingAgent):
-                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
-            if isinstance(agent, ObservingAgent):
-                agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
+        # from gym.spaces import Box
+        # for agent in self.agents.values():
+        #     if isinstance(agent, ObservingAgent):
+        #         agent.observation_space['resources'] = Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
     def reset(self, **kwargs):
         """
@@ -112,49 +110,52 @@ class GridResourceComponent:
                 np.random.uniform(self.min_value, self.max_value, (self.region, self.region)),
                 coverage_filter
             )
+    
+    def set_resources(self, location, value, **kwargs):
+        assert type(location) is tuple
+        if value <= 0:
+            self.resources[location] = 0
+        elif value >= self.max_value:
+            self.resources[location] = self.max_value
+        else:
+            self.resources[location] = value
+    
+    def modify_resources(self, location, value, **kwargs):
+        assert type(location) is tuple
+        resource_before = self.resources[location]
+        self.set_resources(location, self.resources[location] + value, **kwargs)
+        return resource_before - self.resources[location]
 
-    def process_harvest(self, agent, amount, **kwargs):
+class GridResourcesHealthActor:
+    def __init__(self, resources=None, health=None, agents=None, **kwargs):
+        self.resources = resources
+        self.health = health
+        self.agents = agents
+
+        from gym.spaces import Box
+        for agent in agents.values():
+            agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
+
+    def process_harvest(self, agent_id, amount, **kwargs):
         """
         Harvest some amount of resources at the agent's position.
 
         Return the amount of resources harvested. This can be less than the amount
         of harvest if the cell does not have that many resources.
         """
-        location = tuple(agent.position)
-        if self.resources[location] - amount >= 0.:
-            actual_amount_harvested = amount
-        else:
-            actual_amount_harvested = self.resources[location]
-        self.resources[location] = max([0., self.resources[location] - amount])
+        location = tuple(self.agents[agent_id].position)
+        actual_amount = self.resources.modify_resources(location, -amount)
+        self.health.modify_health(agent_id, actual_amount)
 
-        return actual_amount_harvested
+class GridResourceObserver:
+    def __init__(self, resources=None, agents=None, **kwargs):
+        self.resources = resources
+        self.agents = agents
 
-    def regrow(self, **kwargs):
-        """
-        Regrow the resources according to the regrow_rate.
-        """
-        self.resources[self.resources >= self.min_value] += self.regrow_rate
-        self.resources[self.resources >= self.max_value] = self.max_value
+        from gym.spaces import Box
+        for agent in agents.values():
+            agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.view*2+1, agent.view*2+1), np.float)
 
-    def render(self, fig=None, **kwargs):
-        """
-        Draw a heatmap of the resources on the figure.
-        """
-        draw_now = fig is None
-        if draw_now:
-            from matplotlib import pyplot as plt
-            fig = plt.gcf()
-        import seaborn as sns
-
-        ax = fig.gca()
-        ax = sns.heatmap(np.flipud(self.resources), ax=ax, cmap='Greens')
-
-        if draw_now:
-            plt.plot()
-            plt.pause(1e-17)
-
-        return ax
-    
     def get_obs(self, agent_id, **kwargs):
         """
         These cells are filled with the values of the resources surrounding the
@@ -175,3 +176,35 @@ class GridResourceComponent:
             signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
                 self.resources[r_lower:r_upper, c_lower:c_upper]
             return signal
+
+
+
+#
+# Still gotta work out the details of what to do about these
+#
+
+    # def regrow(self, **kwargs):
+    #     """
+    #     Regrow the resources according to the regrow_rate.
+    #     """
+    #     self.resources[self.resources >= self.min_value] += self.regrow_rate
+    #     self.resources[self.resources >= self.max_value] = self.max_value
+
+    # def render(self, fig=None, **kwargs):
+    #     """
+    #     Draw a heatmap of the resources on the figure.
+    #     """
+    #     draw_now = fig is None
+    #     if draw_now:
+    #         from matplotlib import pyplot as plt
+    #         fig = plt.gcf()
+    #     import seaborn as sns
+
+    #     ax = fig.gca()
+    #     ax = sns.heatmap(np.flipud(self.resources), ax=ax, cmap='Greens')
+
+    #     if draw_now:
+    #         plt.plot()
+    #         plt.pause(1e-17)
+
+    #     return ax
