@@ -25,13 +25,13 @@ class GridMovementAgent(Agent):
 
 class GridMovementActor:
     def __init__(self, position=None, agents=None, **kwargs):
-        self.position = None
+        self.position = position
         self.agents = agents
 
         from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, GridMovementAgent):
-                agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
+                agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
 
     def process_move(self, moving_agent, move, **kwargs):
         position_before = moving_agent.position

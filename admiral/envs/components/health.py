@@ -70,22 +70,21 @@ class LifeState:
         self.agents = agents
         self.entropy = entropy
     
-    def reset(self, **kwargs):
+    def reset(self, agent, **kwargs):
         """
         Reset the health and life state of all applicable agents.
         """
-        for agent in self.agents.values():
-            if agent.initial_health is not None:
-                agent.health = agent.initial_health
-            else:
-                agent.health = np.random.uniform(agent.min_health, agent.max_health)
-            agent.is_alive = True
+        if agent.initial_health is not None:
+            agent.health = agent.initial_health
+        else:
+            agent.health = np.random.uniform(agent.min_health, agent.max_health)
+        agent.is_alive = True
     
     def set_health(self, agent, _health):
-        if _health <= self.min_health:
+        if _health <= agent.min_health:
             agent.health = agent.min_health
             agent.is_alive = False
-        elif _health >= self.max_health:
+        elif _health >= agent.max_health:
             agent.health = agent.max_health
         else:
             agent.health = _health
@@ -104,23 +103,23 @@ class HealthObserver:
         self.agents = agents
 
         from gym.spaces import Dict, Box
-        for agent in agent.values():
+        for agent in agents.values():
             agent.observation_space['health'] = Dict({
-                other.id: Box(other.min_health, other.max_health, (1,), np.float) for other in self.agents
+                other.id: Box(other.min_health, other.max_health, (1,), np.float) for other in self.agents.values()
             })
     
-    def get_state(self, *args, **kwargs):
-        return {agent.id: self.agents[agent.id].health for agent in self.agents}
+    def get_obs(self, *args, **kwargs):
+        return {agent.id: self.agents[agent.id].health for agent in self.agents.values()}
 
 class LifeObserver:
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
 
         from gym.spaces import Dict, Box
-        for agent in agent.values():
+        for agent in agents.values():
             agent.observation_space['life'] = Dict({
-                other.id: Box(0, 1, (1,), np.int) for other in self.agents
+                other.id: Box(0, 1, (1,), np.int) for other in self.agents.values()
             })
     
-    def get_state(self, *args, **kwargs):
-        return {agent.id: self.agents[agent.id].is_alive for agent in self.agents}
+    def get_obs(self, *args, **kwargs):
+        return {agent.id: self.agents[agent.id].is_alive for agent in self.agents.values()}

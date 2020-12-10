@@ -50,7 +50,7 @@ class PositionObserver:
             agent.observation_space['position'] = Dict({
                 other.id: Box(0, self.position.region, (2,), np.int) for other in agents.values()
             })
-    
+
     def get_obs(self, *args, **kwargs):
         return {agent.id: self.agents[agent.id].position for agent in self.agents.values()}
 
