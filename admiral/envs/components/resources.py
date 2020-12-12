@@ -119,10 +119,16 @@ class GridResourceState:
         assert type(location) is tuple
         self.set_resources(location, self.resources[location] + value, **kwargs)
 
+    def regrow(self, **kwargs):
+        """
+        Regrow the resources according to the regrow_rate.
+        """
+        self.resources[self.resources >= self.min_value] += self.regrow_rate
+        self.resources[self.resources >= self.max_value] = self.max_value
+
 class GridResourcesActor:
     def __init__(self, resources=None, agents=None, **kwargs):
         self.resources = resources
-        self.health = health
         self.agents = agents
 
         from gym.spaces import Box
@@ -163,11 +169,11 @@ class GridResourceObserver:
             # can be written in the below vectorized form.
             (r,c) = agent.position
             r_lower = max([0, r-agent.view])
-            r_upper = min([self.region-1, r+agent.view])+1
+            r_upper = min([self.resources.region-1, r+agent.view])+1
             c_lower = max([0, c-agent.view])
-            c_upper = min([self.region-1, c+agent.view])+1
+            c_upper = min([self.resources.region-1, c+agent.view])+1
             signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
-                self.resources[r_lower:r_upper, c_lower:c_upper]
+                self.resources.resources[r_lower:r_upper, c_lower:c_upper]
             return signal
 
 
@@ -176,12 +182,6 @@ class GridResourceObserver:
 # Still gotta work out the details of what to do about these
 #
 
-    # def regrow(self, **kwargs):
-    #     """
-    #     Regrow the resources according to the regrow_rate.
-    #     """
-    #     self.resources[self.resources >= self.min_value] += self.regrow_rate
-    #     self.resources[self.resources >= self.max_value] = self.max_value
 
     # def render(self, fig=None, **kwargs):
     #     """
