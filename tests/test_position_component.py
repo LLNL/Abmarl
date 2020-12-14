@@ -3,11 +3,12 @@ from gym.spaces import Box
 
 import numpy as np
 
-from admiral.envs.components.position import PositionAgent, TeamAgent, ObservingAgent
+from admiral.envs.components.team import TeamAgent, TeamState
+from admiral.envs.components.position import PositionAgent, PositionObservingAgent
 from admiral.envs.components.position import PositionState, PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver
 
-class PositionTestAgent(PositionAgent, ObservingAgent): pass
-class PositionTeamTestAgent(PositionAgent, ObservingAgent, TeamAgent): pass
+class PositionTestAgent(PositionAgent, PositionObservingAgent): pass
+class PositionTeamTestAgent(PositionAgent, PositionObservingAgent, TeamAgent): pass
 class PositionTeamNoViewTestAgent(PositionAgent, TeamAgent): pass
 
 def test_position_observer():
@@ -15,10 +16,10 @@ def test_position_observer():
 
 def test_grid_position_observer():
     agents = {
-        'agent0': PositionTestAgent(id='agent0', starting_position=np.array([0, 0]), view=1),
-        'agent1': PositionTestAgent(id='agent1', starting_position=np.array([2, 2]), view=2),
-        'agent2': PositionTestAgent(id='agent2', starting_position=np.array([3, 2]), view=3),
-        'agent3': PositionTestAgent(id='agent3', starting_position=np.array([1, 4]), view=4),
+        'agent0': PositionTestAgent(id='agent0', starting_position=np.array([0, 0]), position_view_range=1),
+        'agent1': PositionTestAgent(id='agent1', starting_position=np.array([2, 2]), position_view_range=2),
+        'agent2': PositionTestAgent(id='agent2', starting_position=np.array([3, 2]), position_view_range=3),
+        'agent3': PositionTestAgent(id='agent3', starting_position=np.array([1, 4]), position_view_range=4),
         'agent4': PositionAgent(id='agent4', starting_position=np.array([1, 4])),
     }
     
@@ -62,20 +63,21 @@ def test_grid_position_observer():
 
 def test_grid_team_position_observer():
     agents = {
-        'agent0': PositionTeamTestAgent      (id='agent0', team=0, starting_position=np.array([0, 0]), view=1),
+        'agent0': PositionTeamTestAgent      (id='agent0', team=0, starting_position=np.array([0, 0]), position_view_range=1),
         'agent1': PositionTeamNoViewTestAgent(id='agent1', team=0, starting_position=np.array([0, 0])),
-        'agent2': PositionTeamTestAgent      (id='agent2', team=0, starting_position=np.array([2, 2]), view=2),
-        'agent3': PositionTeamTestAgent      (id='agent3', team=1, starting_position=np.array([3, 2]), view=3),
-        'agent4': PositionTeamTestAgent      (id='agent4', team=1, starting_position=np.array([1, 4]), view=4),
+        'agent2': PositionTeamTestAgent      (id='agent2', team=0, starting_position=np.array([2, 2]), position_view_range=2),
+        'agent3': PositionTeamTestAgent      (id='agent3', team=1, starting_position=np.array([3, 2]), position_view_range=3),
+        'agent4': PositionTeamTestAgent      (id='agent4', team=1, starting_position=np.array([1, 4]), position_view_range=4),
         'agent5': PositionTeamNoViewTestAgent(id='agent5', team=1, starting_position=np.array([1, 4])),
         'agent6': PositionTeamNoViewTestAgent(id='agent6', team=1, starting_position=np.array([1, 4])),
-        'agent7': PositionTeamTestAgent      (id='agent7', team=2, starting_position=np.array([1, 4]), view=2),
+        'agent7': PositionTeamTestAgent      (id='agent7', team=2, starting_position=np.array([1, 4]), position_view_range=2),
     }
     for agent in agents.values():
         agent.position = agent.starting_position
     
     state = PositionState(agents=agents, region=5)
-    observer = GridPositionTeamBasedObserver(position=state, agents=agents, number_of_teams=3)
+    team = TeamState(agents=agents, number_of_teams=3)
+    observer = GridPositionTeamBasedObserver(position=state, team_state=team, agents=agents)
     state.reset()
 
     np.testing.assert_array_equal(observer.get_obs(agents['agent0'])[:,:,0], np.array([

@@ -3,7 +3,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.observer import ObservingAgent
 from admiral.envs.components.team import TeamAgent, TeamState, TeamObserver
 from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
@@ -14,10 +13,10 @@ from admiral.envs.components.dead_done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class PreyAgent(PositionAgent, ObservingAgent, TeamAgent, GridMovementAgent, LifeAgent, HarvestingAgent):
+class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, HarvestingAgent):
     pass
 
-class PredatorAgent(PositionAgent, ObservingAgent, TeamAgent, GridMovementAgent, AttackingAgent, LifeAgent):
+class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, AttackingAgent, LifeAgent):
     pass
 
 class PredatorPreyEnv(AgentBasedSimulation):

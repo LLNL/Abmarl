@@ -2,8 +2,17 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.envs.components.observer import ObservingAgent
 from admiral.envs.components.position import PositionAgent
+
+class ResourceObservingAgent(Agent):
+    def __init__(self, resource_view_range=None, **kwargs):
+        super().__init__(**kwargs)
+        assert resource_view_range is not None, "resource_view_range must be nonnegative integer"
+        self.resource_view_range = resource_view_range
+    
+    @property
+    def configured(self):
+        return super().configured and self.resource_view_range is not None
 
 class HarvestingAgent(Agent):
     """
@@ -155,24 +164,25 @@ class GridResourceObserver:
 
         from gym.spaces import Box
         for agent in agents.values():
-            agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.view*2+1, agent.view*2+1), np.float)
+            if isinstance(agent, ResourceObservingAgent):
+                agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view_range*2+1, agent.resource_view_range*2+1), np.float)
 
     def get_obs(self, agent, **kwargs):
         """
         These cells are filled with the values of the resources surrounding the
         agent's position.
         """
-        if isinstance(agent, ObservingAgent):
-            signal = -np.ones((agent.view*2+1, agent.view*2+1))
+        if isinstance(agent, ResourceObservingAgent):
+            signal = -np.ones((agent.resource_view_range*2+1, agent.resource_view_range*2+1))
 
             # Derived by considering each square in the resources as an "agent" and
             # then applied the agent diff logic from above. The resulting for-loop
             # can be written in the below vectorized form.
             (r,c) = agent.position
-            r_lower = max([0, r-agent.view])
-            r_upper = min([self.resources.region-1, r+agent.view])+1
-            c_lower = max([0, c-agent.view])
-            c_upper = min([self.resources.region-1, c+agent.view])+1
-            signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
+            r_lower = max([0, r-agent.resource_view_range])
+            r_upper = min([self.resources.region-1, r+agent.resource_view_range])+1
+            c_lower = max([0, c-agent.resource_view_range])
+            c_upper = min([self.resources.region-1, c+agent.resource_view_range])+1
+            signal[(r_lower+agent.resource_view_range-r):(r_upper+agent.resource_view_range-r),(c_lower+agent.resource_view_range-c):(c_upper+agent.resource_view_range-c)] = \
                 self.resources.resources[r_lower:r_upper, c_lower:c_upper]
             return signal

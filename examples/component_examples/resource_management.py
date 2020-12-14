@@ -3,7 +3,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.observer import ObservingAgent
 from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent
 from admiral.envs.components.movement import GridMovementAgent, GridMovementActor
 from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor
@@ -12,7 +11,7 @@ from admiral.envs.components.dead_done import DeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent, ObservingAgent,  HarvestingAgent):
+class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):

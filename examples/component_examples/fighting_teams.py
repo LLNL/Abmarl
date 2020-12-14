@@ -2,7 +2,6 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.observer import ObservingAgent
 from admiral.envs.components.team import TeamAgent, TeamObserver, TeamState
 from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
@@ -12,7 +11,7 @@ from admiral.envs.components.dead_done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent, ObservingAgent):
+class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent):
     pass
 
 class FightingTeamsEnv(AgentBasedSimulation):
