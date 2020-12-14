@@ -45,8 +45,7 @@ def test_life_state():
     assert agents['agent3'].is_alive == True
 
     state = LifeState(agents=agents, entropy=0.5)
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
 
     assert agents['agent0'].health == 3.4
     assert agents['agent1'].health == 2.4
@@ -69,8 +68,7 @@ def test_life_state():
     assert agents['agent2'].is_alive is False
     assert agents['agent3'].is_alive is False
 
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
     assert agents['agent0'].min_health == 0.0
     assert agents['agent0'].max_health == 5.0
     assert agents['agent0'].initial_health == 3.4

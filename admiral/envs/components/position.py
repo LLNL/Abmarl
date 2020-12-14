@@ -23,15 +23,16 @@ class PositionState:
             assert isinstance(agent, PositionAgent)
         self.agents = agents
 
-    def reset(self, agent, **kwargs):
+    def reset(self, **kwargs):
         """
         Reset the agents' positions. If the agents were created with a starting
         position, then use that. Otherwise, randomly assign a position in the region.
         """
-        if agent.starting_position is not None:
-            agent.position = agent.starting_position
-        else:
-            agent.position = np.random.randint(0, self.region, 2)
+        for agent in self.agents.values():
+            if agent.starting_position is not None:
+                agent.position = agent.starting_position
+            else:
+                agent.position = np.random.randint(0, self.region, 2)
     
     def set_position(self, agent, _position, **kwargs):
         if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:

@@ -27,9 +27,9 @@ def test_grid_resources_components():
     actor = GridResourcesActor(resources=state, agents=agents)
     observer = GridResourceObserver(resources=state, agents=agents)
 
+    state.reset()
     for agent in agents.values():
         agent.position = agent.starting_position
-        state.reset()
     np.testing.assert_array_equal(state.resources, initial_resources)
 
     assert np.allclose(observer.get_obs(agents['agent0']), np.array([

@@ -24,8 +24,7 @@ def test_grid_position_observer():
     
     state = PositionState(agents=agents, region=5)
     observer = GridPositionBasedObserver(position=state, agents=agents)
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
 
     np.testing.assert_array_equal(observer.get_obs(agents['agent0']), np.array([
         [-1., -1., -1.],
@@ -77,8 +76,7 @@ def test_grid_team_position_observer():
     
     state = PositionState(agents=agents, region=5)
     observer = GridPositionTeamBasedObserver(position=state, agents=agents, number_of_teams=3)
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
 
     np.testing.assert_array_equal(observer.get_obs(agents['agent0'])[:,:,0], np.array([
         [-1., -1., -1.],

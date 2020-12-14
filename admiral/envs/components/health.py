@@ -70,15 +70,16 @@ class LifeState:
         self.agents = agents
         self.entropy = entropy
     
-    def reset(self, agent, **kwargs):
+    def reset(self, **kwargs):
         """
         Reset the health and life state of all applicable agents.
         """
-        if agent.initial_health is not None:
-            agent.health = agent.initial_health
-        else:
-            agent.health = np.random.uniform(agent.min_health, agent.max_health)
-        agent.is_alive = True
+        for agent in self.agents.values():
+            if agent.initial_health is not None:
+                agent.health = agent.initial_health
+            else:
+                agent.health = np.random.uniform(agent.min_health, agent.max_health)
+            agent.is_alive = True
     
     def set_health(self, agent, _health):
         if _health <= agent.min_health:

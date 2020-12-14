@@ -38,9 +38,8 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.finalize()
     
     def reset(self, **kwargs):
-        for agent in self.agents.values():
-            self.position_state.reset(agent, **kwargs)
-            self.life_state.reset(agent, **kwargs)
+        self.position_state.reset(**kwargs)
+        self.life_state.reset(**kwargs)
     
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():

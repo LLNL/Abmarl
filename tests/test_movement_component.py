@@ -17,8 +17,7 @@ def test_grid_movement_component():
     }
     state = PositionState(region=10, agents=agents)
     actor = GridMovementActor(position=state, agents=agents)
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
 
     actor.process_move(agents['agent0'], np.array([-1,  1]))
     actor.process_move(agents['agent1'], np.array([ 0,  1]))

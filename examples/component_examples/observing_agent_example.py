@@ -28,8 +28,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.finalize()
 
     def reset(self, **kwargs):
-        for agent in self.agents.values():
-            self.position_state.reset(agent, **kwargs)
+        self.position_state.reset(**kwargs)
 
         return {'agent0': self.observer.get_obs(self.agents['agent0'])}
     

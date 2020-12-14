@@ -14,8 +14,7 @@ def test_dead_done_condition():
     }
     state = LifeState(agents=agents)
     done = DeadDone(agents=agents)
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
 
     assert done.get_done(agents['agent0']) is False
     assert done.get_done(agents['agent1']) is False
@@ -50,8 +49,7 @@ def test_team_dead_done_condition():
     }
     state = LifeState(agents=agents)
     done = TeamDeadDone(agents=agents, number_of_teams=3)
-    for agent in agents.values():
-        state.reset(agent)
+    state.reset()
 
     assert not done.get_done(agents['agent0'])
     assert not done.get_done(agents['agent1'])
