@@ -127,10 +127,7 @@ fig = plt.gcf()
 env.render(fig=fig)
 
 for _ in range(50):
-    action_dict = {}
-    for agent_id, agent in env.agents.items():
-        if agent.is_alive:
-            action_dict[agent_id] = agent.action_space.sample()
+    action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
     env.step(action_dict)
     env.render(fig=fig)
     print({agent_id: env.get_done(agent_id) for agent_id in env.agents})
