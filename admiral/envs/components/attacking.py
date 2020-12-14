@@ -38,14 +38,6 @@ class PositionBasedAttackActor:
     range. The action space is appended with a MultiBinary(1), allowing the agent
     to attack or not attack.
 
-    position_state (PositionState):
-        The attack is based on the distance between agents, so we need to query
-        the position part of the state.
-    
-    life_state (LifeState):
-        Successful attacks will change the health of the involved agents. Additionally,
-        agents can only attack other agents that are still alive.
-
     agents (dict):
         The dictionary of agents. Because attacks are distance-based, all agents must
         be PositionAgents; becuase the attacked agent must be alive, all agents
@@ -65,15 +57,16 @@ class PositionBasedAttackActor:
 
     def process_attack(self, attacking_agent, attack, **kwargs):
         """
-        Determine which agent the attacking agent successfully attacks. Attacked
-        agent's health will decrease, while attacking agent's health will increase
-        by the attacking agent's attack_strength.
+        Determine which agent the attacking agent successfully attacks.
 
         attacking_agent (AttackingAgent):
             The agent that we are processing.
 
         attack (bool):
             True if the agent has chosen to attack, otherwise False.
+
+        return (Agent):
+            Return the attacked agent object.
         """
         if attack:
             for attacked_agent in self.agents.values():
@@ -97,10 +90,6 @@ class PositionTeamBasedAttackActor:
     team, and within range. The action space is appended with a MultiBinary(1),
     allowing the agent to attack or not attack.
 
-    life_state (LifeState):
-        Successful attacks will change the health of the involved agents. Additionally,
-        agents can only attack other agents that are still alive.
-
     agents (dict):grid
         The dictionary of agents. Because attacks are distance-based, all agents must
         be PositionAgents; because the attacked agent must be alive, all agents
@@ -122,14 +111,16 @@ class PositionTeamBasedAttackActor:
 
     def process_attack(self, attacking_agent, attack, **kwargs):
         """
-        Determine which agent the attacking agent successfully attacks and return
-        that agent's id. If the attack fails, return None.
+        Determine which agent the attacking agent successfully attacks.
 
         attacking_agent (AttackingAgent):
             The agent that we are processing.
 
         attack (bool):
             True if the agent has chosen to attack, otherwise False.
+
+        return (Agent):
+            Return the attacked agent object.
         """
         if attack:
             for attacked_agent in self.agents.values():
