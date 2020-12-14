@@ -133,7 +133,8 @@ class GridResourcesActor:
 
         from gym.spaces import Box
         for agent in agents.values():
-            agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
+            if isinstance(agent, HarvestingAgent):
+                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
 
     def process_harvest(self, agent, amount, **kwargs):
         """

@@ -55,50 +55,6 @@ class PositionObserver:
 
 
 
-
-
-#
-# Still gotta get the render somehow...
-#
-    # def render(self, fig=None, render_condition={}, shape_dict={}, **kwargs):
-    #     """
-    #     Draw the agents in the grid in the specified fig. The shape of each agent
-    #     is dictated by shape_dict. render_condition determines whether or not the
-    #     agent should be drawn (e.g. don't draw dead agents).
-    #     """
-    #     draw_now = fig is None
-    #     if draw_now:
-    #         from matplotlib import pyplot as plt
-    #         fig = plt.gcf()
-
-    #     ax = fig.gca()
-    #     ax.set(xlim=(0, self.region), ylim=(0, self.region))
-    #     ax.set_xticks(np.arange(0, self.region, 1))
-    #     ax.set_yticks(np.arange(0, self.region, 1))
-    #     ax.grid()
-
-    #     if render_condition:
-    #         agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
-    #         agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
-    #     else:
-    #         agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
-    #         agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values()]
-    #         render_condition = {agent_id: True for agent_id in self.agents}
-
-    #     if shape_dict:
-    #         shape = [shape_dict[agent_id] for agent_id in shape_dict if render_condition[agent_id]]
-    #     else:
-    #         shape = 'o'
-    #     mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
-
-    #     if draw_now:
-    #         plt.plot()
-    #         plt.pause(1e-17)
-
-    #     return ax
-
-
-
 #
 # The below can be incorporated into observers
 #
