@@ -3,7 +3,7 @@ import numpy as np
 
 from admiral.envs import Agent
 
-class HealthAgent(Agent):
+class LifeAgent(Agent):
     """
     Agents have health.
 
@@ -27,6 +27,7 @@ class HealthAgent(Agent):
         self.initial_health = initial_health
         self.min_health = min_health
         self.max_health = max_health
+        self.is_alive = True
         self.health = None
 
     @property
@@ -34,23 +35,7 @@ class HealthAgent(Agent):
         """
         The agent is successfully configured if the min and max health are specified.
         """
-        return super().configured and self.min_health is not None and self.max_health is not None
-
-class LifeAgent(HealthAgent):
-    """
-    Agents have health and a parameter that indicates if the agent is alive or
-    dead.
-    """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.is_alive = True
-    
-    @property
-    def configured(self):
-        """
-        The agent is successfully configured if is_alive is not None.
-        """
-        return super().configured and self.is_alive is not None
+        return super().configured and self.min_health is not None and self.max_health is not None and self.is_alive is not None
 
 class LifeState:
     """
