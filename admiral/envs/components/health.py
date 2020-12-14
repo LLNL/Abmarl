@@ -5,10 +5,10 @@ from admiral.envs import Agent
 
 class LifeAgent(Agent):
     """
-    Agents have health.
+    Agents have health and are alive or dead.
 
     min_health (float):
-        The minimum value the health can reach.
+        The minimum value the health can reach before the agent dies.
     
     max_health (float):
         The maximum value the health can reach.
@@ -16,9 +16,6 @@ class LifeAgent(Agent):
     initial_health (float):
         The initial health of the agent. The health will be set to this initial
         option at reset time.
-
-    Note: You should use the set health function below to intelligently set the
-    agent's health.
     """
     def __init__(self, min_health=0.0, max_health=1.0, initial_health=None, **kwargs):
         super().__init__(**kwargs)
@@ -33,7 +30,8 @@ class LifeAgent(Agent):
     @property
     def configured(self):
         """
-        The agent is successfully configured if the min and max health are specified.
+        The agent is successfully configured if the min and max health are specified
+        and if is_alive is specified.
         """
         return super().configured and self.min_health is not None and self.max_health is not None and self.is_alive is not None
 
@@ -41,13 +39,13 @@ class LifeState:
     """
     Agents can die if their health falls below their minimal health value. Health
     can decrease in a number of interactions. This environment provides an entropy
-    that indicates how much health the agent loses in each step.
+    that indicates how much health an agent loses when apply_entropy is called.
 
     agents (dict):
         Dictionary of agents.
     
     entropy (float):
-        The amount of health that is depleted from the agents whenever apply_entropy
+        The amount of health that is depleted from an agent whenever apply_entropy
         is called.
     """
     def __init__(self, agents=None, entropy=0.1, **kwargs):
@@ -67,6 +65,11 @@ class LifeState:
             agent.is_alive = True
     
     def set_health(self, agent, _health):
+        """
+        Set the health of an agent to a specific value, bounded by the agent's
+        min and max health-value. If that value is less than the agent's health,
+        then the agent dies.
+        """
         if _health <= agent.min_health:
             agent.health = agent.min_health
             agent.is_alive = False
@@ -76,6 +79,9 @@ class LifeState:
             agent.health = _health
     
     def modify_health(self, agent, value):
+        """
+        Add some value to the health of the agent.
+        """
         self.set_health(agent, agent.health + value)
 
     def apply_entropy(self, agent, **kwargs):
@@ -85,6 +91,9 @@ class LifeState:
         self.modify_health(agent, -self.entropy, **kwargs)
 
 class HealthObserver:
+    """
+    Observe the health state of all the agents in the simulator.
+    """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
 
@@ -95,9 +104,15 @@ class HealthObserver:
             })
     
     def get_obs(self, *args, **kwargs):
+        """
+        Get the health state of all the agents in the simulator.
+        """
         return {agent.id: self.agents[agent.id].health for agent in self.agents.values()}
 
 class LifeObserver:
+    """
+    Observe the life state of all the agents in the simulator.
+    """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
 
@@ -108,4 +123,7 @@ class LifeObserver:
             })
     
     def get_obs(self, *args, **kwargs):
+        """
+        Get the life state of all the agents in the simulator.
+        """
         return {agent.id: self.agents[agent.id].is_alive for agent in self.agents.values()}
