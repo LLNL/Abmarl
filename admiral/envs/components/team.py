@@ -20,7 +20,7 @@ class TeamAgent(Agent):
         """
         return super().configured and self.team is not None
 
-class TeamComponent:
+class TeamState:
     def __init__(self, agents=None, number_of_teams=None, **kwargs):
         self.number_of_teams = number_of_teams
         self.agents = agents

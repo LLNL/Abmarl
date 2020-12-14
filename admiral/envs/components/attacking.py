@@ -63,7 +63,6 @@ class PositionBasedAttackActor:
             if isinstance(agent, AttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
 
-    # TODO: Can I do it by agent object instead of agent_id?
     def process_attack(self, attacking_agent, attack, **kwargs):
         """
         Determine which agent the attacking agent successfully attacks. Attacked
@@ -91,9 +90,6 @@ class PositionBasedAttackActor:
                 else:
                     return attacked_agent
 
-# TODO: there is so much duplication between this and the above class... Is there
-# a way to use inheritance here to reduce duplication and still allow for the additional
-# special case where the teams need to be the same?
 class PositionTeamBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and process such
@@ -129,7 +125,7 @@ class PositionTeamBasedAttackActor:
         Determine which agent the attacking agent successfully attacks and return
         that agent's id. If the attack fails, return None.
 
-        attacking_agent (AttackingAgetn):
+        attacking_agent (AttackingAgent):
             The agent that we are processing.
 
         attack (bool):

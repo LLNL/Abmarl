@@ -9,8 +9,6 @@ from admiral.envs.components.movement import GridMovementActor, GridMovementAgen
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-# TODO: This is much better suited as a unit test.
-
 class ObservingTeamMovementAgent(ObservingAgent, TeamAgent, PositionAgent, GridMovementAgent):
     pass
 
