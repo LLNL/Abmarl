@@ -96,18 +96,18 @@ class GridPositionBasedObserver:
             return signal
 
 class GridPositionTeamBasedObserver:
-    def __init__(self, position=None, agents=None, number_of_teams=None, **kwargs):
+    def __init__(self, position=None, team_state=None, agents=None, **kwargs):
         self.position = position
+        self.team_state = team_state
         for agent in agents.values():
             assert isinstance(agent, PositionAgent)
             assert isinstance(agent, TeamAgent)
         self.agents = agents
-        self.number_of_teams = number_of_teams
 
         from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, ObservingAgent):
-                agent.observation_space['position'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
+                agent.observation_space['position'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, self.team_state.number_of_teams), np.int)
     
     def get_obs(self, my_agent, **kwargs):
         """
@@ -131,7 +131,7 @@ class GridPositionTeamBasedObserver:
                 signal[:, self.position.region - my_agent.position[1] - my_agent.view - 1:] = -1
 
             # Repeat the boundaries signal for all teams
-            signal = np.repeat(signal[:, :, np.newaxis], self.number_of_teams, axis=2)
+            signal = np.repeat(signal[:, :, np.newaxis], self.team_state.number_of_teams, axis=2)
 
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():

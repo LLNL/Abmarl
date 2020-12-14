@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.observer import ObservingAgent
-from admiral.envs.components.team import TeamAgent
+from admiral.envs.components.team import TeamAgent, TeamObserver, TeamState
 from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
@@ -22,11 +22,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # State Components
         self.position_state = PositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
+        self.team_state = TeamState(**kwargs)
 
         # Observer Components
         self.position_observer = PositionObserver(position=self.position_state, **kwargs)
         self.health_observer = HealthObserver(**kwargs)
         self.life_observer = LifeObserver(**kwargs)
+        self.team_observer = TeamObserver(team=self.team_state, **kwargs)
 
         # Actor Components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
@@ -79,6 +81,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
             'position': self.position_observer.get_obs(agent_id, **kwargs),
             'health': self.health_observer.get_obs(agent_id, **kwargs),
             'life': self.life_observer.get_obs(agent_id, **kwargs),
+            'team': self.team_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):

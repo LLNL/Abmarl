@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 from admiral.envs.components.observer import ObservingAgent
-from admiral.envs.components.team import TeamAgent
+from admiral.envs.components.team import TeamAgent, TeamState, TeamObserver
 from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
@@ -28,12 +28,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
         self.position_state = PositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.resource_state = GridResourceState(**kwargs)
+        self.team_state = TeamState(**kwargs)
 
         # Observer components
         self.position_observer = PositionObserver(position=self.position_state, **kwargs)
         self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
         self.health_observer = HealthObserver(**kwargs)
         self.life_observer = LifeObserver(**kwargs)
+        self.team_observer = TeamObserver(team=self.team_state, **kwargs)
 
         # Actor components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
@@ -109,6 +111,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
             'resources': self.resource_observer.get_obs(agent),
             'health': self.health_observer.get_obs(agent_id, **kwargs),
             'life': self.life_observer.get_obs(agent_id, **kwargs),
+            'team': self.team_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
