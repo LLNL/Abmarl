@@ -175,29 +175,3 @@ class GridResourceObserver:
             signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
                 self.resources.resources[r_lower:r_upper, c_lower:c_upper]
             return signal
-
-
-
-#
-# Still gotta work out the details of what to do about these
-#
-
-
-    # def render(self, fig=None, **kwargs):
-    #     """
-    #     Draw a heatmap of the resources on the figure.
-    #     """
-    #     draw_now = fig is None
-    #     if draw_now:
-    #         from matplotlib import pyplot as plt
-    #         fig = plt.gcf()
-    #     import seaborn as sns
-
-    #     ax = fig.gca()
-    #     ax = sns.heatmap(np.flipud(self.resources), ax=ax, cmap='Greens')
-
-    #     if draw_now:
-    #         plt.plot()
-    #         plt.pause(1e-17)
-
-    #     return ax

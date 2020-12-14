@@ -1,5 +1,7 @@
 
 from matplotlib import pyplot as plt
+import numpy as np
+import seaborn as sns
 
 from admiral.envs.components.observer import ObservingAgent
 from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent
@@ -8,6 +10,7 @@ from admiral.envs.components.resources import GridResourceState, GridResourceObs
 from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
 from admiral.envs.components.dead_done import DeadDone
 from admiral.envs import AgentBasedSimulation
+from admiral.tools.matplotlib_utils import mscatter
 
 class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent, ObservingAgent,  HarvestingAgent):
     pass
@@ -60,13 +63,25 @@ class ResourceManagementEnv(AgentBasedSimulation):
         self.resource_state.regrow()
     
     def render(self, fig=None, **kwargs):
-        pass
-        # fig.clear()
-        # self.resource.render(fig=fig, **kwargs)
-        # render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
-        # self.position.render(fig=fig, render_condition=render_condition, **kwargs)
-        # plt.plot()
-        # plt.pause(1e-6)
+        fig.clear()
+
+        # Draw the resources
+        ax = fig.gca()
+        ax = sns.heatmap(np.flipud(self.resource_state.resources), ax=ax, cmap='Greens')
+
+        # Draw the agents
+        render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
+        ax.set(xlim=(0, self.position_state.region), ylim=(0, self.position_state.region))
+        ax.set_xticks(np.arange(0, self.position_state.region, 1))
+        ax.set_yticks(np.arange(0, self.position_state.region, 1))
+        ax.grid()
+
+        agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
+        agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+        mscatter(agents_x, agents_y, ax=ax, m='o', s=200, edgecolor='black', facecolor='gray')
+
+        plt.plot()
+        plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
