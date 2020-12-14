@@ -45,12 +45,14 @@ class ResourceManagementEnv(AgentBasedSimulation):
         self.life_state.reset(**kwargs)
     
     def step(self, action_dict, **kwargs):
+        # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             harvested_amount = self.resource_actor.process_harvest(agent, action['harvest'], **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
 
+        # Process movement
         for agent_id, action in action_dict.items():
             self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
 

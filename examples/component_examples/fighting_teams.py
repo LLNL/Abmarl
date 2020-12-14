@@ -44,12 +44,14 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.life_state.reset(**kwargs)
     
     def step(self, action_dict, **kwargs):
+        # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
             attacked_agent = self.attack_actor.process_attack(attacking_agent, action['attack'], **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
     
+        # Process movement
         for agent_id, action in action_dict.items():
             self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
     
