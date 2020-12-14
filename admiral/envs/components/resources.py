@@ -5,6 +5,12 @@ from admiral.envs import Agent
 from admiral.envs.components.position import PositionAgent
 
 class ResourceObservingAgent(Agent):
+    """
+    Agents can observe the resources in the environment.
+
+    resource_view_range (int):
+        Any resources within this range of the agent's position will be fully observed.
+    """
     def __init__(self, resource_view_range=None, **kwargs):
         super().__init__(**kwargs)
         assert resource_view_range is not None, "resource_view_range must be nonnegative integer"
@@ -12,6 +18,9 @@ class ResourceObservingAgent(Agent):
     
     @property
     def configured(self):
+        """
+        Agents are configured if the resource_view_range parameter is set.
+        """
         return super().configured and self.resource_view_range is not None
 
 class HarvestingAgent(Agent):
@@ -116,6 +125,10 @@ class GridResourceState:
             )
     
     def set_resources(self, location, value, **kwargs):
+        """
+        Set the resource at a certain location to a value, bounded between 0 and
+        the maximum resource value.
+        """
         assert type(location) is tuple
         if value <= 0:
             self.resources[location] = 0
@@ -125,6 +138,9 @@ class GridResourceState:
             self.resources[location] = value
     
     def modify_resources(self, location, value, **kwargs):
+        """
+        Add some value to the resource at a certain location.
+        """
         assert type(location) is tuple
         self.set_resources(location, self.resources[location] + value, **kwargs)
 
@@ -136,6 +152,16 @@ class GridResourceState:
         self.resources[self.resources >= self.max_value] = self.max_value
 
 class GridResourcesActor:
+    """
+    Provides the necessary action space for agents who can harvest resources and
+    processes the harvesting action.
+
+    resources (ResourceState):
+        The resource state handler.
+
+    agents (dict):
+        The dictionary of agents.
+    """
     def __init__(self, resources=None, agents=None, **kwargs):
         self.resources = resources
         self.agents = agents
@@ -149,8 +175,15 @@ class GridResourcesActor:
         """
         Harvest some amount of resources at the agent's position.
 
-        Return the amount of resources harvested. This can be less than the amount
-        of harvest if the cell does not have that many resources.
+        agent (HarvestingAgent):
+            The agent who has chosen to harvest the resource.
+
+        amount (float):
+            The amount of resource the agent wants to harvest.
+        
+        return (float):
+            Return the amount of resources that was actually harvested. This can
+            be less than the desired amount if the cell does not have enough resources.
         """
         location = tuple(agent.position)
         resource_before = self.resources.resources[location]
@@ -158,6 +191,17 @@ class GridResourcesActor:
         return resource_before - self.resources.resources[location]
 
 class GridResourceObserver:
+    """
+    Agents observe a grid of size resource_view_range centered on their
+    position. The values in the grid are the values of the resources in that
+    area.
+
+    resources (ResourceState):
+        The resource state handler.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
     def __init__(self, resources=None, agents=None, **kwargs):
         self.resources = resources
         self.agents = agents

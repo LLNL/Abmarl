@@ -27,6 +27,12 @@ class GridMovementActor:
     """
     Provides the necessary action space for agents who can move and processes such
     movements.
+
+    position (PositionState):
+        The position state handler. Needed to modify the agents' positions.
+
+    agents (dict):
+        The dictionary of agents.
     """
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
