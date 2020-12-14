@@ -66,7 +66,8 @@ class PositionBasedAttackActor:
             True if the agent has chosen to attack, otherwise False.
 
         return (Agent):
-            Return the attacked agent object.
+            Return the attacked agent object. This can be None if no agent was
+            attacked.
         """
         if attack:
             for attacked_agent in self.agents.values():
