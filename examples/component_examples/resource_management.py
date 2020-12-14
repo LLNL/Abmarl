@@ -88,6 +88,8 @@ class ResourceManagementEnv(AgentBasedSimulation):
         return {
             'position': self.position_observer.get_obs(agent),
             'resources': self.resource_observer.get_obs(agent),
+            'health': self.health_observer.get_obs(agent_id, **kwargs),
+            'life': self.life_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
