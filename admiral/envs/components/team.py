@@ -21,11 +21,21 @@ class TeamAgent(Agent):
         return super().configured and self.team is not None
 
 class TeamState:
+    """
+    Team state manages the state of agents' teams. Since these are not changing,
+    there is not much to manage. It really just keeps track of the number_of_teams.
+
+    number_of_teams (int):
+        The number of teams in this simulation.
+    """
     def __init__(self, agents=None, number_of_teams=None, **kwargs):
         self.number_of_teams = number_of_teams
         self.agents = agents
 
 class TeamObserver:
+    """
+    Observe the team of each agent in the simulator.
+    """
     def __init__(self, team=None, agents=None, **kwargs):
         self.team = team
         self.agents = agents
@@ -37,4 +47,7 @@ class TeamObserver:
             })
     
     def get_obs(self, *args, **kwargs):
+        """
+        Get the team of each agent in the simulator.
+        """
         return {other.id: self.agents[other.id].team for other in self.agents.values()}
