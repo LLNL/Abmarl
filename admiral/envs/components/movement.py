@@ -26,6 +26,8 @@ class GridMovementAgent(Agent):
 class GridMovementActor:
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
+        for agent in agents.values():
+            assert isinstance(agent, PositionAgent)
         self.agents = agents
 
         from gym.spaces import Box
