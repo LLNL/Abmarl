@@ -67,8 +67,8 @@ class FightForResourcesEnv(AgentBasedSimulation):
             self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
 
         # Apply entropy to all agents
-        for agent_id, action in action_dict.items():
-            self.life_state.modify_health(self.agents[agent_id], -0.1)
+        for agent_id in action_dict:
+            self.life_state.apply_entropy(self.agents[agent_id])
 
         # Regrow the resources
         self.resource_state.regrow()

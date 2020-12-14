@@ -92,12 +92,11 @@ class LifeState:
     def modify_health(self, agent, value):
         self.set_health(agent, agent.health + value)
 
-    # TODO: use this function in the examples
-    # def apply_entropy(self, agent, **kwargs):
-    #     """
-    #     Apply entropy to the agent, decreasing its health by a small amount.
-    #     """
-    #     self.agents['agent_id'].add_health(-self.entropy)
+    def apply_entropy(self, agent, **kwargs):
+        """
+        Apply entropy to the agent, decreasing its health by a small amount.
+        """
+        self.modify_health(agent, -self.entropy, **kwargs)
 
 class HealthObserver:
     def __init__(self, agents=None, **kwargs):
