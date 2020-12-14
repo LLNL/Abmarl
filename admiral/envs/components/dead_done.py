@@ -1,10 +1,10 @@
 
 import numpy as np
 
-from admiral.envs.components.death_life import LifeAgent
+from admiral.envs.components.health import LifeAgent
 from admiral.envs.components.team import TeamAgent
 
-class DeadDoneComponent:
+class DeadDone:
     """
     Dead agents are indicated as done. Additionally, the simulation is over when
     all the agents are dead.
@@ -18,23 +18,22 @@ class DeadDoneComponent:
             assert isinstance(agent, LifeAgent)
         self.agents = agents
     
-    def get_done(self, agent_id, **kwargs):
+    def get_done(self, agent, **kwargs):
         """
-        Return true if the agent is dead. Otherwise, return false.
+        Return True if the agent is dead. Otherwise, return False.
         """
-        agent = self.agents[agent_id]
-        return False if agent.is_alive else True
+        return not agent.is_alive
 
     def get_all_done(self, **kwargs):
         """
-        Return true if all agents are dead. Otherwise, return false.
+        Return True if all agents are dead. Otherwise, return False.
         """
         for agent in self.agents.values():
             if agent.is_alive:
                 return False
         return True
 
-class TeamDeadDoneComponent:
+class TeamDeadDone:
     """
     Dead agents are indicated as done. Additionally, the simulation is over when
     the only agents remaining are on the same team.
@@ -55,11 +54,11 @@ class TeamDeadDoneComponent:
         assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
         self.number_of_teams = number_of_teams
     
-    def get_done(self, agent_id, **kwargs):
+    def get_done(self, agent, **kwargs):
         """
-        Return true if the agent is dead. Otherwise, return false.
+        Return True if the agent is dead. Otherwise, return False.
         """
-        return False if self.agents[agent_id].is_alive else True
+        return not agent.is_alive
 
     def get_all_done(self, **kwargs):
         """
@@ -70,4 +69,4 @@ class TeamDeadDoneComponent:
         for agent in self.agents.values():
             if agent.is_alive:
                 team[agent.team] += 1
-        return False if sum(team != 0) > 1 else True
+        return sum(team != 0) <= 1

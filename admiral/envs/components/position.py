@@ -3,58 +3,55 @@ import numpy as np
 
 from admiral.envs import Agent
 from admiral.envs.components.team import TeamAgent
-from admiral.envs.components.observer import ObservingAgent
-from admiral.tools.matplotlib_utils import mscatter
 
-class GridPositionAgent(Agent):
+class PositionAgent(Agent):
     """
-    GridPosition have a position in the world. This position can given to the agent
-    as a starting position for each episode. If the starting_position is None, then the environment
-    should assign the agent a random position.
+    Agents have a position in the environment.
+
+    starting_position (np.array):
+        The desired starting position for this agent.
     """
     def __init__(self, starting_position=None, **kwargs):
         super().__init__(**kwargs)
         self.starting_position = starting_position
         self.position = None
+
+class PositionObservingAgent(Agent):
+    """
+    Agents can observe other agents.
+
+    position_view_range (int):
+        Any agent within this many spaces will be fully observed.
+    """
+    def __init__(self, position_view_range=None, **kwargs):
+        super().__init__(**kwargs)
+        assert position_view_range is not None, "position_view_range must be nonnegative integer"
+        self.position_view_range = position_view_range
     
     @property
     def configured(self):
-        return super().configured
+        """
+        Agents are configured if the position_view_range parameter is set.
+        """
+        return super().configured and self.position_view_range is not None
 
-class GridPositionComponent:
+class PositionState:
     """
-    GridPositionComponent assigns the agents positions at reset and can generate
-    observations of the other agents in a grid-based view centered around the agent.
-    If the agent was created with a starting position, then that starting position
-    is applied when the simulation resets. Otherwise, the agent is assigned some
-    random position in the region.
+    Manages the agents' positions. All position updates must be within the region.
 
-    The agents observation space is appended with Box(-1, 1, (agent.view*2+1, agent.view*2+1), np.int),
-    indicating that the agents can see a grid of size view*2+1 surrounding its
-    current location.
-        Out of bounds  : -1
-        Empty          :  0
-        Agent occupied : 1
-    
     region (int):
-        The size of the region. Agents' positions can be anywhere within this region.
+        The size of the environment.
     
     agents (dict):
-        The dictionary of agents. Any agent that is in the GridPositionComponent
-        must be a GridPositionAgent.
+        The dictionary of agents.
     """
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer."
         self.region = region
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
-            assert isinstance(agent, GridPositionAgent)
+            assert isinstance(agent, PositionAgent)
         self.agents = agents
-
-        from gym.spaces import Box
-        for agent in self.agents.values():
-            if isinstance(agent, ObservingAgent):
-                agent.observation_space['agents'] = Box(-1, 1, (agent.view*2+1, agent.view*2+1), np.int)
 
     def reset(self, **kwargs):
         """
@@ -66,149 +63,155 @@ class GridPositionComponent:
                 agent.position = agent.starting_position
             else:
                 agent.position = np.random.randint(0, self.region, 2)
-
-    def render(self, fig=None, render_condition={}, shape_dict={}, **kwargs):
-        """
-        Draw the agents in the grid in the specified fig. The shape of each agent
-        is dictated by shape_dict. render_condition determines whether or not the
-        agent should be drawn (e.g. don't draw dead agents).
-        """
-        draw_now = fig is None
-        if draw_now:
-            from matplotlib import pyplot as plt
-            fig = plt.gcf()
-
-        ax = fig.gca()
-        ax.set(xlim=(0, self.region), ylim=(0, self.region))
-        ax.set_xticks(np.arange(0, self.region, 1))
-        ax.set_yticks(np.arange(0, self.region, 1))
-        ax.grid()
-
-        if render_condition:
-            agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
-            agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
-        else:
-            agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
-            agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values()]
-            render_condition = {agent_id: True for agent_id in self.agents}
-
-        if shape_dict:
-            shape = [shape_dict[agent_id] for agent_id in shape_dict if render_condition[agent_id]]
-        else:
-            shape = 'o'
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
-
-        if draw_now:
-            plt.plot()
-            plt.pause(1e-17)
-
-        return ax
     
-    def get_obs(self, my_id, **kwargs):
+    def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value only if the new position
+        is within the region.
+        """
+        if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
+            agent.position = _position
+    
+    def modify_position(self, agent, value, **kwargs):
+        """
+        Add some value to the position of the agent.
+        """
+        self.set_position(agent, agent.position + value)
+
+class PositionObserver:
+    """
+    Observe the positions of all the agents in the simulator.
+    """
+    def __init__(self, position=None, agents=None, **kwargs):
+        self.position = position
+        self.agents = agents
+        from gym.spaces import Dict, Box
+        for agent in agents.values():
+            agent.observation_space['position'] = Dict({
+                other.id: Box(0, self.position.region, (2,), np.int) for other in agents.values()
+            })
+
+    def get_obs(self, *args, **kwargs):
+        """
+        Get the positions of all the agents in the simulator.
+        """
+        return {agent.id: self.agents[agent.id].position for agent in self.agents.values()}
+
+class GridPositionBasedObserver:
+    """
+    Agents observe a grid of size position_view_range centered on their
+    position. The values of the cells are as such:
+        Out of bounds  : -1
+        Empty          :  0
+        Agent occupied : 1
+    
+    position (PositionState):
+        The position state handler, which contains the region.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, position=None, agents=None, **kwargs):
+        self.position = position
+        self.agents = agents
+        from gym.spaces import Dict, Box
+        for agent in agents.values():
+            if isinstance(agent, PositionObservingAgent):
+                agent.observation_space['position'] = Box(-1, 1, (agent.position_view_range*2+1, agent.position_view_range*2+1), np.int)
+
+    def get_obs(self, my_agent, **kwargs):
         """
         Generate an observation of other agents in the grid surrounding this agent's
         position.
         """
-        my_agent = self.agents[my_id]
-        if isinstance(my_agent, ObservingAgent):
-            signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
+        if isinstance(my_agent, PositionObservingAgent):
+            signal = np.zeros((my_agent.position_view_range*2+1, my_agent.position_view_range*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
             # For left and top, we just do: view - x,y >= 0
             # For the right and bottom, we just do region - x,y - 1 - view > 0
-            if my_agent.view - my_agent.position[0] >= 0: # Top end
-                signal[0:my_agent.view - my_agent.position[0], :] = -1
-            if my_agent.view - my_agent.position[1] >= 0: # Left end
-                signal[:, 0:my_agent.view - my_agent.position[1]] = -1
-            if self.region - my_agent.position[0] - my_agent.view - 1 < 0: # Bottom end
-                signal[self.region - my_agent.position[0] - my_agent.view - 1:,:] = -1
-            if self.region - my_agent.position[1] - my_agent.view - 1 < 0: # Right end
-                signal[:, self.region - my_agent.position[1] - my_agent.view - 1:] = -1
+            if my_agent.position_view_range - my_agent.position[0] >= 0: # Top end
+                signal[0:my_agent.position_view_range - my_agent.position[0], :] = -1
+            if my_agent.position_view_range - my_agent.position[1] >= 0: # Left end
+                signal[:, 0:my_agent.position_view_range - my_agent.position[1]] = -1
+            if self.position.region - my_agent.position[0] - my_agent.position_view_range - 1 < 0: # Bottom end
+                signal[self.position.region - my_agent.position[0] - my_agent.position_view_range - 1:,:] = -1
+            if self.position.region - my_agent.position[1] - my_agent.position_view_range - 1 < 0: # Right end
+                signal[:, self.position.region - my_agent.position[1] - my_agent.position_view_range - 1:] = -1
 
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
-                if other_id == my_id: continue # Don't observe yourself
+                if other_id == my_agent.id: continue # Don't observe yourself
                 r_diff = other_agent.position[0] - my_agent.position[0]
                 c_diff = other_agent.position[1] - my_agent.position[1]
-                if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
-                    r_diff += my_agent.view
-                    c_diff += my_agent.view
+                if -my_agent.position_view_range <= r_diff <= my_agent.position_view_range and -my_agent.position_view_range <= c_diff <= my_agent.position_view_range:
+                    r_diff += my_agent.position_view_range
+                    c_diff += my_agent.position_view_range
                     signal[r_diff, c_diff] = 1 # There is an agent at this location.
 
             return signal
 
-class GridPositionTeamsComponent(GridPositionComponent):
+class GridPositionTeamBasedObserver:
     """
-    GridPositionComponent assigns the agents positions at reset and can generate
-    observations of the other agents in a grid-based view centered around the agent.
-    If the agent was created with a starting position, then that starting position
-    is applied when the simulation resets. Otherwise, the agent is assigned some
-    random position in the region.
-
-    The agents observation space is appended with
-    Box(-1, inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int),
-    indicating that the agents can see a grid of size view*2+1 surrounding its
-    current location. The view contains one channel for each team, and the values
-    in those channels are -1 if out of bounds, 0 if empty, and otherwise it is
-    the number of agents of that team occupying that cell.
+    Agents observe a grid of size position_view_range centered on their
+    position. The observation contains one channel per team, where the value of
+    the cell is the number of agents on that team that occupy that square. -1
+    indicates out of bounds.
     
-    region (int):
-        The size of the region. Agents' positions can be anywhere within this region.
+    position (PositionState):
+        The position state handler, which contains the region.
+
+    team_state (TeamState):
+        The team state handler, which contains the number of teams.
     
     agents (dict):
-        The dictionary of agents. Any agent that is in the GridPositionComponent
-        must be a GridPositionAgent. Because the observations are channeled by
-        the agents' teams, every agent must be a TeamAgent.
-    
-    number_of_teams (int):
-        The fixed number of teams in this simulation.
+        The dictionary of agents.
     """
-    def __init__(self, region=None, agents=None, number_of_teams=None, **kwargs):
-        self.region = region
+    def __init__(self, position=None, team_state=None, agents=None, **kwargs):
+        self.position = position
+        self.team_state = team_state
         for agent in agents.values():
-            assert isinstance(agent, GridPositionAgent)
+            assert isinstance(agent, PositionAgent)
             assert isinstance(agent, TeamAgent)
         self.agents = agents
-        self.number_of_teams = number_of_teams
 
         from gym.spaces import Box
         for agent in self.agents.values():
-            if isinstance(agent, ObservingAgent):
-                agent.observation_space['agents'] = Box(-1, np.inf, (agent.view*2+1, agent.view*2+1, number_of_teams), np.int)
+            if isinstance(agent, PositionObservingAgent):
+                agent.observation_space['position'] = Box(-1, np.inf, (agent.position_view_range*2+1, agent.position_view_range*2+1, self.team_state.number_of_teams), np.int)
     
-    def get_obs(self, my_id, **kwargs):
+    def get_obs(self, my_agent, **kwargs):
         """
         Generate an observation of other agents in the grid surrounding this agent's
         position. Each team has its own channel and the value represents the number
         of agents of that team occupying the same square.
         """
-        my_agent = self.agents[my_id]
-        if isinstance(my_agent, ObservingAgent) and isinstance(my_agent, TeamAgent):
-            signal = np.zeros((my_agent.view*2+1, my_agent.view*2+1))
+        if isinstance(my_agent, PositionObservingAgent) and isinstance(my_agent, TeamAgent):
+            signal = np.zeros((my_agent.position_view_range*2+1, my_agent.position_view_range*2+1))
 
             # --- Determine the boundaries of the agents' grids --- #
             # For left and top, we just do: view - x,y >= 0
             # For the right and bottom, we just do region - x,y - 1 - view > 0
-            if my_agent.view - my_agent.position[0] >= 0: # Top end
-                signal[0:my_agent.view - my_agent.position[0], :] = -1
-            if my_agent.view - my_agent.position[1] >= 0: # Left end
-                signal[:, 0:my_agent.view - my_agent.position[1]] = -1
-            if self.region - my_agent.position[0] - my_agent.view - 1 < 0: # Bottom end
-                signal[self.region - my_agent.position[0] - my_agent.view - 1:,:] = -1
-            if self.region - my_agent.position[1] - my_agent.view - 1 < 0: # Right end
-                signal[:, self.region - my_agent.position[1] - my_agent.view - 1:] = -1
+            if my_agent.position_view_range - my_agent.position[0] >= 0: # Top end
+                signal[0:my_agent.position_view_range - my_agent.position[0], :] = -1
+            if my_agent.position_view_range - my_agent.position[1] >= 0: # Left end
+                signal[:, 0:my_agent.position_view_range - my_agent.position[1]] = -1
+            if self.position.region - my_agent.position[0] - my_agent.position_view_range - 1 < 0: # Bottom end
+                signal[self.position.region - my_agent.position[0] - my_agent.position_view_range - 1:,:] = -1
+            if self.position.region - my_agent.position[1] - my_agent.position_view_range - 1 < 0: # Right end
+                signal[:, self.position.region - my_agent.position[1] - my_agent.position_view_range - 1:] = -1
 
             # Repeat the boundaries signal for all teams
-            signal = np.repeat(signal[:, :, np.newaxis], self.number_of_teams, axis=2)
+            signal = np.repeat(signal[:, :, np.newaxis], self.team_state.number_of_teams, axis=2)
 
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
-                if other_id == my_id: continue # Don't observe yourself
+                if other_id == my_agent.id: continue # Don't observe yourself
                 r_diff = other_agent.position[0] - my_agent.position[0]
                 c_diff = other_agent.position[1] - my_agent.position[1]
-                if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
-                    r_diff += my_agent.view
-                    c_diff += my_agent.view
+                if -my_agent.position_view_range <= r_diff <= my_agent.position_view_range and -my_agent.position_view_range <= c_diff <= my_agent.position_view_range:
+                    r_diff += my_agent.position_view_range
+                    c_diff += my_agent.position_view_range
                     signal[r_diff, c_diff, other_agent.team] += 1
 
             return signal

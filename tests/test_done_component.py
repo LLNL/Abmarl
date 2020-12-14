@@ -1,6 +1,7 @@
 
-from admiral.envs.components.done_component import LifeAgent, TeamAgent
-from admiral.envs.components.done_component import DeadDoneComponent, TeamDeadDoneComponent
+from admiral.envs.components.dead_done import LifeAgent, TeamAgent
+from admiral.envs.components.dead_done import DeadDone, TeamDeadDone
+from admiral.envs.components.health import LifeState
 
 class DoneTestAgent(LifeAgent, TeamAgent): pass
 
@@ -11,28 +12,31 @@ def test_dead_done_condition():
         'agent2': LifeAgent(id='agent2'),
         'agent3': LifeAgent(id='agent3'),
     }
-    component = DeadDoneComponent(agents=agents)
-    assert component.get_done('agent0') is False
-    assert component.get_done('agent1') is False
-    assert component.get_done('agent2') is False
-    assert component.get_done('agent3') is False
-    assert component.get_all_done() is False
+    state = LifeState(agents=agents)
+    done = DeadDone(agents=agents)
+    state.reset()
+
+    assert done.get_done(agents['agent0']) is False
+    assert done.get_done(agents['agent1']) is False
+    assert done.get_done(agents['agent2']) is False
+    assert done.get_done(agents['agent3']) is False
+    assert done.get_all_done() is False
 
     agents['agent0'].is_alive = False
     agents['agent1'].is_alive = False
-    assert component.get_done('agent0')
-    assert component.get_done('agent1')
-    assert component.get_done('agent2') is False
-    assert component.get_done('agent3') is False
-    assert component.get_all_done() is False
+    assert done.get_done(agents['agent0'])
+    assert done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2']) is False
+    assert done.get_done(agents['agent3']) is False
+    assert done.get_all_done() is False
 
     agents['agent2'].is_alive = False
     agents['agent3'].is_alive = False
-    assert component.get_done('agent0')
-    assert component.get_done('agent1')
-    assert component.get_done('agent2')
-    assert component.get_done('agent3')
-    assert component.get_all_done()
+    assert done.get_done(agents['agent0'])
+    assert done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert done.get_done(agents['agent3'])
+    assert done.get_all_done()
 
 def test_team_dead_done_condition():
     agents = {
@@ -43,32 +47,34 @@ def test_team_dead_done_condition():
         'agent4': DoneTestAgent(id='agent4', team=0),
         'agent5': DoneTestAgent(id='agent5', team=2),
     }
-    component = TeamDeadDoneComponent(agents=agents, number_of_teams=3)
+    state = LifeState(agents=agents)
+    done = TeamDeadDone(agents=agents, number_of_teams=3)
+    state.reset()
 
-    assert component.get_done('agent0') is False
-    assert component.get_done('agent1') is False
-    assert component.get_done('agent2') is False
-    assert component.get_done('agent3') is False
-    assert component.get_done('agent4') is False
-    assert component.get_done('agent5') is False
-    assert component.get_all_done() is False
+    assert not done.get_done(agents['agent0'])
+    assert not done.get_done(agents['agent1'])
+    assert not done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_done(agents['agent4'])
+    assert not done.get_done(agents['agent5'])
+    assert not done.get_all_done()
 
     agents['agent5'].is_alive = False
     agents['agent4'].is_alive = False
-    assert component.get_done('agent0') is False
-    assert component.get_done('agent1') is False
-    assert component.get_done('agent2') is False
-    assert component.get_done('agent3') is False
-    assert component.get_done('agent4')
-    assert component.get_done('agent5')
-    assert component.get_all_done() is False
+    assert not done.get_done(agents['agent0'])
+    assert not done.get_done(agents['agent1'])
+    assert not done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert     done.get_done(agents['agent4'])
+    assert     done.get_done(agents['agent5'])
+    assert not done.get_all_done()
 
     agents['agent1'].is_alive = False
     agents['agent3'].is_alive = False
-    assert component.get_done('agent0') is False
-    assert component.get_done('agent1')
-    assert component.get_done('agent2') is False
-    assert component.get_done('agent3')
-    assert component.get_done('agent4')
-    assert component.get_done('agent5')
-    assert component.get_all_done()
+    assert not done.get_done(agents['agent0'])
+    assert     done.get_done(agents['agent1'])
+    assert not done.get_done(agents['agent2'])
+    assert     done.get_done(agents['agent3'])
+    assert     done.get_done(agents['agent4'])
+    assert     done.get_done(agents['agent5'])
+    assert     done.get_all_done()

@@ -2,62 +2,63 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.envs.components.position import GridPositionAgent
+from admiral.envs.components.position import PositionAgent
 
 class GridMovementAgent(Agent):
     """
-    Agents can move in the grid up to some number of spaces away.
+    Agents can move up to some number of spaces away.
 
-    move (int):
+    move_range (int):
         The maximum number of cells away that the agent can move.
     """
-    def __init__(self, move=None, **kwargs):
+    def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
-        assert move is not None, "move must be an integer"
-        self.move = move
+        assert move_range is not None, "move_range must be an integer"
+        self.move_range = move_range
     
     @property
     def configured(self):
         """
-        Agents are configured if the move parameter is set.
+        Agents are configured if the move_range parameter is set.
         """
-        return super().configured and self.move is not None
+        return super().configured and self.move_range is not None
 
-class GridMovementComponent:
+class GridMovementActor:
     """
-    Agents can move around in the grid. This component processes the move action.
-    If the new position is out of bounds, then the position is not updated.
+    Provides the necessary action space for agents who can move and processes such
+    movements.
 
-    The agents' action space is appended with Box(-agent.move, agent.move, (2,), np.int),
-    indicating that the agent can move in 2 dimensions up to its maximum distance.
-
-    region (int):
-        The size of the region. This is needed to determine if the agent has attempted
-        to move out of bounds or not.
+    position (PositionState):
+        The position state handler. Needed to modify the agents' positions.
 
     agents (dict):
-        The dictionary of agents. Because the movement is based on the agent's
-        posiiton, the agent must be GridPositionAgents.
+        The dictionary of agents.
     """
-    def __init__(self, region=None, agents=None, **kwargs):
-        assert type(region) is int, "Region must be an integer"
-        self.region = region
-        assert type(agents) is dict, "agents must be a dict"
+    def __init__(self, position=None, agents=None, **kwargs):
+        self.position = position
         for agent in agents.values():
-            assert isinstance(agent, GridPositionAgent)
+            assert isinstance(agent, PositionAgent)
         self.agents = agents
 
         from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, GridMovementAgent):
-                agent.action_space['move'] = Box(-agent.move, agent.move, (2,), np.int)
+                agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
 
-    def process_move(self, agent, move, **kwargs):
+    def process_move(self, moving_agent, move, **kwargs):
         """
-        Process the agent's new position. If the agent attempts to move outside
-        the region, the movement does not happen.
+        Determine the agent's new position based on its move action.
+
+        moving_agent (GridMovementAgent):
+            The agent that moves.
+        
+        move (np.array):
+            How much the agent would like to move in row and column.
+        
+        return (np.array):
+            How much the agent has moved in row and column. This can be different
+            from the desired move if the position update was invalid.
         """
-        new_position = agent.position + move
-        if 0 <= new_position[0] < self.region and \
-            0 <= new_position[1] < self.region: # Still inside the boundary, good move
-            agent.position = new_position
+        position_before = moving_agent.position
+        self.position.modify_position(moving_agent, move, **kwargs)
+        return position_before - moving_agent.position

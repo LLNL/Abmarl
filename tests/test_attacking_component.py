@@ -2,16 +2,16 @@
 from gym.spaces import MultiBinary
 import numpy as np
 
-from admiral.envs.components.attacking import GridAttackingAgent, GridPositionAgent, TeamAgent, LifeAgent
-from admiral.envs.components.attacking import GridAttackingComponent, GridAttackingTeamComponent
+from admiral.envs.components.attacking import AttackingAgent, PositionAgent, TeamAgent, LifeAgent
+from admiral.envs.components.attacking import PositionBasedAttackActor, PositionTeamBasedAttackActor
 
-class AttackTestAgent(GridAttackingAgent, GridPositionAgent, LifeAgent):
+class AttackTestAgent(AttackingAgent, PositionAgent, LifeAgent):
     pass
 
-class AttackTeamTestAgent(GridAttackingAgent, GridPositionAgent, LifeAgent, TeamAgent):
+class AttackTeamTestAgent(AttackingAgent, PositionAgent, LifeAgent, TeamAgent):
     pass
 
-def test_grid_attacking_component():
+def test_position_based_attack_actor():
     agents = {
         'agent0': AttackTestAgent(id='agent0', attack_range=1, starting_position=np.array([1, 1]), \
             attack_strength=0.6),
@@ -40,27 +40,26 @@ def test_grid_attacking_component():
     assert agents['agent5'].attack_range == 2
     np.testing.assert_array_equal(agents['agent5'].starting_position, np.array([4, 0]))
 
-    component = GridAttackingComponent(agents=agents)
+    actor = PositionBasedAttackActor(agents=agents)
     for agent in agents.values():
         agent.position = agent.starting_position
-        assert agent.action_space['attack'] == MultiBinary(1)
 
-    assert component.process_attack(agents['agent0']) == 'agent1'
-    assert component.process_attack(agents['agent1']) == 'agent0'
-    assert component.process_attack(agents['agent2']) == 'agent3'
-    assert component.process_attack(agents['agent3']) == 'agent2'
-    assert component.process_attack(agents['agent4']) is None
-    assert component.process_attack(agents['agent5']) == 'agent2'
+    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
+    assert actor.process_attack(agents['agent1'], True).id == 'agent0'
+    assert actor.process_attack(agents['agent2'], True).id == 'agent3'
+    assert actor.process_attack(agents['agent3'], True).id == 'agent2'
+    assert actor.process_attack(agents['agent4'], True) is None
+    assert actor.process_attack(agents['agent5'], True).id == 'agent2'
 
     agents['agent0'].is_alive = False
     agents['agent2'].is_alive = False
 
-    assert component.process_attack(agents['agent1']) is None
-    assert component.process_attack(agents['agent3']) == 'agent4'
-    assert component.process_attack(agents['agent4']) is None
-    assert component.process_attack(agents['agent5']) == 'agent4'
+    assert actor.process_attack(agents['agent1'], True) is None
+    assert actor.process_attack(agents['agent3'], True).id == 'agent4'
+    assert actor.process_attack(agents['agent4'], True) is None
+    assert actor.process_attack(agents['agent5'], True).id == 'agent4'
 
-def test_grid_team_attacking_component():
+def test_position_team_based_attack_actor():
     agents = {
         'agent0': AttackTeamTestAgent(id='agent0', attack_range=1, starting_position=np.array([1, 1]), \
             attack_strength=0.6, team=1),
@@ -97,19 +96,19 @@ def test_grid_team_attacking_component():
 
     for agent in agents.values():
         agent.position = agent.starting_position
-    component = GridAttackingTeamComponent(agents=agents)
+    actor = PositionTeamBasedAttackActor(agents=agents)
 
-    assert component.process_attack(agents['agent0']) == 'agent1'
-    assert component.process_attack(agents['agent1']) == 'agent0'
-    assert component.process_attack(agents['agent2']) == 'agent4'
-    assert component.process_attack(agents['agent3']) == 'agent4'
-    assert component.process_attack(agents['agent4']) is None
-    assert component.process_attack(agents['agent5']) == 'agent4'
+    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
+    assert actor.process_attack(agents['agent1'], True).id == 'agent0'
+    assert actor.process_attack(agents['agent2'], True).id == 'agent4'
+    assert actor.process_attack(agents['agent3'], True).id == 'agent4'
+    assert actor.process_attack(agents['agent4'], True) is None
+    assert actor.process_attack(agents['agent5'], True).id == 'agent4'
 
     agents['agent4'].is_alive = False
     agents['agent0'].is_alive = False
 
-    assert component.process_attack(agents['agent1']) is None
-    assert component.process_attack(agents['agent2']) is None
-    assert component.process_attack(agents['agent3']) is None
-    assert component.process_attack(agents['agent5']) is None
+    assert actor.process_attack(agents['agent1'], True) is None
+    assert actor.process_attack(agents['agent2'], True) is None
+    assert actor.process_attack(agents['agent3'], True) is None
+    assert actor.process_attack(agents['agent5'], True) is None
