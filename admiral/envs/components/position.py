@@ -5,12 +5,24 @@ from admiral.envs import Agent
 from admiral.envs.components.team import TeamAgent
 
 class PositionAgent(Agent):
+    """
+    Agents have a position in the environment.
+
+    starting_position (np.array):
+        The desired starting position for this agent.
+    """
     def __init__(self, starting_position=None, **kwargs):
         super().__init__(**kwargs)
         self.starting_position = starting_position
         self.position = None
 
 class PositionObservingAgent(Agent):
+    """
+    Agents can observe other agents.
+
+    position_view_range (int):
+        Any agent within this many spaces will be fully observed.
+    """
     def __init__(self, position_view_range=None, **kwargs):
         super().__init__(**kwargs)
         assert position_view_range is not None, "position_view_range must be nonnegative integer"
@@ -18,11 +30,20 @@ class PositionObservingAgent(Agent):
     
     @property
     def configured(self):
+        """
+        Agents are configured if the position_view_range parameter is set.
+        """
         return super().configured and self.position_view_range is not None
 
 class PositionState:
     """
-    Manages the agents' positions.
+    Manages the agents' positions. All position updates must be within the region.
+
+    region (int):
+        The size of the environment.
+    
+    agents (dict):
+        The dictionary of agents.
     """
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer."
@@ -44,13 +65,23 @@ class PositionState:
                 agent.position = np.random.randint(0, self.region, 2)
     
     def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value only if the new position
+        is within the region.
+        """
         if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
             agent.position = _position
     
     def modify_position(self, agent, value, **kwargs):
+        """
+        Add some value to the position of the agent.
+        """
         self.set_position(agent, agent.position + value)
 
 class PositionObserver:
+    """
+    Observe the positions of all the agents in the simulator.
+    """
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
@@ -61,9 +92,25 @@ class PositionObserver:
             })
 
     def get_obs(self, *args, **kwargs):
+        """
+        Get the positions of all the agents in the simulator.
+        """
         return {agent.id: self.agents[agent.id].position for agent in self.agents.values()}
 
 class GridPositionBasedObserver:
+    """
+    Agents observe a grid of size position_view_range centered on their
+    position. The values of the cells are as such:
+        Out of bounds  : -1
+        Empty          :  0
+        Agent occupied : 1
+    
+    position (PositionState):
+        The position state handler, which contains the region.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
@@ -105,6 +152,21 @@ class GridPositionBasedObserver:
             return signal
 
 class GridPositionTeamBasedObserver:
+    """
+    Agents observe a grid of size position_view_range centered on their
+    position. The observation contains one channel per team, where the value of
+    the cell is the number of agents on that team that occupy that square. -1
+    indicates out of bounds.
+    
+    position (PositionState):
+        The position state handler, which contains the region.
+
+    team_state (TeamState):
+        The team state handler, which contains the number of teams.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
     def __init__(self, position=None, team_state=None, agents=None, **kwargs):
         self.position = position
         self.team_state = team_state
