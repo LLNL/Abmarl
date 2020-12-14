@@ -43,7 +43,6 @@ def test_position_based_attack_actor():
     actor = PositionBasedAttackActor(agents=agents)
     for agent in agents.values():
         agent.position = agent.starting_position
-        assert agent.action_space['attack'] == MultiBinary(1)
 
     assert actor.process_attack(agents['agent0'], True).id == 'agent1'
     assert actor.process_attack(agents['agent1'], True).id == 'agent0'
