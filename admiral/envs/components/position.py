@@ -97,6 +97,32 @@ class PositionObserver:
         """
         return {agent.id: self.agents[agent.id].position for agent in self.agents.values()}
 
+class RelativePositionObserver:
+    """
+    Observe the relative positions of agents in the simulator.
+    """
+    def __init__(self, position=None, agents=None, **kwargs):
+        self.position = position
+        self.agents=agents
+        from gym.spaces import Dict, Box
+        for agent in agents.values():
+            if isinstance(agent, PositionObservingAgent):
+                agent.observation_space['position'] = Dict({
+                    other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values() if other.id != agent.id
+                })
+
+    def get_obs(self, agent, **kwargs):
+        """
+        Get the relative positions of all the agents in the simulator.
+        """
+        obs = {}
+        for other in self.agents.values():
+            if other.id == agent.id: continue # Don't observe your own position
+            r_diff = other.position[0] - agent.position[0]
+            c_diff = other.position[1] - agent.position[1]
+            obs[other.id] = np.array([r_diff, c_diff])
+        return obs
+
 class GridPositionBasedObserver:
     """
     Agents observe a grid of size position_view_range centered on their
@@ -114,7 +140,7 @@ class GridPositionBasedObserver:
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
-        from gym.spaces import Dict, Box
+        from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent):
                 agent.observation_space['position'] = Box(-1, 1, (agent.position_view_range*2+1, agent.position_view_range*2+1), np.int)

@@ -5,7 +5,8 @@ import numpy as np
 
 from admiral.envs.components.team import TeamAgent, TeamState
 from admiral.envs.components.position import PositionAgent, PositionObservingAgent
-from admiral.envs.components.position import PositionState, PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver
+from admiral.envs.components.position import PositionState, PositionObserver, GridPositionBasedObserver, \
+    GridPositionTeamBasedObserver, RelativePositionObserver
 
 class PositionTestAgent(PositionAgent, PositionObservingAgent): pass
 class PositionTeamTestAgent(PositionAgent, PositionObservingAgent, TeamAgent): pass
@@ -201,3 +202,52 @@ def test_grid_team_position_observer():
         [ 0.,  0.,  0., -1., -1.],
         [ 0.,  0.,  0., -1., -1.],
     ]))
+
+def test_relative_position_observer():
+    agents = {
+        'agent0': PositionTestAgent(id='agent0', starting_position=np.array([0, 0]), position_view_range=1),
+        'agent1': PositionTestAgent(id='agent1', starting_position=np.array([2, 2]), position_view_range=2),
+        'agent2': PositionTestAgent(id='agent2', starting_position=np.array([3, 2]), position_view_range=3),
+        'agent3': PositionTestAgent(id='agent3', starting_position=np.array([1, 4]), position_view_range=4),
+        'agent4': PositionAgent(id='agent4', starting_position=np.array([1, 4])),
+    }
+    
+    state = PositionState(agents=agents, region=5)
+    observer = RelativePositionObserver(position=state, agents=agents)
+    state.reset()
+
+    assert observer.get_obs(agents['agent0'])['agent1'][0] == 2
+    assert observer.get_obs(agents['agent0'])['agent1'][1] == 2
+    assert observer.get_obs(agents['agent0'])['agent2'][0] == 3
+    assert observer.get_obs(agents['agent0'])['agent2'][1] == 2
+    assert observer.get_obs(agents['agent0'])['agent3'][0] == 1
+    assert observer.get_obs(agents['agent0'])['agent3'][1] == 4
+    assert observer.get_obs(agents['agent0'])['agent4'][0] == 1
+    assert observer.get_obs(agents['agent0'])['agent4'][1] == 4
+
+    assert observer.get_obs(agents['agent1'])['agent0'][0] == -2
+    assert observer.get_obs(agents['agent1'])['agent0'][1] == -2
+    assert observer.get_obs(agents['agent1'])['agent2'][0] == 1
+    assert observer.get_obs(agents['agent1'])['agent2'][1] == 0
+    assert observer.get_obs(agents['agent1'])['agent3'][0] == -1
+    assert observer.get_obs(agents['agent1'])['agent3'][1] == 2
+    assert observer.get_obs(agents['agent1'])['agent4'][0] == -1
+    assert observer.get_obs(agents['agent1'])['agent4'][1] == 2
+
+    assert observer.get_obs(agents['agent2'])['agent0'][0] == -3
+    assert observer.get_obs(agents['agent2'])['agent0'][1] == -2
+    assert observer.get_obs(agents['agent2'])['agent1'][0] == -1
+    assert observer.get_obs(agents['agent2'])['agent1'][1] == 0
+    assert observer.get_obs(agents['agent2'])['agent3'][0] == -2
+    assert observer.get_obs(agents['agent2'])['agent3'][1] == 2
+    assert observer.get_obs(agents['agent2'])['agent4'][0] == -2
+    assert observer.get_obs(agents['agent2'])['agent4'][1] == 2
+
+    assert observer.get_obs(agents['agent3'])['agent0'][0] == -1
+    assert observer.get_obs(agents['agent3'])['agent0'][1] == -4
+    assert observer.get_obs(agents['agent3'])['agent1'][0] == 1
+    assert observer.get_obs(agents['agent3'])['agent1'][1] == -2
+    assert observer.get_obs(agents['agent3'])['agent2'][0] == 2
+    assert observer.get_obs(agents['agent3'])['agent2'][1] == -2
+    assert observer.get_obs(agents['agent3'])['agent4'][0] == 0
+    assert observer.get_obs(agents['agent3'])['agent4'][1] == 0
