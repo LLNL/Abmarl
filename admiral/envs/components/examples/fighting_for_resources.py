@@ -3,16 +3,16 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
+from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, PositionObservingAgent
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
-from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor
+from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor, ResourceObservingAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionBasedAttackActor
 from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
 from admiral.envs.components.dead_done import DeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightForResourcesAgent(LifeAgent, PositionAgent, AttackingAgent, GridMovementAgent, HarvestingAgent):
+class FightForResourcesAgent(LifeAgent, PositionAgent, AttackingAgent, GridMovementAgent, HarvestingAgent, PositionObservingAgent, ResourceObservingAgent):
     pass
 
 class FightForResourcesEnv(AgentBasedSimulation):
@@ -49,20 +49,20 @@ class FightForResourcesEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            harvested_amount = self.resource_actor.process_harvest(agent, action['harvest'], **kwargs)
+            harvested_amount = self.resource_actor.process_harvest(agent, action.get('harvest', 0), **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
         
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action['attack'], **kwargs)
+            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
 
         # Apply entropy to all agents
         for agent_id in action_dict:
@@ -95,10 +95,10 @@ class FightForResourcesEnv(AgentBasedSimulation):
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
-            'position': self.position_observer.get_obs(agent),
-            'resources': self.resource_observer.get_obs(agent),
-            'health': self.health_observer.get_obs(agent_id, **kwargs),
-            'life': self.life_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent),
+            **self.resource_observer.get_obs(agent),
+            **self.health_observer.get_obs(agent_id, **kwargs),
+            **self.life_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -114,7 +114,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
         return {}
 
 agents = {f'agent{i}': FightForResourcesAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, view=3
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, position_view_range=3, resource_view_range=3
 ) for i in range(6)}
 env = FightForResourcesEnv(
     region=10,

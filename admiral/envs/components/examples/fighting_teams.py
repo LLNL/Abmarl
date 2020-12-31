@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.team import TeamAgent, TeamObserver, TeamState
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
+from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, PositionObservingAgent
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
 from admiral.envs.components.health import LifeState, LifeAgent, HealthObserver, LifeObserver
@@ -11,7 +11,7 @@ from admiral.envs.components.dead_done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent):
+class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent, PositionObservingAgent):
     pass
 
 class FightingTeamsEnv(AgentBasedSimulation):
@@ -46,13 +46,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action['attack'], **kwargs)
+            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
     
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -79,10 +79,10 @@ class FightingTeamsEnv(AgentBasedSimulation):
     
     def get_obs(self, agent_id, **kwargs):
         return {
-            'position': self.position_observer.get_obs(agent_id, **kwargs),
-            'health': self.health_observer.get_obs(agent_id, **kwargs),
-            'life': self.life_observer.get_obs(agent_id, **kwargs),
-            'team': self.team_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent_id, **kwargs),
+            **self.health_observer.get_obs(agent_id, **kwargs),
+            **self.life_observer.get_obs(agent_id, **kwargs),
+            **self.team_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -99,7 +99,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         return {}
 
 agents = {f'agent{i}': FightingTeamsAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, view=11
+    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, position_view_range=11
 ) for i in range(24)}
 env = FightingTeamsEnv(
     region=12,

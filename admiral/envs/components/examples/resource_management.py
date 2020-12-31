@@ -3,15 +3,15 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent
+from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent, PositionObservingAgent
 from admiral.envs.components.movement import GridMovementAgent, GridMovementActor
-from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor
+from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor, ResourceObservingAgent
 from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
 from admiral.envs.components.dead_done import DeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent):
+class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent, PositionObservingAgent, ResourceObservingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):
@@ -47,13 +47,13 @@ class ResourceManagementEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            harvested_amount = self.resource_actor.process_harvest(agent, action['harvest'], **kwargs)
+            harvested_amount = self.resource_actor.process_harvest(agent, action.get('harvest', 0), **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
 
         # Apply entropy to all agents
         for agent_id in action_dict:
@@ -86,10 +86,10 @@ class ResourceManagementEnv(AgentBasedSimulation):
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
-            'position': self.position_observer.get_obs(agent),
-            'resources': self.resource_observer.get_obs(agent),
-            'health': self.health_observer.get_obs(agent_id, **kwargs),
-            'life': self.life_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent),
+            **self.resource_observer.get_obs(agent),
+            **self.health_observer.get_obs(agent_id, **kwargs),
+            **self.life_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -104,7 +104,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', view=2, move_range=1, max_harvest=1.0) for i in range(4)}
+agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', position_view_range=2, resource_view_range=2, move_range=1, max_harvest=1.0) for i in range(4)}
 env = ResourceManagementEnv(
     region=10,
     agents=agents
