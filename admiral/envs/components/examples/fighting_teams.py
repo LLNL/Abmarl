@@ -98,23 +98,24 @@ class FightingTeamsEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-agents = {f'agent{i}': FightingTeamsAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, position_view_range=11
-) for i in range(24)}
-env = FightingTeamsEnv(
-    region=12,
-    agents=agents,
-    number_of_teams=2
-)
-env.reset()
-print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-fig = plt.gcf()
-env.render(fig=fig)
-
-for _ in range(100):
-    action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
-    env.step(action_dict)
+if __name__ == '__main__':
+    agents = {f'agent{i}': FightingTeamsAgent(
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, position_view_range=11
+    ) for i in range(24)}
+    env = FightingTeamsEnv(
+        region=12,
+        agents=agents,
+        number_of_teams=2
+    )
+    env.reset()
+    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    fig = plt.gcf()
     env.render(fig=fig)
-    print(env.get_all_done())
-    x = []
+
+    for _ in range(100):
+        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
+        env.step(action_dict)
+        env.render(fig=fig)
+        print(env.get_all_done())
+        x = []
 

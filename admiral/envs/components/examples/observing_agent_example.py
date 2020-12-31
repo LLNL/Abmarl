@@ -81,81 +81,82 @@ class SimpleGridObservations(AgentBasedSimulation):
         return {}
 
 
-agents = {
-    'agent0': ObservingTeamMovementAgent(id='agent0', team=0, position_view_range=1, move_range=1, starting_position=np.array([2, 1])),
-    'agent1': ObservingTeamMovementAgent(id='agent1', team=0, position_view_range=1, move_range=0, starting_position=np.array([2, 2])),
-    'agent2': ObservingTeamMovementAgent(id='agent2', team=1, position_view_range=1, move_range=0, starting_position=np.array([0, 4])),
-    'agent3': ObservingTeamMovementAgent(id='agent3', team=1, position_view_range=1, move_range=0, starting_position=np.array([0, 0])),
-    'agent4': ObservingTeamMovementAgent(id='agent4', team=2, position_view_range=1, move_range=0, starting_position=np.array([4, 0])),
-    'agent5': ObservingTeamMovementAgent(id='agent5', team=2, position_view_range=1, move_range=0, starting_position=np.array([4, 4])),
-}
-env = SimpleGridObservations(
-    region=5,
-    agents=agents,
-    number_of_teams=3
-)
-obs = env.reset()
-fig = plt.gcf()
-env.render(fig=fig)
-print(obs['agent0']['position'])
-print(obs['agent0']['position'])
-print(obs['agent0']['position'])
-print()
+if __name__ == '__main__':
+    agents = {
+        'agent0': ObservingTeamMovementAgent(id='agent0', team=0, position_view_range=1, move_range=1, starting_position=np.array([2, 1])),
+        'agent1': ObservingTeamMovementAgent(id='agent1', team=0, position_view_range=1, move_range=0, starting_position=np.array([2, 2])),
+        'agent2': ObservingTeamMovementAgent(id='agent2', team=1, position_view_range=1, move_range=0, starting_position=np.array([0, 4])),
+        'agent3': ObservingTeamMovementAgent(id='agent3', team=1, position_view_range=1, move_range=0, starting_position=np.array([0, 0])),
+        'agent4': ObservingTeamMovementAgent(id='agent4', team=2, position_view_range=1, move_range=0, starting_position=np.array([4, 0])),
+        'agent5': ObservingTeamMovementAgent(id='agent5', team=2, position_view_range=1, move_range=0, starting_position=np.array([4, 4])),
+    }
+    env = SimpleGridObservations(
+        region=5,
+        agents=agents,
+        number_of_teams=3
+    )
+    obs = env.reset()
+    fig = plt.gcf()
+    env.render(fig=fig)
+    print(obs['agent0']['position'])
+    print(obs['agent0']['position'])
+    print(obs['agent0']['position'])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([-1, 0])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([-1, 0])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([0, 1])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([0, 1])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([0, 1])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([0, 1])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([1, 0])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([1, 0])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([1, 0])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([1, 0])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([0, -1])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([0, -1])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([0, -1])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([0, -1])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-obs = env.step({'agent0': {'move': np.array([-1, 0])}})
-env.render(fig=fig)
-print(obs['agent0']['position'][:,:,0])
-print(obs['agent0']['position'][:,:,1])
-print(obs['agent0']['position'][:,:,2])
-print()
+    obs = env.step({'agent0': {'move': np.array([-1, 0])}})
+    env.render(fig=fig)
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
+    print()
 
-plt.show()
+    plt.show()

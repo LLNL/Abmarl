@@ -123,25 +123,26 @@ class PredatorPreyEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     position_view_range=5, team=0, move_range=1, max_harvest=0.5, resource_view_range=5) for i in range(7)}
-predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', position_view_range=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
-agents = {**prey, **predators}
-region = 10
-env = PredatorPreyEnv(
-    region=region,
-    agents=agents,
-    number_of_teams=2,
-    entropy=0.05
-)
-env.reset()
-print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-fig = plt.gcf()
-env.render(fig=fig)
-
-for _ in range(50):
-    action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
-    env.step(action_dict)
+if __name__ == '__main__':
+    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     position_view_range=5, team=0, move_range=1, max_harvest=0.5, resource_view_range=5) for i in range(7)}
+    predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', position_view_range=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
+    agents = {**prey, **predators}
+    region = 10
+    env = PredatorPreyEnv(
+        region=region,
+        agents=agents,
+        number_of_teams=2,
+        entropy=0.05
+    )
+    env.reset()
+    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    fig = plt.gcf()
     env.render(fig=fig)
-    print(env.get_all_done())
-    x = []
+
+    for _ in range(50):
+        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
+        env.step(action_dict)
+        env.render(fig=fig)
+        print(env.get_all_done())
+        x = []
 
