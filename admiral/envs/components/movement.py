@@ -36,8 +36,6 @@ class GridMovementActor:
     """
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
-        for agent in agents.values():
-            assert isinstance(agent, PositionAgent)
         self.agents = agents
 
         from gym.spaces import Box
@@ -59,7 +57,7 @@ class GridMovementActor:
             How much the agent has moved in row and column. This can be different
             from the desired move if the position update was invalid.
         """
-        if isinstance(moving_agent, GridMovementAgent):
+        if isinstance(moving_agent, GridMovementAgent) and isinstance(agent, PositionAgent):
             position_before = moving_agent.position
             self.position.modify_position(moving_agent, move, **kwargs)
             return position_before - moving_agent.position
