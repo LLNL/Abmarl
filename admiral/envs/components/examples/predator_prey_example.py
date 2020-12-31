@@ -4,19 +4,19 @@ import numpy as np
 import seaborn as sns
 
 from admiral.envs.components.team import TeamAgent, TeamState, TeamObserver
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
+from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, PositionObservingAgent
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
 from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
-from admiral.envs.components.resources import GridResourceObserver, GridResourceState, HarvestingAgent, GridResourcesActor
+from admiral.envs.components.resources import GridResourceObserver, GridResourceState, HarvestingAgent, GridResourcesActor, ResourceObservingAgent
 from admiral.envs.components.dead_done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, HarvestingAgent):
+class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, PositionObservingAgent, HarvestingAgent, ResourceObservingAgent):
     pass
 
-class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, AttackingAgent, LifeAgent):
+class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, PositionObservingAgent, AttackingAgent):
     pass
 
 class PredatorPreyEnv(AgentBasedSimulation):
@@ -55,7 +55,6 @@ class PredatorPreyEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            if not isinstance(agent, HarvestingAgent): continue # TODO: I don't like having to check this here...
             harvested_amount = self.resource_actor.process_harvest(agent, action['harvest'], **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
@@ -63,7 +62,6 @@ class PredatorPreyEnv(AgentBasedSimulation):
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            if not isinstance(attacking_agent, AttackingAgent): continue # TODO: I don't like having to check this here...
             attacked_agent = self.attack_actor.process_attack(attacking_agent, action['attack'], **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
@@ -107,7 +105,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         agent = self.agents[agent_id]
         return {
             'position': self.position_observer.get_obs(agent),
-            'resources': self.resource_observer.get_obs(agent),
+            'resources': self.resource_observer.get_obs(agent), # TODO: How to handle case where predators don't see this?
             'health': self.health_observer.get_obs(agent_id, **kwargs),
             'life': self.life_observer.get_obs(agent_id, **kwargs),
             'team': self.team_observer.get_obs(agent_id, **kwargs),

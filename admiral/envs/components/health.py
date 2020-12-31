@@ -58,11 +58,12 @@ class LifeState:
         Reset the health and life state of all applicable agents.
         """
         for agent in self.agents.values():
-            if agent.initial_health is not None:
-                agent.health = agent.initial_health
-            else:
-                agent.health = np.random.uniform(agent.min_health, agent.max_health)
-            agent.is_alive = True
+            if isinstance(agent, LifeAgent):
+                if agent.initial_health is not None:
+                    agent.health = agent.initial_health
+                else:
+                    agent.health = np.random.uniform(agent.min_health, agent.max_health)
+                agent.is_alive = True
     
     def set_health(self, agent, _health):
         """
@@ -70,25 +71,28 @@ class LifeState:
         min and max health-value. If that value is less than the agent's health,
         then the agent dies.
         """
-        if _health <= agent.min_health:
-            agent.health = agent.min_health
-            agent.is_alive = False
-        elif _health >= agent.max_health:
-            agent.health = agent.max_health
-        else:
-            agent.health = _health
+        if isinstance(agent, LifeAgent):
+            if _health <= agent.min_health:
+                agent.health = agent.min_health
+                agent.is_alive = False
+            elif _health >= agent.max_health:
+                agent.health = agent.max_health
+            else:
+                agent.health = _health
     
     def modify_health(self, agent, value):
         """
         Add some value to the health of the agent.
         """
-        self.set_health(agent, agent.health + value)
+        if isinstance(agent, LifeAgent):
+            self.set_health(agent, agent.health + value)
 
     def apply_entropy(self, agent, **kwargs):
         """
         Apply entropy to the agent, decreasing its health by a small amount.
         """
-        self.modify_health(agent, -self.entropy, **kwargs)
+        if isinstance(agent, LifeAgent):
+            self.modify_health(agent, -self.entropy, **kwargs)
 
 class HealthObserver:
     """
@@ -100,14 +104,14 @@ class HealthObserver:
         from gym.spaces import Dict, Box
         for agent in agents.values():
             agent.observation_space['health'] = Dict({
-                other.id: Box(other.min_health, other.max_health, (1,), np.float) for other in self.agents.values()
+                other.id: Box(other.min_health, other.max_health, (1,), np.float) for other in self.agents.values() if isinstance(other, LifeAgent)
             })
     
     def get_obs(self, *args, **kwargs):
         """
         Get the health state of all the agents in the simulator.
         """
-        return {agent.id: self.agents[agent.id].health for agent in self.agents.values()}
+        return {agent.id: agent.health for agent in self.agents.values() if isinstance(agent, LifeAgent)}
 
 class LifeObserver:
     """
@@ -119,11 +123,11 @@ class LifeObserver:
         from gym.spaces import Dict, Box
         for agent in agents.values():
             agent.observation_space['life'] = Dict({
-                other.id: Box(0, 1, (1,), np.int) for other in self.agents.values()
+                other.id: Box(0, 1, (1,), np.int) for other in self.agents.values() if isinstance(other, LifeAgent)
             })
     
     def get_obs(self, *args, **kwargs):
         """
         Get the life state of all the agents in the simulator.
         """
-        return {agent.id: self.agents[agent.id].is_alive for agent in self.agents.values()}
+        return {agent.id: agent.is_alive for agent in self.agents.values() if isinstance(agent, LifeAgent)}

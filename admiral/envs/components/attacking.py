@@ -69,7 +69,7 @@ class PositionBasedAttackActor:
             Return the attacked agent object. This can be None if no agent was
             attacked.
         """
-        if attack:
+        if isinstance(attacking_agent, AttackingAgent) and attack:
             for attacked_agent in self.agents.values():
                 if attacked_agent.id == attacking_agent.id:
                     # Cannot attack yourself
@@ -78,7 +78,7 @@ class PositionBasedAttackActor:
                     # Cannot attack dead agents
                     continue
                 elif abs(attacking_agent.position[0] - attacked_agent.position[0]) > attacking_agent.attack_range or \
-                     abs(attacking_agent.position[1] - attacked_agent.position[1]) > attacking_agent.attack_range:
+                    abs(attacking_agent.position[1] - attacked_agent.position[1]) > attacking_agent.attack_range:
                     # Agent too far away
                     continue
                 else:
@@ -123,7 +123,7 @@ class PositionTeamBasedAttackActor:
         return (Agent):
             Return the attacked agent object.
         """
-        if attack:
+        if isinstance(attacking_agent, AttackingAgent) and attack:
             for attacked_agent in self.agents.values():
                 if attacked_agent.id == attacking_agent.id:
                     # Cannot attack yourself

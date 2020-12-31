@@ -103,8 +103,6 @@ class GridResourceState:
         self.coverage = coverage
 
         assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, PositionAgent)
         self.agents = agents
 
     def reset(self, **kwargs):
@@ -185,10 +183,11 @@ class GridResourcesActor:
             Return the amount of resources that was actually harvested. This can
             be less than the desired amount if the cell does not have enough resources.
         """
-        location = tuple(agent.position)
-        resource_before = self.resources.resources[location]
-        self.resources.modify_resources(location, -amount)
-        return resource_before - self.resources.resources[location]
+        if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
+            location = tuple(agent.position)
+            resource_before = self.resources.resources[location]
+            self.resources.modify_resources(location, -amount)
+            return resource_before - self.resources.resources[location]
 
 class GridResourceObserver:
     """
