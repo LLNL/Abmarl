@@ -97,7 +97,9 @@ class PositionObserver:
         Get the positions of all the agents in the simulator.
         """
         if isinstance(agent, PositionObservingAgent):
-            return {other.id: other.position for other in self.agents.values() if isinstance(other, PositionAgent)}
+            return {'position': {other.id: other.position for other in self.agents.values() if isinstance(other, PositionAgent)}}
+        else:
+            return {}
 
 class RelativePositionObserver:
     """
@@ -126,7 +128,9 @@ class RelativePositionObserver:
                 r_diff = other.position[0] - agent.position[0]
                 c_diff = other.position[1] - agent.position[1]
                 obs[other.id] = np.array([r_diff, c_diff])
-            return obs
+            return {'position': obs}
+        else:
+            return {}
 
 class GridPositionBasedObserver:
     """
@@ -182,7 +186,9 @@ class GridPositionBasedObserver:
                     c_diff += my_agent.position_view_range
                     signal[r_diff, c_diff] = 1 # There is an agent at this location.
 
-            return signal
+            return {'position': signal}
+        else:
+            return {}
 
 class GridPositionTeamBasedObserver:
     """
@@ -251,4 +257,6 @@ class GridPositionTeamBasedObserver:
                     c_diff += my_agent.position_view_range
                     signal[r_diff, c_diff, other_agent.team] += 1
 
-            return signal
+            return {'position': signal}
+        else:
+            return {}

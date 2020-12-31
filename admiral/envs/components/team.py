@@ -50,4 +50,4 @@ class TeamObserver:
         """
         Get the team of each agent in the simulator.
         """
-        return {other.id: self.agents[other.id].team for other in self.agents.values() if isinstance(other, TeamAgent)}
+        return {'team': {other.id: self.agents[other.id].team for other in self.agents.values() if isinstance(other, TeamAgent)}}

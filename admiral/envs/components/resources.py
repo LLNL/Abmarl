@@ -228,4 +228,6 @@ class GridResourceObserver:
             c_upper = min([self.resources.region-1, c+agent.resource_view_range])+1
             signal[(r_lower+agent.resource_view_range-r):(r_upper+agent.resource_view_range-r),(c_lower+agent.resource_view_range-c):(c_upper+agent.resource_view_range-c)] = \
                 self.resources.resources[r_lower:r_upper, c_lower:c_upper]
-            return signal
+            return {'resources': signal}
+        else:
+            return {}

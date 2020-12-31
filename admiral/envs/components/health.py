@@ -111,7 +111,7 @@ class HealthObserver:
         """
         Get the health state of all the agents in the simulator.
         """
-        return {agent.id: agent.health for agent in self.agents.values() if isinstance(agent, LifeAgent)}
+        return {'health': {agent.id: agent.health for agent in self.agents.values() if isinstance(agent, LifeAgent)}}
 
 class LifeObserver:
     """
@@ -130,4 +130,4 @@ class LifeObserver:
         """
         Get the life state of all the agents in the simulator.
         """
-        return {agent.id: agent.is_alive for agent in self.agents.values() if isinstance(agent, LifeAgent)}
+        return {'life': {agent.id: agent.is_alive for agent in self.agents.values() if isinstance(agent, LifeAgent)}}

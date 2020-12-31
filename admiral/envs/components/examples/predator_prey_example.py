@@ -104,11 +104,11 @@ class PredatorPreyEnv(AgentBasedSimulation):
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
-            'position': self.position_observer.get_obs(agent),
-            'resources': self.resource_observer.get_obs(agent), # TODO: How to handle case where predators don't see this?
-            'health': self.health_observer.get_obs(agent_id, **kwargs),
-            'life': self.life_observer.get_obs(agent_id, **kwargs),
-            'team': self.team_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent),
+            **self.resource_observer.get_obs(agent),
+            **self.health_observer.get_obs(agent_id, **kwargs),
+            **self.life_observer.get_obs(agent_id, **kwargs),
+            **self.team_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
