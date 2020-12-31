@@ -55,21 +55,21 @@ class PredatorPreyEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            harvested_amount = self.resource_actor.process_harvest(agent, action['harvest'], **kwargs)
+            harvested_amount = self.resource_actor.process_harvest(agent, action.get('harvest', 0), **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
         
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action['attack'], **kwargs)
+            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
                 self.life_state.modify_health(attacking_agent, attacking_agent.attack_strength)
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
 
         # Apply entropy to all agents
         for agent_id in action_dict:
@@ -123,8 +123,8 @@ class PredatorPreyEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     view=5, team=0, move_range=1, max_harvest=0.5) for i in range(7)}
-predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', view=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
+prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     position_view_range=5, team=0, move_range=1, max_harvest=0.5, resource_view_range=5) for i in range(7)}
+predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', position_view_range=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
 agents = {**prey, **predators}
 region = 10
 env = PredatorPreyEnv(
