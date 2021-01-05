@@ -43,7 +43,7 @@ class TeamObserver:
         from gym.spaces import Box, Dict
         for agent in agents.values():
             agent.observation_space['team'] = Dict({
-                other.id: Box(0, self.team.number_of_teams, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
+                other.id: Box(-1, self.team.number_of_teams, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
             })
     
     def get_obs(self, *args, **kwargs):
@@ -51,3 +51,7 @@ class TeamObserver:
         Get the team of each agent in the simulator.
         """
         return {'team': {other.id: self.agents[other.id].team for other in self.agents.values() if isinstance(other, TeamAgent)}}
+    
+    @property
+    def null_value(self):
+        return -1
