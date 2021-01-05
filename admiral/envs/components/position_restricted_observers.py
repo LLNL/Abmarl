@@ -23,6 +23,7 @@ def obs_filter(obs, agent, agents, null_value):
     if isinstance(agent, PositionAgent) and \
        isinstance(agent, AgentObservingAgent):
         for other in agents.values():
+            if other not in obs: continue # This agent is not observed
             if other.id == agent.id: continue # Don't modify yourself
             if not isinstance(other, PositionAgent): continue # Can't modify based on position
             r_diff = abs(other.position[0] - agent.position[0])
