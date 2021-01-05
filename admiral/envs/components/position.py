@@ -89,7 +89,7 @@ class PositionObserver:
         from gym.spaces import Dict, Box
         for agent in agents.values():
             agent.observation_space['position'] = Dict({
-                other.id: Box(0, self.position.region, (2,), np.int) for other in agents.values() if isinstance(other, PositionAgent)
+                other.id: Box(-1, self.position.region, (2,), np.int) for other in agents.values() if isinstance(other, PositionAgent)
             })
 
     def get_obs(self, agent, **kwargs):
@@ -100,6 +100,10 @@ class PositionObserver:
             return {'position': {other.id: other.position for other in self.agents.values() if isinstance(other, PositionAgent)}}
         else:
             return {}
+    
+    @property
+    def null_value(self):
+        return np.array([-1, -1])
 
 class RelativePositionObserver:
     """
@@ -131,6 +135,10 @@ class RelativePositionObserver:
             return {'position': obs}
         else:
             return {}
+    
+    @property
+    def null_value(self):
+        return np.array([-self.position.region, -self.position.region])
 
 class GridPositionBasedObserver:
     """
