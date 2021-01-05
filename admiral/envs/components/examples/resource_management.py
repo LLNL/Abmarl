@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent, PositionObservingAgent
+from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent, AgentObservingAgent
 from admiral.envs.components.movement import GridMovementAgent, GridMovementActor
 from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor, ResourceObservingAgent
 from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
@@ -11,7 +11,7 @@ from admiral.envs.components.dead_done import DeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent, PositionObservingAgent, ResourceObservingAgent):
+class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent, AgentObservingAgent, ResourceObservingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):
@@ -105,7 +105,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', position_view_range=2, resource_view_range=2, move_range=1, max_harvest=1.0) for i in range(4)}
+    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', agent_view=2, resource_view_range=2, move_range=1, max_harvest=1.0) for i in range(4)}
     env = ResourceManagementEnv(
         region=10,
         agents=agents
