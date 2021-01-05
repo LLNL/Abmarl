@@ -96,10 +96,13 @@ class PositionObserver:
         """
         Get the positions of all the agents in the simulator.
         """
-        if isinstance(agent, PositionObservingAgent):
-            return {'position': {other.id: other.position for other in self.agents.values() if isinstance(other, PositionAgent)}}
-        else:
-            return {}
+        # if isinstance(agent, PositionObservingAgent):
+            # TODO: I favor AgentObservingAgent over PositionObservingAgent. I
+            # should remove PositionObservingAgent and use AgentObservingAgent
+            # for all the fields here instead. This won't be hard, just a bit tedious.
+        return {'position': {other.id: other.position for other in self.agents.values() if isinstance(other, PositionAgent)}}
+        # else:
+        #     return {}
     
     @property
     def null_value(self):
@@ -124,7 +127,8 @@ class RelativePositionObserver:
         """
         Get the relative positions of all the agents in the simulator.
         """
-        if isinstance(agent, PositionObservingAgent) and isinstance(agent, PositionAgent):
+        # See todo above
+        if isinstance(agent, PositionAgent):
             obs = {}
             for other in self.agents.values():
                 if other.id == agent.id: continue # Don't observe your own position

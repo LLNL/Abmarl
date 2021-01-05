@@ -2,7 +2,7 @@
 from gym.spaces import Dict, MultiBinary
 
 from admiral.envs import Agent
-from admiral.envs.components.position import PositionAgent, PositionObserver
+from admiral.envs.components.position import PositionAgent, PositionObserver, RelativePositionObserver
 from admiral.envs.components.team import TeamObserver
 from admiral.envs.components.health import HealthObserver, LifeObserver
 
@@ -23,33 +23,37 @@ def obs_filter(obs, agent, agents, null_value):
     if isinstance(agent, PositionAgent) and \
        isinstance(agent, AgentObservingAgent):
         for other in agents.values():
-            if other not in obs: continue # This agent is not observed
+            if other.id not in obs: continue # This agent is not observed
             if other.id == agent.id: continue # Don't modify yourself
-            if not isinstance(other, PositionAgent): continue # Can't modify based on position
-            r_diff = abs(other.position[0] - agent.position[0])
-            c_diff = abs(other.position[1] - agent.position[1])
-            if r_diff > agent.agent_view or c_diff > agent.agent_view: # Agent too far away to observe
+            if not isinstance(other, PositionAgent):
+                # Agents without positions will not be observed at all
+                # TODO: make this a parameter to the observers below
                 obs[other.id] = null_value
+            else:
+                r_diff = abs(other.position[0] - agent.position[0])
+                c_diff = abs(other.position[1] - agent.position[1])
+                if r_diff > agent.agent_view or c_diff > agent.agent_view: # Agent too far away to observe
+                    obs[other.id] = null_value
     return obs
 
 class MaskObserver:
-    def __init__(self, agents=agents, **kwargs):
+    def __init__(self, agents=None, **kwargs):
         self.agents = agents
         for agent in agents.values():
             if isinstance(agent, AgentObservingAgent):
                 agent.observation_space['mask'] = Dict({
-                    other: MultiBinary(1) for other in agents.values()
+                    other: MultiBinary(1) for other in agents
                 })
     
     def get_obs(self, agent, **kwargs):
         if isinstance(agent, AgentObservingAgent):
-            return {'mask': {other: True for other in self.agents.values()}}
+            return {'mask': {other: True for other in self.agents}}
         else:
             return {}
     
     @property
     def null_value(self):
-        return 0
+        return False
 
 class PositionRestrictedMaskObserver(MaskObserver):
     """
@@ -57,7 +61,9 @@ class PositionRestrictedMaskObserver(MaskObserver):
     agent.
     """
     def get_obs(self, agent, **kwargs):
-        return obs_filter(super().get_obs(), agent, self.agents, self.null_value)
+        obs = super().get_obs(agent)
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
 class PositionRestrictedTeamObserver(TeamObserver):
     """
@@ -65,7 +71,9 @@ class PositionRestrictedTeamObserver(TeamObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        return obs_filter(super().get_obs(), agent, self.agents, self.null_value)
+        obs = super().get_obs()
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
 class PositionRestrictedPositionObserver(PositionObserver):
     """
@@ -73,7 +81,9 @@ class PositionRestrictedPositionObserver(PositionObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        return obs_filter(super().get_obs(), agent, self.agents, self.null_value)
+        obs = super().get_obs(agent)
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
 class PositionRestrictedRelativePositionObserver(RelativePositionObserver):
     """
@@ -81,7 +91,9 @@ class PositionRestrictedRelativePositionObserver(RelativePositionObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        return obs_filter(super().get_obs(), agent, self.agents, self.null_value)
+        obs = super().get_obs(agent)
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
 class PositionRestrictedHealthObserver(HealthObserver):
     """
@@ -89,7 +101,9 @@ class PositionRestrictedHealthObserver(HealthObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        return obs_filter(super().get_obs(), agent, self.agents, self.null_value)
+        obs = super().get_obs()
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
 class PositionRestrictedLifeObserver(LifeObserver):
     """
@@ -97,4 +111,6 @@ class PositionRestrictedLifeObserver(LifeObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        return obs_filter(super().get_obs(), agent, self.agents, self.null_value)
+        obs = super().get_obs()
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
