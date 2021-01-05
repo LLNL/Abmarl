@@ -37,6 +37,19 @@ def obs_filter(obs, agent, agents, null_value):
     return obs
 
 class MaskObserver:
+    # TODO: Having a single mask observer may actually be confusing because it will
+    # have every single agent in the dictionary, whereas the actual observer may
+    # only have a subset of them. For example, a life observer will only include
+    # life agents, and if this mask is applied, then the mask will include all
+    # the agents, so there is not a clear mapping to the actual observation.
+    #
+    # Paths to take:
+    # (1) Change the observers so that all agents are always observed
+    # and the ones that are not life agents will simply be observed with the null
+    # value.
+    # (2) Have a separate mask for every observer as part of the restricted classes
+    # below.
+    # We should look at some rllib examples to help us decide the right way forward.
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
         for agent in agents.values():
