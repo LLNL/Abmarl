@@ -2,14 +2,9 @@
 from gym.spaces import MultiBinary, Dict, Box
 import numpy as np
 
-from admiral.envs.components.position_restricted_observers \
-    import AgentObservingAgent, \
-           PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, \
-           PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, \
-           PositionRestrictedHealthObserver, PositionRestrictedLifeObserver
-from admiral.envs.components.position import PositionState, PositionAgent
-from admiral.envs.components.health import LifeAgent, LifeState
-from admiral.envs.components.team import TeamAgent, TeamState
+from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent
+from admiral.envs.components.state import PositionState, LifeState, TeamState
+from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver
 
 class PositionRestrictedAgent(AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent): pass
 class TeamlessAgent(AgentObservingAgent, PositionAgent, LifeAgent): pass

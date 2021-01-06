@@ -2,8 +2,8 @@
 from gym.spaces import MultiBinary
 import numpy as np
 
-from admiral.envs.components.attacking import AttackingAgent, PositionAgent, TeamAgent, LifeAgent
-from admiral.envs.components.attacking import PositionBasedAttackActor, PositionTeamBasedAttackActor
+from admiral.envs.components.agent import AttackingAgent, PositionAgent, TeamAgent, LifeAgent
+from admiral.envs.components.actor import PositionBasedAttackActor, PositionTeamBasedAttackActor
 
 class AttackTestAgent(AttackingAgent, PositionAgent, LifeAgent):
     pass
