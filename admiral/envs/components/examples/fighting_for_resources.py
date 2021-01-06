@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, PositionObservingAgent
+from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, AgentObservingAgent
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
 from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor, ResourceObservingAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionBasedAttackActor
@@ -12,7 +12,7 @@ from admiral.envs.components.dead_done import DeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightForResourcesAgent(LifeAgent, PositionAgent, AttackingAgent, GridMovementAgent, HarvestingAgent, PositionObservingAgent, ResourceObservingAgent):
+class FightForResourcesAgent(LifeAgent, PositionAgent, AttackingAgent, GridMovementAgent, HarvestingAgent, AgentObservingAgent, ResourceObservingAgent):
     pass
 
 class FightForResourcesEnv(AgentBasedSimulation):
@@ -115,7 +115,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {f'agent{i}': FightForResourcesAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, position_view_range=3, resource_view_range=3
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, agent_view=3, resource_view_range=3
     ) for i in range(6)}
     env = FightForResourcesEnv(
         region=10,

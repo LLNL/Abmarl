@@ -57,7 +57,7 @@ class GridMovementActor:
             How much the agent has moved in row and column. This can be different
             from the desired move if the position update was invalid.
         """
-        if isinstance(moving_agent, GridMovementAgent) and isinstance(agent, PositionAgent):
+        if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
             position_before = moving_agent.position
             self.position.modify_position(moving_agent, move, **kwargs)
             return position_before - moving_agent.position

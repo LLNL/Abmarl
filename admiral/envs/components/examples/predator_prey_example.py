@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 from admiral.envs.components.team import TeamAgent, TeamState, TeamObserver
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, PositionObservingAgent
+from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, AgentObservingAgent
 from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
 from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
 from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
@@ -13,10 +13,10 @@ from admiral.envs.components.dead_done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, PositionObservingAgent, HarvestingAgent, ResourceObservingAgent):
+class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent):
     pass
 
-class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, PositionObservingAgent, AttackingAgent):
+class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, AttackingAgent):
     pass
 
 class PredatorPreyEnv(AgentBasedSimulation):
@@ -124,8 +124,8 @@ class PredatorPreyEnv(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     position_view_range=5, team=0, move_range=1, max_harvest=0.5, resource_view_range=5) for i in range(7)}
-    predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', position_view_range=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
+    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     agent_view=5, team=0, move_range=1, max_harvest=0.5, resource_view_range=5) for i in range(7)}
+    predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', agent_view=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
     agents = {**prey, **predators}
     region = 10
     env = PredatorPreyEnv(
