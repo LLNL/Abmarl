@@ -2,9 +2,10 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.team import TeamAgent, TeamState
-from admiral.envs.components.position import PositionAgent, PositionState, GridPositionTeamBasedObserver, AgentObservingAgent
-from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
+from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent
+from admiral.envs.components.state import TeamState, PositionState
+from admiral.envs.components.observer import GridPositionTeamBasedObserver
+from admiral.envs.components.actor import GridMovementActor
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 

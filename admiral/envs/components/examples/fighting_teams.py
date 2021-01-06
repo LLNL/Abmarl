@@ -2,12 +2,11 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.team import TeamAgent, TeamObserver, TeamState
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, AgentObservingAgent
-from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
-from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
-from admiral.envs.components.health import LifeState, LifeAgent, HealthObserver, LifeObserver
-from admiral.envs.components.dead_done import TeamDeadDone
+from admiral.envs.components.agent import TeamAgent, PositionAgent, GridMovementAgent, AttackingAgent, LifeAgent, AgentObservingAgent
+from admiral.envs.components.state import TeamState, PositionState, LifeState
+from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver
+from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
+from admiral.envs.components.done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
