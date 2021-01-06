@@ -2,38 +2,9 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.envs.components.team import TeamAgent
-
-class PositionAgent(Agent):
-    """
-    Agents have a position in the environment.
-
-    starting_position (np.array):
-        The desired starting position for this agent.
-    """
-    def __init__(self, starting_position=None, **kwargs):
-        super().__init__(**kwargs)
-        self.starting_position = starting_position
-        self.position = None
-
-class AgentObservingAgent(Agent):
-    """
-    Agents can observe other agents.
-
-    agent_view (int):
-        Any agent within this many spaces will be fully observed.
-    """
-    def __init__(self, agent_view=None, **kwargs):
-        super().__init__(**kwargs)
-        assert agent_view is not None, "agent_view must be nonnegative integer"
-        self.agent_view = agent_view
-    
-    @property
-    def configured(self):
-        """
-        Agents are configured if the agent_view parameter is set.
-        """
-        return super().configured and self.agent_view is not None
+from admiral.envs.components.agent import PositionAgent
+from admiral.envs.components.agent import AgentObservingAgent
+from admiral.envs.components.agent import TeamAgent
 
 class PositionState:
     """

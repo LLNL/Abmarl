@@ -1,35 +1,10 @@
 
 from admiral.envs import Agent
-from admiral.envs.components.position import PositionAgent
-from admiral.envs.components.team import TeamAgent
-from admiral.envs.components.health import LifeAgent
+from admiral.envs.components.agent import AttackingAgent
+from admiral.envs.components.agent import PositionAgent
+from admiral.envs.components.agent import TeamAgent
+from admiral.envs.components.agent import LifeAgent
 
-class AttackingAgent(Agent):
-    """
-    Agents that can attack other agents.
-
-    attack_range (int):
-        The effective range of the attack. Can be used to determine if an attack
-        is successful based on distance between agents.
-    
-    attack_strength (float):
-        How effective the agent's attack is. This is applicable in situations where
-        the agents' health is affected by attacks.
-    """
-    def __init__(self, attack_range=None, attack_strength=None, **kwargs):
-        super().__init__(**kwargs)
-        assert attack_range is not None, "attack_range must be a nonnegative integer"
-        self.attack_range = attack_range
-        assert attack_strength is not None, "attack_strength must be a nonnegative number"
-        self.attack_strength = attack_strength
-    
-    @property
-    def configured(self):
-        """
-        The agent is successfully configured if the attack range and strength is
-        specified.
-        """
-        return super().configured and self.attack_range is not None and self.attack_strength is not None
 
 class PositionBasedAttackActor:
     """

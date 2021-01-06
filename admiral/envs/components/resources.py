@@ -2,46 +2,10 @@
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.envs.components.position import PositionAgent
+from admiral.envs.components.agent import ResourceObservingAgent, HarvestingAgent
+from admiral.envs.components.agent import PositionAgent
 
-class ResourceObservingAgent(Agent):
-    """
-    Agents can observe the resources in the environment.
 
-    resource_view_range (int):
-        Any resources within this range of the agent's position will be fully observed.
-    """
-    def __init__(self, resource_view_range=None, **kwargs):
-        super().__init__(**kwargs)
-        assert resource_view_range is not None, "resource_view_range must be nonnegative integer"
-        self.resource_view_range = resource_view_range
-    
-    @property
-    def configured(self):
-        """
-        Agents are configured if the resource_view_range parameter is set.
-        """
-        return super().configured and self.resource_view_range is not None
-
-class HarvestingAgent(Agent):
-    """
-    Agents can harvest resources.
-
-    max_harvest (double):
-        The maximum amount of resources the agent can harvest from the cell it
-        occupies.
-    """
-    def __init__(self, max_harvest=None, **kwargs):
-        super().__init__(**kwargs)
-        assert max_harvest is not None, "max_harvest must be nonnegative number"
-        self.max_harvest = max_harvest
-    
-    @property
-    def configured(self):
-        """
-        Agents are configured if max_harvest is set.
-        """
-        return super().configured and self.max_harvest is not None
 
 class GridResourceState:
     """

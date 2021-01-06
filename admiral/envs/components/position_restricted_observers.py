@@ -2,22 +2,11 @@
 from gym.spaces import Dict, MultiBinary
 
 from admiral.envs import Agent
+from admiral.envs.components.agent import AgentObservingAgent
 from admiral.envs.components.position import PositionAgent, PositionObserver, RelativePositionObserver
 from admiral.envs.components.team import TeamObserver
 from admiral.envs.components.health import HealthObserver, LifeObserver
 
-class AgentObservingAgent(Agent): # TODO: probably change this name...
-    def __init__(self, agent_view=None, **kwargs):
-        """
-        Agents can see other agents up to some maximal distance away, indicated
-        by the view.
-        """
-        super().__init__(**kwargs)
-        self.agent_view = agent_view
-    
-    @property
-    def configured(self):
-        return super().configured and self.agent_view is not None
 
 def obs_filter(obs, agent, agents, null_value):
     if isinstance(agent, PositionAgent) and \

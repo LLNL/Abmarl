@@ -2,38 +2,7 @@
 import numpy as np
 
 from admiral.envs import Agent
-
-class LifeAgent(Agent):
-    """
-    Agents have health and are alive or dead.
-
-    min_health (float):
-        The minimum value the health can reach before the agent dies.
-    
-    max_health (float):
-        The maximum value the health can reach.
-
-    initial_health (float):
-        The initial health of the agent. The health will be set to this initial
-        option at reset time.
-    """
-    def __init__(self, min_health=0.0, max_health=1.0, initial_health=None, **kwargs):
-        super().__init__(**kwargs)
-        if initial_health is not None:
-            assert min_health <= initial_health <= max_health
-        self.initial_health = initial_health
-        self.min_health = min_health
-        self.max_health = max_health
-        self.is_alive = True
-        self.health = None
-
-    @property
-    def configured(self):
-        """
-        The agent is successfully configured if the min and max health are specified
-        and if is_alive is specified.
-        """
-        return super().configured and self.min_health is not None and self.max_health is not None and self.is_alive is not None
+from admiral.envs.components.agent import LifeAgent
 
 class LifeState:
     """
