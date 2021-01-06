@@ -4,17 +4,8 @@ import numpy as np
 from admiral.envs import Agent
 from admiral.envs.components.agent import TeamAgent
 
-class TeamState:
-    """
-    Team state manages the state of agents' teams. Since these are not changing,
-    there is not much to manage. It really just keeps track of the number_of_teams.
+from admiral.envs.components.state import TeamState
 
-    number_of_teams (int):
-        The number of teams in this simulation.
-    """
-    def __init__(self, agents=None, number_of_teams=None, **kwargs):
-        self.number_of_teams = number_of_teams
-        self.agents = agents
 
 class TeamObserver:
     """

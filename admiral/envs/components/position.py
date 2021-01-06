@@ -6,49 +6,8 @@ from admiral.envs.components.agent import PositionAgent
 from admiral.envs.components.agent import AgentObservingAgent
 from admiral.envs.components.agent import TeamAgent
 
-class PositionState:
-    """
-    Manages the agents' positions. All position updates must be within the region.
+from admiral.envs.components.state import PositionState
 
-    region (int):
-        The size of the environment.
-    
-    agents (dict):
-        The dictionary of agents.
-    """
-    def __init__(self, region=None, agents=None, **kwargs):
-        assert type(region) is int, "Region must be an integer."
-        self.region = region
-        assert type(agents) is dict, "agents must be a dict"
-        self.agents = agents
-
-    def reset(self, **kwargs):
-        """
-        Reset the agents' positions. If the agents were created with a starting
-        position, then use that. Otherwise, randomly assign a position in the region.
-        """
-        for agent in self.agents.values():
-            if isinstance(agent, PositionAgent):
-                if agent.starting_position is not None:
-                    agent.position = agent.starting_position
-                else:
-                    agent.position = np.random.randint(0, self.region, 2)
-    
-    def set_position(self, agent, _position, **kwargs):
-        """
-        Set the agent's position to the incoming value only if the new position
-        is within the region.
-        """
-        if isinstance(agent, PositionAgent):
-            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
-                agent.position = _position
-    
-    def modify_position(self, agent, value, **kwargs):
-        """
-        Add some value to the position of the agent.
-        """
-        if isinstance(agent, PositionAgent):
-            self.set_position(agent, agent.position + value)
 
 class PositionObserver:
     """
