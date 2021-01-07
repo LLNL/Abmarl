@@ -3,13 +3,11 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.team import TeamAgent, TeamState, TeamObserver
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver, AgentObservingAgent
-from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
-from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
-from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
-from admiral.envs.components.resources import GridResourceObserver, GridResourceState, HarvestingAgent, GridResourcesActor, ResourceObservingAgent
-from admiral.envs.components.dead_done import TeamDeadDone
+from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent, LifeAgent, HarvestingAgent, ResourceObservingAgent
+from admiral.envs.components.state import TeamState, PositionState, LifeState, GridResourceState
+from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver, GridResourceObserver
+from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
+from admiral.envs.components.done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 

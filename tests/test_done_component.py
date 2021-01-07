@@ -1,7 +1,7 @@
 
-from admiral.envs.components.dead_done import LifeAgent, TeamAgent
-from admiral.envs.components.dead_done import DeadDone, TeamDeadDone
-from admiral.envs.components.health import LifeState
+from admiral.envs.components.agent import LifeAgent, TeamAgent
+from admiral.envs.components.state import LifeState
+from admiral.envs.components.done import DeadDone, TeamDeadDone
 
 class DoneTestAgent(LifeAgent, TeamAgent): pass
 

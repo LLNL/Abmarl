@@ -1,47 +1,126 @@
 
 import numpy as np
 
-from admiral.envs import Agent
-from admiral.envs.components.position import PositionAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent
 
-class ResourceObservingAgent(Agent):
-    """
-    Agents can observe the resources in the environment.
+# ----------------------- #
+# --- Health and Life --- #
+# ----------------------- #
 
-    resource_view_range (int):
-        Any resources within this range of the agent's position will be fully observed.
+class LifeState:
     """
-    def __init__(self, resource_view_range=None, **kwargs):
-        super().__init__(**kwargs)
-        assert resource_view_range is not None, "resource_view_range must be nonnegative integer"
-        self.resource_view_range = resource_view_range
+    Agents can die if their health falls below their minimal health value. Health
+    can decrease in a number of interactions. This environment provides an entropy
+    that indicates how much health an agent loses when apply_entropy is called.
+
+    agents (dict):
+        Dictionary of agents.
     
-    @property
-    def configured(self):
-        """
-        Agents are configured if the resource_view_range parameter is set.
-        """
-        return super().configured and self.resource_view_range is not None
-
-class HarvestingAgent(Agent):
+    entropy (float):
+        The amount of health that is depleted from an agent whenever apply_entropy
+        is called.
     """
-    Agents can harvest resources.
-
-    max_harvest (double):
-        The maximum amount of resources the agent can harvest from the cell it
-        occupies.
-    """
-    def __init__(self, max_harvest=None, **kwargs):
-        super().__init__(**kwargs)
-        assert max_harvest is not None, "max_harvest must be nonnegative number"
-        self.max_harvest = max_harvest
+    def __init__(self, agents=None, entropy=0.1, **kwargs):
+        assert type(agents) is dict, "Agents must be a dict"
+        self.agents = agents
+        self.entropy = entropy
     
-    @property
-    def configured(self):
+    def reset(self, **kwargs):
         """
-        Agents are configured if max_harvest is set.
+        Reset the health and life state of all applicable agents.
         """
-        return super().configured and self.max_harvest is not None
+        for agent in self.agents.values():
+            if isinstance(agent, LifeAgent):
+                if agent.initial_health is not None:
+                    agent.health = agent.initial_health
+                else:
+                    agent.health = np.random.uniform(agent.min_health, agent.max_health)
+                agent.is_alive = True
+    
+    def set_health(self, agent, _health):
+        """
+        Set the health of an agent to a specific value, bounded by the agent's
+        min and max health-value. If that value is less than the agent's health,
+        then the agent dies.
+        """
+        if isinstance(agent, LifeAgent):
+            if _health <= agent.min_health:
+                agent.health = agent.min_health
+                agent.is_alive = False
+            elif _health >= agent.max_health:
+                agent.health = agent.max_health
+            else:
+                agent.health = _health
+    
+    def modify_health(self, agent, value):
+        """
+        Add some value to the health of the agent.
+        """
+        if isinstance(agent, LifeAgent):
+            self.set_health(agent, agent.health + value)
+
+    def apply_entropy(self, agent, **kwargs):
+        """
+        Apply entropy to the agent, decreasing its health by a small amount.
+        """
+        if isinstance(agent, LifeAgent):
+            self.modify_health(agent, -self.entropy, **kwargs)
+
+
+
+# ----------------------------- #
+# --- Position and Movement --- #
+# ----------------------------- #
+
+class PositionState:
+    """
+    Manages the agents' positions. All position updates must be within the region.
+
+    region (int):
+        The size of the environment.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, region=None, agents=None, **kwargs):
+        assert type(region) is int, "Region must be an integer."
+        self.region = region
+        assert type(agents) is dict, "agents must be a dict"
+        self.agents = agents
+
+    def reset(self, **kwargs):
+        """
+        Reset the agents' positions. If the agents were created with a starting
+        position, then use that. Otherwise, randomly assign a position in the region.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, PositionAgent):
+                if agent.starting_position is not None:
+                    agent.position = agent.starting_position
+                else:
+                    agent.position = np.random.randint(0, self.region, 2)
+    
+    def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value only if the new position
+        is within the region.
+        """
+        if isinstance(agent, PositionAgent):
+            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
+                agent.position = _position
+    
+    def modify_position(self, agent, value, **kwargs):
+        """
+        Add some value to the position of the agent.
+        """
+        if isinstance(agent, PositionAgent):
+            self.set_position(agent, agent.position + value)
+
+
+
+# -------------------------------- #
+# --- Resources and Harvesting --- #
+# -------------------------------- #
 
 class GridResourceState:
     """
@@ -149,85 +228,20 @@ class GridResourceState:
         self.resources[self.resources >= self.min_value] += self.regrow_rate
         self.resources[self.resources >= self.max_value] = self.max_value
 
-class GridResourcesActor:
-    """
-    Provides the necessary action space for agents who can harvest resources and
-    processes the harvesting action.
 
-    resources (ResourceState):
-        The resource state handler.
 
-    agents (dict):
-        The dictionary of agents.
+# ------------ #
+# --- Team --- #
+# ------------ #
+
+class TeamState:
     """
-    def __init__(self, resources=None, agents=None, **kwargs):
-        self.resources = resources
+    Team state manages the state of agents' teams. Since these are not changing,
+    there is not much to manage. It really just keeps track of the number_of_teams.
+
+    number_of_teams (int):
+        The number of teams in this simulation.
+    """
+    def __init__(self, agents=None, number_of_teams=None, **kwargs):
+        self.number_of_teams = number_of_teams
         self.agents = agents
-
-        from gym.spaces import Box
-        for agent in agents.values():
-            if isinstance(agent, HarvestingAgent):
-                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
-
-    def process_harvest(self, agent, amount, **kwargs):
-        """
-        Harvest some amount of resources at the agent's position.
-
-        agent (HarvestingAgent):
-            The agent who has chosen to harvest the resource.
-
-        amount (float):
-            The amount of resource the agent wants to harvest.
-        
-        return (float):
-            Return the amount of resources that was actually harvested. This can
-            be less than the desired amount if the cell does not have enough resources.
-        """
-        if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
-            location = tuple(agent.position)
-            resource_before = self.resources.resources[location]
-            self.resources.modify_resources(location, -amount)
-            return resource_before - self.resources.resources[location]
-
-class GridResourceObserver:
-    """
-    Agents observe a grid of size resource_view_range centered on their
-    position. The values in the grid are the values of the resources in that
-    area.
-
-    resources (ResourceState):
-        The resource state handler.
-    
-    agents (dict):
-        The dictionary of agents.
-    """
-    def __init__(self, resources=None, agents=None, **kwargs):
-        self.resources = resources
-        self.agents = agents
-
-        from gym.spaces import Box
-        for agent in agents.values():
-            if isinstance(agent, ResourceObservingAgent):
-                agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view_range*2+1, agent.resource_view_range*2+1), np.float)
-
-    def get_obs(self, agent, **kwargs):
-        """
-        These cells are filled with the values of the resources surrounding the
-        agent's position.
-        """
-        if isinstance(agent, ResourceObservingAgent):
-            signal = -np.ones((agent.resource_view_range*2+1, agent.resource_view_range*2+1))
-
-            # Derived by considering each square in the resources as an "agent" and
-            # then applied the agent diff logic from above. The resulting for-loop
-            # can be written in the below vectorized form.
-            (r,c) = agent.position
-            r_lower = max([0, r-agent.resource_view_range])
-            r_upper = min([self.resources.region-1, r+agent.resource_view_range])+1
-            c_lower = max([0, c-agent.resource_view_range])
-            c_upper = min([self.resources.region-1, c+agent.resource_view_range])+1
-            signal[(r_lower+agent.resource_view_range-r):(r_upper+agent.resource_view_range-r),(c_lower+agent.resource_view_range-c):(c_upper+agent.resource_view_range-c)] = \
-                self.resources.resources[r_lower:r_upper, c_lower:c_upper]
-            return {'resources': signal}
-        else:
-            return {}

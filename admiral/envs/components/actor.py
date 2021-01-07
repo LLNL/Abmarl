@@ -1,35 +1,12 @@
 
-from admiral.envs import Agent
-from admiral.envs.components.position import PositionAgent
-from admiral.envs.components.team import TeamAgent
-from admiral.envs.components.health import LifeAgent
+import numpy as np
 
-class AttackingAgent(Agent):
-    """
-    Agents that can attack other agents.
+from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
+    GridMovementAgent, PositionAgent, HarvestingAgent
 
-    attack_range (int):
-        The effective range of the attack. Can be used to determine if an attack
-        is successful based on distance between agents.
-    
-    attack_strength (float):
-        How effective the agent's attack is. This is applicable in situations where
-        the agents' health is affected by attacks.
-    """
-    def __init__(self, attack_range=None, attack_strength=None, **kwargs):
-        super().__init__(**kwargs)
-        assert attack_range is not None, "attack_range must be a nonnegative integer"
-        self.attack_range = attack_range
-        assert attack_strength is not None, "attack_strength must be a nonnegative number"
-        self.attack_strength = attack_strength
-    
-    @property
-    def configured(self):
-        """
-        The agent is successfully configured if the attack range and strength is
-        specified.
-        """
-        return super().configured and self.attack_range is not None and self.attack_strength is not None
+# ----------------- #
+# --- Attacking --- #
+# ----------------- #
 
 class PositionBasedAttackActor:
     """
@@ -140,3 +117,96 @@ class PositionTeamBasedAttackActor:
                     continue
                 else:
                     return attacked_agent
+
+
+
+# ----------------------------- #
+# --- Position and Movement --- #
+# ----------------------------- #
+
+class GridMovementActor:
+    """
+    Provides the necessary action space for agents who can move and processes such
+    movements.
+
+    position (PositionState):
+        The position state handler. Needed to modify the agents' positions.
+
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, position=None, agents=None, **kwargs):
+        self.position = position
+        self.agents = agents
+
+        from gym.spaces import Box
+        for agent in self.agents.values():
+            if isinstance(agent, GridMovementAgent):
+                agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
+
+    def process_move(self, moving_agent, move, **kwargs):
+        """
+        Determine the agent's new position based on its move action.
+
+        moving_agent (GridMovementAgent):
+            The agent that moves.
+        
+        move (np.array):
+            How much the agent would like to move in row and column.
+        
+        return (np.array):
+            How much the agent has moved in row and column. This can be different
+            from the desired move if the position update was invalid.
+        """
+        if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
+            position_before = moving_agent.position
+            self.position.modify_position(moving_agent, move, **kwargs)
+            return position_before - moving_agent.position
+
+
+
+# -------------------------------- #
+# --- Resources and Harvesting --- #
+# -------------------------------- #
+
+class GridResourcesActor:
+    """
+    Provides the necessary action space for agents who can harvest resources and
+    processes the harvesting action.
+
+    resources (ResourceState):
+        The resource state handler.
+
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, resources=None, agents=None, **kwargs):
+        self.resources = resources
+        self.agents = agents
+
+        from gym.spaces import Box
+        for agent in agents.values():
+            if isinstance(agent, HarvestingAgent):
+                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
+
+    def process_harvest(self, agent, amount, **kwargs):
+        """
+        Harvest some amount of resources at the agent's position.
+
+        agent (HarvestingAgent):
+            The agent who has chosen to harvest the resource.
+
+        amount (float):
+            The amount of resource the agent wants to harvest.
+        
+        return (float):
+            Return the amount of resources that was actually harvested. This can
+            be less than the desired amount if the cell does not have enough resources.
+        """
+        if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
+            location = tuple(agent.position)
+            resource_before = self.resources.resources[location]
+            self.resources.modify_resources(location, -amount)
+            return resource_before - self.resources.resources[location]
+
+
