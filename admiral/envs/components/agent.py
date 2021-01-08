@@ -186,7 +186,8 @@ class GridMovementAgent(Agent):
 class SpeedAngleAgent(Agent):
     """
     Agents have a speed and a banking angle which are used to determine how the
-    agent moves around a continuous field.
+    agent moves around a continuous field. Additionally, agents can accelerate
+    and change their banking angles to modify their speed and direction.
     
     min_speed (float):
         The minimum speed this agent can travel. This is not speed in the physics
@@ -197,50 +198,32 @@ class SpeedAngleAgent(Agent):
     max_speed (float):
         The maximum speed this agent can travel.
     
+    max_acceleration (float):
+        The maximum amount by which an agent can change its speed in a single time
+        step.
+    
     max_banking_angle (float):
         The maximum banking angle the agent can endure.
+
+    max_banking_angle_change (float):
+        The maximum amount by which an agent can change its banking angle.
     """
-    def __init__(self, min_speed=None, max_speed=None, max_banking_angle=None, **kwargs):
+    def __init__(self, min_speed=None, max_speed=None, max_acceleration=None, \
+                 max_banking_angle=None, max_banking_angle_change=None, **kwargs):
         self.min_speed = min_speed
         self.max_speed = max_speed
+        self.max_acceleration = max_acceleration
         self.speed = None # Should be set by the state handler
 
         self.max_banking_angle = max_banking_angle
+        self.max_banking_angle_change = max_banking_angle_change
         self.banking_angle = None # Should be set by the state handler
     
     @property
     def configured(self):
         return super().configured and self.min_speed is not None and self.max_speed is not None and \
-            self.max_relative_angle is not None
-
-class AcceleratingAgent(Agent):
-    """
-    Agents can change their speed by accelerating or decelerating.
-
-    max_acceleration (float):
-        The maximum amount by which an agent can change its speed in a single time
-        step.
-    """
-    def __init__(self, max_acceleration=None, **kwargs):
-        self.max_acceleration = max_acceleration
-        
-    @property
-    def configured(self):
-        return super().configured and self.max_acceleration is not None
-
-class BankingAgent(Agent):
-    """
-    Agents can change their banking angle.
-
-    max_banking_angle_change (float):
-        The maximum amount by which an agent can change its banking angle.
-    """
-    def __init__(self, max_banking_angle_change=None, **kwargs):
-        self.max_banking_angle_change = max_banking_angle_change
-    
-    @property
-    def configured(self):
-        super().configured and self.max_banking_angle_change is not None
+            self.max_acceleration is not None and self.max_banking_angle is not None and \
+            self.max_banking_angle_change is not None
 
 
 
