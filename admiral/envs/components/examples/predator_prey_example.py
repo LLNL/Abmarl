@@ -5,7 +5,7 @@ import seaborn as sns
 
 from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent, LifeAgent, HarvestingAgent, ResourceObservingAgent
 from admiral.envs.components.state import TeamState, PositionState, LifeState, GridResourceState
-from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver, GridResourceObserver
+from admiral.envs.components.observer import GridPositionTeamBasedObserver, PositionRestrictedRelativePositionObserver, GridResourceObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
@@ -17,7 +17,7 @@ class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObs
 class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, AttackingAgent):
     pass
 
-class PredatorPreyEnv(AgentBasedSimulation):
+class PredatorPreyEnvGridBased(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -28,11 +28,8 @@ class PredatorPreyEnv(AgentBasedSimulation):
         self.team_state = TeamState(**kwargs)
 
         # Observer components
-        self.position_observer = PositionObserver(position=self.position_state, **kwargs)
+        self.position_observer = GridPositionTeamBasedObserver(position=self.position_state, team_state=self.team_state, **kwargs)
         self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
-        self.health_observer = HealthObserver(**kwargs)
-        self.life_observer = LifeObserver(**kwargs)
-        self.team_observer = TeamObserver(team=self.team_state, **kwargs)
 
         # Actor components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
@@ -104,9 +101,6 @@ class PredatorPreyEnv(AgentBasedSimulation):
         return {
             **self.position_observer.get_obs(agent),
             **self.resource_observer.get_obs(agent),
-            **self.health_observer.get_obs(agent_id, **kwargs),
-            **self.life_observer.get_obs(agent_id, **kwargs),
-            **self.team_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -118,7 +112,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
     def get_all_done(self, **kwargs):
         return self.done.get_all_done(**kwargs)
     
-    def get_info(self, **kwargs):
+    def get_info(self, *args, **kwargs):
         return {}
 
 if __name__ == '__main__':
@@ -126,7 +120,7 @@ if __name__ == '__main__':
     predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', agent_view=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
     agents = {**prey, **predators}
     region = 10
-    env = PredatorPreyEnv(
+    env = PredatorPreyEnvGridBased(
         region=region,
         agents=agents,
         number_of_teams=2,

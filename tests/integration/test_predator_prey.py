@@ -2,107 +2,416 @@
 from gym.spaces import Box, Dict, MultiBinary
 import numpy as np
 
-from admiral.envs.components.examples.predator_prey_example import PredatorPreyEnv, PredatorAgent, PreyAgent
+from admiral.envs.components.examples.predator_prey_example import PredatorPreyEnvGridBased, PreyAgent, PredatorAgent
 from admiral.managers import AllStepManager
 
-agents = {
-    'prey0': PreyAgent(id='prey0', starting_position=np.array([2, 2]), position_view_range=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
-    'prey1': PreyAgent(id='prey1', starting_position=np.array([2, 2]), position_view_range=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
-    'predator0': PredatorAgent(id='predator0', starting_position=np.array([0, 0]), position_view_range=2, initial_health=0.5, team=1, move_range=1, attack_range=1, attack_strength=0.24)
-}
-original_resources = np.array([
-    [0.43384617, 0.        , 0.        , 0.36753862, 0.3241253 ],
-    [0.84682462, 0.34216225, 0.46882695, 0.23949859, 0.64573111],
-    [0.86477947, 0.61520966, 0.449564  , 0.97582266, 0.26494157],
-    [0.        , 0.        , 0.89888709, 0.        , 0.        ],
-    [0.        , 0.17875298, 0.97128372, 0.        , 0.94036929]
-])
-env = AllStepManager(PredatorPreyEnv(
-    region=5,
-    agents=agents,
-    number_of_teams=2,
-    entropy=0.1,
-    original_resources=original_resources,
-))
+def test_all_step_grid_based_predator_prey():
+    agents = {
+        'prey0': PreyAgent(id='prey0', starting_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
+        'prey1': PreyAgent(id='prey1', starting_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
+        'predator0': PredatorAgent(id='predator0', starting_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=1, move_range=1, attack_range=1, attack_strength=2.0)
+    }
+    original_resources = np.array([
+        [0.43, 0.  , 0.  , 0.37, 0.32],
+        [0.85, 0.34, 0.47, 0.24, 0.65],
+        [0.86, 0.62, 0.45, 0.98, 0.26],
+        [0.  , 0.  , 0.9 , 0.  , 0.  ],
+        [0.  , 0.18, 0.97, 0.  , 0.94]
+    ])
+    env = AllStepManager(PredatorPreyEnvGridBased(
+        region=5,
+        agents=agents,
+        number_of_teams=2,
+        entropy=0.1,
+        original_resources=original_resources,
+    ))
 
-def test_env_init():
-    unwrapped_env = env.unwrapped
-    # Assertions on state handlers
-    assert unwrapped_env.agents == agents
-    assert unwrapped_env.position_state.agents == agents
-    assert unwrapped_env.position_state.region == 5
-    assert unwrapped_env.life_state.agents == agents
-    assert unwrapped_env.life_state.entropy == 0.1
-    assert unwrapped_env.resource_state.agents == agents
-    assert np.allclose(unwrapped_env.resource_state.original_resources, original_resources)
-    assert unwrapped_env.resource_state.region == 5
-    assert unwrapped_env.resource_state.min_value == 0.1
-    assert unwrapped_env.resource_state.max_value == 1.0
-    assert unwrapped_env.resource_state.regrow_rate == 0.04
-    assert unwrapped_env.resource_state.coverage == 0.75
-    assert unwrapped_env.team_state.number_of_teams == 2
+    obs = env.reset()
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  1.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1.,  1.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey0']['resources'], np.array([
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,    0.43,  0.  ,  0.  ,  0.37,  0.32, -1.,   -1.,  ],
+        [-1.,   -1.,    0.85,  0.34,  0.47,  0.24,  0.65, -1.,   -1.,  ],
+        [-1.,   -1.,    0.86,  0.62,  0.45,  0.98,  0.26, -1.,   -1.,  ],
+        [-1.,   -1.,    0.  ,  0.  ,  0.9 ,  0.  ,  0.  , -1.,   -1.,  ],
+        [-1.,   -1.,    0.  ,  0.18,  0.97,  0.  ,  0.94, -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ]
+    ]))
 
-    # Assertions on observation handlers
-    assert unwrapped_env.position_observer.position == unwrapped_env.position_state
-    assert unwrapped_env.position_observer.agents == agents
-    for agent in agents.values():
-        assert agent.observation_space['position'] == Dict({
-            other.id: Box(0, 5, (2,), np.int) for other in agents.values()
-        }) # TODO: Use a different position observer
-    assert unwrapped_env.resource_observer.resources == unwrapped_env.resource_state
-    assert unwrapped_env.resource_observer.agents == agents
-    for agent in agents.values():
-        if isinstance(agent, PreyAgent):
-            assert agent.observation_space['resources'] == Box(0, 1.0, (9, 9), np.float)
-    assert unwrapped_env.health_observer.agents == agents
-    for agent in agents.values():
-        assert agent.observation_space['health'] == Dict({
-            other.id: Box(0, 1.0, (1,), np.float) for other in agents.values()
-        })
-    assert unwrapped_env.life_observer.agents == agents
-    for agent in agents.values():
-        assert agent.observation_space['life'] == Dict({
-            other.id: Box(0, 1, (1,), np.int) for other in agents.values()
-        })
-    assert unwrapped_env.team_observer.team == unwrapped_env.team_state
-    assert unwrapped_env.team_observer.agents == agents
-    for agent in agents.values():
-        assert agent.observation_space['team'] == Dict({
-            other.id: Box(0, 2, (1,), np.int) for other in agents.values()
-        })
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  1.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1.,  1.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey1']['resources'], np.array([
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,    0.43,  0.  ,  0.  ,  0.37,  0.32, -1.,   -1.,  ],
+        [-1.,   -1.,    0.85,  0.34,  0.47,  0.24,  0.65, -1.,   -1.,  ],
+        [-1.,   -1.,    0.86,  0.62,  0.45,  0.98,  0.26, -1.,   -1.,  ],
+        [-1.,   -1.,    0.  ,  0.  ,  0.9 ,  0.  ,  0.  , -1.,   -1.,  ],
+        [-1.,   -1.,    0.  ,  0.18,  0.97,  0.  ,  0.94, -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ]
+    ]))
+
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.],
+        [-1., -1.,  0.,  0.,  0.],
+        [-1., -1.,  0.,  0.,  2.]
+    ]))
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.],
+        [-1., -1.,  0.,  0.,  0.],
+        [-1., -1.,  0.,  0.,  0.]
+    ]))
+
+
+    obs, reward, done, _ = env.step({
+        'prey0': {'move': np.array([-1, -1]), 'harvest': 0.},
+        'prey1': {'move': np.array([-1,  0]), 'harvest': 0.},
+        'predator0': {'move': np.array([1, 1]), 'attack': False},
+    })
+    # TODO: Add and tests rewards
+
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  1.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  1.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.allclose(obs['prey0']['resources'], np.array([
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ],
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ],
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ],
+        [-1.,   -1.,   -1.,    0.47,  0.  ,  0.  ,  0.41,  0.36, -1.,  ],
+        [-1.,   -1.,   -1.,    0.89,  0.38,  0.51,  0.28,  0.69, -1.,  ],
+        [-1.,   -1.,   -1.,    0.9 ,  0.66,  0.49,  1.  ,  0.3 , -1.,  ],
+        [-1.,   -1.,   -1.,    0.  ,  0.  ,  0.94,  0.  ,  0.  , -1.,  ],
+        [-1.,   -1.,   -1.,    0.  ,  0.22,  1.  ,  0.  ,  0.98, -1.,  ],
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ]
+    ]))
+    assert not done['prey0']
     
-    # Assertions on actor handlers
-    assert unwrapped_env.move_actor.position == unwrapped_env.position_state
-    assert unwrapped_env.move_actor.agents == agents
-    for agent in agents.values():
-        assert agent.action_space == Box(-agent.move_range, agent.move_range, (2,), np.int)
-    assert unwrapped_env.resource_actor.resources == unwrapped_env.resource_state
-    assert unwrapped_env.resource_actor.agents == agents
-    for agent in agents.values():
-        if isinstance(agent, PreyAgent):
-            assert agent.action_space['harvest'] == Box(0, agent.max_harvest, (1,), np.float)
-    assert unwrapped_env.attack_actor.agents == agents
-    for agent in agent.values():
-        if isinstance(agent, PredatorAgent):
-            assert agent.action_space['attack'] == MultiBinary(1)
-    
-    # Assertions on done handlers
-    # TODO: team dead done should take the team state manager as input instead of number of teams
-    assert unwrapped_env.done.agents == agents
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  1.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  1.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    assert np.allclose(obs['prey1']['resources'], np.array([
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ],
+        [-1.,   -1.,    0.47,  0.  ,  0.  ,  0.41,  0.36, -1.,   -1.,  ],
+        [-1.,   -1.,    0.89,  0.38,  0.51,  0.28,  0.69, -1.,   -1.,  ],
+        [-1.,   -1.,    0.9 ,  0.66,  0.49,  1.  ,  0.3 , -1.,   -1.,  ],
+        [-1.,   -1.,    0.  ,  0.  ,  0.94,  0.  ,  0.  , -1.,   -1.,  ],
+        [-1.,   -1.,    0.  ,  0.22,  1.  ,  0.  ,  0.98, -1.,   -1.,  ],
+        [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ]
+    ]))
+    assert not done['prey1']
+
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  1.,  1.,  0.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.]
+    ]))
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.]
+    ]))
+    assert not done['predator0']
+    assert not done['__all__']
 
 
+    obs, reward, done, _ = env.step({
+        'prey0': {'move': np.array([0, 0]), 'harvest': 0.5},
+        'prey1': {'move': np.array([0,  1]), 'harvest': 0.5},
+        'predator0': {'move': np.array([0, 0]), 'attack': True},
+    })
 
-    env.reset()
-    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-    fig = plt.gcf()
-    env.render(fig=fig)
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  1.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  1.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    assert np.allclose(obs['prey0']['resources'], np.array([
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ],
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ],
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ],
+        [-1.,   -1.,   -1.,    0.51,  0.  ,  0.  ,  0.45,  0.4 , -1.,  ],
+        [-1.,   -1.,   -1.,    0.93,  0.  ,  0.01,  0.32,  0.73, -1.,  ],
+        [-1.,   -1.,   -1.,    0.94,  0.7 ,  0.53,  1.  ,  0.34, -1.,  ],
+        [-1.,   -1.,   -1.,    0.  ,  0.  ,  0.98,  0.  ,  0.  , -1.,  ],
+        [-1.,   -1.,   -1.,    0.  ,  0.26,  1.  ,  0.  ,  1.  , -1.,  ],
+        [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ]
+    ]))
+    assert done['prey0']
 
-    for _ in range(50):
-        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
-        env.step(action_dict)
-        env.render(fig=fig)
-        print(env.get_all_done())
-        x = []
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  1.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    assert np.allclose(obs['prey1']['resources'], np.array([
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.,  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.,  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.,  ],
+        [-1.,    0.51,  0.  ,  0.  ,  0.45,  0.4 , -1.,   -1.,   -1.,  ],
+        [-1.,    0.93,  0.  ,  0.01,  0.32,  0.73, -1.,   -1.,   -1.,  ],
+        [-1.,    0.94,  0.7 ,  0.53,  1.  ,  0.34, -1.,   -1.,   -1.,  ],
+        [-1.,    0.  ,  0.  ,  0.98,  0.  ,  0.  , -1.,   -1.,   -1.,  ],
+        [-1.,    0.  ,  0.26,  1.  ,  0.  ,  1.  , -1.,   -1.,   -1.,  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.,  ],
+    ]))
+    assert not done['prey1']
 
-test_integrated_environment()
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  1.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.]
+    ]))
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.],
+        [-1.,  0.,  0.,  0.,  0.]
+    ]))
+    assert not done['predator0']
+    assert not done['__all__']
 
+
+    obs, reward, done, _ = env.step({
+        'prey1': {'move': np.array([1,  0]), 'harvest': 0},
+        'predator0': {'move': np.array([1, 1]), 'attack': False},
+    })
+
+    assert 'prey0' not in obs
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  1.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    assert np.allclose(obs['prey1']['resources'], np.array([
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ],
+        [-1.,    0.55,  0.  ,  0.  ,  0.49,  0.44, -1.,   -1.,   -1.  ],
+        [-1.,    0.97,  0.  ,  0.01,  0.36,  0.77, -1.,   -1.,   -1.  ],
+        [-1.,    0.98,  0.74,  0.57,  1.  ,  0.38, -1.,   -1.,   -1.  ],
+        [-1.,    0.  ,  0.  ,  1.  ,  0.  ,  0.  , -1.,   -1.,   -1.  ],
+        [-1.,    0.  ,  0.3 ,  1.  ,  0.  ,  1.  , -1.,   -1.,   -1.  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ]
+    ]))
+    assert not done['prey1']
+
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 1., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.]
+    ]))
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.]
+    ]))
+    assert not done['predator0']
+    assert not done['__all__']
+
+
+    obs, reward, done, _ = env.step({
+        'prey1': {'move': np.array([0,  0]), 'harvest': 0.5},
+        'predator0': {'move': np.array([0, 0]), 'attack': True},
+    })
+
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  1.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
+        [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
+    ]))
+    assert np.allclose(obs['prey1']['resources'], np.array([
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ],
+        [-1.,    0.59,  0.  ,  0.  ,  0.53,  0.48, -1.,   -1.,   -1.  ],
+        [-1.,    1.  ,  0.  ,  0.01,  0.4 ,  0.81, -1.,   -1.,   -1.  ],
+        [-1.,    1.  ,  0.78,  0.61,  0.54,  0.42, -1.,   -1.,   -1.  ],
+        [-1.,    0.  ,  0.  ,  1.  ,  0.  ,  0.  , -1.,   -1.,   -1.  ],
+        [-1.,    0.  ,  0.34,  1.  ,  0.  ,  1.  , -1.,   -1.,   -1.  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ],
+        [-1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,   -1.  ]
+    ]))
+    assert done['prey1']
+
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.]
+    ]))
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.],
+        [0., 0., 0., 0., 0.]
+    ]))
+    assert not done['predator0']
+    assert done['__all__']
