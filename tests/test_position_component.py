@@ -12,9 +12,6 @@ class PositionTeamTestAgent(PositionAgent, AgentObservingAgent, TeamAgent, LifeA
 class PositionTeamNoViewTestAgent(PositionAgent, TeamAgent, LifeAgent): pass
 class PositionLifeAgent(PositionAgent, LifeAgent): pass
 
-def test_position_observer():
-    pass # TODO: Implement position based observer of the agents
-
 def test_grid_position_observer():
     agents = {
         'agent0': PositionTestAgent(id='agent0', starting_position=np.array([0, 0]), agent_view=1),
