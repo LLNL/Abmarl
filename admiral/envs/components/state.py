@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -141,6 +141,60 @@ class ContinuousPositionState(PositionState):
         """
         agent.position = np.random.uniform(0, self.region, 2)
 
+class SpeedAngleState:
+    def __init__(self, agents=None, *kwargs):
+        self.agents = agents
+    
+    def reset(self, **kwargs):
+        """
+        Reset the agents' speeds and ground angles.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, SpeedAngleAgent):
+                # Reset agent speed
+                if agent.initial_speed is not None:
+                    agent.speed = agent.initial_speed
+                else:
+                    agent.initial_speed = np.random.uniform(agent.min_speed, agent.max_speed)
+
+                # Reset agent banking angle
+                if agent.initial_banking_angle is not None:
+                    agent.banking_angle = agent.initial_banking_angle
+                else:
+                    agent.banking_angle = np.random.uniform(-agent.max_banking_angle, agent.max_banking_angle)
+
+                # Reset agent ground angle
+                if agent.initial_ground_angle is not None:
+                    agent.ground_angle = agent.initial_ground_angle
+                else:
+                    agent.ground_angle = np.random.uniform(0, 360)
+    
+    def set_speed(self, agent, _speed, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            if agent.min_speed <= _speed <= agent.max_speed:
+                agent.speed = _speed
+    
+    def modify_speed(self, agent, value, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.set_speed(agent, agent.speed + value)
+    
+    def set_banking_angle(self, agent, _banking_angle, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            if abs(_banking_angle) <= agent.max_banking_angle:
+                agent.banking_angle = _banking_angle
+                self.modify_ground_angle(agent, agent.banking_angle)
+    
+    def modify_banking_angle(self, agent, value, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.set_banking_angle(agent, agent.banking_angle + value)
+
+    def set_ground_angle(self, agent, _ground_angle, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.ground_angle = _ground_angle % 360
+    
+    def modify_ground_angle(self, agent, value, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.set_ground_angle(agent, agent.ground_angle + value)
 
 
 # -------------------------------- #
