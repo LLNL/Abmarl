@@ -3,7 +3,7 @@ from gym.spaces import MultiBinary, Dict, Box
 import numpy as np
 
 from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent
-from admiral.envs.components.state import PositionState, LifeState, TeamState
+from admiral.envs.components.state import GridPositionState, LifeState, TeamState
 from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver
 
 class PositionRestrictedAgent(AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent): pass
@@ -27,7 +27,7 @@ agents = {
 }
 
 def test_health_restriction():
-    position_state = PositionState(agents=agents, region=10)
+    position_state = GridPositionState(agents=agents, region=10)
     life_state = LifeState(agents=agents)
     health_observer = PositionRestrictedHealthObserver(agents=agents)
 
@@ -180,7 +180,7 @@ def test_health_restriction():
     }}
 
 def test_life_restriction():
-    position_state = PositionState(agents=agents, region=10)
+    position_state = GridPositionState(agents=agents, region=10)
     life_state = LifeState(agents=agents)
     life_observer = PositionRestrictedLifeObserver(agents=agents)
 
@@ -332,7 +332,7 @@ def test_life_restriction():
     }}
 
 def test_team_restriction():
-    position_state = PositionState(agents=agents, region=10)
+    position_state = GridPositionState(agents=agents, region=10)
     life_state = LifeState(agents=agents)
     team_state = TeamState(agents=agents, number_of_teams=3)
     team_observer = PositionRestrictedTeamObserver(team=team_state, agents=agents)
@@ -486,7 +486,7 @@ def test_team_restriction():
     }}
 
 def test_position_observer():
-    position_state = PositionState(agents=agents, region=10)
+    position_state = GridPositionState(agents=agents, region=10)
     life_state = LifeState(agents=agents)
     position_observer = PositionRestrictedPositionObserver(agents=agents, position=position_state)
 
@@ -604,7 +604,7 @@ def test_position_observer():
     np.testing.assert_array_equal(position_observer.get_obs(agents['agent9'])['position']['agent9'], np.array([9, 9]))
 
 def test_relative_position_observer():
-    position_state = PositionState(agents=agents, region=10)
+    position_state = GridPositionState(agents=agents, region=10)
     life_state = LifeState(agents=agents)
     position_observer = PositionRestrictedRelativePositionObserver(agents=agents, position=position_state)
 
@@ -712,7 +712,7 @@ def test_relative_position_observer():
     np.testing.assert_array_equal(position_observer.get_obs(agents['agent9'])['position']['agent8'], np.array([-1, -1]))
 
 def test_mask_restriction():
-    position_state = PositionState(agents=agents, region=10)
+    position_state = GridPositionState(agents=agents, region=10)
     life_state = LifeState(agents=agents)
     mask_observer = PositionRestrictedMaskObserver(agents=agents)
 

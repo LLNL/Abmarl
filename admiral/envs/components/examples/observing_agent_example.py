@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent
-from admiral.envs.components.state import TeamState, PositionState
+from admiral.envs.components.state import TeamState, GridPositionState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver
 from admiral.envs.components.actor import GridMovementActor
 from admiral.envs import AgentBasedSimulation
@@ -17,7 +17,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.team_state = TeamState(**kwargs)
 
         # Actor components

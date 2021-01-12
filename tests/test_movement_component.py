@@ -3,7 +3,7 @@ from gym.spaces import Box
 import numpy as np
 
 from admiral.envs.components.agent import GridMovementAgent, PositionAgent
-from admiral.envs.components.state import PositionState
+from admiral.envs.components.state import GridPositionState
 from admiral.envs.components.actor import GridMovementActor
 
 class MovementTestAgent(GridMovementAgent, PositionAgent): pass
@@ -15,7 +15,7 @@ def test_grid_movement_component():
         'agent2': MovementTestAgent(id='agent2', starting_position=np.array([0, 1]), move_range=1),
         'agent3': MovementTestAgent(id='agent3', starting_position=np.array([8, 4]), move_range=1),
     }
-    state = PositionState(region=10, agents=agents)
+    state = GridPositionState(region=10, agents=agents)
     actor = GridMovementActor(position=state, agents=agents)
     state.reset()
 

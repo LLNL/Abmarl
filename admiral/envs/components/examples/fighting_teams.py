@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.agent import TeamAgent, PositionAgent, GridMovementAgent, AttackingAgent, LifeAgent, AgentObservingAgent
-from admiral.envs.components.state import TeamState, PositionState, LifeState
+from admiral.envs.components.state import TeamState, GridPositionState, LifeState
 from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
 from admiral.envs.components.done import TeamDeadDone
@@ -18,7 +18,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State Components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.team_state = TeamState(**kwargs)
 

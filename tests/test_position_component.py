@@ -4,7 +4,7 @@ from gym.spaces import Box
 import numpy as np
 
 from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, LifeAgent
-from admiral.envs.components.state import TeamState, PositionState, LifeState
+from admiral.envs.components.state import TeamState, GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver, RelativePositionObserver
 
 class PositionTestAgent(PositionAgent, AgentObservingAgent, LifeAgent): pass
@@ -21,7 +21,7 @@ def test_grid_position_observer():
         'agent4': PositionLifeAgent(id='agent4', starting_position=np.array([1, 4])),
     }
     
-    state = PositionState(agents=agents, region=5)
+    state = GridPositionState(agents=agents, region=5)
     life = LifeState(agents=agents)
     observer = GridPositionBasedObserver(position=state, agents=agents)
     state.reset()
@@ -75,7 +75,7 @@ def test_grid_team_position_observer():
     for agent in agents.values():
         agent.position = agent.starting_position
     
-    state = PositionState(agents=agents, region=5)
+    state = GridPositionState(agents=agents, region=5)
     life = LifeState(agents=agents)
     team = TeamState(agents=agents, number_of_teams=3)
     observer = GridPositionTeamBasedObserver(position=state, team_state=team, agents=agents)
@@ -213,7 +213,7 @@ def test_relative_position_observer():
         'agent4': PositionAgent(id='agent4', starting_position=np.array([1, 4])),
     }
     
-    state = PositionState(agents=agents, region=5)
+    state = GridPositionState(agents=agents, region=5)
     observer = RelativePositionObserver(position=state, agents=agents)
     state.reset()
 

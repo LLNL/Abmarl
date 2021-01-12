@@ -1,4 +1,6 @@
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, PositionAgent
@@ -72,7 +74,7 @@ class LifeState:
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionState:
+class PositionState(ABC):
     """
     Manages the agents' positions. All position updates must be within the region.
 
@@ -98,7 +100,16 @@ class PositionState:
                 if agent.starting_position is not None:
                     agent.position = agent.starting_position
                 else:
-                    agent.position = np.random.randint(0, self.region, 2)
+                    self.random_reset(agent)
+    
+    @abstractmethod
+    def random_reset(self, agent, **kwargs):
+        """
+        Reset the agents' positions. Child classes implement this according to their
+        specs. For example, GridPositionState assigns random integers as the position,
+        whereas ContinuousPositionState assigns random numbers.
+        """
+        pass
     
     def set_position(self, agent, _position, **kwargs):
         """
@@ -115,6 +126,20 @@ class PositionState:
         """
         if isinstance(agent, PositionAgent):
             self.set_position(agent, agent.position + value)
+
+class GridPositionState(PositionState):
+    def random_reset(self, agent, **kwargs):
+        """
+        Set the agents' random positions as integers within the region.
+        """
+        agent.position = np.random.randint(0, self.region, 2)
+
+class ContinuousPositionState(PositionState):
+    def random_reset(self, agent, **kwargs):
+        """
+        Set the agents' random positions as numbers within the region.
+        """
+        agent.position = np.random.uniform(0, self.region, 2)
 
 
 
