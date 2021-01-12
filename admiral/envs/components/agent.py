@@ -221,6 +221,7 @@ class SpeedAngleAgent(Agent):
                  max_banking_angle=None, max_banking_angle_change=None, \
                  initial_speed=None, initial_banking_angle=None, \
                  initial_ground_angle=None, **kwargs):
+        super().__init__(**kwargs)
         self.min_speed = min_speed
         self.max_speed = max_speed
         self.max_acceleration = max_acceleration

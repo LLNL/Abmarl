@@ -192,9 +192,10 @@ class SpeedAngleMovementActor:
         self.speed_angle.modify_speed(agent, acceleration)
         self.speed_angle.modify_banking_angle(agent, angle)
         
-        x_position = agent.position[0] + agent.speed*np.cos(np.deg2rad(agent.ground_angle))
-        y_position = agent.position[1] + agent.speed*np.sin(np.deg2rad(agent.ground_angle))
+        x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
+        y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
         
+        # self.position.modify_position(agent, np.concatenate((x_position, y_position)))
         self.position.modify_position(agent, np.array([x_position, y_position]))
 
 

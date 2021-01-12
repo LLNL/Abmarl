@@ -153,7 +153,7 @@ class ContinuousPositionState(PositionState):
         agent.position = np.random.uniform(0, self.region, 2)
 
 class SpeedAngleState:
-    def __init__(self, agents=None, *kwargs):
+    def __init__(self, agents=None, **kwargs):
         self.agents = agents
     
     def reset(self, **kwargs):
@@ -166,7 +166,7 @@ class SpeedAngleState:
                 if agent.initial_speed is not None:
                     agent.speed = agent.initial_speed
                 else:
-                    agent.initial_speed = np.random.uniform(agent.min_speed, agent.max_speed)
+                    agent.speed = np.random.uniform(agent.min_speed, agent.max_speed)
 
                 # Reset agent banking angle
                 if agent.initial_banking_angle is not None:
