@@ -110,15 +110,10 @@ class PositionState(ABC):
         whereas ContinuousPositionState assigns random numbers.
         """
         pass
-    
-    def set_position(self, agent, _position, **kwargs):
-        """
-        Set the agent's position to the incoming value only if the new position
-        is within the region.
-        """
-        if isinstance(agent, PositionAgent):
-            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
-                agent.position = _position
+
+    @abstractmethod
+    def set_position(self, agent, position, **kwargs):
+        pass
     
     def modify_position(self, agent, value, **kwargs):
         """
@@ -128,6 +123,15 @@ class PositionState(ABC):
             self.set_position(agent, agent.position + value)
 
 class GridPositionState(PositionState):
+    def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value only if the new position
+        is within the region.
+        """
+        if isinstance(agent, PositionAgent):
+            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
+                agent.position = _position
+
     def random_reset(self, agent, **kwargs):
         """
         Set the agents' random positions as integers within the region.
@@ -135,6 +139,13 @@ class GridPositionState(PositionState):
         agent.position = np.random.randint(0, self.region, 2)
 
 class ContinuousPositionState(PositionState):
+    def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value.
+        """
+        if isinstance(agent, PositionAgent):
+            agent.position = _position
+
     def random_reset(self, agent, **kwargs):
         """
         Set the agents' random positions as numbers within the region.
