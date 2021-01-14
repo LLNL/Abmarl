@@ -2,7 +2,7 @@
 from gym.spaces import Box, MultiBinary, Dict
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent, AgentObservingAgent, TeamAgent, ResourceObservingAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, AgentObservingAgent, TeamAgent, ResourceObservingAgent, SpeedAngleAgent
 
 # ----------------- #
 # --- Utilities --- #
@@ -361,6 +361,73 @@ class GridPositionTeamBasedObserver:
             return {'position': signal}
         else:
             return {}
+
+class SpeedObserver:
+    """
+    Observe the speed of all the agents in the simulator.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+        from gym.spaces import Dict, Box
+        for agent in agents.values():
+            agent.observation_space['speed'] = Dict({
+                other.id: Box(-1, other.max_speed, (1,)) for other in self.agents.values() if isinstance(other, SpeedAngleAgent)
+            })
+
+    def get_obs(self, agent, **kwargs):
+        """
+        Get the speed of all the agents in the simulator.
+        """
+        return {
+            'speed': {other.id: other.speed for other in self.agents.values() if isinstance(other, SpeedAngleAgent)},
+        }
+    
+    def null_value(self, obs_key):
+        return -1
+
+class PositionRestrictedSpeedObserver(SpeedObserver):
+    """
+    Observe the speed of each agent in the simulator if that agent is close enough
+    to the observing agent. If it is too far, then observe a null value
+    """
+    def get_obs(self, agent, **kwargs):
+        obs = super().get_obs(agent)
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
+
+
+class AngleObserver:
+    """
+    Observe the angle of all the agents in the simulator.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+        from gym.spaces import Dict, Box
+        for agent in agents.values():
+            agent.observation_space['ground_angle'] = Dict({
+                other.id: Box(-1, 360, (1,)) for other in agents.values() if isinstance(other, SpeedAngleAgent)
+            })
+
+    def get_obs(self, agent, **kwargs):
+        """
+        Get the angle of all the agents in the simulator.
+        """
+        return {
+            'ground_angle': {other.id: other.ground_angle for other in self.agents.values() if isinstance(other, SpeedAngleAgent)},
+        }
+    
+    def null_value(self, obs_key):
+        return -1
+
+class PositionRestrictedAngleObserver(AngleObserver):
+    """
+    Observe the angle of each agent in the simulator if that agent is close enough
+    to the observing agent. If it is too far, then observe a null value
+    """
+    def get_obs(self, agent, **kwargs):
+        obs = super().get_obs(agent)
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
 
 

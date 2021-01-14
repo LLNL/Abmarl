@@ -5,6 +5,7 @@ import numpy as np
 from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent
 from admiral.envs.components.state import ContinuousPositionState, SpeedAngleState
 from admiral.envs.components.actor import SpeedAngleMovementActor
+from admiral.envs.components.observer import SpeedObserver, AngleObserver
 from admiral.envs.components.done import TooCloseDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
@@ -21,6 +22,10 @@ class Flight(AgentBasedSimulation):
 
         # Actor
         self.move = SpeedAngleMovementActor(position=self.position, speed_angle=self.speed_angle, **kwargs)
+
+        # Observer
+        self.speed_observer = SpeedObserver(**kwargs)
+        self.angle_observer = AngleObserver(**kwargs)
 
         # Done
         self.done = TooCloseDone(position=self.position, **kwargs)
@@ -57,7 +62,11 @@ class Flight(AgentBasedSimulation):
         plt.pause(1e-6)
 
     def get_obs(self, agent_id, **kwargs):
-        pass
+        agent = self.agents[agent_id]
+        return {
+            **self.speed_observer.get_obs(agent, **kwargs),
+            **self.angle_observer.get_obs(agent, **kwargs),
+        }
 
     def get_reward(self, agent_id, **kwargs):
         pass
@@ -76,7 +85,7 @@ agents = {
             id=f'bird{i}', min_speed=0.5, max_speed=1.0, max_acceleration=0.1, \
             max_banking_angle=90, max_banking_angle_change=90, \
             initial_banking_angle=30
-        ) for i in range(10)
+        ) for i in range(24)
     }
 
 env = Flight(
@@ -87,6 +96,8 @@ env = Flight(
 fig = plt.figure()
 env.reset()
 env.render(fig=fig)
+
+print(env.get_obs('bird0'))
 
 for i in range(50):
     env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
