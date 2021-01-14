@@ -201,7 +201,7 @@ class SpeedAngleState:
 
     def set_ground_angle(self, agent, _ground_angle, **kwargs):
         if isinstance(agent, SpeedAngleAgent):
-            self.ground_angle = _ground_angle % 360
+            agent.ground_angle = _ground_angle % 360
     
     def modify_ground_angle(self, agent, value, **kwargs):
         if isinstance(agent, SpeedAngleAgent):

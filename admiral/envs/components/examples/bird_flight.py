@@ -47,7 +47,7 @@ class Flight(AgentBasedSimulation):
 
         agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
         agents_y = [self.position.region - 0.5 - agent.position[0] for agent in self.agents.values()]
-        mscatter(agents_x, agents_y, ax=ax, m='o', s=200, edgecolor='black', facecolor='gray')
+        mscatter(agents_x, agents_y, ax=ax, m='o', s=100, edgecolor='black', facecolor='gray')
 
         plt.plot()
         plt.pause(1e-6)
@@ -70,7 +70,8 @@ class Flight(AgentBasedSimulation):
 agents = {
     f'bird{i}': BirdAgent(
             id=f'bird{i}', min_speed=0.5, max_speed=1.0, max_acceleration=0.1, \
-            max_banking_angle=90, max_banking_angle_change=90
+            max_banking_angle=90, max_banking_angle_change=90, \
+            initial_banking_angle=30
         ) for i in range(10)
     }
 
