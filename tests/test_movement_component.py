@@ -10,10 +10,10 @@ class GridMovementTestAgent(GridMovementAgent, PositionAgent): pass
 
 def test_grid_movement_component():
     agents = {
-        'agent0': GridMovementTestAgent(id='agent0', starting_position=np.array([6, 4]), move_range=2),
-        'agent1': GridMovementTestAgent(id='agent1', starting_position=np.array([3, 3]), move_range=3),
-        'agent2': GridMovementTestAgent(id='agent2', starting_position=np.array([0, 1]), move_range=1),
-        'agent3': GridMovementTestAgent(id='agent3', starting_position=np.array([8, 4]), move_range=1),
+        'agent0': GridMovementTestAgent(id='agent0', initial_position=np.array([6, 4]), move_range=2),
+        'agent1': GridMovementTestAgent(id='agent1', initial_position=np.array([3, 3]), move_range=3),
+        'agent2': GridMovementTestAgent(id='agent2', initial_position=np.array([0, 1]), move_range=1),
+        'agent3': GridMovementTestAgent(id='agent3', initial_position=np.array([8, 4]), move_range=1),
     }
     state = GridPositionState(region=10, agents=agents)
     actor = GridMovementActor(position=state, agents=agents)
@@ -41,19 +41,19 @@ class SpeedAngleMovementTestAgent(SpeedAngleAgent, PositionAgent): pass
 
 def test_speed_angle_movement_component():
     agents = {
-        'agent0': SpeedAngleMovementTestAgent(id='agent0', starting_position=np.array([6.2,  3.3  ]), \
+        'agent0': SpeedAngleMovementTestAgent(id='agent0', initial_position=np.array([6.2,  3.3  ]), \
             initial_speed=1.0, min_speed=0.0, max_speed=1.0, max_acceleration=0.35, \
             initial_banking_angle=-30, max_banking_angle=45, max_banking_angle_change=30, \
             initial_ground_angle=300),
-        'agent1': SpeedAngleMovementTestAgent(id='agent1', starting_position=np.array([2.1,  3.15 ]), \
+        'agent1': SpeedAngleMovementTestAgent(id='agent1', initial_position=np.array([2.1,  3.15 ]), \
             initial_speed=0.5, min_speed=0.0, max_speed=1.0, max_acceleration=0.35, \
             initial_banking_angle=10, max_banking_angle=45, max_banking_angle_change=30, \
             initial_ground_angle=100),
-        'agent2': SpeedAngleMovementTestAgent(id='agent2', starting_position=np.array([0.5,  1.313]), \
+        'agent2': SpeedAngleMovementTestAgent(id='agent2', initial_position=np.array([0.5,  1.313]), \
             initial_speed=0.24, min_speed=0.0, max_speed=1.0, max_acceleration=0.35, \
             initial_banking_angle=0.0, max_banking_angle=45, max_banking_angle_change=30, \
             initial_ground_angle=45),
-        'agent3': SpeedAngleMovementTestAgent(id='agent3', starting_position=np.array([8.24, 4.4  ]), \
+        'agent3': SpeedAngleMovementTestAgent(id='agent3', initial_position=np.array([8.24, 4.4  ]), \
             initial_speed=0.6, min_speed=0.0, max_speed=1.0, max_acceleration=0.35, \
             initial_banking_angle=24, max_banking_angle=45, max_banking_angle_change=30, \
             initial_ground_angle=180),
@@ -65,7 +65,7 @@ def test_speed_angle_movement_component():
     position_state.reset()
     speed_angle_state.reset()
     for agent in agents.values():
-        np.testing.assert_array_equal(agent.position, agent.starting_position)
+        np.testing.assert_array_equal(agent.position, agent.initial_position)
         assert agent.speed == agent.initial_speed
         assert agent.banking_angle == agent.initial_banking_angle
         assert agent.ground_angle == agent.initial_ground_angle

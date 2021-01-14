@@ -156,12 +156,12 @@ class PositionAgent(Agent):
     """
     Agents have a position in the environment.
 
-    starting_position (np.array):
+    initial_position (np.array):
         The desired starting position for this agent.
     """
-    def __init__(self, starting_position=None, **kwargs):
+    def __init__(self, initial_position=None, **kwargs):
         super().__init__(**kwargs)
-        self.starting_position = starting_position
+        self.initial_position = initial_position
         self.position = None
 
 class GridMovementAgent(Agent):

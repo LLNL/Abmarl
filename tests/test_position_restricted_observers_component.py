@@ -12,16 +12,16 @@ class LifelessAgent(AgentObservingAgent, PositionAgent, TeamAgent): pass
 class PositionlessAgent(AgentObservingAgent, LifeAgent, TeamAgent): pass
 
 agents = {
-    'agent0':  PositionRestrictedAgent(id='agent0',  agent_view=3, team=0, initial_health=1.0, starting_position=np.array([0, 0])),
-    'agent1':  TeamlessAgent(          id='agent1',  agent_view=1,         initial_health=1.0, starting_position=np.array([1, 1])),
-    'agent2':  PositionRestrictedAgent(id='agent2',  agent_view=3, team=1, initial_health=1.0, starting_position=np.array([2, 2])),
-    'agent3':  LifelessAgent(          id='agent3',  agent_view=4, team=2,                     starting_position=np.array([3, 3])),
-    'agent4':  PositionRestrictedAgent(id='agent4',  agent_view=0, team=0, initial_health=1.0, starting_position=np.array([4, 4])),
-    'agent5':  PositionRestrictedAgent(id='agent5',  agent_view=3, team=1, initial_health=1.0, starting_position=np.array([5, 5])),
-    'agent6':  TeamlessAgent(          id='agent6',  agent_view=2,         initial_health=1.0, starting_position=np.array([6, 6])),
-    'agent7':  LifelessAgent(          id='agent7',  agent_view=3, team=2,                     starting_position=np.array([7, 7])),
-    'agent8':  PositionRestrictedAgent(id='agent8',  agent_view=5, team=0, initial_health=1.0, starting_position=np.array([8, 8])),
-    'agent9':  PositionRestrictedAgent(id='agent9',  agent_view=3, team=1, initial_health=1.0, starting_position=np.array([9, 9])),
+    'agent0':  PositionRestrictedAgent(id='agent0',  agent_view=3, team=0, initial_health=1.0, initial_position=np.array([0, 0])),
+    'agent1':  TeamlessAgent(          id='agent1',  agent_view=1,         initial_health=1.0, initial_position=np.array([1, 1])),
+    'agent2':  PositionRestrictedAgent(id='agent2',  agent_view=3, team=1, initial_health=1.0, initial_position=np.array([2, 2])),
+    'agent3':  LifelessAgent(          id='agent3',  agent_view=4, team=2,                     initial_position=np.array([3, 3])),
+    'agent4':  PositionRestrictedAgent(id='agent4',  agent_view=0, team=0, initial_health=1.0, initial_position=np.array([4, 4])),
+    'agent5':  PositionRestrictedAgent(id='agent5',  agent_view=3, team=1, initial_health=1.0, initial_position=np.array([5, 5])),
+    'agent6':  TeamlessAgent(          id='agent6',  agent_view=2,         initial_health=1.0, initial_position=np.array([6, 6])),
+    'agent7':  LifelessAgent(          id='agent7',  agent_view=3, team=2,                     initial_position=np.array([7, 7])),
+    'agent8':  PositionRestrictedAgent(id='agent8',  agent_view=5, team=0, initial_health=1.0, initial_position=np.array([8, 8])),
+    'agent9':  PositionRestrictedAgent(id='agent9',  agent_view=3, team=1, initial_health=1.0, initial_position=np.array([9, 9])),
     'agent10': PositionlessAgent(      id='agent10', agent_view=3, team=2, initial_health=1.0),
     'agent11': PositionlessAgent(      id='agent11', agent_view=3, team=0, initial_health=1.0),
 }

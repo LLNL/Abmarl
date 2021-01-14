@@ -97,8 +97,8 @@ class PositionState(ABC):
         """
         for agent in self.agents.values():
             if isinstance(agent, PositionAgent):
-                if agent.starting_position is not None:
-                    agent.position = agent.starting_position
+                if agent.initial_position is not None:
+                    agent.position = agent.initial_position
                 else:
                     self.random_reset(agent)
     
