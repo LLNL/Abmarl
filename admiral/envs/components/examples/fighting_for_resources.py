@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, GridMovementAgent, HarvestingAgent, ResourceObservingAgent, AttackingAgent, LifeAgent
-from admiral.envs.components.state import PositionState, GridResourceState, LifeState
+from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, GridResourcesActor, PositionBasedAttackActor
 from admiral.envs.components.done import DeadDone
@@ -19,7 +19,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.resource_state = GridResourceState(**kwargs)
 

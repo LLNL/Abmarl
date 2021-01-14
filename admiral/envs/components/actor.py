@@ -2,7 +2,7 @@
 import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
-    GridMovementAgent, PositionAgent, HarvestingAgent
+    GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -161,7 +161,43 @@ class GridMovementActor:
         if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
             position_before = moving_agent.position
             self.position.modify_position(moving_agent, move, **kwargs)
-            return position_before - moving_agent.position
+            return moving_agent.position - position_before
+
+class SpeedAngleMovementActor:
+    """
+    Process acceleration and angle changes for SpeedAngleAgents. Update the agents'
+    positions based on their new speed and direction.
+
+    position (ContinuousPositionState):
+        The position state handler. Needed to modify agent positions.
+    
+    speed_angle (SpeedAngleState):
+        The speed and angle state handler.
+
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, position=None, speed_angle=None, agents=None, **kwargs):
+        self.position = position
+        self.speed_angle = speed_angle
+        self.agents = agents
+
+        from gym.spaces import Box
+        for agent in agents.values():
+            if isinstance(agent, SpeedAngleAgent):
+                agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (1,))
+                agent.action_space['banking_angle_change'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
+    
+    def move(self, agent, acceleration, angle, **kwargs):
+        self.speed_angle.modify_speed(agent, acceleration)
+        self.speed_angle.modify_banking_angle(agent, angle)
+        
+        x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
+        y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
+        
+        position_before = agent.position
+        self.position.modify_position(agent, np.array([x_position, y_position]))
+        return agent.position - position_before
 
 
 

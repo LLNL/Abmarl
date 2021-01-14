@@ -4,7 +4,7 @@ import numpy as np
 import seaborn as sns
 
 from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent, LifeAgent, HarvestingAgent, ResourceObservingAgent
-from admiral.envs.components.state import TeamState, PositionState, LifeState, GridResourceState
+from admiral.envs.components.state import TeamState, GridPositionState, LifeState, GridResourceState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver, PositionRestrictedRelativePositionObserver, GridResourceObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone
@@ -22,7 +22,7 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.resource_state = GridResourceState(**kwargs)
         self.team_state = TeamState(**kwargs)

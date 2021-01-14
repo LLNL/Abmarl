@@ -156,12 +156,12 @@ class PositionAgent(Agent):
     """
     Agents have a position in the environment.
 
-    starting_position (np.array):
+    initial_position (np.array):
         The desired starting position for this agent.
     """
-    def __init__(self, starting_position=None, **kwargs):
+    def __init__(self, initial_position=None, **kwargs):
         super().__init__(**kwargs)
-        self.starting_position = starting_position
+        self.initial_position = initial_position
         self.position = None
 
 class GridMovementAgent(Agent):
@@ -182,6 +182,63 @@ class GridMovementAgent(Agent):
         Agents are configured if the move_range parameter is set.
         """
         return super().configured and self.move_range is not None
+
+class SpeedAngleAgent(Agent):
+    """
+    Agents have a speed and a banking angle which are used to determine how the
+    agent moves around a continuous field. Additionally, agents can accelerate
+    and change their banking angles to modify their speed and direction.
+    
+    min_speed (float):
+        The minimum speed this agent can travel. This is not speed in the physics
+        definition because agents can move backwards w.r.t their relative angle,
+        which happens when their speed is negative. This can make sense for some
+        situations, such as driving cars, but not others, such as flying birds.
+    
+    max_speed (float):
+        The maximum speed this agent can travel.
+    
+    max_acceleration (float):
+        The maximum amount by which an agent can change its speed in a single time
+        step.
+    
+    max_banking_angle (float):
+        The maximum banking angle the agent can endure.
+
+    max_banking_angle_change (float):
+        The maximum amount by which an agent can change its banking angle.
+
+    initial_speed (float):
+        The agent's initial speed.
+    
+    initial_banking_angle (float):
+        The agent's initial banking angle.
+    
+    initial_ground_angle (float):
+        The agent's initial ground angle.
+    """
+    def __init__(self, min_speed=None, max_speed=None, max_acceleration=None, \
+                 max_banking_angle=None, max_banking_angle_change=None, \
+                 initial_speed=None, initial_banking_angle=None, \
+                 initial_ground_angle=None, **kwargs):
+        super().__init__(**kwargs)
+        self.min_speed = min_speed
+        self.max_speed = max_speed
+        self.max_acceleration = max_acceleration
+        self.initial_speed = initial_speed
+        self.speed = None # Should be set by the state handler
+
+        self.max_banking_angle = max_banking_angle
+        self.max_banking_angle_change = max_banking_angle_change
+        self.initial_banking_angle = initial_banking_angle
+        self.initial_ground_angle = initial_ground_angle
+        self.banking_angle = None # Should be set by the state handler
+    
+    @property
+    def configured(self):
+        return super().configured and self.min_speed is not None and self.max_speed is not None and \
+            self.max_acceleration is not None and self.max_banking_angle is not None and \
+            self.max_banking_angle_change is not None
 
 
 

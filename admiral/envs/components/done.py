@@ -1,8 +1,7 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent
-from admiral.envs.components.agent import TeamAgent
+from admiral.envs.components.agent import LifeAgent, TeamAgent, PositionAgent
 
 class DeadDone:
     """
@@ -70,3 +69,35 @@ class TeamDeadDone:
             if agent.is_alive:
                 team[agent.team] += 1
         return sum(team != 0) <= 1
+
+class TooCloseDone:
+    def __init__(self, position=None, agents=None, collision_distance=None, collision_norm=2, **kwargs):
+        assert position is not None
+        self.position = position
+        for agent in agents.values():
+            assert isinstance(agent, PositionAgent)
+        self.agents = agents
+        assert collision_distance is not None
+        self.collision_distance = collision_distance
+        self.collision_norm = collision_norm
+    
+    def get_done(self, agent, **kwargs):
+        #  Collision with region edge
+        if np.any(agent.position[0] < self.collision_distance) \
+            or np.any(agent.position[0] > self.position.region - self.collision_distance) \
+            or np.any(agent.position[1] < self.collision_distance) \
+            or np.any(agent.position[1] > self.position.region - self.collision_distance):
+            return True
+
+        # Collision with other birds
+        for other in self.agents.values():
+            if other.id == agent.id: continue # Cannot collide with yourself
+            if np.linalg.norm(other.position - agent.position, self.collision_norm) < self.collision_distance:
+                return True
+        return False
+    
+    def get_all_done(self, **kwargs):
+        for agent in self.agents.values():
+            if self.get_done(agent):
+                return True
+        return False

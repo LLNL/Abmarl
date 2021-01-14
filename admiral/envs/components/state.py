@@ -1,7 +1,9 @@
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -72,7 +74,7 @@ class LifeState:
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionState:
+class PositionState(ABC):
     """
     Manages the agents' positions. All position updates must be within the region.
 
@@ -95,19 +97,23 @@ class PositionState:
         """
         for agent in self.agents.values():
             if isinstance(agent, PositionAgent):
-                if agent.starting_position is not None:
-                    agent.position = agent.starting_position
+                if agent.initial_position is not None:
+                    agent.position = agent.initial_position
                 else:
-                    agent.position = np.random.randint(0, self.region, 2)
+                    self.random_reset(agent)
     
-    def set_position(self, agent, _position, **kwargs):
+    @abstractmethod
+    def random_reset(self, agent, **kwargs):
         """
-        Set the agent's position to the incoming value only if the new position
-        is within the region.
+        Reset the agents' positions. Child classes implement this according to their
+        specs. For example, GridPositionState assigns random integers as the position,
+        whereas ContinuousPositionState assigns random numbers.
         """
-        if isinstance(agent, PositionAgent):
-            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
-                agent.position = _position
+        pass
+
+    @abstractmethod
+    def set_position(self, agent, position, **kwargs):
+        pass
     
     def modify_position(self, agent, value, **kwargs):
         """
@@ -116,6 +122,90 @@ class PositionState:
         if isinstance(agent, PositionAgent):
             self.set_position(agent, agent.position + value)
 
+class GridPositionState(PositionState):
+    def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value only if the new position
+        is within the region.
+        """
+        if isinstance(agent, PositionAgent):
+            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
+                agent.position = _position
+
+    def random_reset(self, agent, **kwargs):
+        """
+        Set the agents' random positions as integers within the region.
+        """
+        agent.position = np.random.randint(0, self.region, 2)
+
+class ContinuousPositionState(PositionState):
+    def set_position(self, agent, _position, **kwargs):
+        """
+        Set the agent's position to the incoming value.
+        """
+        if isinstance(agent, PositionAgent):
+            agent.position = _position
+
+    def random_reset(self, agent, **kwargs):
+        """
+        Set the agents' random positions as numbers within the region.
+        """
+        agent.position = np.random.uniform(0, self.region, 2)
+
+class SpeedAngleState:
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+    
+    def reset(self, **kwargs):
+        """
+        Reset the agents' speeds and ground angles.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, SpeedAngleAgent):
+                # Reset agent speed
+                if agent.initial_speed is not None:
+                    agent.speed = agent.initial_speed
+                else:
+                    agent.speed = np.random.uniform(agent.min_speed, agent.max_speed)
+
+                # Reset agent banking angle
+                if agent.initial_banking_angle is not None:
+                    agent.banking_angle = agent.initial_banking_angle
+                else:
+                    agent.banking_angle = np.random.uniform(-agent.max_banking_angle, agent.max_banking_angle)
+
+                # Reset agent ground angle
+                if agent.initial_ground_angle is not None:
+                    agent.ground_angle = agent.initial_ground_angle
+                else:
+                    agent.ground_angle = np.random.uniform(0, 360)
+    
+    def set_speed(self, agent, _speed, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            if agent.min_speed <= _speed <= agent.max_speed:
+                agent.speed = _speed
+    
+    def modify_speed(self, agent, value, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.set_speed(agent, agent.speed + value)
+    
+    def set_banking_angle(self, agent, _banking_angle, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            if abs(_banking_angle) <= agent.max_banking_angle:
+                agent.banking_angle = _banking_angle
+                self.modify_ground_angle(agent, agent.banking_angle)
+    
+    def modify_banking_angle(self, agent, value, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.set_banking_angle(agent, agent.banking_angle + value)
+
+    def set_ground_angle(self, agent, _ground_angle, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            agent.ground_angle = _ground_angle % 360
+    
+    def modify_ground_angle(self, agent, value, **kwargs):
+        if isinstance(agent, SpeedAngleAgent):
+            self.set_ground_angle(agent, agent.ground_angle + value)
 
 
 # -------------------------------- #

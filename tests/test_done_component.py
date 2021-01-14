@@ -1,7 +1,9 @@
 
-from admiral.envs.components.agent import LifeAgent, TeamAgent
-from admiral.envs.components.state import LifeState
-from admiral.envs.components.done import DeadDone, TeamDeadDone
+import numpy as np
+
+from admiral.envs.components.agent import LifeAgent, TeamAgent, PositionAgent
+from admiral.envs.components.state import LifeState, ContinuousPositionState
+from admiral.envs.components.done import DeadDone, TeamDeadDone, TooCloseDone
 
 class DoneTestAgent(LifeAgent, TeamAgent): pass
 
@@ -78,3 +80,25 @@ def test_team_dead_done_condition():
     assert     done.get_done(agents['agent4'])
     assert     done.get_done(agents['agent5'])
     assert     done.get_all_done()
+
+def test_too_close_done_with_continuous():
+    agents = {
+        'agent0': PositionAgent(id='agent0', initial_position=np.array([0.1, 0.1])),
+        'agent1': PositionAgent(id='agent1', initial_position=np.array([0.24, 0.5])),
+        'agent2': PositionAgent(id='agent2', initial_position=np.array([0.3, 0.5])),
+        'agent3': PositionAgent(id='agent3', initial_position=np.array([3.76, 3.5])),
+        'agent4': PositionAgent(id='agent4', initial_position=np.array([3.75, 3.6])),
+        'agent5': PositionAgent(id='agent5', initial_position=np.array([2.5, 3.0])),
+    }
+
+    state = ContinuousPositionState(region=4, agents=agents)
+    done = TooCloseDone(position=state, agents=agents, collision_distance=0.25)
+    state.reset()
+
+    assert done.get_done(agents['agent0'])
+    assert done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert done.get_done(agents['agent3'])
+    assert done.get_done(agents['agent4'])
+    assert not done.get_done(agents['agent5'])
+    assert done.get_all_done()

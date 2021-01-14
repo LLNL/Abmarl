@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent
-from admiral.envs.components.state import TeamState, PositionState
+from admiral.envs.components.state import TeamState, GridPositionState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver
 from admiral.envs.components.actor import GridMovementActor
 from admiral.envs import AgentBasedSimulation
@@ -17,7 +17,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.team_state = TeamState(**kwargs)
 
         # Actor components
@@ -84,12 +84,12 @@ class SimpleGridObservations(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {
-        'agent0': ObservingTeamMovementAgent(id='agent0', team=0, agent_view=1, move_range=1, starting_position=np.array([2, 1])),
-        'agent1': ObservingTeamMovementAgent(id='agent1', team=0, agent_view=1, move_range=0, starting_position=np.array([2, 2])),
-        'agent2': ObservingTeamMovementAgent(id='agent2', team=1, agent_view=1, move_range=0, starting_position=np.array([0, 4])),
-        'agent3': ObservingTeamMovementAgent(id='agent3', team=1, agent_view=1, move_range=0, starting_position=np.array([0, 0])),
-        'agent4': ObservingTeamMovementAgent(id='agent4', team=2, agent_view=1, move_range=0, starting_position=np.array([4, 0])),
-        'agent5': ObservingTeamMovementAgent(id='agent5', team=2, agent_view=1, move_range=0, starting_position=np.array([4, 4])),
+        'agent0': ObservingTeamMovementAgent(id='agent0', team=0, agent_view=1, move_range=1, initial_position=np.array([2, 1])),
+        'agent1': ObservingTeamMovementAgent(id='agent1', team=0, agent_view=1, move_range=0, initial_position=np.array([2, 2])),
+        'agent2': ObservingTeamMovementAgent(id='agent2', team=1, agent_view=1, move_range=0, initial_position=np.array([0, 4])),
+        'agent3': ObservingTeamMovementAgent(id='agent3', team=1, agent_view=1, move_range=0, initial_position=np.array([0, 0])),
+        'agent4': ObservingTeamMovementAgent(id='agent4', team=2, agent_view=1, move_range=0, initial_position=np.array([4, 0])),
+        'agent5': ObservingTeamMovementAgent(id='agent5', team=2, agent_view=1, move_range=0, initial_position=np.array([4, 4])),
     }
     env = SimpleGridObservations(
         region=5,

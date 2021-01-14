@@ -7,9 +7,9 @@ from admiral.managers import AllStepManager
 
 def test_all_step_grid_based_predator_prey():
     agents = {
-        'prey0': PreyAgent(id='prey0', starting_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
-        'prey1': PreyAgent(id='prey1', starting_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
-        'predator0': PredatorAgent(id='predator0', starting_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=1, move_range=1, attack_range=1, attack_strength=2.0)
+        'prey0': PreyAgent(id='prey0', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
+        'prey1': PreyAgent(id='prey1', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view_range=4),
+        'predator0': PredatorAgent(id='predator0', initial_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=1, move_range=1, attack_range=1, attack_strength=2.0)
     }
     original_resources = np.array([
         [0.43, 0.  , 0.  , 0.37, 0.32],
