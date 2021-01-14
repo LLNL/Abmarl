@@ -17,6 +17,10 @@ def test_grid_movement_component():
     }
     state = GridPositionState(region=10, agents=agents)
     actor = GridMovementActor(position=state, agents=agents)
+
+    for agent in agents.values():
+        assert 'move' in agent.action_space
+
     state.reset()
 
     np.testing.assert_array_equal(actor.process_move(agents['agent0'], np.array([-1,  1])), np.array([-1,  1]))
@@ -61,6 +65,10 @@ def test_speed_angle_movement_component():
     position_state = ContinuousPositionState(region=10, agents=agents)
     speed_angle_state = SpeedAngleState(agents=agents)
     actor = SpeedAngleMovementActor(position=position_state, speed_angle=speed_angle_state, agents=agents)
+
+    for agent in agents.values():
+        assert 'accelerate' in agent.action_space
+        assert 'banking_angle_change' in agent.action_space
 
     position_state.reset()
     speed_angle_state.reset()
