@@ -161,7 +161,7 @@ class GridMovementActor:
         if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
             position_before = moving_agent.position
             self.position.modify_position(moving_agent, move, **kwargs)
-            return position_before - moving_agent.position
+            return moving_agent.position - position_before
 
 class SpeedAngleMovementActor:
     """
@@ -188,15 +188,16 @@ class SpeedAngleMovementActor:
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (1,))
                 agent.action_space['banking_angle_change'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
     
-    def process_speed_angle_change(self, agent, acceleration, angle, **kwargs):
+    def move(self, agent, acceleration, angle, **kwargs):
         self.speed_angle.modify_speed(agent, acceleration)
         self.speed_angle.modify_banking_angle(agent, angle)
         
         x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
         y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
         
-        # self.position.modify_position(agent, np.concatenate((x_position, y_position)))
+        position_before = agent.position
         self.position.modify_position(agent, np.array([x_position, y_position]))
+        return agent.position - position_before
 
 
 

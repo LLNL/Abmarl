@@ -21,7 +21,7 @@ class Flight(AgentBasedSimulation):
         self.speed_angle = SpeedAngleState(**kwargs)
 
         # Actor
-        self.move = SpeedAngleMovementActor(position=self.position, speed_angle=self.speed_angle, **kwargs)
+        self.move_actor = SpeedAngleMovementActor(position=self.position, speed_angle=self.speed_angle, **kwargs)
 
         # Observer
         self.speed_observer = SpeedObserver(**kwargs)
@@ -41,7 +41,7 @@ class Flight(AgentBasedSimulation):
     
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
-            self.move.process_speed_angle_change(self.agents[agent], action['accelerate'][0], action['banking_angle_change'][0], **kwargs)
+            self.move_actor.move(self.agents[agent], action['accelerate'][0], action['banking_angle_change'][0], **kwargs)
         
     def render(self, fig=None, **kwargs):
         fig.clear()
