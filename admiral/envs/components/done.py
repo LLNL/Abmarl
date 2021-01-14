@@ -82,16 +82,17 @@ class TooCloseDone:
         self.collision_norm = collision_norm
     
     def get_done(self, agent, **kwargs):
+        #  Collision with region edge
+        if np.any(agent.position[0] < self.collision_distance) \
+            or np.any(agent.position[0] > self.position.region - self.collision_distance) \
+            or np.any(agent.position[1] < self.collision_distance) \
+            or np.any(agent.position[1] > self.position.region - self.collision_distance):
+            return True
+
+        # Collision with other birds
         for other in self.agents.values():
             if other.id == agent.id: continue # Cannot collide with yourself
-            # Collision with other birds
             if np.linalg.norm(other.position - agent.position, self.collision_norm) < self.collision_distance:
-                return True
-            #  Collision with region edge
-            if np.any(agent.position[0] < -self.position.region + self.collision_distance) \
-                or np.any(agent.position[0] > self.position.region - self.collision_distance) \
-                or np.any(agent.position[1] < -self.position.region + self.collision_distance) \
-                or np.any(agent.position[1] > self.position.region - self.collision_distance):
                 return True
         return False
     
