@@ -2,9 +2,9 @@
 from gym.spaces import MultiBinary, Dict, Box
 import numpy as np
 
-from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent
-from admiral.envs.components.state import GridPositionState, LifeState, TeamState
-from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver
+from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent
+from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState
+from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver, PositionRestrictedAngleObserver, PositionRestrictedSpeedObserver
 
 class PositionRestrictedAgent(AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent): pass
 class TeamlessAgent(AgentObservingAgent, PositionAgent, LifeAgent): pass
@@ -868,3 +868,175 @@ def test_mask_restriction():
         'agent10': False,
         'agent11': False
     }}
+
+
+
+class ContinuousPositionRestrictedAgent(AgentObservingAgent, PositionAgent, SpeedAngleAgent): pass
+
+continuous_agents = {
+    'agent0': ContinuousPositionRestrictedAgent(id='agent0', agent_view=3, initial_position=np.array([0, 0]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.32, initial_banking_angle=0.0, initial_ground_angle=0),
+    'agent1': ContinuousPositionRestrictedAgent(id='agent1', agent_view=1, initial_position=np.array([1, 1]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.24, initial_banking_angle=0.0, initial_ground_angle=90),
+    'agent2': ContinuousPositionRestrictedAgent(id='agent2', agent_view=3, initial_position=np.array([2, 2]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.78, initial_banking_angle=0.0, initial_ground_angle=180),
+    'agent3': ContinuousPositionRestrictedAgent(id='agent3', agent_view=4, initial_position=np.array([3, 3]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.50, initial_banking_angle=0.0, initial_ground_angle=270),
+    'agent4': ContinuousPositionRestrictedAgent(id='agent4', agent_view=0, initial_position=np.array([4, 4]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=1.00, initial_banking_angle=0.0, initial_ground_angle=24),
+    'agent5': ContinuousPositionRestrictedAgent(id='agent5', agent_view=3, initial_position=np.array([5, 5]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.08, initial_banking_angle=0.0, initial_ground_angle=300),
+    'agent6': ContinuousPositionRestrictedAgent(id='agent6', agent_view=2, initial_position=np.array([6, 6]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.95, initial_banking_angle=0.0, initial_ground_angle=123),
+}
+
+def test_speed_restriction():
+    position_state = ContinuousPositionState(agents=continuous_agents, region=10)
+    speed_angle_state = SpeedAngleState(agents=continuous_agents)
+    speed_observer = PositionRestrictedSpeedObserver(agents=continuous_agents)
+
+    position_state.reset()
+    speed_angle_state.reset()
+
+    assert speed_observer.get_obs(agents['agent0']) == {'speed': {
+        'agent0': 0.32,
+        'agent1': 0.24,
+        'agent2': 0.78,
+        'agent3': 0.5,
+        'agent4': -1,
+        'agent5': -1,
+        'agent6': -1,
+    }}
+
+    assert speed_observer.get_obs(agents['agent1']) == {'speed': {
+        'agent0': 0.32,
+        'agent1': 0.24,
+        'agent2': 0.78,
+        'agent3': -1,
+        'agent4': -1,
+        'agent5': -1,
+        'agent6': -1,
+    }}
+
+    assert speed_observer.get_obs(agents['agent2']) == {'speed': {
+        'agent0': 0.32,
+        'agent1': 0.24,
+        'agent2': 0.78,
+        'agent3': 0.5,
+        'agent4': 1.0,
+        'agent5': 0.08,
+        'agent6': -1,
+    }}
+
+    assert speed_observer.get_obs(agents['agent3']) == {'speed': {
+        'agent0': 0.32,
+        'agent1': 0.24,
+        'agent2': 0.78,
+        'agent3': 0.5,
+        'agent4': 1.0,
+        'agent5': 0.08,
+        'agent6': 0.95,
+    }}
+
+    assert speed_observer.get_obs(agents['agent4']) == {'speed': {
+        'agent0': -1,
+        'agent1': -1,
+        'agent2': -1,
+        'agent3': -1,
+        'agent4': 1.0,
+        'agent5': -1,
+        'agent6': -1,
+    }}
+
+    assert speed_observer.get_obs(agents['agent5']) == {'speed': {
+        'agent0': -1,
+        'agent1': -1,
+        'agent2': 0.78,
+        'agent3': 0.5,
+        'agent4': 1.0,
+        'agent5': 0.08,
+        'agent6': 0.95,
+    }}
+
+    assert speed_observer.get_obs(agents['agent6']) == {'speed': {
+        'agent0': -1,
+        'agent1': -1,
+        'agent2': -1,
+        'agent3': -1,
+        'agent4': 1.0,
+        'agent5': 0.08,
+        'agent6': 0.95,
+    }}
+    
+def test_angle_restriction():
+    position_state = ContinuousPositionState(agents=continuous_agents, region=10)
+    speed_angle_state = SpeedAngleState(agents=continuous_agents)
+    angle_observer = PositionRestrictedAngleObserver(agents=continuous_agents)
+
+    position_state.reset()
+    speed_angle_state.reset()
+
+    assert angle_observer.get_obs(agents['agent0']) == {'ground_angle': {
+        'agent0': 0,
+        'agent1': 90,
+        'agent2': 180,
+        'agent3': 270,
+        'agent4': -1,
+        'agent5': -1,
+        'agent6': -1,
+    }}
+
+    assert angle_observer.get_obs(agents['agent1']) == {'ground_angle': {
+        'agent0': 0,
+        'agent1': 90,
+        'agent2': 180,
+        'agent3': -1,
+        'agent4': -1,
+        'agent5': -1,
+        'agent6': -1,
+    }}
+
+    assert angle_observer.get_obs(agents['agent2']) == {'ground_angle': {
+        'agent0': 0,
+        'agent1': 90,
+        'agent2': 180,
+        'agent3': 270,
+        'agent4': 24,
+        'agent5': 300,
+        'agent6': -1,
+    }}
+
+    assert angle_observer.get_obs(agents['agent3']) == {'ground_angle': {
+        'agent0': 0,
+        'agent1': 90,
+        'agent2': 180,
+        'agent3': 270,
+        'agent4': 24,
+        'agent5': 300,
+        'agent6': 123,
+    }}
+
+    assert angle_observer.get_obs(agents['agent4']) == {'ground_angle': {
+        'agent0': -1,
+        'agent1': -1,
+        'agent2': -1,
+        'agent3': -1,
+        'agent4': 24,
+        'agent5': -1,
+        'agent6': -1,
+    }}
+
+    assert angle_observer.get_obs(agents['agent5']) == {'ground_angle': {
+        'agent0': -1,
+        'agent1': -1,
+        'agent2': 180,
+        'agent3': 270,
+        'agent4': 24,
+        'agent5': 300,
+        'agent6': 123,
+    }}
+
+    assert angle_observer.get_obs(agents['agent6']) == {'ground_angle': {
+        'agent0': -1,
+        'agent1': -1,
+        'agent2': -1,
+        'agent3': -1,
+        'agent4': 24,
+        'agent5': 300,
+        'agent6': 123,
+    }}
+
+

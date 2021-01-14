@@ -382,7 +382,8 @@ class SpeedObserver:
             'speed': {other.id: other.speed for other in self.agents.values() if isinstance(other, SpeedAngleAgent)},
         }
     
-    def null_value(self, obs_key):
+    @property
+    def null_value(self):
         return -1
 
 class PositionRestrictedSpeedObserver(SpeedObserver):
@@ -416,7 +417,8 @@ class AngleObserver:
             'ground_angle': {other.id: other.ground_angle for other in self.agents.values() if isinstance(other, SpeedAngleAgent)},
         }
     
-    def null_value(self, obs_key):
+    @property
+    def null_value(self):
         return -1
 
 class PositionRestrictedAngleObserver(AngleObserver):
