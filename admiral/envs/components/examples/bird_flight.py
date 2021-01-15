@@ -51,8 +51,8 @@ class Flight(AgentBasedSimulation):
         ax.set_xticks(np.arange(0, self.position.region, 1))
         ax.set_yticks(np.arange(0, self.position.region, 1))
 
-        agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
-        agents_y = [self.position.region - 0.5 - agent.position[0] for agent in self.agents.values()]
+        agents_x = [agent.position[0] for agent in self.agents.values()]
+        agents_y = [agent.position[1] for agent in self.agents.values()]
         mscatter(agents_x, agents_y, ax=ax, m='o', s=100, edgecolor='black', facecolor='gray')
 
         plt.plot()

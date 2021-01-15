@@ -158,6 +158,10 @@ class PositionAgent(Agent):
 
     initial_position (np.array):
         The desired starting position for this agent.
+
+    Warning: You should consider the positional state of the environment when
+    working with the agent's position because state interpret the elements of
+    the array differently.
     """
     def __init__(self, initial_position=None, **kwargs):
         super().__init__(**kwargs)

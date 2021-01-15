@@ -130,7 +130,9 @@ class PositionState(ABC):
 
 class GridPositionState(PositionState):
     """
-    Agents are positioned in a grid and cannot go outside of the region.
+    Agents are positioned in a grid and cannot go outside of the region. Positions
+    are a 2-element numpy array, where the first element is the grid-row from top
+    to bottom and the second is the grid-column from left to right.
     """
     def set_position(self, agent, _position, **kwargs):
         """
@@ -150,7 +152,8 @@ class GridPositionState(PositionState):
 class ContinuousPositionState(PositionState):
     """
     Agents are positioned in a continuous space and can go outside the bounds
-    of the region.
+    of the region. Positions are a 2-element array, where the first element is
+    the x-location and the second is the y-location.
     """
     def set_position(self, agent, _position, **kwargs):
         """
