@@ -7,6 +7,244 @@ from admiral.envs.predator_prey import PredatorPreyEnv, PredatorPreyEnvDistanceO
 from admiral.envs.predator_prey import Predator, Prey
 from admiral.envs.modules import GridResources
 
+def test_build_fails():
+    with pytest.raises(TypeError): # Abstract class error
+        PredatorPreyEnv()
+    with pytest.raises(TypeError): # Missing argument
+        PredatorPreyEnvDistanceObs()
+    with pytest.raises(TypeError): # Missing argument
+        PredatorPreyEnvGridObs()
+    with pytest.raises(TypeError): # Abstract class error
+        PredatorPreyEnv({
+            'region': None,
+            'max_steps': None,
+            'agents': None,
+            'reward_map': None,
+        })
+    
+def test_agent_class_attributes():
+    with pytest.raises(TypeError):
+        Predator()
+    with pytest.raises(TypeError):
+        Prey()
+
+def test_class_attributes():
+    assert PredatorPreyEnv.ActionStatus.BAD_MOVE == 0
+    assert PredatorPreyEnv.ActionStatus.GOOD_MOVE == 1
+    assert PredatorPreyEnv.ActionStatus.NO_MOVE == 2
+    assert PredatorPreyEnv.ActionStatus.BAD_ATTACK == 3
+    assert PredatorPreyEnv.ActionStatus.GOOD_ATTACK == 4
+    assert PredatorPreyEnv.ActionStatus.EATEN == 5
+
+    assert PredatorPreyEnv.ObservationMode.GRID == 0
+    assert PredatorPreyEnv.ObservationMode.DISTANCE == 1
+
+def test_builder():
+    env = PredatorPreyEnv.build()
+    assert isinstance(env, PredatorPreyEnvGridObs)
+    assert env.region == 10
+    assert env.max_steps == 200
+    assert env.reward_map == {
+        'predator': {
+            PredatorPreyEnv.ActionStatus.BAD_MOVE: -10,
+            PredatorPreyEnv.ActionStatus.GOOD_MOVE: -1,
+            PredatorPreyEnv.ActionStatus.NO_MOVE: 0,
+            PredatorPreyEnv.ActionStatus.BAD_ATTACK: -10,
+            PredatorPreyEnv.ActionStatus.GOOD_ATTACK: 100,
+        },
+        'prey': {
+            PredatorPreyEnv.ActionStatus.BAD_MOVE: -10,
+            PredatorPreyEnv.ActionStatus.GOOD_MOVE: -1,
+            PredatorPreyEnv.ActionStatus.NO_MOVE: 0,
+            PredatorPreyEnv.ActionStatus.EATEN: -100,
+            PredatorPreyEnv.ActionStatus.BAD_HARVEST: -10,
+            PredatorPreyEnv.ActionStatus.GOOD_HARVEST: 10,
+        }
+    }
+    grid_resources = GridResources.build({'region': env.region})
+    assert env.resources.region == grid_resources.region
+    assert env.resources.coverage == grid_resources.coverage
+    assert env.resources.min_value == grid_resources.min_value
+    assert env.resources.max_value == grid_resources.max_value
+    assert env.resources.revive_rate == grid_resources.revive_rate
+
+    agents = env.agents
+    assert type(agents) == dict
+    assert len(agents) == 2
+    assert agents['prey0'].id == 'prey0'
+    assert type(agents['prey0']) == Prey
+    assert agents['prey0'].view == 9
+    assert agents['prey0'].harvest_amount == 0.1
+    assert agents['prey0'].observation_space == Dict({
+        'agents': Box(low=-1, high=2, shape=(19,19), dtype=np.int),
+        'resources': Box(-1, env.resources.max_value, (19,19), np.float),
+    })
+    assert agents['prey0'].action_space == Dict({
+        'move': Box(low=-1, high=1, shape=(2,), dtype=np.int),
+        'harvest': Discrete(2)
+    })
+    assert agents['predator0'].id == 'predator0'
+    assert type(agents['predator0']) == Predator
+    assert agents['predator0'].view == 9
+    assert agents['predator0'].attack == 0
+    assert agents['predator0'].observation_space == Dict({
+        'agents': Box(low=-1, high=2, shape=(19,19), dtype=np.int),
+        'resources': Box(-1, env.resources.max_value, (19,19), np.float),
+    })
+    assert agents['predator0'].action_space == Dict({
+        'move': Box(low=-1, high=1, shape=(2,), dtype=np.int),
+        'attack': Discrete(2)
+    })
+
+def test_builder_region():
+    env = PredatorPreyEnv.build({'region': 20})
+    assert env.region == 20
+    assert env.resources.region == 20
+    with pytest.raises(TypeError):
+        PredatorPreyEnv.build({'region': '12'})
+    with pytest.raises(TypeError):
+        PredatorPreyEnv.build({'region': -2})
+
+    agents = env.agents
+    assert len(agents) == 2
+    assert agents['prey0'].id == 'prey0'
+    assert type(agents['prey0']) == Prey
+    assert agents['prey0'].view == 19
+    assert agents['prey0'].observation_space == Dict({
+        'agents': Box(low=-1, high=2, shape=(39,39), dtype=np.int),
+        'resources': Box(-1, env.resources.max_value, (39,39), np.float),
+    })
+    assert agents['predator0'].id == 'predator0'
+    assert type(agents['predator0']) == Predator
+    assert agents['predator0'].view == 19
+    assert agents['predator0'].attack == 0
+    assert agents['predator0'].observation_space == Dict({
+        'agents': Box(low=-1, high=2, shape=(39,39), dtype=np.int),
+        'resources': Box(-1, env.resources.max_value, (39,39), np.float),
+    })
+
+def test_build_max_steps():
+    env = PredatorPreyEnv.build({'max_steps': 100})
+    assert env.max_steps == 100
+    with pytest.raises(TypeError):
+        PredatorPreyEnv.build({'max_steps': 12.5})
+    with pytest.raises(TypeError):
+        PredatorPreyEnv.build({'max_steps': -8})
+
+def test_builder_observation_mode():
+    env = PredatorPreyEnv.build({'observation_mode': PredatorPreyEnv.ObservationMode.DISTANCE})
+    assert isinstance(env, PredatorPreyEnvDistanceObs)
+
+    agents = env.agents
+    assert type(agents) == dict
+    assert len(agents) == 2
+    assert agents['prey0'].id == 'prey0'
+    assert type(agents['prey0']) == Prey
+    assert agents['prey0'].view == 9
+    assert agents['prey0'].observation_space == Dict({
+        'predator0': Box(-9, 9, (3,), np.int)
+    })
+    assert agents['predator0'].id == 'predator0'
+    assert type(agents['predator0']) == Predator
+    assert agents['predator0'].view == 9
+    assert agents['predator0'].attack == 0
+    assert agents['predator0'].observation_space == Dict({
+        'prey0': Box(low=-9, high=9, shape=(3,), dtype=np.int)
+    })
+
+def test_builder_rewards():
+    rewards = {
+        'predator': {
+            PredatorPreyEnv.ActionStatus.BAD_MOVE: -2, 
+            PredatorPreyEnv.ActionStatus.GOOD_MOVE: -1, 
+            PredatorPreyEnv.ActionStatus.NO_MOVE: 0,
+            PredatorPreyEnv.ActionStatus.BAD_ATTACK: -5,
+            PredatorPreyEnv.ActionStatus.GOOD_ATTACK: 10,
+        },
+        'prey': {
+            PredatorPreyEnv.ActionStatus.BAD_MOVE: -2, 
+            PredatorPreyEnv.ActionStatus.GOOD_MOVE: 2, 
+            PredatorPreyEnv.ActionStatus.NO_MOVE: 1,
+            PredatorPreyEnv.ActionStatus.EATEN: -10,
+        }
+    }
+    env = PredatorPreyEnv.build({'rewards': rewards})
+    assert env.reward_map == rewards
+    with pytest.raises(TypeError):
+        PredatorPreyEnv.build({'rewards': 12})
+
+def test_builder_resources():
+    resources = {
+        'coverage': 0.5,
+        'min_value': 0.3,
+        'max_value': 1.2,
+        'revive_rate': 0.1,
+    }
+    env = PredatorPreyEnv.build({'resources': resources})
+    assert env.resources.region == env.region
+    assert env.resources.coverage == resources['coverage']
+    assert env.resources.min_value == resources['min_value']
+    assert env.resources.max_value == resources['max_value']
+    assert env.resources.revive_rate == resources['revive_rate']
+
+def test_builder_agents():
+    np.random.seed(24)
+    # Create some good agents
+    agents = [
+        Prey(id='prey0', view=7, move=2),
+        Predator(id='predator1', view=3, attack=2),
+        Prey(id='prey2', view=5, move=3),
+        Predator(id='predator3', view=2, move=2, attack=1),
+        Predator(id='predator4', view=0, attack=3)
+    ]
+    env = PredatorPreyEnv.build({'agents': agents})
+
+    agents = env.agents
+    for agent in agents.values():
+        assert agent.configured
+        
+    assert agents['prey0'].observation_space == Dict({
+        'agents': Box(-1, 2, (15,15), np.int),
+        'resources': Box(-1, env.resources.max_value, (15,15), np.float),
+    })
+    assert agents['predator1'].observation_space == Dict({
+        'agents': Box(-1, 2, (7, 7), np.int),
+        'resources': Box(-1, env.resources.max_value, (7,7), np.float),
+    })
+    assert agents['prey2'].observation_space == Dict({
+        'agents': Box(-1, 2, (11, 11), np.int),
+        'resources': Box(-1, env.resources.max_value, (11,11), np.float),
+    })
+    assert agents['predator3'].observation_space == Dict({
+        'agents': Box(-1, 2, (5, 5), np.int),
+        'resources': Box(-1, env.resources.max_value, (5,5), np.float),
+    })
+    assert agents['predator4'].observation_space == Dict({
+        'agents': Box(-1, 2, (1, 1), np.int),
+        'resources': Box(-1, env.resources.max_value, (1,1), np.float),
+    })
+
+    assert agents['prey0'].action_space == Dict({
+        'move': Box(-2, 2, (2,), np.int),
+        'harvest': Discrete(2),
+    })
+    assert agents['predator1'].action_space == Dict({
+        'attack': Discrete(2),
+        'move': Box(-1, 1, (2,), np.int),
+    })
+    assert agents['prey2'].action_space == Dict({
+        'move': Box(-3, 3, (2,), np.int),
+        'harvest': Discrete(2),
+    })
+    assert agents['predator3'].action_space == Dict({
+        'attack': Discrete(2),
+        'move': Box(-2, 2, (2,), np.int),
+    })
+    assert agents['predator4'].action_space == Dict({
+        'attack': Discrete(2),
+        'move': Box(-1, 1, (2,), np.int),
+    })
+
 def test_reset_grid_obs():
     np.random.seed(24)
     agents = [
