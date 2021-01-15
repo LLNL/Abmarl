@@ -40,7 +40,7 @@ class SimulationManager(ABC):
         pass
     
     def render(self, **kwargs):
-        self.env.render()
+        self.env.render(**kwargs)
 
     @property
     def unwrapped(self):

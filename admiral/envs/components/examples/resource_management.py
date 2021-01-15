@@ -3,15 +3,15 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.position import PositionState, PositionObserver, PositionAgent
-from admiral.envs.components.movement import GridMovementAgent, GridMovementActor
-from admiral.envs.components.resources import GridResourceState, GridResourceObserver, HarvestingAgent, GridResourcesActor
-from admiral.envs.components.health import LifeAgent, LifeState, HealthObserver, LifeObserver
-from admiral.envs.components.dead_done import DeadDone
+from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, GridMovementAgent, HarvestingAgent, ResourceObservingAgent, LifeAgent
+from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
+from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
+from admiral.envs.components.actor import GridMovementActor, GridResourcesActor
+from admiral.envs.components.done import DeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent):
+class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent, AgentObservingAgent, ResourceObservingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):
@@ -19,7 +19,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.resource_state = GridResourceState(**kwargs)
 
@@ -47,13 +47,13 @@ class ResourceManagementEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            harvested_amount = self.resource_actor.process_harvest(agent, action['harvest'], **kwargs)
+            harvested_amount = self.resource_actor.process_harvest(agent, action.get('harvest', 0), **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
 
         # Apply entropy to all agents
         for agent_id in action_dict:
@@ -86,10 +86,10 @@ class ResourceManagementEnv(AgentBasedSimulation):
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
-            'position': self.position_observer.get_obs(agent),
-            'resources': self.resource_observer.get_obs(agent),
-            'health': self.health_observer.get_obs(agent_id, **kwargs),
-            'life': self.life_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent),
+            **self.resource_observer.get_obs(agent),
+            **self.health_observer.get_obs(agent_id, **kwargs),
+            **self.life_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -104,20 +104,21 @@ class ResourceManagementEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', view=2, move_range=1, max_harvest=1.0) for i in range(4)}
-env = ResourceManagementEnv(
-    region=10,
-    agents=agents
-)
-env.reset()
-print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-fig = plt.gcf()
-env.render(fig=fig)
-
-for _ in range(50):
-    action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
-    env.step(action_dict)
-    print({agent_id: env.get_done(agent_id) for agent_id in env.agents})
+if __name__ == '__main__':
+    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', agent_view=2, resource_view=2, move_range=1, max_harvest=1.0) for i in range(4)}
+    env = ResourceManagementEnv(
+        region=10,
+        agents=agents
+    )
+    env.reset()
+    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    fig = plt.gcf()
     env.render(fig=fig)
 
-print(env.get_all_done())
+    for _ in range(50):
+        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
+        env.step(action_dict)
+        print({agent_id: env.get_done(agent_id) for agent_id in env.agents})
+        env.render(fig=fig)
+
+    print(env.get_all_done())

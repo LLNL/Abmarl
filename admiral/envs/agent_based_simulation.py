@@ -5,7 +5,7 @@ class AgentBasedSimulation(ABC):
     """
     AgentBasedSimulation defines the interface that agent-based simulations will
     implement. The interface defines the following API:
-        agents: property
+        agents: dict
             A dictionary that maps the Agent's id to Agent object. An Agent object can hold
             any property, but it must include an id, the action space, and the
             observation space. A multi-agent environment is expected to have
@@ -40,13 +40,14 @@ class AgentBasedSimulation(ABC):
     """
     @abstractmethod
     def __init__(self):
-        """
-        config: dict
-            Environment parameters, including the dictionary of Agents.
-        """
-        self.agents = {}
+        pass
 
     def finalize(self):
+        """
+        Finalize the initialization process. At this point, every agent should
+        be configured with action and observation spaces, which we convert into
+        Dict spaces for interfacing with the trainer.
+        """
         from gym.spaces import Dict
         for agent in self.agents.values():
             assert agent.configured

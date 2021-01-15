@@ -2,16 +2,15 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.team import TeamAgent, TeamObserver, TeamState
-from admiral.envs.components.position import PositionState, PositionAgent, PositionObserver
-from admiral.envs.components.movement import GridMovementActor, GridMovementAgent
-from admiral.envs.components.attacking import AttackingAgent, PositionTeamBasedAttackActor
-from admiral.envs.components.health import LifeState, LifeAgent, HealthObserver, LifeObserver
-from admiral.envs.components.dead_done import TeamDeadDone
+from admiral.envs.components.agent import TeamAgent, PositionAgent, GridMovementAgent, AttackingAgent, LifeAgent, AgentObservingAgent
+from admiral.envs.components.state import TeamState, GridPositionState, LifeState
+from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver
+from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
+from admiral.envs.components.done import TeamDeadDone
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent):
+class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent, AgentObservingAgent):
     pass
 
 class FightingTeamsEnv(AgentBasedSimulation):
@@ -19,7 +18,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State Components
-        self.position_state = PositionState(**kwargs)
+        self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.team_state = TeamState(**kwargs)
 
@@ -46,13 +45,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action['attack'], **kwargs)
+            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
     
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action['move'], **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -79,10 +78,10 @@ class FightingTeamsEnv(AgentBasedSimulation):
     
     def get_obs(self, agent_id, **kwargs):
         return {
-            'position': self.position_observer.get_obs(agent_id, **kwargs),
-            'health': self.health_observer.get_obs(agent_id, **kwargs),
-            'life': self.life_observer.get_obs(agent_id, **kwargs),
-            'team': self.team_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent_id, **kwargs),
+            **self.health_observer.get_obs(agent_id, **kwargs),
+            **self.life_observer.get_obs(agent_id, **kwargs),
+            **self.team_observer.get_obs(agent_id, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -98,23 +97,22 @@ class FightingTeamsEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
-agents = {f'agent{i}': FightingTeamsAgent(
-    id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, view=11
-) for i in range(24)}
-env = FightingTeamsEnv(
-    region=12,
-    agents=agents,
-    number_of_teams=2
-)
-env.reset()
-print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-fig = plt.gcf()
-env.render(fig=fig)
-
-for _ in range(100):
-    action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
-    env.step(action_dict)
+if __name__ == '__main__':
+    agents = {f'agent{i}': FightingTeamsAgent(
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, agent_view=11
+    ) for i in range(24)}
+    env = FightingTeamsEnv(
+        region=12,
+        agents=agents,
+        number_of_teams=2
+    )
+    env.reset()
+    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    fig = plt.gcf()
     env.render(fig=fig)
-    print(env.get_all_done())
-    x = []
 
+    for _ in range(100):
+        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
+        env.step(action_dict)
+        env.render(fig=fig)
+        print(env.get_all_done())

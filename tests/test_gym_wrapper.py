@@ -26,4 +26,3 @@ def test_gym_reset_and_step():
     assert reward == 'Reward from agent0'
     assert done == 'Done from agent0'
     assert info == {'Action from agent0': 0}
-

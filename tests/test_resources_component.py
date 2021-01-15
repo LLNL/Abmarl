@@ -3,17 +3,19 @@ from gym.spaces import Box
 
 import numpy as np
 
-from admiral.envs.components.resources import HarvestingAgent, PositionAgent, ResourceObservingAgent
-from admiral.envs.components.resources import GridResourceState, GridResourceObserver, GridResourcesActor
+from admiral.envs.components.agent import HarvestingAgent, PositionAgent, ResourceObservingAgent
+from admiral.envs.components.state import GridResourceState
+from admiral.envs.components.observer import GridResourceObserver
+from admiral.envs.components.actor import GridResourcesActor
 
 class ResourcesTestAgent(ResourceObservingAgent, PositionAgent, HarvestingAgent): pass
 
 def test_grid_resources_components():
     agents = {
-        'agent0': ResourcesTestAgent(id='agent0', max_harvest=0.5, resource_view_range=1, starting_position=np.array([0, 0])),
-        'agent1': ResourcesTestAgent(id='agent1', max_harvest=0.5, resource_view_range=2, starting_position=np.array([2, 2])),
-        'agent2': ResourcesTestAgent(id='agent2', max_harvest=0.5, resource_view_range=3, starting_position=np.array([3, 1])),
-        'agent3': ResourcesTestAgent(id='agent3', max_harvest=0.5, resource_view_range=4, starting_position=np.array([1, 4])),
+        'agent0': ResourcesTestAgent(id='agent0', max_harvest=0.5, resource_view=1, initial_position=np.array([0, 0])),
+        'agent1': ResourcesTestAgent(id='agent1', max_harvest=0.5, resource_view=2, initial_position=np.array([2, 2])),
+        'agent2': ResourcesTestAgent(id='agent2', max_harvest=0.5, resource_view=3, initial_position=np.array([3, 1])),
+        'agent3': ResourcesTestAgent(id='agent3', max_harvest=0.5, resource_view=4, initial_position=np.array([1, 4])),
     }
     initial_resources = np.array([
         [0.84727271, 0.47440489, 0.29693299, 0.5311798,  0.25446477],
@@ -23,28 +25,28 @@ def test_grid_resources_components():
         [0.55379678, 0.32311497, 0.46094834, 0.12981774, 0.        ],
     ])
 
-    state = GridResourceState(agents=agents, original_resources=initial_resources, regrow_rate=0.4)
+    state = GridResourceState(agents=agents, initial_resources=initial_resources, regrow_rate=0.4)
     actor = GridResourcesActor(resources=state, agents=agents)
     observer = GridResourceObserver(resources=state, agents=agents)
 
     state.reset()
     for agent in agents.values():
-        agent.position = agent.starting_position
+        agent.position = agent.initial_position
     np.testing.assert_array_equal(state.resources, initial_resources)
 
-    assert np.allclose(observer.get_obs(agents['agent0']), np.array([
+    assert np.allclose(observer.get_obs(agents['agent0'])['resources'], np.array([
         [-1.,         -1.,         -1.        ],
         [-1.,          0.84727271,  0.47440489],
         [-1.,          0.58155565,  0.79666705],
     ]))
-    assert np.allclose(observer.get_obs(agents['agent1']), np.array([
+    assert np.allclose(observer.get_obs(agents['agent1'])['resources'], np.array([
         [0.84727271, 0.47440489, 0.29693299, 0.5311798,  0.25446477],
         [0.58155565, 0.79666705, 0.53135774, 0.51300926, 0.90118474],
         [0.7125912,  0.86805178, 0.,         0.,         0.38538807],
         [0.48882905, 0.36891643, 0.76354359, 0.,         0.71936923],
         [0.55379678, 0.32311497, 0.46094834, 0.12981774, 0.        ],
     ]))
-    assert np.allclose(observer.get_obs(agents['agent2']), np.array([
+    assert np.allclose(observer.get_obs(agents['agent2'])['resources'], np.array([
         [-1.,         -1.,          0.84727271,  0.47440489,  0.29693299,  0.5311798,   0.25446477],
         [-1.,         -1.,          0.58155565,  0.79666705,  0.53135774,  0.51300926,  0.90118474],
         [-1.,         -1.,          0.7125912,   0.86805178,  0.,          0.,          0.38538807],
@@ -53,7 +55,7 @@ def test_grid_resources_components():
         [-1.,         -1.,         -1.,         -1.,         -1.,         -1.,         -1.        ],
         [-1.,         -1.,         -1.,         -1.,         -1.,         -1.,         -1.        ],
     ]))
-    assert np.allclose(observer.get_obs(agents['agent3']), np.array([
+    assert np.allclose(observer.get_obs(agents['agent3'])['resources'], np.array([
         [-1.,         -1.,         -1.,         -1.,         -1.,         -1., -1.,         -1.,         -1.,        ],
         [-1.,         -1.,         -1.,         -1.,         -1.,         -1., -1.,         -1.,         -1.,        ],
         [-1.,         -1.,         -1.,         -1.,         -1.,         -1., -1.,         -1.,         -1.,        ],
