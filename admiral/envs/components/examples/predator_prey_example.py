@@ -116,7 +116,7 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     agent_view=5, team=0, move_range=1, max_harvest=0.5, resource_view_range=5) for i in range(7)}
+    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     agent_view=5, team=0, move_range=1, max_harvest=0.5, resource_view=5) for i in range(7)}
     predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', agent_view=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
     agents = {**prey, **predators}
     region = 10

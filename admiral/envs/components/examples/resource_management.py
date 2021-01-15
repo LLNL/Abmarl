@@ -105,7 +105,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', agent_view=2, resource_view_range=2, move_range=1, max_harvest=1.0) for i in range(4)}
+    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', agent_view=2, resource_view=2, move_range=1, max_harvest=1.0) for i in range(4)}
     env = ResourceManagementEnv(
         region=10,
         agents=agents

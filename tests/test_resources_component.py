@@ -12,10 +12,10 @@ class ResourcesTestAgent(ResourceObservingAgent, PositionAgent, HarvestingAgent)
 
 def test_grid_resources_components():
     agents = {
-        'agent0': ResourcesTestAgent(id='agent0', max_harvest=0.5, resource_view_range=1, initial_position=np.array([0, 0])),
-        'agent1': ResourcesTestAgent(id='agent1', max_harvest=0.5, resource_view_range=2, initial_position=np.array([2, 2])),
-        'agent2': ResourcesTestAgent(id='agent2', max_harvest=0.5, resource_view_range=3, initial_position=np.array([3, 1])),
-        'agent3': ResourcesTestAgent(id='agent3', max_harvest=0.5, resource_view_range=4, initial_position=np.array([1, 4])),
+        'agent0': ResourcesTestAgent(id='agent0', max_harvest=0.5, resource_view=1, initial_position=np.array([0, 0])),
+        'agent1': ResourcesTestAgent(id='agent1', max_harvest=0.5, resource_view=2, initial_position=np.array([2, 2])),
+        'agent2': ResourcesTestAgent(id='agent2', max_harvest=0.5, resource_view=3, initial_position=np.array([3, 1])),
+        'agent3': ResourcesTestAgent(id='agent3', max_harvest=0.5, resource_view=4, initial_position=np.array([1, 4])),
     }
     initial_resources = np.array([
         [0.84727271, 0.47440489, 0.29693299, 0.5311798,  0.25446477],

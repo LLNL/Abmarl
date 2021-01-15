@@ -131,20 +131,20 @@ class ResourceObservingAgent(Agent):
     """
     Agents can observe the resources in the environment.
 
-    resource_view_range (int):
+    resource_view (int):
         Any resources within this range of the agent's position will be fully observed.
     """
-    def __init__(self, resource_view_range=None, **kwargs):
+    def __init__(self, resource_view=None, **kwargs):
         super().__init__(**kwargs)
-        assert resource_view_range is not None, "resource_view_range must be nonnegative integer"
-        self.resource_view_range = resource_view_range
+        assert resource_view is not None, "resource_view must be nonnegative integer"
+        self.resource_view = resource_view
     
     @property
     def configured(self):
         """
-        Agents are configured if the resource_view_range parameter is set.
+        Agents are configured if the resource_view parameter is set.
         """
-        return super().configured and self.resource_view_range is not None
+        return super().configured and self.resource_view is not None
 
 
 

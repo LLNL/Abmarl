@@ -114,7 +114,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {f'agent{i}': FightForResourcesAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, agent_view=3, resource_view_range=3
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, agent_view=3, resource_view=3
     ) for i in range(6)}
     env = FightForResourcesEnv(
         region=10,
