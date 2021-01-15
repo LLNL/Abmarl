@@ -219,8 +219,8 @@ class SpeedAngleAgent(Agent):
     initial_ground_angle (float):
         The agent's initial ground angle.
     """
-    def __init__(self, min_speed=None, max_speed=None, max_acceleration=None, \
-                 max_banking_angle=None, max_banking_angle_change=None, \
+    def __init__(self, min_speed=0.25, max_speed=1.0, max_acceleration=0.25, \
+                 max_banking_angle=45, max_banking_angle_change=30, \
                  initial_speed=None, initial_banking_angle=None, \
                  initial_ground_angle=None, **kwargs):
         super().__init__(**kwargs)
