@@ -107,4 +107,3 @@ def test_grid_resources_components():
         [1., 0., 1., 0.,         1.],
         [1., 1., 1., 0.92981774, 0.        ],
     ]))
-test_grid_resources_components()

@@ -1038,5 +1038,3 @@ def test_angle_restriction():
         'agent5': 300,
         'agent6': 123,
     }}
-
-
