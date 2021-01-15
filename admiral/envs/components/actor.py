@@ -208,8 +208,8 @@ class SpeedAngleMovementActor:
         return (np.array):
             Return the change in position.
         """
-        self.speed_angle.modify_speed(agent, acceleration)
-        self.speed_angle.modify_banking_angle(agent, angle)
+        self.speed_angle.modify_speed(agent, acceleration[0])
+        self.speed_angle.modify_banking_angle(agent, angle[0])
         
         x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
         y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))

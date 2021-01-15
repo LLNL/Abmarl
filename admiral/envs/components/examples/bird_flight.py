@@ -38,7 +38,7 @@ class Flight(AgentBasedSimulation):
     
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
-            self.move_actor.move(self.agents[agent], action['accelerate'][0], action['bank'][0], **kwargs)
+            self.move_actor.move(self.agents[agent], action.get('accelerate', 0), action.get('bank', 0), **kwargs)
         
     def render(self, fig=None, **kwargs):
         fig.clear()

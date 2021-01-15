@@ -78,20 +78,20 @@ def test_speed_angle_movement_component():
         assert agent.banking_angle == agent.initial_banking_angle
         assert agent.ground_angle == agent.initial_ground_angle
     
-    assert np.allclose(actor.move(agents['agent0'], 0.0, 0.0), np.array([0.,          -1.]))
+    assert np.allclose(actor.move(agents['agent0'], np.array([0.0]), np.array([0.0])), np.array([0.,          -1.]))
     assert np.allclose(agents['agent0'].position, np.array([6.2, 2.3]))
-    assert np.allclose(actor.move(agents['agent1'], 0.0, 0.0), np.array([-0.17101007,  0.46984631]))
+    assert np.allclose(actor.move(agents['agent1'], np.array([0.0]), np.array([0.0])), np.array([-0.17101007,  0.46984631]))
     assert np.allclose(agents['agent1'].position, np.array([1.92898993, 3.61984631]))
-    assert np.allclose(actor.move(agents['agent2'], 0.0, 0.0), np.array([0.16970563,   0.16970563]))
+    assert np.allclose(actor.move(agents['agent2'], np.array([0.0]), np.array([0.0])), np.array([0.16970563,   0.16970563]))
     assert np.allclose(agents['agent2'].position, np.array([0.66970563, 1.48270563]))
-    assert np.allclose(actor.move(agents['agent3'], 0.0, 0.0), np.array([-0.54812727, -0.24404199]))
+    assert np.allclose(actor.move(agents['agent3'], np.array([0.0]), np.array([0.0])), np.array([-0.54812727, -0.24404199]))
     assert np.allclose(agents['agent3'].position, np.array([7.69187273, 4.15595801]))
 
-    assert np.allclose(actor.move(agents['agent0'], -0.35, 30), np.array([0,           -0.65      ]))
+    assert np.allclose(actor.move(agents['agent0'], np.array([-0.35]), np.array([30])), np.array([0,           -0.65      ]))
     assert np.allclose(agents['agent0'].position, np.array([6.2,  1.65]))
-    assert np.allclose(actor.move(agents['agent1'], -0.1, -30), np.array([0,            0.4       ]))
+    assert np.allclose(actor.move(agents['agent1'], np.array([-0.1]), np.array([-30])), np.array([0,            0.4       ]))
     assert np.allclose(agents['agent1'].position, np.array([1.92898993, 4.01984631]))
-    assert np.allclose(actor.move(agents['agent2'], -0.24, 30), np.array([0,            0.0       ]))
+    assert np.allclose(actor.move(agents['agent2'], np.array([-0.24]), np.array([30])), np.array([0,            0.0       ]))
     assert np.allclose(agents['agent2'].position, np.array([0.66970563, 1.48270563]))
-    assert np.allclose(actor.move(agents['agent3'],  0.0, -24), np.array([-0.54812727, -0.24404199]))
+    assert np.allclose(actor.move(agents['agent3'],  np.array([0.0]), np.array([-24])), np.array([-0.54812727, -0.24404199]))
     assert np.allclose(agents['agent3'].position, np.array([7.14374545, 3.91191603]))
