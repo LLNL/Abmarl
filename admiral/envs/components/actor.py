@@ -194,7 +194,7 @@ class SpeedAngleMovementActor:
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (1,))
                 agent.action_space['bank'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
     
-    def move(self, agent, acceleration, angle, **kwargs):
+    def process_move(self, agent, acceleration, angle, **kwargs):
         """
         Update the agent's speed by applying the acceleration and the agent's banking
         angle by applying the change. Then use the updated speed and ground angle

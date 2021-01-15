@@ -52,8 +52,7 @@ class FightingBirdsEnv(AgentBasedSimulation):
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.move(self.agents[agent_id], action.get('accelerate', np.zeros(1)), action.get('bank', np.zeros(1)), **kwargs)
-            # self.move_actor.process_move(self.agents[agent_id], action.get('accelerate', np.zeros(1)), action.get('bank', np.zeros(1)), **kwargs)
+            self.move_actor.process_move(self.agents[agent_id], action.get('accelerate', np.zeros(1)), action.get('bank', np.zeros(1)), **kwargs)
         
     def render(self, fig=None, **kwargs):
         fig.clear()
