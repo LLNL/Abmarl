@@ -68,7 +68,7 @@ def test_speed_angle_movement_component():
 
     for agent in agents.values():
         assert 'accelerate' in agent.action_space
-        assert 'banking_angle_change' in agent.action_space
+        assert 'bank' in agent.action_space
 
     position_state.reset()
     speed_angle_state.reset()

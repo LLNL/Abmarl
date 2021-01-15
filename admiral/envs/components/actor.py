@@ -186,7 +186,7 @@ class SpeedAngleMovementActor:
         for agent in agents.values():
             if isinstance(agent, SpeedAngleAgent):
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (1,))
-                agent.action_space['banking_angle_change'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
+                agent.action_space['bank'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
     
     def move(self, agent, acceleration, angle, **kwargs):
         """
