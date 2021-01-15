@@ -129,7 +129,7 @@ class GridMovementActor:
     Provides the necessary action space for agents who can move and processes such
     movements.
 
-    position (PositionState):
+    position (GridPositionState):
         The position state handler. Needed to modify the agents' positions.
 
     agents (dict):

@@ -136,5 +136,3 @@ if __name__ == '__main__':
         env.step(action_dict)
         env.render(fig=fig)
         print(env.get_all_done())
-        x = []
-

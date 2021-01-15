@@ -130,6 +130,5 @@ if __name__ == '__main__':
         env.step(action_dict)
         env.render(fig=fig)
         print({agent_id: env.get_done(agent_id) for agent_id in env.agents})
-        x = []
 
     print(env.get_all_done())

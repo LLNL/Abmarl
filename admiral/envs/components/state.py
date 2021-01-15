@@ -14,6 +14,9 @@ class LifeState:
     Agents can die if their health falls below their minimal health value. Health
     can decrease in a number of interactions. This environment provides an entropy
     that indicates how much health an agent loses when apply_entropy is called.
+    This is a generic entropy for the step. If you want to specify health changes
+    for specific actions, such as being attacked or harvesting, you must write
+    it in the environment.
 
     agents (dict):
         Dictionary of agents.
@@ -47,7 +50,7 @@ class LifeState:
         """
         if isinstance(agent, LifeAgent):
             if _health <= agent.min_health:
-                agent.health = agent.min_health
+                agent.health = 0
                 agent.is_alive = False
             elif _health >= agent.max_health:
                 agent.health = agent.max_health
@@ -76,7 +79,7 @@ class LifeState:
 
 class PositionState(ABC):
     """
-    Manages the agents' positions. All position updates must be within the region.
+    Manages the agents' positions.
 
     region (int):
         The size of the environment.
@@ -221,18 +224,12 @@ class GridResourceState:
     the minimum value, it will not regrow. Agents can harvest resources from the cell they occupy.
     Agents can observe the resources in a grid-like observation surrounding their positions.
 
-    The action space of GridResourcesHarvestingAgents is appended with
-    Box(0, agent.max_harvest, (1,), np.float), indicating that the agent can harvest
-    up to its max harvest value on the cell it occupies.
-
-    The observation space of ObservingAgents is appended with
-    Box(0, self.max_value, (agent.view*2+1, agent.view*2+1), np.float), indicating
-    that an agent can observe the resources in a grid surrounding its position,
-    up to its view distance.
+    An agent can harvest up to its max harvest value on the cell it occupies. It
+    can observe the resources in a grid surrounding its position, up to its view
+    distance.
 
     agents (dict):
-        The dictionary of agents. Because agents harvest and observe resources
-        based on their positions, agents must be GridPositionAgents.
+        The dictionary of agents.
 
     region (int):
         The size of the region

@@ -30,9 +30,6 @@ class Flight(AgentBasedSimulation):
         # Done
         self.done = TooCloseDone(position=self.position, **kwargs)
 
-        from gym.spaces import MultiBinary
-        for agent in self.agents.values():
-            agent.observation_space = {'dummy': MultiBinary(1)}
         self.finalize()
 
     def reset(self, **kwargs):
@@ -80,32 +77,31 @@ class Flight(AgentBasedSimulation):
     def get_info(self, agent_id, **kwargs):
         pass
 
-agents = {
-    f'bird{i}': BirdAgent(
-            id=f'bird{i}', min_speed=0.5, max_speed=1.0, max_acceleration=0.1, \
-            max_banking_angle=90, max_banking_angle_change=90, \
-            initial_banking_angle=30
-        ) for i in range(24)
-    }
+if __name__ == "__main__":
+    agents = {
+        f'bird{i}': BirdAgent(
+                id=f'bird{i}', min_speed=0.5, max_speed=1.0, max_acceleration=0.1, \
+                max_banking_angle=90, max_banking_angle_change=90, \
+                initial_banking_angle=30
+            ) for i in range(24)
+        }
 
-env = Flight(
-    region=20,
-    agents=agents,
-    collision_distance=1.0,
-)
-fig = plt.figure()
-env.reset()
-env.render(fig=fig)
-
-print(env.get_obs('bird0'))
-
-for i in range(50):
-    env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+    env = Flight(
+        region=20,
+        agents=agents,
+        collision_distance=1.0,
+    )
+    fig = plt.figure()
+    env.reset()
     env.render(fig=fig)
-    for agent in agents:
-        print(agent, ': ', env.get_done(agent))
-    print('\n')
 
-print(env.get_all_done())
+    print(env.get_obs('bird0'))
 
+    for i in range(50):
+        env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+        env.render(fig=fig)
+        for agent in agents:
+            print(agent, ': ', env.get_done(agent))
+        print('\n')
 
+    print(env.get_all_done())

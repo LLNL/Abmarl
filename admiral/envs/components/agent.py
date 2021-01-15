@@ -190,10 +190,7 @@ class SpeedAngleAgent(Agent):
     and change their banking angles to modify their speed and direction.
     
     min_speed (float):
-        The minimum speed this agent can travel. This is not speed in the physics
-        definition because agents can move backwards w.r.t their relative angle,
-        which happens when their speed is negative. This can make sense for some
-        situations, such as driving cars, but not others, such as flying birds.
+        The minimum speed this agent can travel.
     
     max_speed (float):
         The maximum speed this agent can travel.
@@ -206,7 +203,8 @@ class SpeedAngleAgent(Agent):
         The maximum banking angle the agent can endure.
 
     max_banking_angle_change (float):
-        The maximum amount by which an agent can change its banking angle.
+        The maximum amount by which an agent can change its banking angle in a
+        single time step.
 
     initial_speed (float):
         The agent's initial speed.
