@@ -116,6 +116,9 @@ class PositionState(ABC):
 
     @abstractmethod
     def set_position(self, agent, position, **kwargs):
+        """
+        Set the position of the agents. Child classes implement.
+        """
         pass
     
     def modify_position(self, agent, value, **kwargs):
@@ -126,6 +129,9 @@ class PositionState(ABC):
             self.set_position(agent, agent.position + value)
 
 class GridPositionState(PositionState):
+    """
+    Agents are positioned in a grid and cannot go outside of the region.
+    """
     def set_position(self, agent, _position, **kwargs):
         """
         Set the agent's position to the incoming value only if the new position
@@ -142,6 +148,10 @@ class GridPositionState(PositionState):
         agent.position = np.random.randint(0, self.region, 2)
 
 class ContinuousPositionState(PositionState):
+    """
+    Agents are positioned in a continuous space and can go outside the bounds
+    of the region.
+    """
     def set_position(self, agent, _position, **kwargs):
         """
         Set the agent's position to the incoming value.
@@ -156,6 +166,9 @@ class ContinuousPositionState(PositionState):
         agent.position = np.random.uniform(0, self.region, 2)
 
 class SpeedAngleState:
+    """
+    Manges the agents' speed, banking angles, and ground angles.
+    """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
     
@@ -184,29 +197,48 @@ class SpeedAngleState:
                     agent.ground_angle = np.random.uniform(0, 360)
     
     def set_speed(self, agent, _speed, **kwargs):
+        """
+        Set the agent's speed if it is between its min and max speed.
+        """
         if isinstance(agent, SpeedAngleAgent):
             if agent.min_speed <= _speed <= agent.max_speed:
                 agent.speed = _speed
     
     def modify_speed(self, agent, value, **kwargs):
+        """
+        Modify the agent's speed.
+        """
         if isinstance(agent, SpeedAngleAgent):
             self.set_speed(agent, agent.speed + value)
     
     def set_banking_angle(self, agent, _banking_angle, **kwargs):
+        """
+        Set the agent's banking angle if it is between its min and max angle.
+        """
         if isinstance(agent, SpeedAngleAgent):
             if abs(_banking_angle) <= agent.max_banking_angle:
                 agent.banking_angle = _banking_angle
                 self.modify_ground_angle(agent, agent.banking_angle)
     
     def modify_banking_angle(self, agent, value, **kwargs):
+        """
+        Modify the agent's banking angle.
+        """
         if isinstance(agent, SpeedAngleAgent):
             self.set_banking_angle(agent, agent.banking_angle + value)
 
     def set_ground_angle(self, agent, _ground_angle, **kwargs):
+        """
+        Set the agent's ground angle, which will be modded to fall between 0 and
+        360.
+        """
         if isinstance(agent, SpeedAngleAgent):
             agent.ground_angle = _ground_angle % 360
     
     def modify_ground_angle(self, agent, value, **kwargs):
+        """
+        Modify the agent's ground angle.
+        """
         if isinstance(agent, SpeedAngleAgent):
             self.set_ground_angle(agent, agent.ground_angle + value)
 

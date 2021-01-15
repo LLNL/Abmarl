@@ -9,6 +9,10 @@ from admiral.envs.components.agent import LifeAgent, PositionAgent, AgentObservi
 # ----------------- #
 
 def obs_filter(obs, agent, agents, null_value):
+    """
+    Modify the observation, inserting null values for observation of agents that
+    are too far way from the observing agent.
+    """
     if isinstance(agent, PositionAgent) and \
        isinstance(agent, AgentObservingAgent):
         for other in agents.values():
@@ -105,6 +109,11 @@ class PositionRestrictedLifeObserver(LifeObserver):
 # --------------- #
 
 class MaskObserver:
+    """
+    Observe a mask of each agent in the simulator. Agents that can be seen are
+    indicatead with True, agents that cannot be seen (e.g. they are too far away)
+    are indicated with False.
+    """
     # TODO: Having a single mask observer may actually be confusing because it will
     # have every single agent in the dictionary, whereas the actual observer may
     # only have a subset of them. For example, a life observer will only include
@@ -127,6 +136,9 @@ class MaskObserver:
                 })
     
     def get_obs(self, agent, **kwargs):
+        """
+        Get the masking of all the agents in the simulator.
+        """
         if isinstance(agent, AgentObservingAgent):
             return {'mask': {other: True for other in self.agents}}
         else:
@@ -223,7 +235,7 @@ class RelativePositionObserver:
 class PositionRestrictedRelativePositionObserver(RelativePositionObserver):
     """
     Observe the relative position of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
+    to the observing agent. If it is too far, then observe a null value.
     """
     def get_obs(self, agent, **kwargs):
         obs = super().get_obs(agent)

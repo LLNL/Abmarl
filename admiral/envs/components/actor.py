@@ -189,6 +189,25 @@ class SpeedAngleMovementActor:
                 agent.action_space['banking_angle_change'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
     
     def move(self, agent, acceleration, angle, **kwargs):
+        """
+        Update the agent's speed by applying the acceleration and the agent's banking
+        angle by applying the change. Then use the updated speed and ground angle
+        to determine the agent's next position.
+
+        agent (SpeedAngleAgent):
+            Agent that is attempting to move.
+        
+        acceleration (np.array):
+            A one-element float array that changes the agent's speed. New speed
+            must be within the agent's min and max speed.
+        
+        angle (np.array):
+            A one-element float array that changes the agent's banking angle. New
+            banking angle must be within the agent's min and max banking angles.
+
+        return (np.array):
+            Return the change in position.
+        """
         self.speed_angle.modify_speed(agent, acceleration)
         self.speed_angle.modify_banking_angle(agent, angle)
         
