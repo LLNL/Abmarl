@@ -79,8 +79,13 @@ class PositionTeamBasedAttackActor:
         be PositionAgents; because the attacked agent must be alive, all agents
         must be LifeAgents; and because the attacked agent must be on a different
         team, all agents must be TeamAgents.
+    
+    attack_norm (int):
+        Norm used to measure the distance between agents. For example, you might
+        use a norm of 1 or np.inf in a Gird space, while 2 might be used in a Contnuous
+        space. Default is np.inf.
     """
-    def __init__(self, agents=None, **kwargs):
+    def __init__(self, agents=None, attack_norm=np.inf, **kwargs):
         assert type(agents) is dict, "agents must be a dict"
         for agent in agents.values():
             assert isinstance(agent, PositionAgent)
@@ -92,6 +97,8 @@ class PositionTeamBasedAttackActor:
         for agent in self.agents.values():
             if isinstance(agent, AttackingAgent):
                 agent.action_space['attack'] = MultiBinary(1)
+        
+        self.attack_norm = attack_norm
 
     def process_attack(self, attacking_agent, attack, **kwargs):
         """
@@ -117,8 +124,7 @@ class PositionTeamBasedAttackActor:
                 elif attacking_agent.team == attacked_agent.team:
                     # Cannot attack agents on the same team
                     continue
-                elif abs(attacking_agent.position[0] - attacked_agent.position[0]) > attacking_agent.attack_range or \
-                     abs(attacking_agent.position[1] - attacked_agent.position[1]) > attacking_agent.attack_range:
+                elif np.linalg.norm(attacking_agent.position - attacked_agent.position, self.attack_norm) > attacking_agent.attack_range:
                     # Agent too far away
                     continue
                 else:
