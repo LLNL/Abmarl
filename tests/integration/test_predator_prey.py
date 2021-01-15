@@ -11,7 +11,7 @@ def test_all_step_grid_based_predator_prey():
         'prey1': PreyAgent(id='prey1', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view=4),
         'predator0': PredatorAgent(id='predator0', initial_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=1, move_range=1, attack_range=1, attack_strength=2.0)
     }
-    original_resources = np.array([
+    initial_resources = np.array([
         [0.43, 0.  , 0.  , 0.37, 0.32],
         [0.85, 0.34, 0.47, 0.24, 0.65],
         [0.86, 0.62, 0.45, 0.98, 0.26],
@@ -23,7 +23,7 @@ def test_all_step_grid_based_predator_prey():
         agents=agents,
         number_of_teams=2,
         entropy=0.1,
-        original_resources=original_resources,
+        initial_resources=initial_resources,
     ))
 
     obs = env.reset()

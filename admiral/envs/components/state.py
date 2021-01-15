@@ -280,7 +280,7 @@ class GridResourceState:
     regrow_rate (float):
         The rate at which resources regrow.
     
-    original_resources (np.array):
+    initial_resources (np.array):
         Instead of specifying the above resource-related parameters, we can provide
         an initial state of the resources. At reset time, the resources will be
         set to these original resources. Otherwise, the resources will be set
@@ -288,13 +288,13 @@ class GridResourceState:
         region.
     """
     def __init__(self, agents=None, region=None, coverage=0.75, min_value=0.1, max_value=1.0,
-            regrow_rate=0.04, original_resources=None, **kwargs):        
-        self.original_resources = original_resources
-        if self.original_resources is None:
+            regrow_rate=0.04, initial_resources=None, **kwargs):        
+        self.initial_resources = initial_resources
+        if self.initial_resources is None:
             assert type(region) is int, "Region must be an integer."
             self.region = region
         else:
-            self.region = self.original_resources.shape[0]
+            self.region = self.initial_resources.shape[0]
         self.min_value = min_value
         self.max_value = max_value
         self.regrow_rate = regrow_rate
@@ -310,8 +310,8 @@ class GridResourceState:
         be randomly generated values between the min and max value up to some coverage
         of the region.
         """
-        if self.original_resources is not None:
-            self.resources = self.original_resources
+        if self.initial_resources is not None:
+            self.resources = self.initial_resources
         else:
             coverage_filter = np.zeros((self.region, self.region))
             coverage_filter[np.random.uniform(0, 1, (self.region, self.region)) < self.coverage] = 1.
