@@ -72,7 +72,12 @@ class ParticleEnv(AgentBasedSimulation):
         pass
 
 if __name__ == "__main__":
-    agents = {f'agent{i}': ParticleAgent(id=f'agent{i}', max_speed=1, max_acceleration=0.25, initial_velocity=np.ones(2)) for i in range(10)}
+    agents = {f'agent{i}': ParticleAgent(
+        id=f'agent{i}',
+        max_speed=1,
+        max_acceleration=0.25,
+        initial_velocity=np.ones(2)
+    ) for i in range(10)}
 
     env = ParticleEnv(
         agents=agents,
@@ -87,7 +92,11 @@ if __name__ == "__main__":
         env.step({agent.id: {} for agent in agents.values()})
         env.render(fig=fig)
     
-    agents = {f'agent{i}': ParticleAgent(id=f'agent{i}', max_speed=1, max_acceleration=0.25) for i in range(10)}
+    agents = {f'agent{i}': ParticleAgent(
+        id=f'agent{i}',
+        max_speed=1,
+        max_acceleration=0.25
+    ) for i in range(10)}
 
     env = ParticleEnv(
         agents=agents,
