@@ -231,6 +231,19 @@ class SpeedAngleMovementActor:
         return agent.position - position_before
 
 class AccelerationMovementActor:
+    """
+    Process x,y accelerations for VelocityAgents, which are given an 'accelerate'
+    action. Update the agents' positions based on their new velocity.
+
+    position_state (ContinuousPositionState):
+        The position state handler. Needed to modify agent positions.
+    
+    velocity_state (VelocityState):
+        The velocity state handler. Needed to modify agent velocities.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
     def __init__(self, position_state=None, velocity_state=None, agents=None, **kwargs):
         self.position_state = position_state
         self.velocity_state = velocity_state
@@ -242,6 +255,20 @@ class AccelerationMovementActor:
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
     
     def process_move(self, agent, acceleration, **kwargs):
+        """
+        Update the agent's velocity by applying the acceleration. Then use the
+        updated velocity to determine the agent's next position.
+
+        agent (VelocityAgent):
+            Agent that is attempting to move.
+        
+        acceleration (np.array):
+            A two-element float array that changes the agent's velocity. New velocity
+            must be within the agent's max speed.
+        
+        return (np.array):
+            Return the change in position.
+        """
         self.velocity_state.modify_velocity(agent, acceleration)
         position_before = agent.position
         self.position_state.modify_position(agent, agent.velocity, **kwargs)

@@ -243,6 +243,20 @@ class SpeedAngleAgent(Agent):
             self.max_banking_angle_change is not None
 
 class VelocityAgent(Agent):
+    """
+    Agents have a velocity which determines how it moves around in a continuous
+    field. Agents can accelerate to modify their velocities.
+
+    initial_velocity (np.array):
+        Two-element float array that is the agent's initial velocity.
+
+    max_speed (float):
+        The maximum speed the agent can travel.
+    
+    max_acceleration (float):
+        The maximum amount by which an agent can change its velocity in a single
+        time step.
+    """
     def __init__(self, initial_velocity=None, max_speed=None, max_acceleration=None, **kwargs):
         super().__init__(**kwargs)
         self.initial_velocity = initial_velocity

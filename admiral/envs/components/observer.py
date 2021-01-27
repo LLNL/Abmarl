@@ -445,6 +445,9 @@ class PositionRestrictedAngleObserver(AngleObserver):
 
 
 class VelocityObserver:
+    """
+    Observe the velocity of all the agents in the simulator.
+    """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
         from gym.spaces import Dict, Box
@@ -454,6 +457,9 @@ class VelocityObserver:
             })
     
     def get_obs(self, *args, **kwargs):
+        """
+        Get the velocity of all the agents in the simulator.
+        """
         return {'velocity': {agent.id: agent.velocity for agent in self.agents.values() if isinstance(agent, VelocityAgent)}}
     
     @property
@@ -461,6 +467,10 @@ class VelocityObserver:
         return np.zeros(2)
 
 class PositionRestrictedVelocityObserver(VelocityObserver):
+    """
+    Observe the velocity of each agent in the simulator if that agent is close
+    enough to the observing agent. If it is too far, then observe a null value.
+    """
     def get_obs(self, agent, **kwargs):
         obs = super().get_obs()
         obs_key = next(iter(obs))

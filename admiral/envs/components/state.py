@@ -170,7 +170,7 @@ class ContinuousPositionState(PositionState):
 
 class SpeedAngleState:
     """
-    Manges the agents' speed, banking angles, and ground angles.
+    Manages the agents' speed, banking angles, and ground angles.
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
@@ -246,11 +246,17 @@ class SpeedAngleState:
             self.set_ground_angle(agent, agent.ground_angle + value)
 
 class VelocityState:
+    """
+    Manages the agents' velocities.
+    """
     def __init__(self, agents=None, friction=0.05, **kwargs):
         self.agents = agents
         self.friction = friction
     
     def reset(self, **kwargs):
+        """
+        Reset the agents' velocities.
+        """
         for agent in self.agents.values():
             if isinstance(agent, VelocityAgent):
                 # Reset the agent's velocity
@@ -260,15 +266,24 @@ class VelocityState:
                     agent.velocity = np.random.uniform(-agent.max_speed, agent.max_speed, (2,))
     
     def set_velocity(self, agent, _velocity, **kwargs):
+        """
+        Set the agent's velocity if it is within its max speed.
+        """
         if isinstance(agent, VelocityAgent):
             if np.linalg.norm(_velocity) < agent.max_speed:
                 agent.velocity = _velocity
     
     def modify_velocity(self, agent, value, **kwargs):
+        """
+        Modify the agent's velocity.
+        """
         if isinstance(agent, VelocityAgent):
             self.set_velocity(agent, agent.velocity + value, **kwargs)
     
     def apply_friction(self, agent, **kwargs):
+        """
+        Apply friction to the agent's movement, decreasing its speed by a small amount.
+        """
         if isinstance(agent, VelocityAgent):
             self.modify_velocity(agent, -self.friction, **kwargs)
 
