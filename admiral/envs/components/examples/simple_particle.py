@@ -36,6 +36,7 @@ class ParticleEnv(AgentBasedSimulation):
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
             self.move_actor.process_move(self.agents[agent], action.get("accelerate", np.zeros(2)), **kwargs)
+            self.velocity_state.apply_friction(self.agents[agent])
 
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -71,17 +72,27 @@ class ParticleEnv(AgentBasedSimulation):
         pass
 
 if __name__ == "__main__":
-    agents = {
-        'agent0': ParticleAgent(id='agent0', max_speed=1, max_acceleration=0.25),
-        'agent1': ParticleAgent(id='agent1', max_speed=1, max_acceleration=0.25),
-        'agent2': ParticleAgent(id='agent2', max_speed=1, max_acceleration=0.25),
-        'agent3': ParticleAgent(id='agent3', max_speed=1, max_acceleration=0.25),
-        'agent4': ParticleAgent(id='agent4', max_speed=1, max_acceleration=0.25),
-    }
+    agents = {f'agent{i}': ParticleAgent(id=f'agent{i}', max_speed=1, max_acceleration=0.25, initial_velocity=np.ones(2)) for i in range(10)}
 
     env = ParticleEnv(
         agents=agents,
-        region=10
+        region=20,
+        friction=0.1
+    )
+    fig = plt.figure()
+    env.reset()
+    env.render(fig=fig)
+
+    for _ in range(24):
+        env.step({agent.id: {} for agent in agents.values()})
+        env.render(fig=fig)
+    
+    agents = {f'agent{i}': ParticleAgent(id=f'agent{i}', max_speed=1, max_acceleration=0.25) for i in range(10)}
+
+    env = ParticleEnv(
+        agents=agents,
+        region=20,
+        friction=0.1
     )
     fig = plt.figure()
     env.reset()

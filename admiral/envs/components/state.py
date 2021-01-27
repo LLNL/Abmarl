@@ -285,7 +285,12 @@ class VelocityState:
         Apply friction to the agent's movement, decreasing its speed by a small amount.
         """
         if isinstance(agent, VelocityAgent):
-            self.modify_velocity(agent, -self.friction, **kwargs)
+            old_speed = np.linalg.norm(agent.velocity)
+            new_speed = old_speed - self.friction
+            if new_speed <= 0:
+                agent.velocity = np.zeros(2)
+            else:
+                agent.velocity *= new_speed / old_speed
 
 
 
