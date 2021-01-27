@@ -239,10 +239,10 @@ class AccelerationMovementActor:
         from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, VelocityAgent):
-                agent.action_space['move'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
+                agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
     
     def process_move(self, agent, acceleration, **kwargs):
-        self.velocity_state.modify_velocity(acceleration)
+        self.velocity_state.modify_velocity(agent, acceleration)
         position_before = agent.position
         self.position_state.modify_position(agent, agent.velocity, **kwargs)
         return agent.position - position_before

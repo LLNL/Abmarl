@@ -257,7 +257,7 @@ class VelocityState:
                 if agent.initial_velocity is not None:
                     agent.velocity = agent.initial_velocity
                 else:
-                    agnet.velocity = np.random.uniform(-agent.max_speed, agent.max_speed, (2,))
+                    agent.velocity = np.random.uniform(-agent.max_speed, agent.max_speed, (2,))
     
     def set_velocity(self, agent, _velocity, **kwargs):
         if isinstance(agent, VelocityAgent):

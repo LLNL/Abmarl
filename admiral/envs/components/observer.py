@@ -450,7 +450,7 @@ class VelocityObserver:
         from gym.spaces import Dict, Box
         for agent in agents.values():
             agent.observation_space['velocity'] = Dict({
-                other.id: Box(-agent.max_speed, agent.max_speed, (2,)) for other in agent.values() if isinstance(other, VelocityAgent)
+                other.id: Box(-agent.max_speed, agent.max_speed, (2,)) for other in agents.values() if isinstance(other, VelocityAgent)
             })
     
     def get_obs(self, *args, **kwargs):
