@@ -2,7 +2,7 @@
 import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
-    GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent
+    GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent, VelocityAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -230,6 +230,23 @@ class SpeedAngleMovementActor:
         self.position.modify_position(agent, np.array([x_position, y_position]))
         return agent.position - position_before
 
+class AccelerationMovementActor:
+    def __init__(self, position_state=None, velocity_state=None, agents=None, **kwargs):
+        self.position_state = position_state
+        self.velocity_state = velocity_state
+        self.agents = agents
+
+        from gym.spaces import Box
+        for agent in agents.values():
+            if isinstance(agent, VelocityAgent):
+                agent.action_space['move'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
+    
+    def process_move(self, agent, acceleration, **kwargs):
+        self.velocity_state.modify_velocity(acceleration)
+        position_before = agent.position
+        self.position_state.modify_position(agent, agent.velocity, **kwargs)
+        return agent.position - position_before
+                
 
 
 # -------------------------------- #

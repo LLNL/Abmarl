@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent, VelocityAgent
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -244,6 +244,34 @@ class SpeedAngleState:
         """
         if isinstance(agent, SpeedAngleAgent):
             self.set_ground_angle(agent, agent.ground_angle + value)
+
+class VelocityState:
+    def __init__(self, agents=None, friction=0.05, **kwargs):
+        self.agents = agents
+        self.friction = friction
+    
+    def reset(self, **kwargs):
+        for agent in self.agents.values():
+            if isinstance(agent, VelocityAgent):
+                # Reset the agent's velocity
+                if agent.initial_velocity is not None:
+                    agent.velocity = agent.initial_velocity
+                else:
+                    agnet.velocity = np.random.uniform(-agent.max_speed, agent.max_speed, (2,))
+    
+    def set_velocity(self, agent, _velocity, **kwargs):
+        if isinstance(agent, VelocityAgent):
+            if np.linalg.norm(_velocity) < agent.max_speed:
+                agent.velocity = _velocity
+    
+    def modify_velocity(self, agent, value, **kwargs):
+        if isinstance(agent, VelocityAgent):
+            self.set_velocity(agent, agent.velocity + value, **kwargs)
+    
+    def apply_friction(self, agent, **kwargs):
+        if isinstance(agent, VelocityAgent):
+            self.modify_velocity(agent, -self.friction, **kwargs)
+
 
 
 # -------------------------------- #
