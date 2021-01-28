@@ -270,8 +270,11 @@ class VelocityState:
         Set the agent's velocity if it is within its max speed.
         """
         if isinstance(agent, VelocityAgent):
-            if np.linalg.norm(_velocity) < agent.max_speed:
+            vel_norm = np.linalg.norm(_velocity)
+            if vel_norm < agent.max_speed:
                 agent.velocity = _velocity
+            else:
+                agent.velocity = _velocity / vel_norm * agent.max_speed
     
     def modify_velocity(self, agent, value, **kwargs):
         """
