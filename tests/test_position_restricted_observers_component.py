@@ -2,9 +2,9 @@
 from gym.spaces import MultiBinary, Dict, Box
 import numpy as np
 
-from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent
-from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState
-from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver, PositionRestrictedAngleObserver, PositionRestrictedSpeedObserver
+from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent
+from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState, VelocityState
+from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver, PositionRestrictedAngleObserver, PositionRestrictedSpeedObserver, PositionRestrictedVelocityObserver
 
 class PositionRestrictedAgent(AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent): pass
 class TeamlessAgent(AgentObservingAgent, PositionAgent, LifeAgent): pass
@@ -1038,3 +1038,80 @@ def test_angle_restriction():
         'agent5': 300,
         'agent6': 123,
     }}
+
+
+
+class ContinuousVelocityAgent(AgentObservingAgent, PositionAgent, VelocityAgent): pass
+
+def test_velocity_restriction():
+    continuous_agents = {
+        'agent0': ContinuousVelocityAgent(id='agent0', agent_view=3, initial_position=np.array([0, 0]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 0,  0])),
+        'agent1': ContinuousVelocityAgent(id='agent1', agent_view=1, initial_position=np.array([1, 1]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 0,  1])),
+        'agent2': ContinuousVelocityAgent(id='agent2', agent_view=3, initial_position=np.array([2, 2]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 1,  0])),
+        'agent3': ContinuousVelocityAgent(id='agent3', agent_view=4, initial_position=np.array([3, 3]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 1,  1])),
+        'agent4': ContinuousVelocityAgent(id='agent4', agent_view=0, initial_position=np.array([4, 4]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 0, -1])),
+        'agent5': ContinuousVelocityAgent(id='agent5', agent_view=3, initial_position=np.array([5, 5]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([-1,  0])),
+        'agent6': ContinuousVelocityAgent(id='agent6', agent_view=2, initial_position=np.array([6, 6]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([-1, -1])),
+    }
+    position_state = ContinuousPositionState(agents=continuous_agents, region=10)
+    velocity_state = VelocityState(agents=continuous_agents)
+    velocity_observer = PositionRestrictedVelocityObserver(agents=continuous_agents)
+
+    position_state.reset()
+    velocity_state.reset()
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent1'], np.array([ 0,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent2'], np.array([ 1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent3'], np.array([ 1,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent4'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent5'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent0'])['velocity']['agent6'], np.array([ 0,  0]))
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent1'], np.array([ 0,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent2'], np.array([ 1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent3'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent4'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent5'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent1'])['velocity']['agent6'], np.array([ 0,  0]))
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent1'], np.array([ 0,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent2'], np.array([ 1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent3'], np.array([ 1,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent4'], np.array([ 0, -1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent5'], np.array([-1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent2'])['velocity']['agent6'], np.array([ 0,  0]))
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent1'], np.array([ 0,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent2'], np.array([ 1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent3'], np.array([ 1,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent4'], np.array([ 0, -1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent5'], np.array([-1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent3'])['velocity']['agent6'], np.array([-1, -1]))
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent1'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent2'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent3'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent4'], np.array([ 0, -1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent5'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent4'])['velocity']['agent6'], np.array([ 0,  0]))
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent1'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent2'], np.array([ 1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent3'], np.array([ 1,  1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent4'], np.array([ 0, -1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent5'], np.array([-1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent5'])['velocity']['agent6'], np.array([-1, -1]))
+
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent0'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent1'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent2'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent3'], np.array([ 0,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent4'], np.array([ 0, -1]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent5'], np.array([-1,  0]))
+    np.testing.assert_array_equal(velocity_observer.get_obs(agents['agent6'])['velocity']['agent6'], np.array([-1, -1]))
