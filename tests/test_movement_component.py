@@ -2,9 +2,9 @@
 from gym.spaces import Box
 import numpy as np
 
-from admiral.envs.components.agent import GridMovementAgent, PositionAgent, SpeedAngleAgent
-from admiral.envs.components.state import GridPositionState, ContinuousPositionState, SpeedAngleState
-from admiral.envs.components.actor import GridMovementActor, SpeedAngleMovementActor
+from admiral.envs.components.agent import GridMovementAgent, PositionAgent, SpeedAngleAgent, VelocityAgent
+from admiral.envs.components.state import GridPositionState, ContinuousPositionState, SpeedAngleState, VelocityState
+from admiral.envs.components.actor import GridMovementActor, SpeedAngleMovementActor, AccelerationMovementActor
 
 class GridMovementTestAgent(GridMovementAgent, PositionAgent): pass
 
@@ -95,3 +95,39 @@ def test_speed_angle_movement_component():
     assert np.allclose(agents['agent2'].position, np.array([0.66970563, 1.48270563]))
     assert np.allclose(actor.process_move(agents['agent3'],  np.array([0.0]), np.array([-24])), np.array([-0.54812727, -0.24404199]))
     assert np.allclose(agents['agent3'].position, np.array([7.14374545, 3.91191603]))
+
+class ParticleAgent(PositionAgent, VelocityAgent): pass
+
+def test_acceleration_movement_component():
+
+    agents = {
+        'agent0': ParticleAgent(id='agent0', initial_position=np.array([2.3, 4.5]), initial_velocity=np.array([1, 0]), max_speed=1.0, max_acceleration=0.5),
+        'agent1': ParticleAgent(id='agent1', initial_position=np.array([8.5, 1.0]), initial_velocity=np.array([0, 0]), max_speed=1.0, max_acceleration=0.5),
+        'agent2': ParticleAgent(id='agent2', initial_position=np.array([5.0, 5.0]), initial_velocity=np.array([-1, -1]), max_speed=2.0, max_acceleration=0.5),
+    }
+
+    position_state = ContinuousPositionState(region=10, agents=agents)
+    velocity_state = VelocityState(agents=agents, friction=0.1)
+    actor = AccelerationMovementActor(position_state=position_state, velocity_state=velocity_state, agents=agents)
+
+    for agent in agents.values():
+        assert 'accelerate' in agent.action_space
+
+    position_state.reset()
+    velocity_state.reset()
+    for agent in agents.values():
+        np.testing.assert_array_equal(agent.position, agent.initial_position)
+        np.testing.assert_array_equal(agent.velocity, agent.initial_velocity)
+
+    
+    assert np.allclose(actor.process_move(agents['agent0'], np.array([-1, 0])), np.array([0., 0.]))
+    assert np.allclose(agents['agent0'].position, np.array([2.3, 4.5]))
+    assert np.allclose(actor.process_move(agents['agent1'], np.array([-1, 1])), np.array([-0.70710678,  0.70710678]))
+    assert np.allclose(agents['agent1'].position, np.array([7.79289322, 1.70710678]))
+    assert np.allclose(actor.process_move(agents['agent2'], np.array([0, 0])), np.array([-1, -1]))
+    assert np.allclose(agents['agent2'].position, np.array([4, 4]))
+
+    velocity_state.apply_friction(agents['agent0'])
+    assert np.allclose(agents['agent0'].velocity, np.array([0, 0]))
+    velocity_state.apply_friction(agents['agent1'])
+    assert np.allclose(agents['agent1'].velocity, np.array([-0.6363961, 0.6363961]))

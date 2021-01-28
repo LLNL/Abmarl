@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent, VelocityAgent
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -170,7 +170,7 @@ class ContinuousPositionState(PositionState):
 
 class SpeedAngleState:
     """
-    Manges the agents' speed, banking angles, and ground angles.
+    Manages the agents' speed, banking angles, and ground angles.
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
@@ -244,6 +244,57 @@ class SpeedAngleState:
         """
         if isinstance(agent, SpeedAngleAgent):
             self.set_ground_angle(agent, agent.ground_angle + value)
+
+class VelocityState:
+    """
+    Manages the agents' velocities.
+    """
+    def __init__(self, agents=None, friction=0.05, **kwargs):
+        self.agents = agents
+        self.friction = friction
+    
+    def reset(self, **kwargs):
+        """
+        Reset the agents' velocities.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, VelocityAgent):
+                # Reset the agent's velocity
+                if agent.initial_velocity is not None:
+                    agent.velocity = agent.initial_velocity
+                else:
+                    agent.velocity = np.random.uniform(-agent.max_speed, agent.max_speed, (2,))
+    
+    def set_velocity(self, agent, _velocity, **kwargs):
+        """
+        Set the agent's velocity if it is within its max speed.
+        """
+        if isinstance(agent, VelocityAgent):
+            vel_norm = np.linalg.norm(_velocity)
+            if vel_norm < agent.max_speed:
+                agent.velocity = _velocity
+            else:
+                agent.velocity = _velocity / vel_norm * agent.max_speed
+    
+    def modify_velocity(self, agent, value, **kwargs):
+        """
+        Modify the agent's velocity.
+        """
+        if isinstance(agent, VelocityAgent):
+            self.set_velocity(agent, agent.velocity + value, **kwargs)
+    
+    def apply_friction(self, agent, **kwargs):
+        """
+        Apply friction to the agent's movement, decreasing its speed by a small amount.
+        """
+        if isinstance(agent, VelocityAgent):
+            old_speed = np.linalg.norm(agent.velocity)
+            new_speed = old_speed - self.friction
+            if new_speed <= 0:
+                agent.velocity = np.zeros(2)
+            else:
+                agent.velocity *= new_speed / old_speed
+
 
 
 # -------------------------------- #

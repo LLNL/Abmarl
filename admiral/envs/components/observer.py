@@ -2,7 +2,7 @@
 from gym.spaces import Box, MultiBinary, Dict
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent, AgentObservingAgent, TeamAgent, ResourceObservingAgent, SpeedAngleAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, AgentObservingAgent, TeamAgent, ResourceObservingAgent, SpeedAngleAgent, VelocityAgent
 
 # ----------------- #
 # --- Utilities --- #
@@ -440,6 +440,39 @@ class PositionRestrictedAngleObserver(AngleObserver):
     """
     def get_obs(self, agent, **kwargs):
         obs = super().get_obs(agent)
+        obs_key = next(iter(obs))
+        return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
+
+
+class VelocityObserver:
+    """
+    Observe the velocity of all the agents in the simulator.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+        from gym.spaces import Dict, Box
+        for agent in agents.values():
+            agent.observation_space['velocity'] = Dict({
+                other.id: Box(-agent.max_speed, agent.max_speed, (2,)) for other in agents.values() if isinstance(other, VelocityAgent)
+            })
+    
+    def get_obs(self, *args, **kwargs):
+        """
+        Get the velocity of all the agents in the simulator.
+        """
+        return {'velocity': {agent.id: agent.velocity for agent in self.agents.values() if isinstance(agent, VelocityAgent)}}
+    
+    @property
+    def null_value(self):
+        return np.zeros(2)
+
+class PositionRestrictedVelocityObserver(VelocityObserver):
+    """
+    Observe the velocity of each agent in the simulator if that agent is close
+    enough to the observing agent. If it is too far, then observe a null value.
+    """
+    def get_obs(self, agent, **kwargs):
+        obs = super().get_obs()
         obs_key = next(iter(obs))
         return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
 
