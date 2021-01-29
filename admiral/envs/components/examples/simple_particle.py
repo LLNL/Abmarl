@@ -40,6 +40,7 @@ class ParticleEnv(AgentBasedSimulation):
             self.move_actor.process_move(self.agents[agent], action.get("accelerate", np.zeros(2)), **kwargs)
             self.velocity_state.apply_friction(self.agents[agent], **kwargs)
         
+        self.render(**kwargs)
         self.collision_actor.detect_collisions_and_modify_states(**kwargs)
 
     def render(self, fig=None, **kwargs):
@@ -76,34 +77,34 @@ class ParticleEnv(AgentBasedSimulation):
         pass
 
 if __name__ == "__main__":
-    agents = {f'agent{i}': ParticleAgent(
-        id=f'agent{i}',
-        max_speed=1,
-        max_acceleration=0.25,
-        initial_velocity=np.ones(2),
-        mass=1,
-        size=1
-    ) for i in range(10)}
+    # agents = {f'agent{i}': ParticleAgent(
+    #     id=f'agent{i}',
+    #     max_speed=1,
+    #     max_acceleration=0.25,
+    #     initial_velocity=np.ones(2),
+    #     mass=1,
+    #     size=1
+    # ) for i in range(10)}
 
-    env = ParticleEnv(
-        agents=agents,
-        region=20,
-        friction=0.1
-    )
-    fig = plt.figure()
-    env.reset()
-    env.render(fig=fig)
+    # env = ParticleEnv(
+    #     agents=agents,
+    #     region=20,
+    #     friction=0.1
+    # )
+    # fig = plt.figure()
+    # env.reset()
+    # env.render(fig=fig)
 
-    for _ in range(24):
-        env.step({agent.id: {} for agent in agents.values()})
-        env.render(fig=fig)
+    # for _ in range(10):
+    #     env.step({agent.id: {} for agent in agents.values()}, fig=fig)
+    #     env.render(fig=fig)
     
     agents = {f'agent{i}': ParticleAgent(
         id=f'agent{i}',
         max_speed=1,
         max_acceleration=0.25,
         mass=1,
-        size=2,
+        size=0.5,
     ) for i in range(20)}
 
     env = ParticleEnv(
@@ -116,5 +117,5 @@ if __name__ == "__main__":
     env.render(fig=fig)
 
     for _ in range(24):
-        env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+        env.step({agent.id: agent.action_space.sample() for agent in agents.values()}, fig=fig)
         env.render(fig=fig)
