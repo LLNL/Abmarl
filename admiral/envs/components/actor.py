@@ -321,3 +321,69 @@ class GridResourcesActor:
             return resource_before - self.resources.resources[location]
 
 
+
+
+
+# --------------------------------------------- #
+# --- Actors that don't receive agent input --- #
+# --------------------------------------------- #
+
+class ContinuousCollisionActor:
+    def __init__(self, position_state=None, velocity_state=None, agents=None, **kwargs):
+        self.position_state = position_state
+        self.velocity_state = velocity_state
+        self.agents = agents
+
+    def detect_collisions_and_modify_states(self, **kwargs):
+        for agent1 in self.agents.values():
+            if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent)): continue
+            for agent2 in self.agents.values():
+                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent)): continue
+                if agent1.id == agent2.id: continue # Cannot collide with yourself
+                self._undo_overlap(agent1, agent2)
+                self._update_velocities(agent1, agent2)
+
+    def _undo_overlap(self, agent1, agent2, **kwargs):
+        dist = np.linalg.norm(agent1.position - agent2.position)
+        combined_sizes = agent1.size + agent2.size
+        overlap = (combined_sizes - dist) / combined_sizes
+        if dist < combined_sizes:
+            self.position_state.modify_position(agent1, -agent1.velocity * overlap)
+            self.position_state.modify_position(agent2, -agent2.velocity * overlap)
+
+    def _update_velocities(self, agent1, agent2, **kwargs):
+        """Updates the velocities of two entities when they collide based on an
+        inelastic collision assumption."""
+        # calculate vector between centers
+        rel_vector = [
+            agent2.position - agent1.position,
+            agent1.position - agent2.position
+        ]
+        # Calculate relative velocities
+        rel_velocities = [
+            agent1.velocity - agent2.velocity,
+            agent2.velocity - agent1.velocity
+        ]
+        # Calculate mass factor
+        mass_factor = [
+            2 * agent2.mass / (agent2.mass + agent1.mass),
+            2 * agent1.mass / (agent2.mass + agent1.mass)
+        ]
+        # norm
+        norm = [
+            np.square(np.linalg.norm(rel_vector[0])),
+            np.square(np.linalg.norm(rel_vector[1]))
+        ]
+        # Dot product of relative velocity and relative distcance
+        dot = [
+            np.dot(rel_velocities[0], rel_vector[0]),
+            np.dot(rel_velocities[1], rel_vector[1])
+        ]
+        # bringing it all together
+        vel_new = [
+            agent1.velocity - (mass_factor[0] * (dot[0]/norm[0]) * rel_vector[0]),
+            agent2.velocity - (mass_factor[1] * (dot[1]/norm[1]) * rel_vector[1])
+        ]
+        # Only update the velocity if not stationary
+        self.velocity_state.modify_velocity(agent1, vel_new[0])
+        self.velocity_state.modify_velocity(agent2, vel_new[1])
