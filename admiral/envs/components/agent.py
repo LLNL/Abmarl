@@ -1,4 +1,6 @@
 
+from gym.spaces import Dict
+
 # ------------------ #
 # --- Base Agent --- #
 # ------------------ #
@@ -9,23 +11,50 @@ class Agent:
     id in in order to even be constructed. Agents must also have an observation
     space and action space to be considered successfully configured.
     """
-    def __init__(self, id=None, observation_space=None, action_space=None, **kwargs):
+    def __init__(self, id=None, **kwargs):
         if id is None:
             raise TypeError("Agents must be constructed with an id.")
         else:
             self.id = id
-        self.observation_space = {} if observation_space is None else observation_space
-        self.action_space = {} if action_space is None else action_space
+        
+    def finalize(self, **kwargs):
+        pass
     
     @property
     def configured(self):
         """
         Determine if the agent has been successfully configured.
         """
-        return self.id is not None and self.action_space and self.observation_space
+        return self.id is not None
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
+
+class ActingAgent(Agent):
+    def __init__(self, action_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.action_space = {} if action_space is None else action_space
+
+    def finalize(self, **kwargs):
+        super().finalize(**kwargs)
+        self.action_space = Dict(self.action_space)
+    
+    @property
+    def configured(self):
+        return super().configured and self.action_space
+
+class ObservingAgent(Agent):
+    def __init__(self, observation_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.observation_space = {} if observation_space is None else observation_space
+
+    def finalize(self, **kwargs):
+        super().finalize(**kwargs)
+        self.observation_space = Dict(self.observation_space)
+    
+    @property
+    def configured(self):
+        return super().configured and self.observation_space
 
 
 
