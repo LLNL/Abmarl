@@ -2,14 +2,14 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import VelocityAgent, PositionAgent
+from admiral.envs.components.agent import VelocityAgent, PositionAgent, MassAgent, SizeAgent
 from admiral.envs.components.state import VelocityState, ContinuousPositionState
-from admiral.envs.components.actor import AccelerationMovementActor
+from admiral.envs.components.actor import AccelerationMovementActor, ContinuousCollisionActor
 from admiral.envs.components.observer import VelocityObserver, PositionObserver
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ParticleAgent(VelocityAgent, PositionAgent): pass
+class ParticleAgent(VelocityAgent, PositionAgent, MassAgent, SizeAgent): pass
 
 class ParticleEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -21,6 +21,8 @@ class ParticleEnv(AgentBasedSimulation):
 
         # Actor
         self.move_actor = AccelerationMovementActor(position_state=self.position_state, \
+            velocity_state=self.velocity_state, **kwargs)
+        self.collision_actor = ContinuousCollisionActor(position_state=self.position_state, \
             velocity_state=self.velocity_state, **kwargs)
         
         # Observer
@@ -36,7 +38,9 @@ class ParticleEnv(AgentBasedSimulation):
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
             self.move_actor.process_move(self.agents[agent], action.get("accelerate", np.zeros(2)), **kwargs)
-            self.velocity_state.apply_friction(self.agents[agent])
+            self.velocity_state.apply_friction(self.agents[agent], **kwargs)
+        
+        self.collision_actor.detect_collisions_and_modify_states(**kwargs)
 
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -76,7 +80,9 @@ if __name__ == "__main__":
         id=f'agent{i}',
         max_speed=1,
         max_acceleration=0.25,
-        initial_velocity=np.ones(2)
+        initial_velocity=np.ones(2),
+        mass=1,
+        size=1
     ) for i in range(10)}
 
     env = ParticleEnv(
@@ -95,13 +101,15 @@ if __name__ == "__main__":
     agents = {f'agent{i}': ParticleAgent(
         id=f'agent{i}',
         max_speed=1,
-        max_acceleration=0.25
-    ) for i in range(10)}
+        max_acceleration=0.25,
+        mass=1,
+        size=2,
+    ) for i in range(20)}
 
     env = ParticleEnv(
         agents=agents,
         region=20,
-        friction=0.1
+        friction=0.0
     )
     fig = plt.figure()
     env.reset()
