@@ -3,7 +3,7 @@ import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
     GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent, VelocityAgent, \
-    MassAgent
+    MassAgent, SizeAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -341,8 +341,11 @@ class ContinuousCollisionActor:
             for agent2 in self.agents.values():
                 if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent)): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
-                self._undo_overlap(agent1, agent2)
-                self._update_velocities(agent1, agent2)
+                dist = np.linalg.norm(agent1.position - agent2.position)
+                combined_sizes = agent1.size + agent2.size
+                if dist < combined_sizes:
+                    self._undo_overlap(agent1, agent2)
+                    self._update_velocities(agent1, agent2)
 
     def _undo_overlap(self, agent1, agent2, **kwargs):
         dist = np.linalg.norm(agent1.position - agent2.position)
