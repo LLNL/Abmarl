@@ -336,24 +336,24 @@ class ContinuousCollisionActor:
         self.agents = agents
 
     def detect_collisions_and_modify_states(self, **kwargs):
+        checked_agents = set()
         for agent1 in self.agents.values():
             if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent1, MassAgent)): continue
+            checked_agents.add(agent1.id)
             for agent2 in self.agents.values():
                 if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent)): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
+                if agent2.id in checked_agents: continue # Already checked this agent
                 dist = np.linalg.norm(agent1.position - agent2.position)
                 combined_sizes = agent1.size + agent2.size
                 if dist < combined_sizes:
-                    self._undo_overlap(agent1, agent2)
+                    self._undo_overlap(agent1, agent2, dist, combined_sizes)
                     self._update_velocities(agent1, agent2)
 
-    def _undo_overlap(self, agent1, agent2, **kwargs):
-        dist = np.linalg.norm(agent1.position - agent2.position)
-        combined_sizes = agent1.size + agent2.size
+    def _undo_overlap(self, agent1, agent2, dist, combined_sizes, **kwargs):
         overlap = (combined_sizes - dist) / combined_sizes
-        if dist < combined_sizes:
-            self.position_state.modify_position(agent1, -agent1.velocity * overlap)
-            self.position_state.modify_position(agent2, -agent2.velocity * overlap)
+        self.position_state.modify_position(agent1, -agent1.velocity * overlap)
+        self.position_state.modify_position(agent2, -agent2.velocity * overlap)
 
     def _update_velocities(self, agent1, agent2, **kwargs):
         """Updates the velocities of two entities when they collide based on an
