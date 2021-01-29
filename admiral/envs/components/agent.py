@@ -276,6 +276,15 @@ class MassAgent(Agent):
     def configured(self):
         return super().configured and self.mass is not None
 
+class SizeAgent(Agent):
+    def __init__(self, size=None, **kwargs):
+        super().__init__(**kwargs)
+        self.size = size
+    
+    @property
+    def configured(self):
+        return super().configured and self.size is not None
+
 
 
 # -------------------------------- #
