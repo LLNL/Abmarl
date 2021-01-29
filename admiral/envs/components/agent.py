@@ -267,6 +267,15 @@ class VelocityAgent(Agent):
     def configured(self):
         return super().configured and self.max_speed is not None and self.max_acceleration is not None
 
+class MassAgent(Agent):
+    def __init__(self, mass=None, **kwargs):
+        super().__init__(**kwargs)
+        self.mass = mass
+    
+    @property
+    def configured(self):
+        return super().configured and self.mass is not None
+
 
 
 # -------------------------------- #

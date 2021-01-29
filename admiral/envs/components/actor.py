@@ -2,7 +2,8 @@
 import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
-    GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent, VelocityAgent
+    GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent, VelocityAgent, \
+    MassAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -336,9 +337,9 @@ class ContinuousCollisionActor:
 
     def detect_collisions_and_modify_states(self, **kwargs):
         for agent1 in self.agents.values():
-            if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent)): continue
+            if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent1, MassAgent)): continue
             for agent2 in self.agents.values():
-                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent)): continue
+                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent)): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
                 self._undo_overlap(agent1, agent2)
                 self._update_velocities(agent1, agent2)
