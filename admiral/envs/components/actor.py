@@ -338,10 +338,10 @@ class ContinuousCollisionActor:
     def detect_collisions_and_modify_states(self, **kwargs):
         checked_agents = set()
         for agent1 in self.agents.values():
-            if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent1, MassAgent)): continue
+            if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent1, MassAgent) and isinstance(agent1, SizeAgent)): continue
             checked_agents.add(agent1.id)
             for agent2 in self.agents.values():
-                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent)): continue
+                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent) and isinstance(agent2, SizeAgent)): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
                 if agent2.id in checked_agents: continue # Already checked this agent
                 dist = np.linalg.norm(agent1.position - agent2.position)
