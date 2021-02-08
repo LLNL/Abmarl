@@ -3,7 +3,7 @@ import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
     GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent, VelocityAgent, \
-    MassAgent, SizeAgent
+    MassAgent, SizeAgent, CollisionAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -338,20 +338,27 @@ class ContinuousCollisionActor:
     def detect_collisions_and_modify_states(self, **kwargs):
         checked_agents = set()
         for agent1 in self.agents.values():
-            if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent1, MassAgent) and isinstance(agent1, SizeAgent)): continue
+            #if not (isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent1, MassAgent) and isinstance(agent1, SizeAgent)): continue
+            if not isinstance(agent1, CollisionAgent): continue
             checked_agents.add(agent1.id)
             for agent2 in self.agents.values():
-                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent) and isinstance(agent2, SizeAgent)): continue
+                #if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, MassAgent) and isinstance(agent2, SizeAgent)): continue
+                if not isinstance(agent2, CollisionAgent): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
                 if agent2.id in checked_agents: continue # Already checked this agent
                 dist = np.linalg.norm(agent1.position - agent2.position)
                 combined_sizes = agent1.size + agent2.size
                 if dist < combined_sizes:
+                    print('{} vs {}, Distance (before): {}'.format(agent1, agent2, dist))
+                    print('{} vs {}, Allowed (before): {}'.format(agent1, agent2, combined_sizes))
                     self._undo_overlap(agent1, agent2, dist, combined_sizes)
+                    print('{} vs {}, Distance (after): {}'.format(agent1, agent2, np.linalg.norm(agent1.position - agent2.position)))
+                    print('{} vs {}, Allowed (after): {}'.format(agent1, agent2, agent1.size + agent2.size))
                     self._update_velocities(agent1, agent2)
 
     def _undo_overlap(self, agent1, agent2, dist, combined_sizes, **kwargs):
         overlap = (combined_sizes - dist) / combined_sizes
+        print('{} vs {}, Overlap: {}'.format(agent1, agent2, overlap))
         self.position_state.modify_position(agent1, -agent1.velocity * overlap)
         self.position_state.modify_position(agent2, -agent2.velocity * overlap)
 
@@ -359,7 +366,7 @@ class ContinuousCollisionActor:
         """Updates the velocities of two entities when they collide based on an
         inelastic collision assumption."""
         # calculate vector between centers
-        rel_vector = [
+        rel_position = [
             agent2.position - agent1.position,
             agent1.position - agent2.position
         ]
@@ -375,18 +382,18 @@ class ContinuousCollisionActor:
         ]
         # norm
         norm = [
-            np.square(np.linalg.norm(rel_vector[0])),
-            np.square(np.linalg.norm(rel_vector[1]))
+            np.square(np.linalg.norm(rel_position[0])),
+            np.square(np.linalg.norm(rel_position[1]))
         ]
         # Dot product of relative velocity and relative distcance
         dot = [
-            np.dot(rel_velocities[0], rel_vector[0]),
-            np.dot(rel_velocities[1], rel_vector[1])
+            np.dot(rel_velocities[0], rel_position[0]),
+            np.dot(rel_velocities[1], rel_position[1])
         ]
         # bringing it all together
         vel_new = [
-            agent1.velocity - (mass_factor[0] * (dot[0]/norm[0]) * rel_vector[0]),
-            agent2.velocity - (mass_factor[1] * (dot[1]/norm[1]) * rel_vector[1])
+            agent1.velocity - (mass_factor[0] * (dot[0]/norm[0]) * rel_position[0]),
+            agent2.velocity - (mass_factor[1] * (dot[1]/norm[1]) * rel_position[1])
         ]
         # Only update the velocity if not stationary
         self.velocity_state.modify_velocity(agent1, vel_new[0])

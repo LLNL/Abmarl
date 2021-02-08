@@ -286,6 +286,16 @@ class SizeAgent(Agent):
         return super().configured and self.size is not None
 
 
+class CollisionAgent(Agent):
+    def __init__(self, size=None, mass=None, **kwargs):
+        super().__init__(**kwargs)
+        self.size = size
+        self.mass = mass
+        self.render_size = 1000 * size
+    
+    @property
+    def configured(self):
+        return super().configured and self.size is not None and self.mass is not None
 
 # -------------------------------- #
 # --- Resources and Harvesting --- #
