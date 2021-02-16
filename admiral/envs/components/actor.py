@@ -1,8 +1,8 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, AttackingAgent, TeamAgent, \
-    GridMovementAgent, PositionAgent, HarvestingAgent, SpeedAngleAgent, VelocityAgent
+from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, HarvestingAgent, \
+    SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -150,6 +150,7 @@ class GridMovementActor:
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
+        # Not all agents need to be PositionAgents; only the ones who can move.
 
         from gym.spaces import Box
         for agent in self.agents.values():
@@ -220,19 +221,20 @@ class SpeedAngleMovementActor:
         return (np.array):
             Return the change in position.
         """
-        self.speed_angle.modify_speed(agent, acceleration[0])
-        self.speed_angle.modify_banking_angle(agent, angle[0])
-        
-        x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
-        y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
-        
-        position_before = agent.position
-        self.position.modify_position(agent, np.array([x_position, y_position]))
-        return agent.position - position_before
+        if isinstance(agent, SpeedAngleAgent):
+            self.speed_angle.modify_speed(agent, acceleration[0])
+            self.speed_angle.modify_banking_angle(agent, angle[0])
+            
+            x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
+            y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
+            
+            position_before = agent.position
+            self.position.modify_position(agent, np.array([x_position, y_position]))
+            return agent.position - position_before
 
 class AccelerationMovementActor:
     """
-    Process x,y accelerations for VelocityAgents, which are given an 'accelerate'
+    Process x,y accelerations for AcceleratingAgents, which are given an 'accelerate'
     action. Update the agents' positions based on their new velocity.
 
     position_state (ContinuousPositionState):
@@ -251,7 +253,7 @@ class AccelerationMovementActor:
 
         from gym.spaces import Box
         for agent in agents.values():
-            if isinstance(agent, VelocityAgent):
+            if isinstance(agent, AcceleratingAgent):
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
     
     def process_move(self, agent, acceleration, **kwargs):
@@ -259,7 +261,7 @@ class AccelerationMovementActor:
         Update the agent's velocity by applying the acceleration. Then use the
         updated velocity to determine the agent's next position.
 
-        agent (VelocityAgent):
+        agent (AcceleratingAgent):
             Agent that is attempting to move.
         
         acceleration (np.array):
@@ -269,10 +271,11 @@ class AccelerationMovementActor:
         return (np.array):
             Return the change in position.
         """
-        self.velocity_state.modify_velocity(agent, acceleration)
-        position_before = agent.position
-        self.position_state.modify_position(agent, agent.velocity, **kwargs)
-        return agent.position - position_before
+        if isinstance(agent, AcceleratingAgent):
+            self.velocity_state.modify_velocity(agent, acceleration)
+            position_before = agent.position
+            self.position_state.modify_position(agent, agent.velocity, **kwargs)
+            return agent.position - position_before
                 
 
 
@@ -319,5 +322,3 @@ class GridResourcesActor:
             resource_before = self.resources.resources[location]
             self.resources.modify_resources(location, -amount)
             return resource_before - self.resources.resources[location]
-
-
