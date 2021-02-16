@@ -3,15 +3,15 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, GridMovementAgent, HarvestingAgent, ResourceObservingAgent, LifeAgent
 from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, GridResourcesActor
 from admiral.envs.components.done import DeadDone
+from admiral.envs.components.agent import PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ResourceManagementAgent(LifeAgent, GridMovementAgent, PositionAgent,  HarvestingAgent, AgentObservingAgent, ResourceObservingAgent):
+class ResourceManagementAgent(PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):
@@ -88,8 +88,8 @@ class ResourceManagementEnv(AgentBasedSimulation):
         return {
             **self.position_observer.get_obs(agent),
             **self.resource_observer.get_obs(agent),
-            **self.health_observer.get_obs(agent_id, **kwargs),
-            **self.life_observer.get_obs(agent_id, **kwargs),
+            **self.health_observer.get_obs(agent, **kwargs),
+            **self.life_observer.get_obs(agent, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -105,7 +105,7 @@ class ResourceManagementEnv(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', agent_view=2, resource_view=2, move_range=1, max_harvest=1.0) for i in range(4)}
+    agents = {f'agent{i}': ResourceManagementAgent(id=f'agent{i}', resource_view=2, move_range=1, max_harvest=1.0) for i in range(4)}
     env = ResourceManagementEnv(
         region=10,
         agents=agents
