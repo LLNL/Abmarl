@@ -2,7 +2,8 @@
 from gym.spaces import Discrete
 import numpy as np
 
-from admiral.envs import Agent, AgentBasedSimulation
+from admiral.envs import AgentBasedSimulation
+from admiral.envs import SimpleAgent as Agent
 
 class Corridor(AgentBasedSimulation):
     """
@@ -82,9 +83,9 @@ class Corridor(AgentBasedSimulation):
 
         config['end'] = env_config.get('end', config['end'])
         config['agents'] = {'agent0': Agent(
-            'agent0',
-            Discrete(config['end'] + 1),
-            Discrete(3)
+            id='agent0',
+            observations_space=Discrete(config['end'] + 1),
+            action_space=Discrete(3)
         )}
 
         return cls(config)
