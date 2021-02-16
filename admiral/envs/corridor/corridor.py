@@ -84,7 +84,7 @@ class Corridor(AgentBasedSimulation):
         config['end'] = env_config.get('end', config['end'])
         config['agents'] = {'agent0': Agent(
             id='agent0',
-            observations_space=Discrete(config['end'] + 1),
+            observation_space=Discrete(config['end'] + 1),
             action_space=Discrete(3)
         )}
 

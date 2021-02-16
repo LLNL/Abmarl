@@ -1,7 +1,7 @@
 
 from gym.spaces import Discrete
 
-from admiral.envs import Agent
+from admiral.envs import SimpleAgent as Agent
 from admiral.envs.corridor import Corridor
 
 def test_corridor_attributes():
@@ -13,13 +13,13 @@ def test_corridor_build():
     env = Corridor.build()
     assert env.start == 0
     assert env.end == 5
-    assert env.agents == {'agent0': Agent('agent0', Discrete(6), Discrete(3))}
+    assert env.agents == {'agent0': Agent(id='agent0', observation_space=Discrete(6), action_space=Discrete(3))}
 
 def test_corridor_build_end():
     env = Corridor.build({'end': 3})
     assert env.start == 0
     assert env.end == 3
-    assert env.agents == {'agent0': Agent('agent0', Discrete(4), Discrete(3))}
+    assert env.agents == {'agent0': Agent(id='agent0', observation_space=Discrete(4), action_space=Discrete(3))}
 
 def test_corridor_reset():
     env = Corridor.build()
