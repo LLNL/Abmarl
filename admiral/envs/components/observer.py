@@ -47,7 +47,7 @@ class HealthObserver:
 
         from gym.spaces import Dict, Box
         for agent in agents.values():
-            if isinstance(HealthObservingAgent):
+            if isinstance(agent, HealthObservingAgent):
                 agent.observation_space['health'] = Dict({
                     other.id: Box(-1, other.max_health, (1,), np.float) for other in self.agents.values() if isinstance(other, LifeAgent)
                 })
