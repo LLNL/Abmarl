@@ -8,8 +8,7 @@ from gym.spaces import Dict
 class Agent:
     """
     Base Agent class for agents that live in an environment. Agents require an
-    id in in order to even be constructed. Agents must also have an observation
-    space and action space to be considered successfully configured.
+    id in in order to even be constructed.
     """
     def __init__(self, id=None, **kwargs):
         if id is None:
@@ -31,6 +30,10 @@ class Agent:
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
 
 class ActingAgent(Agent):
+    """
+    ActingAgents are Agents that are expected to produce actions and therefore
+    should have an action space in order to be successfully configured.
+    """
     def __init__(self, action_space=None, **kwargs):
         super().__init__(**kwargs)
         self.action_space = {} if action_space is None else action_space
@@ -44,6 +47,10 @@ class ActingAgent(Agent):
         return super().configured and self.action_space
 
 class ObservingAgent(Agent):
+    """
+    ObservingAgents are Agents that are expected to receive observations and therefore
+    should have an observation space in order to be successfully configured.
+    """
     def __init__(self, observation_space=None, **kwargs):
         super().__init__(**kwargs)
         self.observation_space = {} if observation_space is None else observation_space
@@ -173,7 +180,7 @@ class PositionAgent(Agent):
         The desired starting position for this agent.
 
     Warning: You should consider the positional state of the environment when
-    working with the agent's position because state interpret the elements of
+    working with the agent's position because states interpret the elements of
     the array differently.
     """
     def __init__(self, initial_position=None, **kwargs):
