@@ -8,4 +8,3 @@ class SimpleAgent(ObservingAgent, ActingAgent):
     components.
     """
     pass
-
