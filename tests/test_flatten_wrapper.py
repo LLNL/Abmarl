@@ -156,17 +156,17 @@ def test_flatten_space():
 
 from .helpers import MultiAgentEnv
 from admiral.envs import AgentBasedSimulation
-from admiral.envs import Agent
+from admiral.envs import SimpleAgent as Agent
 from admiral.envs.wrappers import FlattenActionWrapper, FlattenWrapper
 
 class MultiAgentContinuousGymSpaceEnv(MultiAgentEnv):
     def __init__(self):
         self.params = {'params': "there are none"}
         self.agents = {
-            'agent0': Agent('agent0', MultiBinary(4), Tuple((Dict({'first': Discrete(4), 'second': Box(low=-1, high=3, shape=(2,))}), MultiBinary(3)))),
-            'agent1': Agent('agent1', Box(low=0, high=1, shape=(1,)), MultiDiscrete([4, 6, 2])),
-            'agent2': Agent('agent2', MultiDiscrete([2, 2]), Dict({'alpha': MultiBinary(3)})),
-            'agent3': Agent('agent3', Dict({'first': Discrete(4), 'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)}), Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2))))
+            'agent0': Agent(id='agent0', observation_space=MultiBinary(4), action_space=Tuple((Dict({'first': Discrete(4), 'second': Box(low=-1, high=3, shape=(2,))}), MultiBinary(3)))),
+            'agent1': Agent(id='agent1', observation_space=Box(low=0, high=1, shape=(1,)), action_space=MultiDiscrete([4, 6, 2])),
+            'agent2': Agent(id='agent2', observation_space=MultiDiscrete([2, 2]), action_space=Dict({'alpha': MultiBinary(3)})),
+            'agent3': Agent(id='agent3', observation_space=Dict({'first': Discrete(4), 'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)}), action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2))))
         }
     
     def get_obs(self, agent_id, **kwargs):
