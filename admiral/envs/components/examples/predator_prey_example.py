@@ -3,18 +3,18 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent, LifeAgent, HarvestingAgent, ResourceObservingAgent
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState, GridResourceState
-from admiral.envs.components.observer import GridPositionTeamBasedObserver, PositionRestrictedRelativePositionObserver, GridResourceObserver
+from admiral.envs.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone
+from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AgentObservingAgent, PositionObservingAgent, ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent):
+class PreyAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent, PositionObservingAgent):
     pass
 
-class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, AttackingAgent):
+class PredatorAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, AgentObservingAgent, AttackingAgent, PositionObservingAgent):
     pass
 
 class PredatorPreyEnvGridBased(AgentBasedSimulation):

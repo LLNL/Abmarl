@@ -2,14 +2,14 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import VelocityAgent, PositionAgent
 from admiral.envs.components.state import VelocityState, ContinuousPositionState
 from admiral.envs.components.actor import AccelerationMovementActor
 from admiral.envs.components.observer import VelocityObserver, PositionObserver
+from admiral.envs.components.agent import VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ParticleAgent(VelocityAgent, PositionAgent): pass
+class ParticleAgent(VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent): pass
 
 class ParticleEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -57,7 +57,11 @@ class ParticleEnv(AgentBasedSimulation):
         plt.pause(1e-6)
 
     def get_obs(self, agent_id, **kwargs):
-        pass
+        agent = self.agents[agent_id]
+        return {
+            **self.position_observer.get_obs(agent),
+            **self.velocity_observer.get_obs(agent),
+        }
 
     def get_reward(self, agent_id, **kwargs):
         pass
@@ -87,6 +91,7 @@ if __name__ == "__main__":
     fig = plt.figure()
     env.reset()
     env.render(fig=fig)
+    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
 
     for _ in range(24):
         env.step({agent.id: {} for agent in agents.values()})

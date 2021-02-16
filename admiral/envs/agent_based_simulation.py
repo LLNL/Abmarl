@@ -48,11 +48,9 @@ class AgentBasedSimulation(ABC):
         be configured with action and observation spaces, which we convert into
         Dict spaces for interfacing with the trainer.
         """
-        from gym.spaces import Dict
         for agent in self.agents.values():
             assert agent.configured
-            agent.action_space = Dict(agent.action_space)
-            agent.observation_space = Dict(agent.observation_space)
+            agent.finalize()
     
     @abstractmethod
     def reset(self, **kwargs):

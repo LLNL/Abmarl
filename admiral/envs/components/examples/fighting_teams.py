@@ -2,15 +2,15 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import TeamAgent, PositionAgent, GridMovementAgent, AttackingAgent, LifeAgent, AgentObservingAgent
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState
 from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
 from admiral.envs.components.done import TeamDeadDone
+from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightingTeamsAgent(LifeAgent, PositionAgent, AttackingAgent, TeamAgent, GridMovementAgent, AgentObservingAgent):
+class FightingTeamsAgent(TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent):
     pass
 
 class FightingTeamsEnv(AgentBasedSimulation):
@@ -77,16 +77,16 @@ class FightingTeamsEnv(AgentBasedSimulation):
         plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
+        agent = self.agents[agent_id]
         return {
-            **self.position_observer.get_obs(agent_id, **kwargs),
-            **self.health_observer.get_obs(agent_id, **kwargs),
-            **self.life_observer.get_obs(agent_id, **kwargs),
-            **self.team_observer.get_obs(agent_id, **kwargs),
+            **self.position_observer.get_obs(agent, **kwargs),
+            **self.health_observer.get_obs(agent, **kwargs),
+            **self.life_observer.get_obs(agent, **kwargs),
+            **self.team_observer.get_obs(agent, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
         pass
-        # self.rewarder.get_reward(agent_id)
 
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(agent_id)
@@ -99,7 +99,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {f'agent{i}': FightingTeamsAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, agent_view=11
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1
     ) for i in range(24)}
     env = FightingTeamsEnv(
         region=12,
