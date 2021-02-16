@@ -6,11 +6,11 @@ from admiral.envs.components.state import ContinuousPositionState, SpeedAngleSta
 from admiral.envs.components.actor import SpeedAngleMovementActor, PositionBasedAttackActor
 from admiral.envs.components.observer import SpeedObserver, AngleObserver, PositionObserver, LifeObserver, HealthObserver
 from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent
+from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightingBirdAgent(PositionAgent, SpeedAngleAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
+class FightingBirdAgent(PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
 
 class FightingBirdsEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):

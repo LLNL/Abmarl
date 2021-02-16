@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.envs.components.state import GridPositionState, ContinuousPositionState, SpeedAngleState, VelocityState
 from admiral.envs.components.actor import GridMovementActor, SpeedAngleMovementActor, AccelerationMovementActor
-from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent, VelocityAgent, GridMovementAgent, AcceleratingAgent
+from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, VelocityAgent, GridMovementAgent, AcceleratingAgent
 
 class GridMovementTestAgent(GridMovementAgent, PositionAgent): pass
 
@@ -41,7 +41,7 @@ def test_grid_movement_component():
     np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 0]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([9, 4]))
 
-class SpeedAngleMovementTestAgent(SpeedAngleAgent, PositionAgent): pass
+class SpeedAngleMovementTestAgent(SpeedAngleAgent, SpeedAngleActingAgent, PositionAgent): pass
 
 def test_speed_angle_movement_component():
     agents = {
