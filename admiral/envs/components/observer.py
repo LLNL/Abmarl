@@ -74,7 +74,7 @@ class PositionRestrictedHealthObserver(HealthObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        obs = super().get_obs()
+        obs = super().get_obs(agent)
         if obs:
             obs_key = next(iter(obs))
             return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
@@ -118,7 +118,7 @@ class PositionRestrictedLifeObserver(LifeObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        obs = super().get_obs()
+        obs = super().get_obs(agent)
         if obs:
             obs_key = next(iter(obs))
             return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
@@ -532,7 +532,7 @@ class PositionRestrictedVelocityObserver(VelocityObserver):
     enough to the observing agent. If it is too far, then observe a null value.
     """
     def get_obs(self, agent, **kwargs):
-        obs = super().get_obs()
+        obs = super().get_obs(agent)
         if obs:
             obs_key = next(iter(obs))
             return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
@@ -628,7 +628,7 @@ class PositionRestrictedTeamObserver(TeamObserver):
     to the observing agent. If it is too far, then observe a null value
     """
     def get_obs(self, agent, **kwargs):
-        obs = super().get_obs()
+        obs = super().get_obs(agent)
         if obs:
             obs_key = next(iter(obs))
             return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
