@@ -271,7 +271,6 @@ class AccelerationMovementActor:
         return (np.array):
             Return the change in position.
         """
-        # TODO: maybe these should check the state types, like velocity and position, instead of the actor type...
         if isinstance(agent, VelocityAgent) and isinstance(agent, PositionAgent):
             self.velocity_state.modify_velocity(agent, acceleration)
             position_before = agent.position
