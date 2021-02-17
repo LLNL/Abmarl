@@ -2,11 +2,10 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import MassAgent, SizeAgent, CollisionAgent
 from admiral.envs.components.state import VelocityState, ContinuousPositionState
 from admiral.envs.components.actor import AccelerationMovementActor, ContinuousCollisionActor
 from admiral.envs.components.observer import VelocityObserver, PositionObserver
-from admiral.envs.components.agent import VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, ActingAgent
+from admiral.envs.components.agent import VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, ActingAgent, CollisionAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 

@@ -3,7 +3,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent, VelocityAgent
+from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent, VelocityAgent, \
+    CollisionAgent
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -160,6 +161,10 @@ class ContinuousPositionState(PositionState):
     of the region. Positions are a 2-element array, where the first element is
     the x-location and the second is the y-location.
     """
+    def __init__(self, reset_attempts=100, **kwargs):
+        super().__init__(**kwargs)
+        self.reset_attempts = reset_attempts
+
     def set_position(self, agent, _position, **kwargs):
         """
         Set the agent's position to the incoming value.
@@ -171,7 +176,23 @@ class ContinuousPositionState(PositionState):
         """
         Set the agents' random positions as numbers within the region.
         """
-        agent.position = np.random.uniform(0, self.region, 2)
+        if isinstance(agent, CollisionAgent):
+            for _ in range(self.reset_attempts):
+                potential_position = np.random.uniform(0, self.region, 2)
+                collision = False
+                for other in self.agents.values():
+                    if other.id != agent.id and \
+                       isinstance(other, CollisionAgent) and \
+                       other.position is not None and \
+                       np.linalg.norm(other.position - potential_position) < (other.size + agent.size):
+                        collision = True
+                        break
+                if not collision:
+                    agent.position = potential_position
+                    return
+            raise Exception("Could not fit all the agents in the region without collisions")
+        else:
+            agent.position = np.random.uniform(0, self.region, 2)
 
 class SpeedAngleState:
     """
