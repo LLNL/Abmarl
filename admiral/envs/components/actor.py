@@ -2,7 +2,7 @@
 import numpy as np
 
 from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, HarvestingAgent, \
-    SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent
+    SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -271,7 +271,8 @@ class AccelerationMovementActor:
         return (np.array):
             Return the change in position.
         """
-        if isinstance(agent, AcceleratingAgent):
+        # TODO: maybe these should check the state types, like velocity and position, instead of the actor type...
+        if isinstance(agent, VelocityAgent) and isinstance(agent, PositionAgent):
             self.velocity_state.modify_velocity(agent, acceleration)
             position_before = agent.position
             self.position_state.modify_position(agent, agent.velocity, **kwargs)

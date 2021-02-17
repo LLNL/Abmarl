@@ -5,11 +5,13 @@ import numpy as np
 from admiral.envs.components.state import VelocityState, ContinuousPositionState
 from admiral.envs.components.actor import AccelerationMovementActor
 from admiral.envs.components.observer import VelocityObserver, PositionObserver
-from admiral.envs.components.agent import VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent
+from admiral.envs.components.agent import VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, ActingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 class ParticleAgent(VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent): pass
+class FixedLandmark(PositionAgent): pass
+class MovingLandmark(VelocityAgent, PositionAgent): pass
 
 class ParticleEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -37,6 +39,9 @@ class ParticleEnv(AgentBasedSimulation):
         for agent, action in action_dict.items():
             self.move_actor.process_move(self.agents[agent], action.get("accelerate", np.zeros(2)), **kwargs)
             self.velocity_state.apply_friction(self.agents[agent])
+        
+        if 'moving_landmark0' in self.agents:
+            self.move_actor.process_move(self.agents['moving_landmark0'], np.ones(2), **kwargs)
 
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -49,9 +54,13 @@ class ParticleEnv(AgentBasedSimulation):
         ax.set_xticks(np.arange(0, self.position_state.region, 1))
         ax.set_yticks(np.arange(0, self.position_state.region, 1))
 
-        agents_x = [agent.position[0] for agent in self.agents.values()]
-        agents_y = [agent.position[1] for agent in self.agents.values()]
+        agents_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
+        agents_y = [agent.position[1] for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
         mscatter(agents_x, agents_y, ax=ax, m='o', s=100, edgecolor='black', facecolor='gray')
+
+        landmark_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
+        landmark_y = [agent.position[1] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
+        mscatter(landmark_x, landmark_y, ax=ax, m='o', s=100, edgecolor='black', facecolor='black')
 
         plt.plot()
         plt.pause(1e-6)
@@ -102,6 +111,10 @@ if __name__ == "__main__":
         max_speed=1,
         max_acceleration=0.25
     ) for i in range(10)}
+    agents = {**agents, 
+        f'fixed_landmark0': FixedLandmark(id='fixed_landmark0'),
+        f'moving_landmark0': MovingLandmark(id='moving_landmark0', max_speed=1),
+    }
 
     env = ParticleEnv(
         agents=agents,
@@ -113,5 +126,5 @@ if __name__ == "__main__":
     env.render(fig=fig)
 
     for _ in range(24):
-        env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+        env.step({agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)})
         env.render(fig=fig)
