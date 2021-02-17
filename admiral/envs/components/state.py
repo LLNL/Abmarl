@@ -98,6 +98,11 @@ class PositionState(ABC):
         Reset the agents' positions. If the agents were created with a starting
         position, then use that. Otherwise, randomly assign a position in the region.
         """
+        # Invalidate all the agents' positions from last episode
+        for agent in self.agents.values():
+            if isinstance(agent, PositionAgent):
+                agent.position = None
+
         for agent in self.agents.values():
             if isinstance(agent, PositionAgent):
                 if agent.initial_position is not None:
