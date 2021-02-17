@@ -399,5 +399,5 @@ class ContinuousCollisionActor:
             agent2.velocity - (mass_factor[1] * (dot[1]/norm[1]) * rel_position[1])
         ]
         # Only update the velocity if not stationary
-        self.velocity_state.modify_velocity(agent1, vel_new[0])
-        self.velocity_state.modify_velocity(agent2, vel_new[1])
+        self.velocity_state.set_velocity(agent1, vel_new[0])
+        self.velocity_state.set_velocity(agent2, vel_new[1])
