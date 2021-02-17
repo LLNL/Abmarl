@@ -2,14 +2,14 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, GridMovementAgent
-from admiral.envs.components.state import TeamState, GridPositionState
+from admiral.envs.components.state import TeamState, GridPositionState, LifeState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver
 from admiral.envs.components.actor import GridMovementActor
+from admiral.envs.components.agent import TeamAgent, PositionAgent, PositionObservingAgent, AgentObservingAgent, GridMovementAgent, LifeAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ObservingTeamMovementAgent(TeamAgent, PositionAgent, GridMovementAgent, AgentObservingAgent):
+class ObservingTeamMovementAgent(TeamAgent, PositionAgent, PositionObservingAgent, AgentObservingAgent, GridMovementAgent, LifeAgent):
     pass
 
 class SimpleGridObservations(AgentBasedSimulation):
@@ -18,6 +18,7 @@ class SimpleGridObservations(AgentBasedSimulation):
 
         # State components
         self.position_state = GridPositionState(**kwargs)
+        self.life_state = LifeState(**kwargs)
         self.team_state = TeamState(**kwargs)
 
         # Actor components
@@ -30,8 +31,9 @@ class SimpleGridObservations(AgentBasedSimulation):
 
     def reset(self, **kwargs):
         self.position_state.reset(**kwargs)
+        self.life_state.reset(**kwargs)
 
-        return {'agent0': self.observer.get_obs(self.agents['agent0'])}
+        return {'agent0': self.get_obs('agent0')}
     
     def step(self, action_dict, **kwargs):
 
@@ -39,7 +41,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         for agent_id, action in action_dict.items():
             self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
 
-        return {'agent0': self.observer.get_obs(self.agents['agent0'])}
+        return {'agent0': self.get_obs('agent0')}
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -67,10 +69,13 @@ class SimpleGridObservations(AgentBasedSimulation):
         plt.pause(1e-6)
     
     def get_obs(self, agent_id, **kwargs):
-        return self.position.get_obs(agent_id, **kwargs)
+        agent = self.agents[agent_id]
+        return {
+            **self.observer.get_obs(agent, **kwargs),
+        }
     
     def get_reward(self, agent_id, **kwargs):
-        return self.rewarder.get_reward(agent_id, **kwargs)
+        pass
     
     def get_done(self, agent_id, **kwargs):
         pass
@@ -99,9 +104,9 @@ if __name__ == '__main__':
     obs = env.reset()
     fig = plt.gcf()
     env.render(fig=fig)
-    print(obs['agent0']['position'])
-    print(obs['agent0']['position'])
-    print(obs['agent0']['position'])
+    print(obs['agent0']['position'][:,:,0])
+    print(obs['agent0']['position'][:,:,1])
+    print(obs['agent0']['position'][:,:,2])
     print()
 
     obs = env.step({'agent0': {'move': np.array([-1, 0])}})

@@ -3,12 +3,12 @@ from gym.spaces import Box
 
 import numpy as np
 
-from admiral.envs.components.agent import TeamAgent, PositionAgent, AgentObservingAgent, LifeAgent
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver, RelativePositionObserver
+from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, PositionObservingAgent, AgentObservingAgent
 
-class PositionTestAgent(PositionAgent, AgentObservingAgent, LifeAgent): pass
-class PositionTeamTestAgent(PositionAgent, AgentObservingAgent, TeamAgent, LifeAgent): pass
+class PositionTestAgent(PositionAgent, PositionObservingAgent, LifeAgent, AgentObservingAgent): pass
+class PositionTeamTestAgent(PositionAgent, PositionObservingAgent, TeamAgent, LifeAgent, AgentObservingAgent): pass
 class PositionTeamNoViewTestAgent(PositionAgent, TeamAgent, LifeAgent): pass
 class PositionLifeAgent(PositionAgent, LifeAgent): pass
 

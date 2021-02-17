@@ -2,15 +2,15 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent
 from admiral.envs.components.state import ContinuousPositionState, SpeedAngleState
 from admiral.envs.components.actor import SpeedAngleMovementActor
 from admiral.envs.components.observer import SpeedObserver, AngleObserver
 from admiral.envs.components.done import TooCloseDone
+from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, SpeedAngleObservingAgent, SpeedAngleObservingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class BirdAgent(PositionAgent, SpeedAngleAgent): pass
+class BirdAgent(PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, SpeedAngleObservingAgent): pass
 
 class Flight(AgentBasedSimulation):
     def __init__(self, **kwargs):

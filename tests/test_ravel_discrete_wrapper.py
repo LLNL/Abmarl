@@ -2,7 +2,7 @@
 from admiral.envs import AgentBasedSimulation
 from admiral.envs.wrappers.ravel_discrete_wrapper import ravel, unravel
 from admiral.envs.wrappers import RavelDiscreteWrapper
-from admiral.envs import Agent
+from admiral.envs import SimpleAgent as Agent
 
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np
@@ -53,51 +53,51 @@ from .helpers import FillInHelper, MultiAgentGymSpacesEnv
 # Observations that we don't support
 class FloatObservation(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent('agent0', Box(-1.0, 1.0, shape=(4,)), Discrete(3))}
+        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3))}
 
 class UnboundedBelowObservation(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent('agent0', Box(
+        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
             np.array([0, 13, -3, -np.inf]),
             np.array([0, 20, 0, 0]),
             dtype=np.int
         ),
-        Discrete(3)
+        action_space=Discrete(3)
         )}
 
 class UnboundedAboveObservation(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent('agent0', Box(
+        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
             np.array([0, 12, 20, 0]),
             np.array([np.inf, 20, 24, np.inf]),
             dtype=np.int
         ),
-        Discrete(2)
+        action_space=Discrete(2)
         )}
 
 # Actions that we don't support
 class FloatAction(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent('agent0', Box(-1.0, 1.0, shape=(4,)), Discrete(3))}
+        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3))}
 
 class UnboundedBelowAction(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent('agent0', Box(
+        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
             np.array([0, 13, -3, -np.inf]),
             np.array([0, 20, 0, 0]),
             dtype=np.int
         ),
-        Discrete(3)
+        action_space=Discrete(3)
         )}
 
 class UnboundedAboveAction(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent('agent0', Box(
+        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
             np.array([0, 12, 20, 0]),
             np.array([np.inf, 20, 24, np.inf]),
             dtype=np.int
         ), 
-        Discrete(2)
+        action_space=Discrete(2)
         )}
 
 def test_exceptions():

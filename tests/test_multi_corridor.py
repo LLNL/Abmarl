@@ -2,7 +2,7 @@
 from gym.spaces import Box, MultiBinary, Discrete, Dict
 import numpy as np
 
-from admiral.envs import Agent
+from admiral.envs import SimpleAgent as Agent
 from admiral.envs.corridor import MultiCorridor as Corridor
 
 
@@ -15,11 +15,11 @@ def test_corridor_build():
     env = Corridor.build()
     assert env.end == 10
     assert env.agents == {
-        'agent0': Agent('agent0', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
-        'agent1': Agent('agent1', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
-        'agent2': Agent('agent2', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
-        'agent3': Agent('agent3', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
-        'agent4': Agent('agent4', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
+        'agent0': Agent(id='agent0', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
+        'agent1': Agent(id='agent1', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
+        'agent2': Agent(id='agent2', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
+        'agent3': Agent(id='agent3', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
+        'agent4': Agent(id='agent4', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
     }
 
 def test_corridor_build_end():
@@ -31,8 +31,8 @@ def test_corridor_build_end():
 def test_corridor_build_num_agents():
     env = Corridor.build({'num_agents': 2})
     assert env.agents == {
-        'agent0': Agent('agent0', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
-        'agent1': Agent('agent1', Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), Discrete(3)),
+        'agent0': Agent(id='agent0', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
+        'agent1': Agent(id='agent1', observation_space=Dict({'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)}), action_space=Discrete(3)),
     }
 
 def test_corridor_reset():

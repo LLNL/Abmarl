@@ -1,6 +1,5 @@
 
 from admiral.envs import AgentBasedSimulation
-from admiral.envs import Agent
 from admiral.envs.wrappers import SARWrapper
 from .helpers import MultiAgentEnv
 

@@ -2,14 +2,14 @@
 from gym.spaces import MultiBinary, Dict, Box
 import numpy as np
 
-from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent
+from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent
 from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState, VelocityState
 from admiral.envs.components.observer import PositionRestrictedMaskObserver, PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedRelativePositionObserver, PositionRestrictedHealthObserver, PositionRestrictedLifeObserver, PositionRestrictedAngleObserver, PositionRestrictedSpeedObserver, PositionRestrictedVelocityObserver
 
-class PositionRestrictedAgent(AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent): pass
-class TeamlessAgent(AgentObservingAgent, PositionAgent, LifeAgent): pass
-class LifelessAgent(AgentObservingAgent, PositionAgent, TeamAgent): pass
-class PositionlessAgent(AgentObservingAgent, LifeAgent, TeamAgent): pass
+class PositionRestrictedAgent(AgentObservingAgent, PositionAgent, LifeAgent, TeamAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
+class TeamlessAgent(AgentObservingAgent, PositionAgent, LifeAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
+class LifelessAgent(AgentObservingAgent, PositionAgent, TeamAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
+class PositionlessAgent(AgentObservingAgent, LifeAgent, TeamAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
 
 agents = {
     'agent0':  PositionRestrictedAgent(id='agent0',  agent_view=3, team=0, initial_health=1.0, initial_position=np.array([0, 0])),
@@ -871,22 +871,22 @@ def test_mask_restriction():
 
 
 
-class ContinuousPositionRestrictedAgent(AgentObservingAgent, PositionAgent, SpeedAngleAgent): pass
-
-continuous_agents = {
-    'agent0': ContinuousPositionRestrictedAgent(id='agent0', agent_view=3, initial_position=np.array([0, 0]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.32, initial_banking_angle=0.0, initial_ground_angle=0),
-    'agent1': ContinuousPositionRestrictedAgent(id='agent1', agent_view=1, initial_position=np.array([1, 1]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.24, initial_banking_angle=0.0, initial_ground_angle=90),
-    'agent2': ContinuousPositionRestrictedAgent(id='agent2', agent_view=3, initial_position=np.array([2, 2]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.78, initial_banking_angle=0.0, initial_ground_angle=180),
-    'agent3': ContinuousPositionRestrictedAgent(id='agent3', agent_view=4, initial_position=np.array([3, 3]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.50, initial_banking_angle=0.0, initial_ground_angle=270),
-    'agent4': ContinuousPositionRestrictedAgent(id='agent4', agent_view=0, initial_position=np.array([4, 4]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=1.00, initial_banking_angle=0.0, initial_ground_angle=24),
-    'agent5': ContinuousPositionRestrictedAgent(id='agent5', agent_view=3, initial_position=np.array([5, 5]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.08, initial_banking_angle=0.0, initial_ground_angle=300),
-    'agent6': ContinuousPositionRestrictedAgent(id='agent6', agent_view=2, initial_position=np.array([6, 6]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.95, initial_banking_angle=0.0, initial_ground_angle=123),
-}
+class ContinuousPositionRestrictedAgent(AgentObservingAgent, PositionAgent, SpeedAngleAgent, PositionObservingAgent, SpeedAngleObservingAgent): pass
 
 def test_speed_restriction():
-    position_state = ContinuousPositionState(agents=continuous_agents, region=10)
-    speed_angle_state = SpeedAngleState(agents=continuous_agents)
-    speed_observer = PositionRestrictedSpeedObserver(agents=continuous_agents)
+    agents = {
+        'agent0': ContinuousPositionRestrictedAgent(id='agent0', agent_view=3, initial_position=np.array([0, 0]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.32, initial_banking_angle=0.0, initial_ground_angle=0),
+        'agent1': ContinuousPositionRestrictedAgent(id='agent1', agent_view=1, initial_position=np.array([1, 1]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.24, initial_banking_angle=0.0, initial_ground_angle=90),
+        'agent2': ContinuousPositionRestrictedAgent(id='agent2', agent_view=3, initial_position=np.array([2, 2]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.78, initial_banking_angle=0.0, initial_ground_angle=180),
+        'agent3': ContinuousPositionRestrictedAgent(id='agent3', agent_view=4, initial_position=np.array([3, 3]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.50, initial_banking_angle=0.0, initial_ground_angle=270),
+        'agent4': ContinuousPositionRestrictedAgent(id='agent4', agent_view=0, initial_position=np.array([4, 4]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=1.00, initial_banking_angle=0.0, initial_ground_angle=24),
+        'agent5': ContinuousPositionRestrictedAgent(id='agent5', agent_view=3, initial_position=np.array([5, 5]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.08, initial_banking_angle=0.0, initial_ground_angle=300),
+        'agent6': ContinuousPositionRestrictedAgent(id='agent6', agent_view=2, initial_position=np.array([6, 6]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.95, initial_banking_angle=0.0, initial_ground_angle=123),
+    }
+
+    position_state = ContinuousPositionState(agents=agents, region=10)
+    speed_angle_state = SpeedAngleState(agents=agents)
+    speed_observer = PositionRestrictedSpeedObserver(agents=agents)
 
     position_state.reset()
     speed_angle_state.reset()
@@ -962,9 +962,18 @@ def test_speed_restriction():
     }}
     
 def test_angle_restriction():
-    position_state = ContinuousPositionState(agents=continuous_agents, region=10)
-    speed_angle_state = SpeedAngleState(agents=continuous_agents)
-    angle_observer = PositionRestrictedAngleObserver(agents=continuous_agents)
+    agents = {
+        'agent0': ContinuousPositionRestrictedAgent(id='agent0', agent_view=3, initial_position=np.array([0, 0]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.32, initial_banking_angle=0.0, initial_ground_angle=0),
+        'agent1': ContinuousPositionRestrictedAgent(id='agent1', agent_view=1, initial_position=np.array([1, 1]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.24, initial_banking_angle=0.0, initial_ground_angle=90),
+        'agent2': ContinuousPositionRestrictedAgent(id='agent2', agent_view=3, initial_position=np.array([2, 2]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.78, initial_banking_angle=0.0, initial_ground_angle=180),
+        'agent3': ContinuousPositionRestrictedAgent(id='agent3', agent_view=4, initial_position=np.array([3, 3]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.50, initial_banking_angle=0.0, initial_ground_angle=270),
+        'agent4': ContinuousPositionRestrictedAgent(id='agent4', agent_view=0, initial_position=np.array([4, 4]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=1.00, initial_banking_angle=0.0, initial_ground_angle=24),
+        'agent5': ContinuousPositionRestrictedAgent(id='agent5', agent_view=3, initial_position=np.array([5, 5]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.08, initial_banking_angle=0.0, initial_ground_angle=300),
+        'agent6': ContinuousPositionRestrictedAgent(id='agent6', agent_view=2, initial_position=np.array([6, 6]), min_speed=0., max_speed=1., max_acceleration=0.5, max_banking_angle=30, max_banking_angle_change=10, initial_speed=0.95, initial_banking_angle=0.0, initial_ground_angle=123),
+    }
+    position_state = ContinuousPositionState(agents=agents, region=10)
+    speed_angle_state = SpeedAngleState(agents=agents)
+    angle_observer = PositionRestrictedAngleObserver(agents=agents)
 
     position_state.reset()
     speed_angle_state.reset()
@@ -1041,10 +1050,10 @@ def test_angle_restriction():
 
 
 
-class ContinuousVelocityAgent(AgentObservingAgent, PositionAgent, VelocityAgent): pass
+class ContinuousVelocityAgent(AgentObservingAgent, PositionAgent, VelocityAgent, VelocityObservingAgent): pass
 
 def test_velocity_restriction():
-    continuous_agents = {
+    agents = {
         'agent0': ContinuousVelocityAgent(id='agent0', agent_view=3, initial_position=np.array([0, 0]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 0,  0])),
         'agent1': ContinuousVelocityAgent(id='agent1', agent_view=1, initial_position=np.array([1, 1]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 0,  1])),
         'agent2': ContinuousVelocityAgent(id='agent2', agent_view=3, initial_position=np.array([2, 2]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([ 1,  0])),
@@ -1053,9 +1062,9 @@ def test_velocity_restriction():
         'agent5': ContinuousVelocityAgent(id='agent5', agent_view=3, initial_position=np.array([5, 5]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([-1,  0])),
         'agent6': ContinuousVelocityAgent(id='agent6', agent_view=2, initial_position=np.array([6, 6]), max_speed=1., max_acceleration=0.5, initial_velocity=np.array([-1, -1])),
     }
-    position_state = ContinuousPositionState(agents=continuous_agents, region=10)
-    velocity_state = VelocityState(agents=continuous_agents)
-    velocity_observer = PositionRestrictedVelocityObserver(agents=continuous_agents)
+    position_state = ContinuousPositionState(agents=agents, region=10)
+    velocity_state = VelocityState(agents=agents)
+    velocity_observer = PositionRestrictedVelocityObserver(agents=agents)
 
     position_state.reset()
     velocity_state.reset()

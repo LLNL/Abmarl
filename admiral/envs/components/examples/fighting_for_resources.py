@@ -3,15 +3,15 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.agent import AgentObservingAgent, PositionAgent, GridMovementAgent, HarvestingAgent, ResourceObservingAgent, AttackingAgent, LifeAgent
 from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, GridResourcesActor, PositionBasedAttackActor
 from admiral.envs.components.done import DeadDone
+from admiral.envs.components.agent import PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightForResourcesAgent(LifeAgent, PositionAgent, AttackingAgent, GridMovementAgent, HarvestingAgent, AgentObservingAgent, ResourceObservingAgent):
+class FightForResourcesAgent(PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent):
     pass
 
 class FightForResourcesEnv(AgentBasedSimulation):
@@ -96,8 +96,8 @@ class FightForResourcesEnv(AgentBasedSimulation):
         return {
             **self.position_observer.get_obs(agent),
             **self.resource_observer.get_obs(agent),
-            **self.health_observer.get_obs(agent_id, **kwargs),
-            **self.life_observer.get_obs(agent_id, **kwargs),
+            **self.health_observer.get_obs(agent, **kwargs),
+            **self.life_observer.get_obs(agent, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
@@ -114,7 +114,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {f'agent{i}': FightForResourcesAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, agent_view=3, resource_view=3
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, resource_view=3
     ) for i in range(6)}
     env = FightForResourcesEnv(
         region=10,

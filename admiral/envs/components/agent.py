@@ -1,4 +1,6 @@
 
+from gym.spaces import Dict
+
 # ------------------ #
 # --- Base Agent --- #
 # ------------------ #
@@ -6,26 +8,60 @@
 class Agent:
     """
     Base Agent class for agents that live in an environment. Agents require an
-    id in in order to even be constructed. Agents must also have an observation
-    space and action space to be considered successfully configured.
+    id in in order to even be constructed.
     """
-    def __init__(self, id=None, observation_space=None, action_space=None, **kwargs):
+    def __init__(self, id=None, **kwargs):
         if id is None:
             raise TypeError("Agents must be constructed with an id.")
         else:
             self.id = id
-        self.observation_space = {} if observation_space is None else observation_space
-        self.action_space = {} if action_space is None else action_space
+        
+    def finalize(self, **kwargs):
+        pass
     
     @property
     def configured(self):
         """
         Determine if the agent has been successfully configured.
         """
-        return self.id is not None and self.action_space and self.observation_space
+        return self.id is not None
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
+
+class ActingAgent(Agent):
+    """
+    ActingAgents are Agents that are expected to produce actions and therefore
+    should have an action space in order to be successfully configured.
+    """
+    def __init__(self, action_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.action_space = {} if action_space is None else action_space
+
+    def finalize(self, **kwargs):
+        super().finalize(**kwargs)
+        self.action_space = Dict(self.action_space)
+    
+    @property
+    def configured(self):
+        return super().configured and self.action_space
+
+class ObservingAgent(Agent):
+    """
+    ObservingAgents are Agents that are expected to receive observations and therefore
+    should have an observation space in order to be successfully configured.
+    """
+    def __init__(self, observation_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.observation_space = {} if observation_space is None else observation_space
+
+    def finalize(self, **kwargs):
+        super().finalize(**kwargs)
+        self.observation_space = Dict(self.observation_space)
+    
+    @property
+    def configured(self):
+        return super().configured and self.observation_space
 
 
 
@@ -33,7 +69,7 @@ class Agent:
 # --- Attacking --- #
 # ----------------- #
 
-class AttackingAgent(Agent):
+class AttackingAgent(ActingAgent):
     """
     Agents that can attack other agents.
 
@@ -98,13 +134,16 @@ class LifeAgent(Agent):
         """
         return super().configured and self.min_health is not None and self.max_health is not None and self.is_alive is not None
 
+class LifeObservingAgent(ObservingAgent): pass
+class HealthObservingAgent(ObservingAgent): pass
 
 
 # ----------------- #
 # --- Observing --- #
 # ----------------- #
 
-class AgentObservingAgent(Agent):
+# TODO: move this to a more specific location
+class AgentObservingAgent(ObservingAgent):
     """
     Agents can observe other agents.
 
@@ -127,25 +166,6 @@ class AgentObservingAgent(Agent):
         """
         return super().configured and self.agent_view is not None
 
-class ResourceObservingAgent(Agent):
-    """
-    Agents can observe the resources in the environment.
-
-    resource_view (int):
-        Any resources within this range of the agent's position will be fully observed.
-    """
-    def __init__(self, resource_view=None, **kwargs):
-        super().__init__(**kwargs)
-        assert resource_view is not None, "resource_view must be nonnegative integer"
-        self.resource_view = resource_view
-    
-    @property
-    def configured(self):
-        """
-        Agents are configured if the resource_view parameter is set.
-        """
-        return super().configured and self.resource_view is not None
-
 
 
 # ----------------------------- #
@@ -160,7 +180,7 @@ class PositionAgent(Agent):
         The desired starting position for this agent.
 
     Warning: You should consider the positional state of the environment when
-    working with the agent's position because state interpret the elements of
+    working with the agent's position because states interpret the elements of
     the array differently.
     """
     def __init__(self, initial_position=None, **kwargs):
@@ -168,7 +188,9 @@ class PositionAgent(Agent):
         self.initial_position = initial_position
         self.position = None
 
-class GridMovementAgent(Agent):
+class PositionObservingAgent(ObservingAgent): pass
+
+class GridMovementAgent(ActingAgent):
     """
     Agents can move up to some number of spaces away.
 
@@ -190,8 +212,7 @@ class GridMovementAgent(Agent):
 class SpeedAngleAgent(Agent):
     """
     Agents have a speed and a banking angle which are used to determine how the
-    agent moves around a continuous field. Additionally, agents can accelerate
-    and change their banking angles to modify their speed and direction.
+    agent moves around a continuous field.
     
     min_speed (float):
         The minimum speed this agent can travel.
@@ -199,16 +220,8 @@ class SpeedAngleAgent(Agent):
     max_speed (float):
         The maximum speed this agent can travel.
     
-    max_acceleration (float):
-        The maximum amount by which an agent can change its speed in a single time
-        step.
-    
     max_banking_angle (float):
         The maximum banking angle the agent can endure.
-
-    max_banking_angle_change (float):
-        The maximum amount by which an agent can change its banking angle in a
-        single time step.
 
     initial_speed (float):
         The agent's initial speed.
@@ -219,19 +232,15 @@ class SpeedAngleAgent(Agent):
     initial_ground_angle (float):
         The agent's initial ground angle.
     """
-    def __init__(self, min_speed=0.25, max_speed=1.0, max_acceleration=0.25, \
-                 max_banking_angle=45, max_banking_angle_change=30, \
-                 initial_speed=None, initial_banking_angle=None, \
-                 initial_ground_angle=None, **kwargs):
+    def __init__(self, min_speed=0.25, max_speed=1.0, max_banking_angle=45, initial_speed=None, \
+                 initial_banking_angle=None, initial_ground_angle=None, **kwargs):
         super().__init__(**kwargs)
         self.min_speed = min_speed
         self.max_speed = max_speed
-        self.max_acceleration = max_acceleration
         self.initial_speed = initial_speed
         self.speed = None # Should be set by the state handler
 
         self.max_banking_angle = max_banking_angle
-        self.max_banking_angle_change = max_banking_angle_change
         self.initial_banking_angle = initial_banking_angle
         self.initial_ground_angle = initial_ground_angle
         self.banking_angle = None # Should be set by the state handler
@@ -239,8 +248,31 @@ class SpeedAngleAgent(Agent):
     @property
     def configured(self):
         return super().configured and self.min_speed is not None and self.max_speed is not None and \
-            self.max_acceleration is not None and self.max_banking_angle is not None and \
+            self.max_banking_angle is not None
+
+class SpeedAngleActingAgent(ActingAgent):
+    """
+    Agents can change their speed and banking angles.
+    
+    max_acceleration (float):
+        The maximum amount by which an agent can change its speed in a single time
+        step.
+
+    max_banking_angle_change (float):
+        The maximum amount by which an agent can change its banking angle in a
+        single time step.
+    """
+    def __init__(self, max_acceleration=0.25, max_banking_angle_change=30, **kwargs):
+        super().__init__(**kwargs)
+        self.max_acceleration = max_acceleration
+        self.max_banking_angle_change = max_banking_angle_change
+    
+    @property
+    def configured(self):
+        return super().configured and self.max_acceleration is not None and \
             self.max_banking_angle_change is not None
+
+class SpeedAngleObservingAgent(ObservingAgent): pass
 
 class VelocityAgent(Agent):
     """
@@ -257,15 +289,30 @@ class VelocityAgent(Agent):
         The maximum amount by which an agent can change its velocity in a single
         time step.
     """
-    def __init__(self, initial_velocity=None, max_speed=None, max_acceleration=None, **kwargs):
+    def __init__(self, initial_velocity=None, max_speed=None, **kwargs):
         super().__init__(**kwargs)
         self.initial_velocity = initial_velocity
         self.max_speed = max_speed
+    
+    @property
+    def configured(self):
+        return super().configured and self.max_speed is not None
+
+class AcceleratingAgent(ActingAgent):
+    """
+    Agents can accelerate to modify their velocities.
+    
+    max_acceleration (float):
+        The maximum amount by which an agent can change its velocity in a single
+        time step.
+    """
+    def __init__(self, max_acceleration=None, **kwargs):
+        super().__init__(**kwargs)
         self.max_acceleration = max_acceleration
     
     @property
     def configured(self):
-        return super().configured and self.max_speed is not None and self.max_acceleration is not None
+        return super().configured and self.max_acceleration is not None
 
 class MassAgent(Agent):
     def __init__(self, mass=None, **kwargs):
@@ -285,6 +332,7 @@ class SizeAgent(Agent):
     def configured(self):
         return super().configured and self.size is not None
 
+class VelocityObservingAgent(ObservingAgent): pass
 
 class CollisionAgent(Agent):
     def __init__(self, size=None, mass=None, **kwargs):
@@ -301,7 +349,7 @@ class CollisionAgent(Agent):
 # --- Resources and Harvesting --- #
 # -------------------------------- #
 
-class HarvestingAgent(Agent):
+class HarvestingAgent(ActingAgent):
     """
     Agents can harvest resources.
 
@@ -320,6 +368,25 @@ class HarvestingAgent(Agent):
         Agents are configured if max_harvest is set.
         """
         return super().configured and self.max_harvest is not None
+
+class ResourceObservingAgent(ObservingAgent):
+    """
+    Agents can observe the resources in the environment.
+
+    resource_view (int):
+        Any resources within this range of the agent's position will be fully observed.
+    """
+    def __init__(self, resource_view=None, **kwargs):
+        super().__init__(**kwargs)
+        assert resource_view is not None, "resource_view must be nonnegative integer"
+        self.resource_view = resource_view
+
+    @property
+    def configured(self):
+        """
+        Agents are configured if the resource_view parameter is set.
+        """
+        return super().configured and self.resource_view is not None
 
 
 
@@ -343,3 +410,5 @@ class TeamAgent(Agent):
         Agent is configured if team is set.
         """
         return super().configured and self.team is not None
+
+class TeamObservingAgent(ObservingAgent): pass
