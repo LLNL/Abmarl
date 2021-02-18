@@ -58,14 +58,14 @@ class ParticleEnv(AgentBasedSimulation):
         ax.set_xticks(np.arange(0, self.position_state.region, 1))
         ax.set_yticks(np.arange(0, self.position_state.region, 1))
 
+        landmark_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
+        landmark_y = [agent.position[1] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
+        mscatter(landmark_x, landmark_y, ax=ax, m='o', s=3000, edgecolor='black', facecolor='black')
+
         agents_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
         agents_y = [agent.position[1] for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
         agents_size = [3000*agent.size for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
         mscatter(agents_x, agents_y, ax=ax, m='o', s=agents_size, edgecolor='black', facecolor='gray')
-
-        landmark_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
-        landmark_y = [agent.position[1] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
-        mscatter(landmark_x, landmark_y, ax=ax, m='o', s=100, edgecolor='black', facecolor='black')
 
         plt.plot()
         plt.pause(1e-6)
@@ -89,31 +89,7 @@ class ParticleEnv(AgentBasedSimulation):
     def get_info(self, agent_id, **kwargs):
         pass
 
-if __name__ == "__main__":
-    # Turn this into a test for friction
-    agents = {f'agent{i}': ParticleAgent(
-        id=f'agent{i}',
-        max_speed=1,
-        max_acceleration=0.25,
-        initial_velocity=np.ones(2),
-        mass=1,
-        size=1,
-    ) for i in range(10)}
-
-    env = ParticleEnv(
-        agents=agents,
-        region=10,
-        friction=0.1
-    )
-    fig = plt.figure()
-    env.reset()
-    env.render(fig=fig)
-    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-
-    for _ in range(24):
-        env.step({agent.id: {} for agent in agents.values()})
-        env.render(fig=fig)
-    
+if __name__ == "__main__":    
     agents = {f'agent{i}': ParticleAgent(
         id=f'agent{i}',
         max_speed=.25,
@@ -121,6 +97,7 @@ if __name__ == "__main__":
         mass=1,
         size=1,
     ) for i in range(10)}
+    
     agents = {**agents, 
         f'fixed_landmark0': FixedLandmark(id='fixed_landmark0'),
         f'moving_landmark0': MovingLandmark(id='moving_landmark0', max_speed=1),
