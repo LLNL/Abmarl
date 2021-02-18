@@ -389,7 +389,6 @@ class ContinuousCollisionActor:
             The combined size of the two agents
         """
         overlap = (combined_sizes - dist) / combined_sizes
-        print('{} vs {}, Overlap: {}'.format(agent1, agent2, overlap))
         self.position_state.modify_position(agent1, -agent1.velocity * overlap)
         self.position_state.modify_position(agent2, -agent2.velocity * overlap)
 

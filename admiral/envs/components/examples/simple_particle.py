@@ -60,7 +60,7 @@ class ParticleEnv(AgentBasedSimulation):
 
         agents_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
         agents_y = [agent.position[1] for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
-        agents_size = [agent.render_size for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
+        agents_size = [3000*agent.size for agent in self.agents.values() if isinstance(agent, ParticleAgent)]
         mscatter(agents_x, agents_y, ax=ax, m='o', s=agents_size, edgecolor='black', facecolor='gray')
 
         landmark_x = [agent.position[0] for agent in self.agents.values() if isinstance(agent, (FixedLandmark, MovingLandmark))]
