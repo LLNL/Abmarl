@@ -90,6 +90,7 @@ class ParticleEnv(AgentBasedSimulation):
         pass
 
 if __name__ == "__main__":
+    # Turn this into a test for friction
     agents = {f'agent{i}': ParticleAgent(
         id=f'agent{i}',
         max_speed=1,
