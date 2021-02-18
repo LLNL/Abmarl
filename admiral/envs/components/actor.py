@@ -367,7 +367,7 @@ class ContinuousCollisionActor:
 
     def _update_velocities(self, agent1, agent2, **kwargs):
         """Updates the velocities of two entities when they collide based on an
-        inelastic collision assumption."""
+        elastic collision assumption."""
         # calculate vector between centers
         rel_position = [
             agent2.position - agent1.position,

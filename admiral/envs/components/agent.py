@@ -339,7 +339,7 @@ class CollisionAgent(Agent):
         super().__init__(**kwargs)
         self.size = size
         self.mass = mass
-        self.render_size = 1000 * size
+        self.render_size = 3000 * size
     
     @property
     def configured(self):

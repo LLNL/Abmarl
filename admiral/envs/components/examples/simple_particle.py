@@ -90,28 +90,28 @@ class ParticleEnv(AgentBasedSimulation):
         pass
 
 if __name__ == "__main__":
-    # agents = {f'agent{i}': ParticleAgent(
-    #     id=f'agent{i}',
-    #     max_speed=1,
-    #     max_acceleration=0.25,
-    #     initial_velocity=np.ones(2),
-    #     mass=1,
-    #     size=1,
-    # ) for i in range(10)}
+    agents = {f'agent{i}': ParticleAgent(
+        id=f'agent{i}',
+        max_speed=1,
+        max_acceleration=0.25,
+        initial_velocity=np.ones(2),
+        mass=1,
+        size=1,
+    ) for i in range(10)}
 
-    # env = ParticleEnv(
-    #     agents=agents,
-    #     region=20,
-    #     friction=0.1
-    # )
-    # fig = plt.figure()
-    # env.reset()
-    # env.render(fig=fig)
-    # print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    env = ParticleEnv(
+        agents=agents,
+        region=10,
+        friction=0.1
+    )
+    fig = plt.figure()
+    env.reset()
+    env.render(fig=fig)
+    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
 
-    # for _ in range(24):
-    #     env.step({agent.id: {} for agent in agents.values()})
-    #     env.render(fig=fig)
+    for _ in range(24):
+        env.step({agent.id: {} for agent in agents.values()})
+        env.render(fig=fig)
     
     agents = {f'agent{i}': ParticleAgent(
         id=f'agent{i}',
@@ -134,6 +134,6 @@ if __name__ == "__main__":
     env.reset()
     env.render(fig=fig)
 
-    for _ in range(200):
+    for _ in range(50):
         env.step({agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)})
         env.render(fig=fig)
