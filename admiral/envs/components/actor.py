@@ -361,7 +361,6 @@ class ContinuousCollisionActor:
             checked_agents.add(agent1.id)
             for agent2 in self.agents.values():
                 if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, CollisionAgent)): continue
-                if not isinstance(agent2, CollisionAgent): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
                 if agent2.id in checked_agents: continue # Already checked this agent
                 dist = np.linalg.norm(agent1.position - agent2.position)
