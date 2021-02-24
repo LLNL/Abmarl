@@ -314,8 +314,28 @@ class AcceleratingAgent(ActingAgent):
     def configured(self):
         return super().configured and self.max_acceleration is not None
 
-
 class VelocityObservingAgent(ObservingAgent): pass
+
+class CollisionAgent(Agent):
+    """
+    Agents that have physical size and mass and can be used in collisions.
+
+    size (float):
+        The size of the agent.
+        Default 1.
+    
+    mass (float):
+        The mass of the agent.
+        Default 1.
+    """
+    def __init__(self, size=1, mass=1, **kwargs):
+        super().__init__(**kwargs)
+        self.size = size
+        self.mass = mass
+    
+    @property
+    def configured(self):
+        return super().configured and self.size is not None and self.mass is not None
 
 # -------------------------------- #
 # --- Resources and Harvesting --- #

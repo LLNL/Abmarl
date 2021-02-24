@@ -2,7 +2,8 @@
 import numpy as np
 
 from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, HarvestingAgent, \
-    SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent
+    SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent, \
+    CollisionAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -322,3 +323,115 @@ class GridResourcesActor:
             resource_before = self.resources.resources[location]
             self.resources.modify_resources(location, -amount)
             return resource_before - self.resources.resources[location]
+
+
+
+
+
+# --------------------------------------------- #
+# --- Actors that don't receive agent input --- #
+# --------------------------------------------- #
+
+class ContinuousCollisionActor:
+    """
+    Identify collisions among agents and update positions and velocities according to
+    elastic collision physics.
+
+    position_state (PositionState):
+        The PositionState handler.
+    
+    velocity_state (VelocityState):
+        The VelocityState handler.
+    
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, position_state=None, velocity_state=None, agents=None, **kwargs):
+        self.position_state = position_state
+        self.velocity_state = velocity_state
+        self.agents = agents
+
+    def detect_collisions_and_modify_states(self, **kwargs):
+        """
+        Detect collisions between agents and update position and velocities.
+        """
+        checked_agents = set()
+        for agent1 in self.agents.values():
+            if not (isinstance(agent1, CollisionAgent) and isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent)): continue
+            checked_agents.add(agent1.id)
+            for agent2 in self.agents.values():
+                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, CollisionAgent)): continue
+                if agent1.id == agent2.id: continue # Cannot collide with yourself
+                if agent2.id in checked_agents: continue # Already checked this agent
+                dist = np.linalg.norm(agent1.position - agent2.position)
+                combined_sizes = agent1.size + agent2.size
+                if dist < combined_sizes:
+                    self._undo_overlap(agent1, agent2, dist, combined_sizes)
+                    self._update_velocities(agent1, agent2)
+
+    def _undo_overlap(self, agent1, agent2, dist, combined_sizes, **kwargs):
+        """
+        Colliding agents can overlap within a timestep. So we need to move the
+        colliding agents "backwards" through their path in order to capture the
+        positions they were in when they actually collided.
+
+        agent1 (CollisionAgent):
+            One of the colliding agents.
+        
+        agent2 (CollisionAgent):
+            The other colliding agent.
+        
+        dist (float):
+            The collision distance threshold.
+        
+        combined_size (float):
+            The combined size of the two agents
+        """
+        overlap = (combined_sizes - dist) / combined_sizes
+        self.position_state.modify_position(agent1, -agent1.velocity * overlap)
+        self.position_state.modify_position(agent2, -agent2.velocity * overlap)
+
+    def _update_velocities(self, agent1, agent2, **kwargs):
+        """
+        Updates the velocities of two agents when they collide based on an
+        elastic collision assumption.
+
+        agent1 (CollisionAgent):
+            One of the colliding agents.
+        
+        agent2 (CollisionAgent):
+            The other colliding agent.
+        """
+        # calculate vector between centers
+        rel_position = [
+            agent2.position - agent1.position,
+            agent1.position - agent2.position
+        ]
+        # Calculate relative velocities
+        rel_velocities = [
+            agent1.velocity - agent2.velocity,
+            agent2.velocity - agent1.velocity
+        ]
+        # Calculate mass factor
+        mass_factor = [
+            2 * agent2.mass / (agent2.mass + agent1.mass),
+            2 * agent1.mass / (agent2.mass + agent1.mass)
+        ]
+        # norm
+        norm = [
+            np.square(np.linalg.norm(rel_position[0])),
+            np.square(np.linalg.norm(rel_position[1]))
+        ]
+        # Dot product of relative velocity and relative distcance
+        dot = [
+            np.dot(rel_velocities[0], rel_position[0]),
+            np.dot(rel_velocities[1], rel_position[1])
+        ]
+        # bringing it all together
+        vel_new = [
+            agent1.velocity - (mass_factor[0] * (dot[0]/norm[0]) * rel_position[0]),
+            agent2.velocity - (mass_factor[1] * (dot[1]/norm[1]) * rel_position[1])
+        ]
+        # Only update the velocity if not stationary
+        self.velocity_state.set_velocity(agent1, vel_new[0])
+        self.velocity_state.set_velocity(agent2, vel_new[1])
