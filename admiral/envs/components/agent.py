@@ -41,7 +41,8 @@ class ActingAgent(Agent):
 
     def finalize(self, **kwargs):
         """
-        Wrap all the action spaces with a Dict and seed it.
+        Wrap all the action spaces with a Dict and seed it if the agent was
+        created with a seed.
         """
         super().finalize(**kwargs)
         self.action_space = Dict(self.action_space)
@@ -63,7 +64,8 @@ class ObservingAgent(Agent):
 
     def finalize(self, **kwargs):
         """
-        Wrap all the observation spaces with a Dict and seed it.
+        Wrap all the observation spaces with a Dict and seed it if the agent was
+        created with a seed.
         """
         super().finalize(**kwargs)
         self.observation_space = Dict(self.observation_space)
