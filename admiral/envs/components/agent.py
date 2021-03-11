@@ -1,5 +1,5 @@
 
-from gym.spaces import Dict
+from gym.spaces import Discrete, Box, MultiDiscrete, MultiBinary, Dict, Tuple
 
 # ------------------ #
 # --- Base Agent --- #
@@ -9,16 +9,20 @@ class Agent:
     """
     Base Agent class for agents that live in an environment. Agents require an
     id in in order to even be constructed.
+
+    seed (int):
+        Seed this agent's rng. Default value is None.
     """
-    def __init__(self, id=None, **kwargs):
+    def __init__(self, id=None, seed=None, **kwargs):
         if id is None:
             raise TypeError("Agents must be constructed with an id.")
         else:
             self.id = id
+        self.seed = seed
         
     def finalize(self, **kwargs):
         pass
-    
+
     @property
     def configured(self):
         """
@@ -39,8 +43,13 @@ class ActingAgent(Agent):
         self.action_space = {} if action_space is None else action_space
 
     def finalize(self, **kwargs):
+        """
+        Wrap all the action spaces with a Dict and seed it if the agent was
+        created with a seed.
+        """
         super().finalize(**kwargs)
         self.action_space = Dict(self.action_space)
+        self.action_space.seed(self.seed)
     
     @property
     def configured(self):
@@ -56,8 +65,13 @@ class ObservingAgent(Agent):
         self.observation_space = {} if observation_space is None else observation_space
 
     def finalize(self, **kwargs):
+        """
+        Wrap all the observation spaces with a Dict and seed it if the agent was
+        created with a seed.
+        """
         super().finalize(**kwargs)
         self.observation_space = Dict(self.observation_space)
+        self.observation_space.seed(self.seed)
     
     @property
     def configured(self):
