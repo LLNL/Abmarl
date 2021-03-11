@@ -227,6 +227,8 @@ env = CompositeEnv(
 )
 
 # TODO: Why do parents and children take EXACT SAME action?
+# ANSWER: because the child is a copy of the parent, and that means it copies
+# the random number generator, so the actions will be the same.
 for ep in range(3):
     print(f'Episode is {ep}')
     env.reset()
