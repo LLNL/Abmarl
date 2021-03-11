@@ -9,6 +9,9 @@ class Agent:
     """
     Base Agent class for agents that live in an environment. Agents require an
     id in in order to even be constructed.
+
+    seed (int):
+        Seed this agent's rng. Default value is None.
     """
     def __init__(self, id=None, seed=None, **kwargs):
         if id is None:
@@ -46,8 +49,7 @@ class ActingAgent(Agent):
         """
         super().finalize(**kwargs)
         self.action_space = Dict(self.action_space)
-        if self.seed is not None:
-            self.action_space.seed(self.seed)
+        self.action_space.seed(self.seed)
     
     @property
     def configured(self):
@@ -69,8 +71,7 @@ class ObservingAgent(Agent):
         """
         super().finalize(**kwargs)
         self.observation_space = Dict(self.observation_space)
-        if self.seed is not None:
-            self.observation_space.seed(self.seed)
+        self.observation_space.seed(self.seed)
     
     @property
     def configured(self):
