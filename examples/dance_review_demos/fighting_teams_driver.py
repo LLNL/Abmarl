@@ -80,6 +80,7 @@ def policy_mapping_fn(agent_id):
 #     print(policy_mapping_fn(agent))
 # import sys; sys.exit()
 
+
 # --------------------------- #
 # --- Setup the algorithm --- #
 # --------------------------- #
@@ -95,22 +96,27 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('The-title-of-this-experiment'),
+        'title': '{}'.format('TeamBattle'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
+        'checkpoint_freq': 50,
+        'checkpoint_at_end': True,
         'stop': {
-            # Stopping criteria
+            'episodes_total': 20,
         },
+        'verbose': 2,
         'config': {
             # --- Environment ---
-            'env': env_name,
-            'env_config': env_config,
+            'env': env,
+            'env_config': {},
             # --- Multiagent ---
             'multiagent': {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
+            "num_workers": 7,
+            "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
     }
 }
