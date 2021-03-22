@@ -4,6 +4,7 @@
 # ----------------------------- #
 
 # --- Create the agents and the environment --- #
+
 # Import the simulation environment and agents
 from admiral.envs.components.examples.fighting_teams import FightingTeamsEnv, FightingTeamAgent
 
@@ -32,6 +33,7 @@ env = FightingTeamsEnv(
 )
 
 # --- Prepare the environment for use with RLlib --- #
+
 # Now that you've created the environment, you must wrap it with a simulation manager,
 # which controls the timing of the simulation step.
 from admiral.managers import AllStepManager # All agents take the step at the same time
@@ -42,76 +44,73 @@ env = AllStepManager(env)
 from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
 env = MultiAgentWrapper(env)
 
+# USE FOR DEBUGGING
+# from matplotlib import pyplot as plt
+# fig = plt.gcf()
+# env.reset()
+# shape_dict={0: 's', 1:'o', 2:'d'}
+# env.render(fig=fig, shape_dict=shape_dict)
 
-from matplotlib import pyplot as plt
-fig = plt.gcf()
-env.reset()
-shape_dict={0: 's', 1:'o', 2:'d'}
-env.render(fig=fig, shape_dict=shape_dict)
-
-for _ in range(100):
-    action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
-    env.step(action_dict)
-    env.render(fig=fig, shape_dict=shape_dict)
-
-# from admiral.envs.wrappers import MultiAgentWrapper
-# from ray.tune.registry import register_env
-# env_name = "EnvironmentName"
-# register_env(env_name, lambda env_config: MultiAgentWrapper.wrap(env))
-
-# # --- Prepare th
-
-# # -------------------------- #
-# # --- Setup the policies --- #
-# # -------------------------- #
-
-# from admiral.pols import HeuristicPolicy
-
-# class CustomHeuristicPolicy(HeuristicPolicy):
-#     """A custom heuristic policy for you the design"""
-#     def compute_actions(self, obs_batch, *args, **kwargs):
-#         return [some_action for _ in obs_batch], [], {}
-
-# policies = {
-#     'policy_0_name': (None, agents[0].observation_space, agents[0].action_space, {}),
-#     'policy_1_name': (None, agents[1].observation_space, agents[1].action_space, {}),
-#     'policy_2_name': (None, agents[2].observation_space, agents[2].action_space, {})
-# }
-# def policy_mapping_fn(agent_id):
-#     pass # Map the agent id to the policy you want that agent to train.
+# for _ in range(100):
+#     action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
+#     _, _, done, _ = env.step(action_dict)
+#     env.render(fig=fig, shape_dict=shape_dict)
+#     if done['__all__']:
+#         break
+# import sys; sys.exit()
 
 
-# # --------------------------- #
-# # --- Setup the algorithm --- #
-# # --------------------------- #
+# -------------------------- #
+# --- Setup the policies --- #
+# -------------------------- #
 
-# # Full list of supported algorithms here: https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
-# algo_name = 'PG'
+# Here we have it setup so that every agent on a team trains the same policy.
+# Because every agent has the same observation and action space, we can just use
+# the specs from one of the agent to define the policies' inputs and outputs.
+policies = {
+    'team0': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
+    'team1': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
+    'team2': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
+}
+def policy_mapping_fn(agent_id):
+    return f'team{agents[agent_id].team}'
+
+# USE FOR DEBUGGING
+# for agent in agents:
+#     print(policy_mapping_fn(agent))
+# import sys; sys.exit()
+
+# --------------------------- #
+# --- Setup the algorithm --- #
+# --------------------------- #
+
+# Full list of supported algorithms here: https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
+algo_name = 'PG'
 
 
-# # ------------------ #
-# # --- Parameters --- #
-# # ------------------ #
+# ------------------ #
+# --- Parameters --- #
+# ------------------ #
 
-# # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
-# params = {
-#     'experiment': {
-#         'title': '{}'.format('The-title-of-this-experiment'),
-#     },
-#     'ray_tune': {
-#         'run_or_experiment': algo_name,
-#         'stop': {
-#             # Stopping criteria
-#         },
-#         'config': {
-#             # --- Environment ---
-#             'env': env_name,
-#             'env_config': env_config,
-#             # --- Multiagent ---
-#             'multiagent': {
-#                 'policies': policies,
-#                 'policy_mapping_fn': policy_mapping_fn,
-#             },
-#         },
-#     }
-# }
+# List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
+params = {
+    'experiment': {
+        'title': '{}'.format('The-title-of-this-experiment'),
+    },
+    'ray_tune': {
+        'run_or_experiment': algo_name,
+        'stop': {
+            # Stopping criteria
+        },
+        'config': {
+            # --- Environment ---
+            'env': env_name,
+            'env_config': env_config,
+            # --- Multiagent ---
+            'multiagent': {
+                'policies': policies,
+                'policy_mapping_fn': policy_mapping_fn,
+            },
+        },
+    }
+}
