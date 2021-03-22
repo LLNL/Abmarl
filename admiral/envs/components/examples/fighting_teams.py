@@ -123,12 +123,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
         pass
 
     def get_done(self, agent_id, **kwargs):
-        return self.done.get_done(agent_id)
+        agent = self.agents[agent_id]
+        return self.done.get_done(agent)
     
     def get_all_done(self, **kwargs):
         return self.done.get_all_done(**kwargs)
     
-    def get_info(self, **kwargs):
+    def get_info(self, *args, **kwargs):
         return {}
 
 # Running this script via python3 battle_env will generate a simulation with three
