@@ -39,8 +39,8 @@ env = AllStepManager(env)
 
 # Finally, we must wrap the environment with the MultiAgentWrapper so that it
 # works with RLlib
-# from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
-# env = MultiAgentWrapper(env)
+from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
+env = MultiAgentWrapper(env)
 
 
 from matplotlib import pyplot as plt
