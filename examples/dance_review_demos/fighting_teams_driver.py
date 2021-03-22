@@ -22,7 +22,7 @@ agents = {f'agent{i}': FightingTeamAgent(
     max_health=1.0, # Agent's health cannot grow above this value.
     initial_health=None, # Episode-starting health. If None, then random between min and max health. 
     initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(24)}
+) for i in range(3)}
 
 # Instantiate the environment
 env = FightingTeamsEnv(
@@ -112,7 +112,7 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 20,
+            'episodes_total': 200,
         },
         'verbose': 2,
         'config': {

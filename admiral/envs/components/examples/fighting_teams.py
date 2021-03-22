@@ -120,7 +120,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         }
     
     def get_reward(self, agent_id, **kwargs):
-        pass
+        return 0
 
     def get_done(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
