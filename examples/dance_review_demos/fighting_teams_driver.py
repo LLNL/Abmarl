@@ -39,10 +39,16 @@ env = FightingTeamsEnv(
 from admiral.managers import AllStepManager # All agents take the step at the same time
 env = AllStepManager(env)
 
-# Finally, we must wrap the environment with the MultiAgentWrapper so that it
+# We must wrap the environment with the MultiAgentWrapper so that it
 # works with RLlib
 from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
 env = MultiAgentWrapper(env)
+
+# Finally we must register the environment with RLlib
+from ray.tune.registry import register_env
+env_name = "TeamBattle"
+register_env(env_name, lambda env_config: env)
+
 
 # USE FOR DEBUGGING
 # from matplotlib import pyplot as plt
@@ -76,6 +82,7 @@ def policy_mapping_fn(agent_id):
     return f'team{agents[agent_id].team}'
 
 # USE FOR DEBUGGING
+# print(agents['agent0'].action_space)
 # for agent in agents:
 #     print(policy_mapping_fn(agent))
 # import sys; sys.exit()
@@ -108,14 +115,14 @@ params = {
         'verbose': 2,
         'config': {
             # --- Environment ---
-            'env': env,
-            'env_config': {},
+            'env': "TeamBattle",
+            # 'env_config': {},
             # --- Multiagent ---
             'multiagent': {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 7,
+            "num_workers": 1,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
     }
