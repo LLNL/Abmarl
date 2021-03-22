@@ -3,6 +3,7 @@
 # --- Setup the environment --- #
 # ----------------------------- #
 
+# --- Create the agents and the environment --- #
 # Import the simulation environment and agents
 from admiral.envs.components.examples.fighting_teams import FightingTeamsEnv, FightingTeamAgent
 
@@ -30,11 +31,35 @@ env = FightingTeamsEnv(
     agents=agents # Give the environment the dictionary of agents we created above
 )
 
+# --- Prepare the environment for use with RLlib --- #
+# Now that you've created the environment, you must wrap it with a simulation manager,
+# which controls the timing of the simulation step.
+from admiral.managers import AllStepManager # All agents take the step at the same time
+env = AllStepManager(env)
+
+# Finally, we must wrap the environment with the MultiAgentWrapper so that it
+# works with RLlib
+# from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
+# env = MultiAgentWrapper(env)
+
+
+from matplotlib import pyplot as plt
+fig = plt.gcf()
+env.reset()
+shape_dict={0: 's', 1:'o', 2:'d'}
+env.render(fig=fig, shape_dict=shape_dict)
+
+for _ in range(100):
+    action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
+    env.step(action_dict)
+    env.render(fig=fig, shape_dict=shape_dict)
+
 # from admiral.envs.wrappers import MultiAgentWrapper
 # from ray.tune.registry import register_env
 # env_name = "EnvironmentName"
 # register_env(env_name, lambda env_config: MultiAgentWrapper.wrap(env))
 
+# # --- Prepare th
 
 # # -------------------------- #
 # # --- Setup the policies --- #
