@@ -156,7 +156,10 @@ class GridMovementActor:
         from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, GridMovementAgent):
-                agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
+                # agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
+                # RLlib cannot handle integer box space, so we increase the move range and will floor
+                # the value at step
+                agent.action_space['move'] = Box(-agent.move_range, agent.move_range+0.9, (2,))
 
     def process_move(self, moving_agent, move, **kwargs):
         """
@@ -174,7 +177,7 @@ class GridMovementActor:
         """
         if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
             position_before = moving_agent.position
-            self.position.modify_position(moving_agent, move, **kwargs)
+            self.position.modify_position(moving_agent, np.floor(move), **kwargs)
             return moving_agent.position - position_before
 
 class SpeedAngleMovementActor:
