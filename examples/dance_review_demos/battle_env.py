@@ -89,11 +89,9 @@ class FightingTeamsEnv(AgentBasedSimulation):
             # and it will not move at all.
             self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
     
-    def render(self, fig=None, **kwargs):
+    def render(self, fig=None, shape_dict=None, **kwargs):
         fig.clear()
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
-        shape_dict = {agent.id: 'o' if agent.team == 1 else 's' for agent in self.agents.values()}
-        # TODO: generalize the shape dict
 
         ax = fig.gca()
         ax.set(xlim=(0, self.position_state.region), ylim=(0, self.position_state.region))
@@ -105,7 +103,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
 
         if shape_dict:
-            shape = [shape_dict[agent_id] for agent_id in shape_dict if render_condition[agent_id]]
+            shape = [shape_dict[agent.team] for agent in self.agents.values() if render_condition[agent.id]]
         else:
             shape = 'o'
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
@@ -133,6 +131,8 @@ class FightingTeamsEnv(AgentBasedSimulation):
     def get_info(self, **kwargs):
         return {}
 
+# Running this script via python3 battle_env will generate a simulation with three
+# teams battling, each agent taking random actions.
 if __name__ == '__main__':
     agents = {f'agent{i}': BattleAgent(
         id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1
@@ -143,12 +143,14 @@ if __name__ == '__main__':
         number_of_teams=2
     )
     env.reset()
+
     print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
     fig = plt.gcf()
-    env.render(fig=fig)
+
+    shape_dict = {0: 's', 1: 'o'}
+    env.render(fig=fig, shape_dict=shape_dict)
 
     for _ in range(100):
         action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
         env.step(action_dict)
-        env.render(fig=fig)
-        print(env.get_all_done())
+        env.render(fig=fig, shape_dict=shape_dict)
