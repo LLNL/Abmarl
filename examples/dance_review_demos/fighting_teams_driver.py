@@ -22,7 +22,7 @@ agents = {f'agent{i}': FightingTeamAgent(
     max_health=1.0, # Agent's health cannot grow above this value.
     initial_health=None, # Episode-starting health. If None, then random between min and max health. 
     initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(3)}
+) for i in range(24)}
 
 # Instantiate the environment
 env = FightingTeamsEnv(
@@ -112,7 +112,7 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 200,
+            'episodes_total': 2000,
         },
         'verbose': 2,
         'config': {
@@ -124,7 +124,7 @@ params = {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 1,
+            "num_workers": 7,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
     }
