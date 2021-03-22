@@ -13,7 +13,7 @@ class PositionBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and processes such
     attacks. The attack is successful if the attacked agent is alive and within
-    range. The action space is appended with a MultiBinary(1), allowing the agent
+    range. The action space is appended with a Discrete(2), allowing the agent
     to attack or not attack.
 
     agents (dict):
@@ -33,10 +33,10 @@ class PositionBasedAttackActor:
             assert isinstance(agent, LifeAgent)
         self.agents = agents
 
-        from gym.spaces import MultiBinary
+        from gym.spaces import Discrete
         for agent in self.agents.values():
             if isinstance(agent, AttackingAgent):
-                agent.action_space['attack'] = MultiBinary(1)
+                agent.action_space['attack'] = Discrete(2)
         
         self.attack_norm = attack_norm
 
@@ -72,7 +72,7 @@ class PositionTeamBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and process such
     attacks. The attack is successful if the attacked agent is alive, on a different
-    team, and within range. The action space is appended with a MultiBinary(1),
+    team, and within range. The action space is appended with a Discrete(2),
     allowing the agent to attack or not attack.
 
     agents (dict):grid
@@ -94,10 +94,10 @@ class PositionTeamBasedAttackActor:
             assert isinstance(agent, LifeAgent)
         self.agents = agents
 
-        from gym.spaces import MultiBinary
+        from gym.spaces import Discrete
         for agent in self.agents.values():
             if isinstance(agent, AttackingAgent):
-                agent.action_space['attack'] = MultiBinary(1)
+                agent.action_space['attack'] = Discrete(2)
         
         self.attack_norm = attack_norm
 
