@@ -104,13 +104,13 @@ class LifeObserver:
             The agent making the observation.
         """
         if isinstance(agent, LifeObservingAgent):
-            return {'life': {agent.id: agent.is_alive for agent in self.agents.values() if isinstance(agent, LifeAgent)}}
+            return {'life': {agent.id: np.array([agent.is_alive]) for agent in self.agents.values() if isinstance(agent, LifeAgent)}}
         else:
             return {}
     
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 class PositionRestrictedLifeObserver(LifeObserver):
     """
@@ -614,13 +614,13 @@ class TeamObserver:
         Get the team of each agent in the simulator.
         """
         if isinstance(agent, TeamObservingAgent):
-            return {'team': {other.id: self.agents[other.id].team for other in self.agents.values() if isinstance(other, TeamAgent)}}
+            return {'team': {other.id: np.array([self.agents[other.id].team]) for other in self.agents.values() if isinstance(other, TeamAgent)}}
         else:
             return {}
     
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 class PositionRestrictedTeamObserver(TeamObserver):
     """
