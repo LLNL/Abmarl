@@ -89,6 +89,12 @@ class HuntingForagingEnv(AgentBasedSimulation):
         self.resource_state.reset(**kwargs)
         self.life_state.reset(**kwargs)
 
+        # We haven't designed the rewards handling yet, so we'll do it manually for now.
+        # An important principle to follow in MARL: track the rewards of all the agents
+        # and report them when get_reward is called. Once the reward is reported,
+        # reset it to zero.
+        self.rewards = {agent: 0 for agent in self.agents}
+
     def step(self, action_dict, **kwargs):
         # Process harvesting
         for agent_id, action in action_dict.items():
@@ -97,8 +103,9 @@ class HuntingForagingEnv(AgentBasedSimulation):
             # resource on the same cell as this agent and the agent chooses to
             # harvest, then the resource will be harvested.
             harvested_amount = self.resource_actor.process_harvest(harvesting_agent, action.get('harvest', 0), **kwargs)
-            if harvested_amount is not None:
-                pass
+            if harvested_amount != 0:
+                # Reward the foraging agent for successfully harvesting the resource
+                self.rewards[agent_id] += 1
         
         # Process attacking
         for agent_id, action in action_dict.items():
@@ -113,6 +120,8 @@ class HuntingForagingEnv(AgentBasedSimulation):
             # If the agent loses all its health, it dies.
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
+                # Reward the attacking agent for its successful attack
+                self.rewards[attacking_agent.id] += 1
 
         # Process movement
         for agent_id, action in action_dict.items():
@@ -124,8 +133,11 @@ class HuntingForagingEnv(AgentBasedSimulation):
             amount_moved = self.move_actor.process_move(self.agents[agent_id], proposed_amount_move, **kwargs)
             if np.any(proposed_amount_move != amount_moved):
                 # This was a rejected move, so we penalize a bit for it
-                # self.rewards[agent_id] -= 0.1
-                pass
+                self.rewards[agent_id] -= 0.1
+        
+        # Small penalty for every agent that acted in this time step to incentive rapid actions
+        for agent_id in action_dict:
+            self.rewards[agent_id] -= 0.01
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -160,7 +172,12 @@ class HuntingForagingEnv(AgentBasedSimulation):
         }
     
     def get_reward(self, agent_id, **kwargs):
-        return 0
+        """
+        Return the agents reward and reset it to zero.
+        """
+        reward_out = self.rewards[agent_id]
+        self.rewards[agent_id] = 0
+        return reward_out
 
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(self.agents[agent_id])
