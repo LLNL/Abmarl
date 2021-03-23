@@ -4,11 +4,11 @@ import numpy as np
 
 # Import all the features that we need from the simulation components
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState
-from admiral.envs.components.observer import TeamObserver, PositionObserver, LifeObserver
+from admiral.envs.components.observer import PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedLifeObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
 from admiral.envs.components.done import TeamDeadDone
 # Each env component needs a corresponding agent component
-from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent
+from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, LifeObservingAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent
 
 # Import the interface
 from admiral.envs import AgentBasedSimulation
@@ -20,7 +20,7 @@ from admiral.tools.matplotlib_utils import mscatter
 # These agents have a position, team, life/death state
 # These agents can observe the above attributes of other agents and itself.
 # These agents can move around in the grid and attack other agents
-class FightingTeamAgent(TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent):
+class FightingTeamAgent(TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, LifeObservingAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent):
     pass
 
 # Create the simulation environment from the components
@@ -41,9 +41,9 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # These components handle the observations that the agents receive whenever
         # get_obs is called. In this environment supports agents that can observe
         # the position, health, and team of other agents and itself.
-        self.position_observer = PositionObserver(position=self.position_state, **kwargs)
-        self.life_observer = LifeObserver(**kwargs)
-        self.team_observer = TeamObserver(team=self.team_state, **kwargs)
+        self.position_observer = PositionRestrictedPositionObserver(position=self.position_state, **kwargs)
+        self.life_observer = PositionRestrictedLifeObserver(**kwargs)
+        self.team_observer = PositionRestrictedTeamObserver(team=self.team_state, **kwargs)
 
         # Actor Components
         # These components handle the actions in the step function. This environment
@@ -136,7 +136,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
 # teams battling, each agent taking random actions.
 if __name__ == '__main__':
     agents = {f'agent{i}': FightingTeamAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, agent_view=2
     ) for i in range(24)}
     env = FightingTeamsEnv(
         region=12,

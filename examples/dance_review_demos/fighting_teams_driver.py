@@ -20,6 +20,7 @@ agents = {f'agent{i}': FightingTeamAgent(
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
     max_health=1.0, # Agent's health cannot grow above this value.
+    agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
     initial_health=None, # Episode-starting health. If None, then random between min and max health. 
     initial_position=None # Episode-starting position. If None, then random within the region.
 ) for i in range(24)}
