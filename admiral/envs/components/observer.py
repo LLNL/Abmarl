@@ -564,7 +564,7 @@ class GridResourceObserver:
         from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, ResourceObservingAgent):
-                agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1), np.float)
+                agent.observation_space['resources'] = Box(-1, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1), np.float)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -577,7 +577,7 @@ class GridResourceObserver:
             # Derived by considering each square in the resources as an "agent" and
             # then applied the agent diff logic from above. The resulting for-loop
             # can be written in the below vectorized form.
-            (r,c) = agent.position
+            (r,c) = agent.position.astype(int)
             r_lower = max([0, r-agent.resource_view])
             r_upper = min([self.resources.region-1, r+agent.resource_view])+1
             c_lower = max([0, c-agent.resource_view])
@@ -606,7 +606,7 @@ class TeamObserver:
         for agent in agents.values():
             if isinstance(agent, TeamObservingAgent):
                 agent.observation_space['team'] = Dict({
-                    other.id: Box(-1, self.team.number_of_teams, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
+                    other.id: Box(-1, self.team.number_of_teams-1, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
                 })
     
     def get_obs(self, agent, **kwargs):

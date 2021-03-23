@@ -17,7 +17,7 @@ class ResourcesDepletedDone:
         """
         Return true if all the resources are depleted.
         """
-        return self.get_all_done(self, **kwargs)
+        return self.get_all_done(**kwargs)
     
     def get_all_done(self, **kwargs):
         """
