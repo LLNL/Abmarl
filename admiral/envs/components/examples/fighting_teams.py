@@ -65,6 +65,12 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # throughout the episode, the team state does not need to reset.
         self.position_state.reset(**kwargs)
         self.life_state.reset(**kwargs)
+
+        # We haven't designed the rewards handling yet, so we'll do it manually for now.
+        # An important principle to follow in MARL: track the rewards of all the agents
+        # and report them when get_reward is called. Once the reward is reported,
+        # reset it to zero.
+        self.rewards = {agent: 0 for agent in self.agents}
     
     def step(self, action_dict, **kwargs):
         # Process attacking
@@ -80,6 +86,9 @@ class FightingTeamsEnv(AgentBasedSimulation):
             # If the agent loses all its health, it dies.
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
+                # Reward the agents according to the outcome of the actions
+                self.rewards[attacked_agent.id] -= 1
+                self.rewards[attacking_agent.id] += 1
     
         # Process movement
         for agent_id, action in action_dict.items():
@@ -87,7 +96,15 @@ class FightingTeamsEnv(AgentBasedSimulation):
             # within their max move radius, and they can occupy the same cells.
             # If an agent attempts to move out of bounds, the move is invalid,
             # and it will not move at all.
-            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
+            proposed_amount_move = action.get('move', np.zeros(2))
+            amount_moved = self.move_actor.process_move(self.agents[agent_id], proposed_amount_move, **kwargs)
+            if np.any(proposed_amount_move != amount_moved):
+                # This was a rejected move, so we penalize a bit for it
+                self.rewards[agent_id] -= 0.1
+        
+        # Small penalty for every agent that acted in this time step to incentive rapid actions
+        for agent_id in action_dict:
+            self.rewards[agent_id] -= 0.01
     
     def render(self, fig=None, shape_dict=None, **kwargs):
         fig.clear()
@@ -120,7 +137,12 @@ class FightingTeamsEnv(AgentBasedSimulation):
         }
     
     def get_reward(self, agent_id, **kwargs):
-        return 0
+        """
+        Return the agents reward and reset it to zero.
+        """
+        reward_out = self.rewards[agent_id]
+        self.rewards[agent_id] = 0
+        return reward_out
 
     def get_done(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
