@@ -305,7 +305,7 @@ class GridResourcesActor:
         from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, HarvestingAgent):
-                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,), np.float)
+                agent.action_space['harvest'] = Box(agent.min_harvest, agent.max_harvest, (1,), np.float)
 
     def process_harvest(self, agent, amount, **kwargs):
         """
@@ -322,7 +322,7 @@ class GridResourcesActor:
             be less than the desired amount if the cell does not have enough resources.
         """
         if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
-            location = tuple(agent.position)
+            location = tuple(agent.position.astype(int))
             resource_before = self.resources.resources[location]
             self.resources.modify_resources(location, -amount)
             return resource_before - self.resources.resources[location]
