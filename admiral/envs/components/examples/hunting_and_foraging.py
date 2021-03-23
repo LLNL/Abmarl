@@ -7,7 +7,7 @@ import seaborn as sns
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState, GridResourceState
 from admiral.envs.components.observer import PositionRestrictedPositionObserver, PositionRestrictedLifeObserver, PositionRestrictedTeamObserver, GridResourceObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
-from admiral.envs.components.done import TeamDeadDone
+from admiral.envs.components.done import TeamDeadDone, ResourcesDepletedDone
 
 # Environment needs a corresponding agent component
 from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
@@ -75,8 +75,8 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # done when either:
         # (1) All the hunter have killed all the foragers.
         # (2) All the foragers have harvested all the resources.
-        # TODO: Need to implement this done condition!
-        self.done = TeamDeadDone(**kwargs)
+        self.resources_done = ResourcesDepletedDone(resource_state=self.resource_state, **kwargs)
+        self.foragers_dead_done = TeamDeadDone(**kwargs)
 
         # This is needed at the end of init in every environment. It ensures that
         # agents have been configured correctly.
@@ -180,10 +180,10 @@ class HuntingForagingEnv(AgentBasedSimulation):
         return reward_out
 
     def get_done(self, agent_id, **kwargs):
-        return self.done.get_done(self.agents[agent_id])
+        return self.foragers_dead_done.get_done(self.agents[agent_id]) or self.resources_done.get_done(self.agents[agent_id])
     
     def get_all_done(self, **kwargs):
-        return self.done.get_all_done(**kwargs)
+        return self.foragers_dead_done.get_all_done(**kwargs) or self.resources_done.get_all_done(**kwargs)
     
     def get_info(self, *args, **kwargs):
         return {}
@@ -209,4 +209,4 @@ if __name__ == '__main__':
         action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
         env.step(action_dict)
         env.render(fig=fig)
-        # print(env.get_all_done())
+        print(env.get_all_done())
