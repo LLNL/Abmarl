@@ -560,7 +560,7 @@ class GridResourceObserver:
 
         for agent in agents.values():
             if isinstance(agent, ResourceObservingAgent):
-                agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1))
+                agent.observation_space['resources'] = Box(-1, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1))
 
     def get_obs(self, agent, **kwargs):
         """
