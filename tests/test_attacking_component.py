@@ -112,3 +112,27 @@ def test_position_team_based_attack_actor():
     assert actor.process_attack(agents['agent2'], True) is None
     assert actor.process_attack(agents['agent3'], True) is None
     assert actor.process_attack(agents['agent5'], True) is None
+
+def test_attack_accuracy():
+    np.random.seed(24)
+    agents = {
+        'agent0': AttackTestAgent(id='agent0', attack_range=1, attack_strength=0, attack_accuracy=0, initial_position=np.array([1,1])),
+        'agent1': AttackTestAgent(id='agent1', attack_range=0, attack_strength=0, initial_position=np.array([0,0]))
+    }
+
+    assert agents['agent0'].attack_accuracy == 0
+    assert agents['agent1'].attack_accuracy == 1
+
+    for agent in agents.values():
+        agent.position = agent.initial_position
+
+    actor = PositionBasedAttackActor(agents=agents)
+    assert actor.process_attack(agents['agent0'], True) is None # Action failed because low accuracy
+
+    agents['agent0'].attack_accuracy = 0.5
+    assert actor.process_attack(agents['agent0'], True) is None
+    assert actor.process_attack(agents['agent0'], True) is None
+    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
+    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
+    assert actor.process_attack(agents['agent0'], True) is None
+    assert actor.process_attack(agents['agent0'], True) is None
