@@ -67,22 +67,6 @@ env_name = "HuntingForaging"
 register_env(env_name, lambda env_config: env)
 
 
-# USE FOR DEBUGGING
-# from matplotlib import pyplot as plt
-# fig = plt.gcf()
-# obs = env.reset()
-# import pprint; pprint.pprint(obs['hunter1'])
-# env.render(fig=fig)
-
-# for _ in range(100):
-#     action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
-#     _, _, done, _ = env.step(action_dict)
-#     env.render(fig=fig)
-#     if done['__all__']:
-#         break
-# import sys; sys.exit()
-
-
 # -------------------------- #
 # --- Setup the policies --- #
 # -------------------------- #
@@ -149,3 +133,19 @@ params = {
         },
     }
 }
+
+
+
+
+if __name__ == "__main__":
+    from matplotlib import pyplot as plt
+    fig = plt.gcf()
+    obs = env.reset()
+    env.render(fig=fig)
+
+    for _ in range(100):
+        action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
+        _, _, done, _ = env.step(action_dict)
+        env.render(fig=fig)
+        if done['__all__']:
+            break
