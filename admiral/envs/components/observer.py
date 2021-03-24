@@ -48,7 +48,7 @@ class HealthObserver:
         for agent in agents.values():
             if isinstance(agent, HealthObservingAgent):
                 agent.observation_space['health'] = Dict({
-                    other.id: Box(-1, other.max_health, (1,), np.float) for other in self.agents.values() if isinstance(other, LifeAgent)
+                    other.id: Box(-1, other.max_health, (1,)) for other in self.agents.values() if isinstance(other, LifeAgent)
                 })
     
     def get_obs(self, agent, **kwargs):
@@ -560,7 +560,7 @@ class GridResourceObserver:
 
         for agent in agents.values():
             if isinstance(agent, ResourceObservingAgent):
-                agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1), np.float)
+                agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1))
 
     def get_obs(self, agent, **kwargs):
         """
