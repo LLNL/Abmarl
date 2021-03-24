@@ -1,4 +1,5 @@
 
+from gym.spaces import Discrete, Box
 import numpy as np
 
 from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, HarvestingAgent, \
@@ -33,7 +34,6 @@ class PositionBasedAttackActor:
             assert isinstance(agent, LifeAgent)
         self.agents = agents
 
-        from gym.spaces import Discrete
         for agent in self.agents.values():
             if isinstance(agent, AttackingAgent):
                 agent.action_space['attack'] = Discrete(2)
@@ -94,7 +94,6 @@ class PositionTeamBasedAttackActor:
             assert isinstance(agent, LifeAgent)
         self.agents = agents
 
-        from gym.spaces import Discrete
         for agent in self.agents.values():
             if isinstance(agent, AttackingAgent):
                 agent.action_space['attack'] = Discrete(2)
@@ -153,7 +152,6 @@ class GridMovementActor:
         self.agents = agents
         # Not all agents need to be PositionAgents; only the ones who can move.
 
-        from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, GridMovementAgent):
                 # agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
@@ -199,7 +197,6 @@ class SpeedAngleMovementActor:
         self.speed_angle = speed_angle
         self.agents = agents
 
-        from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, SpeedAngleAgent):
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (1,))
@@ -255,7 +252,6 @@ class AccelerationMovementActor:
         self.velocity_state = velocity_state
         self.agents = agents
 
-        from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, AcceleratingAgent):
                 agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
@@ -302,7 +298,6 @@ class GridResourcesActor:
         self.resources = resources
         self.agents = agents
 
-        from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, HarvestingAgent):
                 agent.action_space['harvest'] = Box(agent.min_harvest, agent.max_harvest, (1,))
