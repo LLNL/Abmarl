@@ -1,5 +1,5 @@
 
-from gym.spaces import Box, MultiBinary, Dict
+from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
 from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAgent, \
@@ -45,7 +45,6 @@ class HealthObserver:
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
 
-        from gym.spaces import Dict, Box
         for agent in agents.values():
             if isinstance(agent, HealthObservingAgent):
                 agent.observation_space['health'] = Dict({
@@ -89,7 +88,6 @@ class LifeObserver:
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
 
-        from gym.spaces import Dict, Box
         for agent in agents.values():
             if isinstance(agent, LifeObservingAgent):
                 agent.observation_space['life'] = Dict({
@@ -155,7 +153,7 @@ class MaskObserver:
         for agent in agents.values():
             if isinstance(agent, AgentObservingAgent):
                 agent.observation_space['mask'] = Dict({
-                    other: MultiBinary(1) for other in agents
+                    other: Discrete(2) for other in agents
                 })
     
     def get_obs(self, agent, **kwargs):
@@ -197,7 +195,7 @@ class PositionObserver:
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
-        from gym.spaces import Dict, Box
+        
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent):
                 agent.observation_space['position'] = Dict({
@@ -238,7 +236,7 @@ class RelativePositionObserver:
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
-        from gym.spaces import Dict, Box
+        
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent) and \
                isinstance(agent, PositionAgent):
@@ -300,7 +298,7 @@ class GridPositionBasedObserver:
         for agent in agents.values():
             assert isinstance(agent, PositionAgent)
         self.agents = agents
-        from gym.spaces import Box
+        
         for agent in agents.values():
             if isinstance(agent, AgentObservingAgent) and \
                isinstance(agent, PositionAgent) and \
@@ -369,7 +367,6 @@ class GridPositionTeamBasedObserver:
             assert isinstance(agent, TeamAgent)
         self.agents = agents
 
-        from gym.spaces import Box
         for agent in self.agents.values():
             if isinstance(agent, AgentObservingAgent) and \
                isinstance(agent, PositionAgent) and \
@@ -426,7 +423,7 @@ class SpeedObserver:
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
-        from gym.spaces import Dict, Box
+        
         for agent in agents.values():
             if isinstance(agent, SpeedAngleObservingAgent):
                 agent.observation_space['speed'] = Dict({
@@ -466,7 +463,7 @@ class AngleObserver:
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
-        from gym.spaces import Dict, Box
+
         for agent in agents.values():
             if isinstance(agent, SpeedAngleObservingAgent):
                 agent.observation_space['ground_angle'] = Dict({
@@ -506,7 +503,7 @@ class VelocityObserver:
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
-        from gym.spaces import Dict, Box
+        
         for agent in agents.values():
             if isinstance(agent, VelocityObservingAgent):
                 agent.observation_space['velocity'] = Dict({
@@ -561,7 +558,6 @@ class GridResourceObserver:
         self.resources = resources
         self.agents = agents
 
-        from gym.spaces import Box
         for agent in agents.values():
             if isinstance(agent, ResourceObservingAgent):
                 agent.observation_space['resources'] = Box(0, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1), np.float)
@@ -602,7 +598,6 @@ class TeamObserver:
         self.team = team
         self.agents = agents
     
-        from gym.spaces import Box, Dict
         for agent in agents.values():
             if isinstance(agent, TeamObservingAgent):
                 agent.observation_space['team'] = Dict({

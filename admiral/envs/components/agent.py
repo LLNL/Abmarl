@@ -1,5 +1,5 @@
 
-from gym.spaces import Discrete, Box, MultiDiscrete, MultiBinary, Dict, Tuple
+from gym.spaces import Dict
 
 # ------------------ #
 # --- Base Agent --- #
