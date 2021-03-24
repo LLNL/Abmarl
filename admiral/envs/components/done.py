@@ -3,6 +3,28 @@ import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, TeamAgent, PositionAgent
 
+class ResourcesDepletedDone:
+    """
+    Simulation ends when all the resources are depleted.
+
+    resource_state (GridResourceState):
+        The state of the resources
+    """
+    def __init__(self, resource_state=None, **kwargs):
+        self.resource_state = resource_state
+    
+    def get_done(self, *args, **kwargs):
+        """
+        Return true if all the resources are depleted.
+        """
+        return self.get_all_done(**kwargs)
+    
+    def get_all_done(self, **kwargs):
+        """
+        Return True if all the resources are depleted.
+        """
+        return np.all(self.resource_state.resources == 0)
+
 class DeadDone:
     """
     Dead agents are indicated as done. Additionally, the simulation is over when
