@@ -13,9 +13,10 @@ from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, Har
 class PositionBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and processes such
-    attacks. The attack is successful if the attacked agent is alive and within
-    range. The action space is appended with a MultiBinary(1), allowing the agent
-    to attack or not attack.
+    attacks. The attack is unsuccessful if the attacked agent is dead or out of
+    range. If alive and in range, the attack may be successful, depending on the
+    attacking agent's accuracy. The action space is appended with a Discrete(2),
+    allowing the agent to attack or not attack.
 
     agents (dict):
         The dictionary of agents. Because attacks are distance-based, all agents must
@@ -65,15 +66,19 @@ class PositionBasedAttackActor:
                 elif np.linalg.norm(attacking_agent.position - attacked_agent.position, self.attack_norm) > attacking_agent.attack_range:
                     # Agent too far away
                     continue
+                elif np.random.uniform() > attacking_agent.attack_accuracy:
+                    # Attempted attack, but it failed due to inaccuracy.
+                    continue
                 else:
                     return attacked_agent
 
 class PositionTeamBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and process such
-    attacks. The attack is successful if the attacked agent is alive, on a different
-    team, and within range. The action space is appended with a MultiBinary(1),
-    allowing the agent to attack or not attack.
+    attacks. The attack is unsuccessful if the attacked agent is dead, on the same
+    team, or out of range. If alive, in range, and on a different team, the attack
+    may be successful, depending on the attacking agent's accuracy. The action
+    space is appended with a Discrete(2), allowing the agent to attack or not attack.
 
     agents (dict):grid
         The dictionary of agents. Because attacks are distance-based, all agents must
@@ -126,6 +131,9 @@ class PositionTeamBasedAttackActor:
                     continue
                 elif np.linalg.norm(attacking_agent.position - attacked_agent.position, self.attack_norm) > attacking_agent.attack_range:
                     # Agent too far away
+                    continue
+                elif np.random.uniform() > attacking_agent.attack_accuracy:
+                    # Attempted attack, but it failed due to inaccuracy.
                     continue
                 else:
                     return attacked_agent

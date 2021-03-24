@@ -94,13 +94,18 @@ class AttackingAgent(ActingAgent):
     attack_strength (float):
         How effective the agent's attack is. This is applicable in situations where
         the agents' health is affected by attacks.
+
+    attack_accuracy (float):
+        The effective accuracy of the agent's attack. Should be between 0 and 1.
+        To make deterministic attacks, use 1. Default is 1.
     """
-    def __init__(self, attack_range=None, attack_strength=None, **kwargs):
+    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=1, **kwargs):
         super().__init__(**kwargs)
         assert attack_range is not None, "attack_range must be a nonnegative integer"
         self.attack_range = attack_range
         assert attack_strength is not None, "attack_strength must be a nonnegative number"
         self.attack_strength = attack_strength
+        self.attack_accuracy = attack_accuracy
     
     @property
     def configured(self):
