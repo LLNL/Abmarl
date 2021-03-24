@@ -601,7 +601,7 @@ class TeamObserver:
         for agent in agents.values():
             if isinstance(agent, TeamObservingAgent):
                 agent.observation_space['team'] = Dict({
-                    other.id: Box(-1, self.team.number_of_teams, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
+                    other.id: Box(-1, self.team.number_of_teams-1, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
                 })
     
     def get_obs(self, agent, **kwargs):
