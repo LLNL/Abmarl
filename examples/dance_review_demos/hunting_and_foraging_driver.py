@@ -33,6 +33,7 @@ hunters =  {f'hunter{i}': HuntingAgent(
     max_health=1.0, # Agent's health cannot grow above this value.
     attack_range=1, # How far this agent's attack will reach.
     attack_strength=1.0, # How powerful the agent's attack is.
+    attack_accuracy=1.0, # Probability of successful attack
     initial_health=None, # Episode-starting health. If None, then random between min and max health. 
     initial_position=None # Episode-starting position. If None, then random within the region.
 ) for i in range(2)}

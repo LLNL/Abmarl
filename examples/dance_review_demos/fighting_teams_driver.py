@@ -16,6 +16,7 @@ agents = {f'agent{i}': FightingTeamAgent(
     id=f'agent{i}', # Every agent needs a unique id.
     attack_range=1, # How far this agent's attack will reach.
     attack_strength=1.0, # How powerful the agent's attack is.
+    attack_accuracy=1.0, # Probability of successful attack
     team=i%number_of_teams, # Every agent is on a team
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
