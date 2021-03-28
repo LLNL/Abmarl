@@ -7,33 +7,6 @@ from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAge
     ResourceObservingAgent, TeamObservingAgent, PositionAgent, LifeAgent, TeamAgent, \
     SpeedAngleAgent, VelocityAgent
 
-# ----------------- #
-# --- Utilities --- #
-# ----------------- #
-
-def obs_filter(obs, agent, agents, null_value):
-    """
-    Modify the observation, inserting null values for observation of agents that
-    are too far way from the observing agent.
-    """
-    if isinstance(agent, PositionAgent) and \
-       isinstance(agent, AgentObservingAgent):
-        for other in agents.values():
-            if other.id not in obs: continue # This agent is not observed
-            if other.id == agent.id: continue # Don't modify yourself
-            if not isinstance(other, PositionAgent):
-                # Agents without positions will not be observed at all
-                # TODO: make this a parameter to the observers below
-                obs[other.id] = null_value
-            else:
-                r_diff = abs(other.position[0] - agent.position[0])
-                c_diff = abs(other.position[1] - agent.position[1])
-                if r_diff > agent.agent_view or c_diff > agent.agent_view: # Agent too far away to observe
-                    obs[other.id] = null_value
-    return obs
-
-
-
 # ----------------------- #
 # --- Health and Life --- #
 # ----------------------- #
@@ -67,19 +40,6 @@ class HealthObserver:
     def null_value(self):
         return -1
 
-class PositionRestrictedHealthObserver(HealthObserver):
-    """
-    Observe the health of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
-
 
 class LifeObserver:
     """
@@ -109,19 +69,6 @@ class LifeObserver:
     @property
     def null_value(self):
         return -1
-
-class PositionRestrictedLifeObserver(LifeObserver):
-    """
-    Observe the life of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
 
 
 
@@ -169,19 +116,6 @@ class MaskObserver:
     def null_value(self):
         return False
 
-class PositionRestrictedMaskObserver(MaskObserver):
-    """
-    Set the mask value to False for any agent that is too far way from the observing
-    agent.
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
-
 
 
 # ----------------------------- #
@@ -214,19 +148,6 @@ class PositionObserver:
     @property
     def null_value(self):
         return np.array([-1, -1])
-
-class PositionRestrictedPositionObserver(PositionObserver):
-    """
-    Observe the position of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
 
 
 class RelativePositionObserver:
@@ -264,19 +185,6 @@ class RelativePositionObserver:
     @property
     def null_value(self):
         return np.array([-self.position.region, -self.position.region])
-
-class PositionRestrictedRelativePositionObserver(RelativePositionObserver):
-    """
-    Observe the relative position of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value.
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
 
 
 class GridPositionBasedObserver:
@@ -443,19 +351,6 @@ class SpeedObserver:
     def null_value(self):
         return -1
 
-class PositionRestrictedSpeedObserver(SpeedObserver):
-    """
-    Observe the speed of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
-
 
 class AngleObserver:
     """
@@ -483,19 +378,6 @@ class AngleObserver:
     def null_value(self):
         return -1
 
-class PositionRestrictedAngleObserver(AngleObserver):
-    """
-    Observe the angle of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
-
 
 class VelocityObserver:
     """
@@ -522,19 +404,6 @@ class VelocityObserver:
     @property
     def null_value(self):
         return np.zeros(2)
-
-class PositionRestrictedVelocityObserver(VelocityObserver):
-    """
-    Observe the velocity of each agent in the simulator if that agent is close
-    enough to the observing agent. If it is too far, then observe a null value.
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
 
 
 
@@ -616,16 +485,3 @@ class TeamObserver:
     @property
     def null_value(self):
         return -1
-
-class PositionRestrictedTeamObserver(TeamObserver):
-    """
-    Observe the team of each agent in the simulator if that agent is close enough
-    to the observing agent. If it is too far, then observe a null value
-    """
-    def get_obs(self, agent, **kwargs):
-        obs = super().get_obs(agent)
-        if obs:
-            obs_key = next(iter(obs))
-            return {obs_key: obs_filter(obs[obs_key], agent, self.agents, self.null_value)}
-        else:
-            return {}
