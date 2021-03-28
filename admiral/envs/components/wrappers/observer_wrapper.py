@@ -20,6 +20,10 @@ class PositionRestrictedObservationWrapper:
 
     def get_obs(self, agent, **kwargs):
         all_obs = {}
+        if not isinstance(agent, PositionAgent):
+            for observer in self.observers:
+                all_obs.update(observer.get_obs(agent, **kwargs))
+            return all_obs
 
         other_filter = []
         for other in self.agents.values():
@@ -41,23 +45,3 @@ class PositionRestrictedObservationWrapper:
             all_obs.update(obs)
         
         return all_obs
-    
-    # def get_obs(self, agent, **kwargs):
-    #     obs = {**observer.get_obs(agent, **kwargs) for observer in self.observers}
-    #     if not isinstance(agent, PositionAgent):
-    #         # Agent does not have a position, so we cannot filter based on position.
-    #         # We return the observation as is
-    #         return obs
-    #     else:
-    #         for other in self.agents.values():
-    #             if other.id == agent.id: continue
-    #             elif not isinstance(other, PositionAgent): continue # Cannot filter out agents who have no position
-    #             elif np.random.uniform() <= \
-    #                 self.obs_filter(np.linalg.norm(agent.position - other.position, self.obs_norm), agent.agent_view): \
-    #                     continue # We perfectly observed this agent
-    #             else:
-    #                 # We did not observe the agent, so we have to modify the obs
-    #                 for obs_type, obs_content in obs.items():
-    #                     if other.id in obs_content: # TODO: observers should see all agents for consistent input, so this if check will go away when we fix that
-    #                         obs_content[other.id] = self.observers.null_value
-    #     return obs
