@@ -240,7 +240,7 @@ class RelativePositionObserver:
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent) and \
                isinstance(agent, PositionAgent):
-                agent.observation_space['position'] = Dict({
+                agent.observation_space['relative_position'] = Dict({
                     other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values() if (other.id != agent.id and isinstance(other, PositionAgent))
                 })
 
@@ -257,7 +257,7 @@ class RelativePositionObserver:
                 r_diff = other.position[0] - agent.position[0]
                 c_diff = other.position[1] - agent.position[1]
                 obs[other.id] = np.array([r_diff, c_diff])
-            return {'position': obs}
+            return {'relative_position': obs}
         else:
             return {}
     
