@@ -20,9 +20,13 @@ class HealthObserver:
 
         for agent in agents.values():
             if isinstance(agent, HealthObservingAgent):
-                agent.observation_space['health'] = Dict({
-                    other.id: Box(-1, other.max_health, (1,)) for other in self.agents.values() if isinstance(other, LifeAgent)
-                })
+                obs_space = {}
+                for other in self.agents.values():
+                    if isinstance(other, LifeAgent):
+                        obs_space[other.id] = Box(-1, other.max_health, (1,))
+                    else:
+                        obs_space[other.id] = Box(-1, -1, (1,))
+                agent.observation_space['health'] = Dict(obs_space)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -32,7 +36,13 @@ class HealthObserver:
             The agent making the observation.
         """
         if isinstance(agent, HealthObservingAgent):
-            return {'health': {agent.id: agent.health for agent in self.agents.values() if isinstance(agent, LifeAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, LifeAgent):
+                    obs[other.id] = other.health
+                else:
+                    obs[other.id] = self.null_value
+            return {'health': obs}
         else:
             return {}
     
@@ -51,7 +61,7 @@ class LifeObserver:
         for agent in agents.values():
             if isinstance(agent, LifeObservingAgent):
                 agent.observation_space['life'] = Dict({
-                    other.id: Box(-1, 1, (1,), np.int) for other in self.agents.values() if isinstance(other, LifeAgent)
+                    other.id: Box(-1, 1, (1,), np.int) for other in self.agents.values()
                 })
     
     def get_obs(self, agent, **kwargs):
@@ -62,7 +72,13 @@ class LifeObserver:
             The agent making the observation.
         """
         if isinstance(agent, LifeObservingAgent):
-            return {'life': {agent.id: agent.is_alive for agent in self.agents.values() if isinstance(agent, LifeAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, LifeAgent):
+                    obs[other.id] = other.is_alive
+                else:
+                    obs[other.id] = self.null_value
+            return {'life': obs}
         else:
             return {}
     
@@ -92,9 +108,8 @@ class MaskObserver:
     # (1) Change the observers so that all agents are always observed
     # and the ones that are not life agents will simply be observed with the null
     # value.
-    # (2) Have a separate mask for every observer as part of the restricted classes
-    # below.
-    # We should look at some rllib examples to help us decide the right way forward.
+    # 
+    # Took path 1.
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
         for agent in agents.values():
@@ -133,7 +148,7 @@ class PositionObserver:
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent):
                 agent.observation_space['position'] = Dict({
-                    other.id: Box(-1, self.position.region, (2,), np.int) for other in agents.values() if isinstance(other, PositionAgent)
+                    other.id: Box(-1, self.position.region, (2,), np.int) for other in agents.values()
                 })
 
     def get_obs(self, agent, **kwargs):
@@ -141,7 +156,13 @@ class PositionObserver:
         Get the positions of all the agents in the simulator.
         """
         if isinstance(agent, PositionObservingAgent):
-            return {'position': {other.id: other.position for other in self.agents.values() if isinstance(other, PositionAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, PositionAgent):
+                    obs[other.id] = other.position
+                else:
+                    obs[other.id] = self.null_value
+            return {'position': obs}
         else:
             return {}   
     
@@ -162,7 +183,7 @@ class RelativePositionObserver:
             if isinstance(agent, PositionObservingAgent) and \
                isinstance(agent, PositionAgent):
                 agent.observation_space['relative_position'] = Dict({
-                    other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values() if (other.id != agent.id and isinstance(other, PositionAgent))
+                    other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values()
                 })
 
     def get_obs(self, agent, **kwargs):
@@ -173,11 +194,12 @@ class RelativePositionObserver:
            isinstance(agent, PositionAgent):
             obs = {}
             for other in self.agents.values():
-                if other.id == agent.id: continue # Don't observe your own position
-                if not isinstance(other, PositionAgent): continue # Can't observe relative position from agents who do not have a position.
-                r_diff = other.position[0] - agent.position[0]
-                c_diff = other.position[1] - agent.position[1]
-                obs[other.id] = np.array([r_diff, c_diff])
+                if isinstance(other, PositionAgent):
+                    r_diff = other.position[0] - agent.position[0]
+                    c_diff = other.position[1] - agent.position[1]
+                    obs[other.id] = np.array([r_diff, c_diff])
+                else:
+                    obs[other.id] = self.null_value
             return {'relative_position': obs}
         else:
             return {}
@@ -334,16 +356,26 @@ class SpeedObserver:
         
         for agent in agents.values():
             if isinstance(agent, SpeedAngleObservingAgent):
-                agent.observation_space['speed'] = Dict({
-                    other.id: Box(-1, other.max_speed, (1,)) for other in self.agents.values() if isinstance(other, SpeedAngleAgent)
-                })
+                obs_space = {}
+                for other in self.agents.values():
+                    if isinstance(other, SpeedAngleAgent):
+                        obs_space[other.id] = Box(-1, other.max_speed, (1,))
+                    else:
+                        obs_space[other.id] = Box(-1, -1, (1,))
+                agent.observation_space['speed'] = Dict(obs_space)
 
     def get_obs(self, agent, **kwargs):
         """
         Get the speed of all the agents in the simulator.
         """
         if isinstance(agent, SpeedAngleObservingAgent):
-            return {'speed': {other.id: other.speed for other in self.agents.values() if isinstance(other, SpeedAngleAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, SpeedAngleAgent):
+                    obs[other.id] = other.speed
+                else:
+                    obs[other.id] = self.null_value
+            return {'speed': obs}
         else:
             return {}
     
@@ -362,7 +394,7 @@ class AngleObserver:
         for agent in agents.values():
             if isinstance(agent, SpeedAngleObservingAgent):
                 agent.observation_space['ground_angle'] = Dict({
-                    other.id: Box(-1, 360, (1,)) for other in agents.values() if isinstance(other, SpeedAngleAgent)
+                    other.id: Box(-1, 360, (1,)) for other in agents.values()
                 })
 
     def get_obs(self, agent, **kwargs):
@@ -370,7 +402,13 @@ class AngleObserver:
         Get the angle of all the agents in the simulator.
         """
         if isinstance(agent, SpeedAngleObservingAgent):
-            return {'ground_angle': {other.id: other.ground_angle for other in self.agents.values() if isinstance(other, SpeedAngleAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, SpeedAngleAgent):
+                    obs[other.id] = other.ground_angle
+                else:
+                    obs[other.id] = self.null_value
+            return {'ground_angle': obs}
         else:
             return {}
     
@@ -388,16 +426,26 @@ class VelocityObserver:
         
         for agent in agents.values():
             if isinstance(agent, VelocityObservingAgent):
-                agent.observation_space['velocity'] = Dict({
-                    other.id: Box(-agent.max_speed, agent.max_speed, (2,)) for other in agents.values() if isinstance(other, VelocityAgent)
-                })
+                obs_space = {}
+                for other in self.agents.values():
+                    if isinstance(other, VelocityAgent):
+                        obs_space[other.id] = Box(-agent.max_speed, agent.max_speed, (2,))
+                    else:
+                        obs_space[other.id] = Box(0, 0, (2,))
+                agent.observation_space['velocity'] = Dict(obs_space)
     
     def get_obs(self, agent, **kwargs):
         """
         Get the velocity of all the agents in the simulator.
         """
         if isinstance(agent, VelocityObservingAgent):
-            return {'velocity': {agent.id: agent.velocity for agent in self.agents.values() if isinstance(agent, VelocityAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, VelocityAgent):
+                    obs[other.id] = other.velocity
+                else:
+                    obs[other.id] = self.null_value
+            return {'velocity': obs}
         else:
             return {}
     
@@ -470,7 +518,7 @@ class TeamObserver:
         for agent in agents.values():
             if isinstance(agent, TeamObservingAgent):
                 agent.observation_space['team'] = Dict({
-                    other.id: Box(-1, self.team.number_of_teams-1, (1,), np.int) for other in agents.values() if isinstance(other, TeamAgent)
+                    other.id: Box(-1, self.team.number_of_teams-1, (1,), np.int) for other in agents.values()
                 })
     
     def get_obs(self, agent, **kwargs):
@@ -478,7 +526,13 @@ class TeamObserver:
         Get the team of each agent in the simulator.
         """
         if isinstance(agent, TeamObservingAgent):
-            return {'team': {other.id: self.agents[other.id].team for other in self.agents.values() if isinstance(other, TeamAgent)}}
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, TeamAgent):
+                    obs[other.id] = other.team
+                else:
+                    obs[other.id] = self.null_value
+            return {'team': obs}
         else:
             return {}
     
