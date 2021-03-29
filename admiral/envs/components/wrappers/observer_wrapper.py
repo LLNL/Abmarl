@@ -14,14 +14,14 @@ def obs_filter_step(distance, view):
 class PositionRestrictedObservationWrapper:
     """
     Partial observation based on position distance. If the observing agent is an
-    AgentObservingAgent, then we will filter the observation based on the distance
-    between the agent and the agent's view according to the given obs_filter function.
+    AgentObservingAgent, then we will filter the observation based on agent's view
+    and the distance between the agents according to the given obs_filter function.
     We will also append that agent's observation with a "mask" channel that shows
     which agents have been observed and which have been filtered.
 
     We wrap multiple observers in one because you probably want to apply the same
     observation filter to many observers in the same step. For example, suppose
-    your agent can observe the health and position of other agents. Supposed based
+    your agent can observe the health and position of other agents. Suppose based
     on its position and view, another agent gets filtered out of the observation.
     We want that agent to be filtered out from both the position and health channels
     consistently, so we wrap both of those observers with a single wrapper.
@@ -56,7 +56,7 @@ class PositionRestrictedObservationWrapper:
         
         # Append a "mask" observation to the observing agents
         for agent in agents.values():
-            if isinstance(agent, AgentObservingAgent):
+            if isinstance(agent, ObservingAgent):
                 agent.observation_space['mask'] = Dict({
                     other: Discrete(2) for other in agents
                 })
@@ -69,7 +69,7 @@ class PositionRestrictedObservationWrapper:
         agent (ObservingAgent):
             An agent that can observe. If the agent does not have a position, then
             we cannot do position-based filtering, so we just return the observations
-            wihtout a filter and with a mask that is all 1's for all agents. 
+            without a filter and with a mask that is all 1's for all agents. 
         
         return (dict):
             A dictionary composed of the channels from the observers and a "mask"
