@@ -3,10 +3,7 @@
 from gym.spaces import Dict, Discrete
 import numpy as np
 
-from admiral.envs.components.observer import HealthObserver, LifeObserver, MaskObserver, \
-    PositionObserver, RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, \
-    TeamObserver, AgentObservingAgent
-from admiral.envs.components.agent import PositionAgent
+from admiral.envs.components.agent import PositionAgent, AgentObservingAgent
 
 def obs_filter_step(distance, view):
     return 0 if distance > view else 1

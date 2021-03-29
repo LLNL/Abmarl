@@ -3,9 +3,8 @@ import numpy as np
 
 from admiral.envs.components.agent import PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent
 from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState, VelocityState
-from admiral.envs.components.observer import HealthObserver, LifeObserver, MaskObserver, \
-    PositionObserver, RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, \
-    TeamObserver
+from admiral.envs.components.observer import HealthObserver, LifeObserver, PositionObserver, \
+    RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, TeamObserver
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 
 from admiral.envs.components.agent import AgentObservingAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent
@@ -48,7 +47,6 @@ def test_position_restricted_observer_wrapper():
     health_observer = HealthObserver(agents=agents)
     life_observer = LifeObserver(agents=agents)
     team_observer = TeamObserver(team=team_state, agents=agents)
-    mask_observer = MaskObserver(agents=agents)
     speed_observer = SpeedObserver(agents=agents)
     angle_observer = AngleObserver(agents=agents)
     velocity_observer = VelocityObserver(agents=agents)
@@ -66,7 +64,6 @@ def test_position_restricted_observer_wrapper():
             health_observer,
             life_observer,
             team_observer,
-            # mask_observer,
             speed_observer,
             angle_observer,
             velocity_observer

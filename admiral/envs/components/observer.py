@@ -88,51 +88,6 @@ class LifeObserver:
 
 
 
-# --------------- #
-# --- Masking --- #
-# --------------- #
-
-class MaskObserver:
-    """
-    Observe a mask of each agent in the simulator. Agents that can be seen are
-    indicatead with True, agents that cannot be seen (e.g. they are too far away)
-    are indicated with False.
-    """
-    # TODO: Having a single mask observer may actually be confusing because it will
-    # have every single agent in the dictionary, whereas the actual observer may
-    # only have a subset of them. For example, a life observer will only include
-    # life agents, and if this mask is applied, then the mask will include all
-    # the agents, so there is not a clear mapping to the actual observation.
-    #
-    # Paths to take:
-    # (1) Change the observers so that all agents are always observed
-    # and the ones that are not life agents will simply be observed with the null
-    # value.
-    # 
-    # Took path 1.
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-        for agent in agents.values():
-            if isinstance(agent, AgentObservingAgent):
-                agent.observation_space['mask'] = Dict({
-                    other: Discrete(2) for other in agents
-                })
-    
-    def get_obs(self, agent, **kwargs):
-        """
-        Get the masking of all the agents in the simulator.
-        """
-        if isinstance(agent, AgentObservingAgent):
-            return {'mask': {other: True for other in self.agents}}
-        else:
-            return {}
-    
-    @property
-    def null_value(self):
-        return False
-
-
-
 # ----------------------------- #
 # --- Position and Movement --- #
 # ----------------------------- #
