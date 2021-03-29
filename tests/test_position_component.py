@@ -217,38 +217,38 @@ def test_relative_position_observer():
     observer = RelativePositionObserver(position=state, agents=agents)
     state.reset()
 
-    assert observer.get_obs(agents['agent0'])['position']['agent1'][0] == 2
-    assert observer.get_obs(agents['agent0'])['position']['agent1'][1] == 2
-    assert observer.get_obs(agents['agent0'])['position']['agent2'][0] == 3
-    assert observer.get_obs(agents['agent0'])['position']['agent2'][1] == 2
-    assert observer.get_obs(agents['agent0'])['position']['agent3'][0] == 1
-    assert observer.get_obs(agents['agent0'])['position']['agent3'][1] == 4
-    assert observer.get_obs(agents['agent0'])['position']['agent4'][0] == 1
-    assert observer.get_obs(agents['agent0'])['position']['agent4'][1] == 4
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent1'][0] == 2
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent1'][1] == 2
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent2'][0] == 3
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent2'][1] == 2
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent3'][0] == 1
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent3'][1] == 4
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent4'][0] == 1
+    assert observer.get_obs(agents['agent0'])['relative_position']['agent4'][1] == 4
 
-    assert observer.get_obs(agents['agent1'])['position']['agent0'][0] == -2
-    assert observer.get_obs(agents['agent1'])['position']['agent0'][1] == -2
-    assert observer.get_obs(agents['agent1'])['position']['agent2'][0] == 1
-    assert observer.get_obs(agents['agent1'])['position']['agent2'][1] == 0
-    assert observer.get_obs(agents['agent1'])['position']['agent3'][0] == -1
-    assert observer.get_obs(agents['agent1'])['position']['agent3'][1] == 2
-    assert observer.get_obs(agents['agent1'])['position']['agent4'][0] == -1
-    assert observer.get_obs(agents['agent1'])['position']['agent4'][1] == 2
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent0'][0] == -2
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent0'][1] == -2
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent2'][0] == 1
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent2'][1] == 0
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent3'][0] == -1
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent3'][1] == 2
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent4'][0] == -1
+    assert observer.get_obs(agents['agent1'])['relative_position']['agent4'][1] == 2
 
-    assert observer.get_obs(agents['agent2'])['position']['agent0'][0] == -3
-    assert observer.get_obs(agents['agent2'])['position']['agent0'][1] == -2
-    assert observer.get_obs(agents['agent2'])['position']['agent1'][0] == -1
-    assert observer.get_obs(agents['agent2'])['position']['agent1'][1] == 0
-    assert observer.get_obs(agents['agent2'])['position']['agent3'][0] == -2
-    assert observer.get_obs(agents['agent2'])['position']['agent3'][1] == 2
-    assert observer.get_obs(agents['agent2'])['position']['agent4'][0] == -2
-    assert observer.get_obs(agents['agent2'])['position']['agent4'][1] == 2
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent0'][0] == -3
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent0'][1] == -2
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent1'][0] == -1
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent1'][1] == 0
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent3'][0] == -2
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent3'][1] == 2
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent4'][0] == -2
+    assert observer.get_obs(agents['agent2'])['relative_position']['agent4'][1] == 2
 
-    assert observer.get_obs(agents['agent3'])['position']['agent0'][0] == -1
-    assert observer.get_obs(agents['agent3'])['position']['agent0'][1] == -4
-    assert observer.get_obs(agents['agent3'])['position']['agent1'][0] == 1
-    assert observer.get_obs(agents['agent3'])['position']['agent1'][1] == -2
-    assert observer.get_obs(agents['agent3'])['position']['agent2'][0] == 2
-    assert observer.get_obs(agents['agent3'])['position']['agent2'][1] == -2
-    assert observer.get_obs(agents['agent3'])['position']['agent4'][0] == 0
-    assert observer.get_obs(agents['agent3'])['position']['agent4'][1] == 0
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent0'][0] == -1
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent0'][1] == -4
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent1'][0] == 1
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent1'][1] == -2
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent2'][0] == 2
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent2'][1] == -2
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent4'][0] == 0
+    assert observer.get_obs(agents['agent3'])['relative_position']['agent4'][1] == 0
