@@ -123,6 +123,7 @@ params = {
         'config': {
             # --- Environment ---
             'env': "HuntingForaging",
+            'horizon': 200,
             # 'env_config': {},
             # --- Multiagent ---
             'multiagent': {

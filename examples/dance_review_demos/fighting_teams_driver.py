@@ -103,6 +103,7 @@ params = {
         'config': {
             # --- Environment ---
             'env': "TeamBattle",
+            'horizon': 200,
             # 'env_config': {},
             # --- Multiagent ---
             'multiagent': {
