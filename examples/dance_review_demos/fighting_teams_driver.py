@@ -68,11 +68,11 @@ def policy_mapping_fn(agent_id):
     return f'team{agents[agent_id].team}'
 
 # USE FOR DEBUGGING
-print(agents['agent0'].action_space)
-print(agents['agent0'].observation_space)
-# for agent in agents:
-#     print(policy_mapping_fn(agent))
-import sys; sys.exit()
+# print(agents['agent0'].action_space)
+# print(agents['agent0'].observation_space)
+# # for agent in agents:
+# #     print(policy_mapping_fn(agent))
+# import sys; sys.exit()
 
 
 # --------------------------- #

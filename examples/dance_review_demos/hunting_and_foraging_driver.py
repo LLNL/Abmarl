@@ -90,8 +90,8 @@ def policy_mapping_fn(agent_id):
 # print(agents['forager0'].observation_space)
 # print(agents['hunter0'].action_space)
 # print(agents['hunter0'].observation_space)
-# for agent in agents:
-#     print(policy_mapping_fn(agent))
+# # for agent in agents:
+# #     print(policy_mapping_fn(agent))
 # import sys; sys.exit()
 
 
