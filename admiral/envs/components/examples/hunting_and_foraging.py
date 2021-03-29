@@ -5,7 +5,8 @@ import seaborn as sns
 
 # Import all the features that we need from the simulation components
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState, GridResourceState
-from admiral.envs.components.observer import PositionRestrictedPositionObserver, PositionRestrictedLifeObserver, PositionRestrictedTeamObserver, GridResourceObserver
+from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridResourceObserver
+from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone, ResourcesDepletedDone
 
@@ -22,7 +23,7 @@ from admiral.tools.matplotlib_utils import mscatter
 # have a position, team, and life/death state
 # can observe positions, teams, and life state of other agents
 # can move around the grid
-class GenericAgent(PositionAgent, TeamAgent, GridMovementAgent, LifeAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, AgentObservingAgent): pass
+class GenericAgent(PositionAgent, TeamAgent, LifeAgent, GridMovementAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent, AgentObservingAgent): pass
 
 # Foraging agents can see the resources and harvest them
 class ForagingAgent(GenericAgent, HarvestingAgent, ResourceObservingAgent):
@@ -54,9 +55,10 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # agents that can see resources. The observers are smart enough to know which
         # agents they can work with. For example, the resource observer will only
         # give resource observations to ForagingAgents.
-        self.position_observer = PositionRestrictedPositionObserver(position=self.position_state, **kwargs)
-        self.team_observer = PositionRestrictedTeamObserver(team=self.team_state, **kwargs)
-        self.life_observer = PositionRestrictedLifeObserver(**kwargs)
+        position_observer = PositionObserver(position=self.position_state, **kwargs)
+        team_observer = TeamObserver(team=self.team_state, **kwargs)
+        life_observer = LifeObserver(**kwargs)
+        self.agent_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)
         self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
 
         # Actor components
@@ -165,10 +167,8 @@ class HuntingForagingEnv(AgentBasedSimulation):
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
-            **self.position_observer.get_obs(agent),
-            **self.team_observer.get_obs(agent),
-            **self.life_observer.get_obs(agent),
-            **self.resource_observer.get_obs(agent),
+            **self.agent_observer.get_obs(agent, **kwargs),
+            **self.resource_observer.get_obs(agent, **kwargs),
         }
     
     def get_reward(self, agent_id, **kwargs):
