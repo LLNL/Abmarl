@@ -4,7 +4,8 @@ import numpy as np
 
 # Import all the features that we need from the simulation components
 from admiral.envs.components.state import TeamState, GridPositionState, LifeState
-from admiral.envs.components.observer import PositionRestrictedTeamObserver, PositionRestrictedPositionObserver, PositionRestrictedLifeObserver
+from admiral.envs.components.observer import TeamObserver, PositionObserver, LifeObserver
+from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
 from admiral.envs.components.done import TeamDeadDone
 # Each env component needs a corresponding agent component
@@ -40,10 +41,12 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # Observer Components
         # These components handle the observations that the agents receive whenever
         # get_obs is called. In this environment supports agents that can observe
-        # the position, health, and team of other agents and itself.
-        self.position_observer = PositionRestrictedPositionObserver(position=self.position_state, **kwargs)
-        self.life_observer = PositionRestrictedLifeObserver(**kwargs)
-        self.team_observer = PositionRestrictedTeamObserver(team=self.team_state, **kwargs)
+        # the position, health, and team of other agents and itself. We then filter
+        # those observations based on our partial observation filter settings.
+        position_observer = PositionObserver(position=self.position_state, **kwargs)
+        life_observer = LifeObserver(**kwargs)
+        team_observer = TeamObserver(team=self.team_state, **kwargs)
+        self.observer = PositionRestrictedObservationWrapper([position_observer, life_observer, team_observer], **kwargs)
 
         # Actor Components
         # These components handle the actions in the step function. This environment
@@ -130,11 +133,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
     
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
-        return {
-            **self.position_observer.get_obs(agent, **kwargs),
-            **self.life_observer.get_obs(agent, **kwargs),
-            **self.team_observer.get_obs(agent, **kwargs),
-        }
+        return self.observer.get_obs(agent, **kwargs)
     
     def get_reward(self, agent_id, **kwargs):
         """
@@ -167,7 +166,7 @@ if __name__ == '__main__':
     )
     env.reset()
 
-    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    import pprint; pprint.pprint({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
     fig = plt.gcf()
 
     shape_dict = {0: 's', 1: 'o'}
