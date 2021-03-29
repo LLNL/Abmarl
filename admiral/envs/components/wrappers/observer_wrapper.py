@@ -20,15 +20,18 @@ class PositionRestrictedObservationWrapper:
 
     def get_obs(self, agent, **kwargs):
         all_obs = {}
+
+        # If the observing agent does not have a position, then we canot filter
+        # it here, so we just return the observations from the wrapped observers.
         if not isinstance(agent, PositionAgent):
             for observer in self.observers:
                 all_obs.update(observer.get_obs(agent, **kwargs))
             return all_obs
 
+        # Determine which other agents the observing agent sees. Add the observation mask.
         other_filter = []
         for other in self.agents.values():
-            if other.id == agent.id: continue
-            elif not isinstance(other, PositionAgent): continue # Cannot filter out agents who have no position
+            if not isinstance(other, PositionAgent): continue # Cannot filter out agents who have no position
             elif np.random.uniform() <= \
                 self.obs_filter(np.linalg.norm(agent.position - other.position, self.obs_norm), agent.agent_view): \
                     continue # We perfectly observed this agent

@@ -78,102 +78,102 @@ def test_position_restricted_observer_wrapper():
     obs = wrapped_observer.get_obs(agents['agent0'])
     assert obs['health'] == {
         'agent0': 0.67,
-        'agent1': 0.54,
-        'agent2': -1,
-        'agent3': 0.24,
+        'agent1': -1, 
+        'agent2': 0.36,
+        'agent3': -1,
         'agent4': -1,
-        'agent5': 0.89,
+        'agent5': -1,
         'agent6': -1,
-        'agent7': -1, 
+        'agent7': 0.5, 
         'agent8': 0.26,
         'agent9': 0.08,
     }
     assert obs['life'] == {
         'agent0': True,
-        'agent1': True,
-        'agent2': -1,
-        'agent3': True,
+        'agent1': -1,
+        'agent2': True,
+        'agent3': -1,
         'agent4': -1,
-        'agent5': True,
+        'agent5': -1,
         'agent6': -1,
-        'agent7': -1,
+        'agent7': True,
         'agent8': True,
         'agent9': True,
     }
     assert obs['team'] == {
         'agent0': 0,
-        'agent1': 1,
-        'agent2': -1,
-        'agent3': 1,
-        'agent4': -1,
+        'agent1': -1,
+        'agent2': 1,
+        'agent3': -1,
+        'agent4': 2,
         'agent5': -1,
         'agent6': -1,
-        'agent7': -1,
+        'agent7': 1,
         'agent8': 0,
         'agent9': 2,
     }
     np.testing.assert_array_equal(obs['position']['agent0'], np.array([2, 2]))
-    np.testing.assert_array_equal(obs['position']['agent1'], np.array([4, 4]))
-    np.testing.assert_array_equal(obs['position']['agent2'], np.array([-1, -1]))
-    np.testing.assert_array_equal(obs['position']['agent3'], np.array([4, 2]))
-    np.testing.assert_array_equal(obs['position']['agent4'], np.array([-1, -1]))
-    np.testing.assert_array_equal(obs['position']['agent5'], np.array([4, 0]))
+    np.testing.assert_array_equal(obs['position']['agent1'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent2'], np.array([4, 3]))
+    np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent4'], np.array([4, 1]))
+    np.testing.assert_array_equal(obs['position']['agent5'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([-1, -1]))
-    np.testing.assert_array_equal(obs['position']['agent7'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent7'], np.array([0, 4]))
     np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent9'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['relative_position']['agent0'], np.array([0, 0]))
-    np.testing.assert_array_equal(obs['relative_position']['agent1'], np.array([2, 2]))
-    np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([-5, -5]))
-    np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([2, 0]))
-    np.testing.assert_array_equal(obs['relative_position']['agent4'], np.array([-5, -5]))
-    np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([2, -2]))
+    np.testing.assert_array_equal(obs['relative_position']['agent1'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([2, 1]))
+    np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent4'], np.array([2, -1]))
+    np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent6'], np.array([-5, -5]))
-    np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-2, 2]))
     np.testing.assert_array_equal(obs['relative_position']['agent8'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent9'], np.array([-5, -5]))
     assert obs['mask'] == {
         'agent0': True,
-        'agent1': True,
-        'agent2': False,
-        'agent3': True,
-        'agent4': False,
-        'agent5': True,
+        'agent1': False,
+        'agent2': True,
+        'agent3': False,
+        'agent4': True,
+        'agent5': False,
         'agent6': False,
-        'agent7': False,
+        'agent7': True,
         'agent8': True,
         'agent9': True,
     }
     assert obs['speed'] == {
         'agent0': 0.3,
-        'agent1': 0.0,
-        'agent2': -1,
-        'agent3': 0.05,
-        'agent4': -1,
-        'agent5': 0.21,
+        'agent1': -1,
+        'agent2': 0.12,
+        'agent3': -1,
+        'agent4': 0.17,
+        'agent5': -1,
         'agent6': -1,
-        'agent7': -1,
+        'agent7': 0.36,
         'agent8': 0.06,
         'agent9': 0.24,
     }
     assert obs['ground_angle'] == {
         'agent0': 123,
-        'agent1': 126,
-        'agent2': -1,
-        'agent3': 46,
-        'agent4': -1,
-        'agent5': 276,
+        'agent1': -1,
+        'agent2': 180,
+        'agent3': -1,
+        'agent4': 212,
+        'agent5': -1,
         'agent6': -1,
-        'agent7': -1,
+        'agent7': 0,
         'agent8': 5,
         'agent9': 246
     }
     np.testing.assert_array_equal(obs['velocity']['agent0'], np.array([-0.3, 0.8]))
-    np.testing.assert_array_equal(obs['velocity']['agent1'], np.array([-0.2, 0.7]))
-    np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([0.0, 0.0]))
-    np.testing.assert_array_equal(obs['velocity']['agent3'], np.array([0.0, 0.5]))
-    np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.0, 0.0]))
-    np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.2, 0.3]))
+    np.testing.assert_array_equal(obs['velocity']['agent1'], np.array([0.0, 0.0]))
+    np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([-0.1, 0.6]))
+    np.testing.assert_array_equal(obs['velocity']['agent3'], np.array([0.0, 0.0]))
+    np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.1, 0.4]))
+    np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
@@ -184,7 +184,7 @@ def test_position_restricted_observer_wrapper():
     assert obs['health'] == {
         'agent0': -1,
         'agent1': 0.54,
-        'agent2': -1,
+        'agent2': 0.36,
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
@@ -196,7 +196,7 @@ def test_position_restricted_observer_wrapper():
     assert obs['life'] == {
         'agent0': -1,
         'agent1': True,
-        'agent2': -1,
+        'agent2': True,
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
@@ -208,7 +208,7 @@ def test_position_restricted_observer_wrapper():
     assert obs['team'] == {
         'agent0': -1,
         'agent1': 1,
-        'agent2': -1,
+        'agent2': 1,
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
@@ -219,7 +219,7 @@ def test_position_restricted_observer_wrapper():
     }
     np.testing.assert_array_equal(obs['position']['agent0'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent1'], np.array([4, 4]))
-    np.testing.assert_array_equal(obs['position']['agent2'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent2'], np.array([4, 3]))
     np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent4'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent5'], np.array([-1, -1]))
@@ -229,7 +229,7 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['position']['agent9'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['relative_position']['agent0'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent1'], np.array([0, 0]))
-    np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([0, -1]))
     np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent4'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([-5, -5]))
@@ -240,7 +240,7 @@ def test_position_restricted_observer_wrapper():
     assert obs['mask'] == {
         'agent0': False,
         'agent1': True,
-        'agent2': False,
+        'agent2': True,
         'agent3': False,
         'agent4': False,
         'agent5': False,
@@ -252,7 +252,7 @@ def test_position_restricted_observer_wrapper():
     assert obs['speed'] == {
         'agent0': -1,
         'agent1': 0.0,
-        'agent2': -1,
+        'agent2': 0.12,
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
@@ -264,7 +264,7 @@ def test_position_restricted_observer_wrapper():
     assert obs['ground_angle'] == {
         'agent0': -1,
         'agent1': 126,
-        'agent2': -1,
+        'agent2': 180,
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
@@ -275,7 +275,7 @@ def test_position_restricted_observer_wrapper():
     }
     np.testing.assert_array_equal(obs['velocity']['agent0'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent1'], np.array([-0.2, 0.7]))
-    np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([0.0, 0.0]))
+    np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([-0.1, 0.6]))
     np.testing.assert_array_equal(obs['velocity']['agent3'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.0, 0.0]))
@@ -378,7 +378,3 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent9'], np.array([0.6, -0.1]))
-
-
-
-test_position_restricted_observer_wrapper()
