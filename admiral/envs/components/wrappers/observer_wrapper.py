@@ -2,7 +2,7 @@
 from gym.spaces import Dict, Discrete
 import numpy as np
 
-from admiral.envs.components.agent import PositionAgent, AgentObservingAgent
+from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, ObservingAgent
 
 def obs_filter_step(distance, view):
     """
@@ -49,7 +49,6 @@ class PositionRestrictedObservationWrapper:
         assert callable(obs_filter), "obs_filter must be a function."
         self.obs_filter = obs_filter
 
-        assert type(obs_norm) is int, "obs_norm must be an integer or np.inf."
         self.obs_norm = obs_norm
 
         assert type(agents) is dict, "agents must be the dictionary of agents."
@@ -76,12 +75,12 @@ class PositionRestrictedObservationWrapper:
             A dictionary composed of the channels from the observers and a "mask"
             channel that is 1 if the agent was observed, otherwise 0.
         """
-        if isinstance(agent, AgentObservingAgent):
+        if isinstance(agent, ObservingAgent):
             all_obs = {}
 
-            # If the observing agent does not have a position, then we cannot filter
+            # If the observing agent does not have a position and view, then we cannot filter
             # it here, so we just return the observations from the wrapped observers.
-            if not isinstance(agent, PositionAgent):
+            if not (isinstance(agent, PositionAgent) and isinstance(agent, AgentObservingAgent)):
                 mask = {other: 1 for other in self.agents}
                 all_obs['mask'] = mask
                 for observer in self.observers:

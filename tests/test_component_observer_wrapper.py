@@ -9,9 +9,10 @@ from admiral.envs.components.wrappers.observer_wrapper import PositionRestricted
 
 from admiral.envs.components.agent import AgentObservingAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent
 class AllObservingAgent(AgentObservingAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
+class NonViewAgent(VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
 
 class AllAgent(           AllObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
-class PositionlessAgent(  AllObservingAgent,                LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
+class PositionlessAgent(  NonViewAgent,                     LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
 class LifelessAgent(      AllObservingAgent, PositionAgent,            TeamAgent, SpeedAngleAgent, VelocityAgent): pass
 class TeamlessAgent(      AllObservingAgent, PositionAgent, LifeAgent,            SpeedAngleAgent, VelocityAgent): pass
 class SpeedAnglelessAgent(AllObservingAgent, PositionAgent, LifeAgent, TeamAgent,                  VelocityAgent): pass
@@ -27,8 +28,8 @@ def test_position_restricted_observer_wrapper():
         'agent5': TeamlessAgent(      id='agent5', agent_view=1, initial_position=np.array([4, 0]), initial_health=0.89,         max_speed=2, initial_speed=0.21, initial_banking_angle=23, initial_ground_angle=276, initial_velocity=np.array([0.2,  0.3])),
         'agent6': SpeedAnglelessAgent(id='agent6', agent_view=0, initial_position=np.array([1, 1]), initial_health=0.53, team=0, max_speed=1,                                                                         initial_velocity=np.array([0.3,  0.2])),
         'agent7': VelocitylessAgent(  id='agent7', agent_view=5, initial_position=np.array([0, 4]), initial_health=0.50, team=1, max_speed=1, initial_speed=0.36, initial_banking_angle=24, initial_ground_angle=0                                          ),
-        'agent8': PositionlessAgent(  id='agent8', agent_view=1,                                    initial_health=0.26, team=0, max_speed=2, initial_speed=0.06, initial_banking_angle=16, initial_ground_angle=5,   initial_velocity=np.array([0.5,  0.0])),
-        'agent9': PositionlessAgent(  id='agent9', agent_view=1,                                    initial_health=0.08, team=2, max_speed=0, initial_speed=0.24, initial_banking_angle=30, initial_ground_angle=246, initial_velocity=np.array([0.6, -0.1])),
+        'agent8': PositionlessAgent(  id='agent8',                                                  initial_health=0.26, team=0, max_speed=2, initial_speed=0.06, initial_banking_angle=16, initial_ground_angle=5,   initial_velocity=np.array([0.5,  0.0])),
+        'agent9': PositionlessAgent(  id='agent9',                                                  initial_health=0.08, team=2, max_speed=0, initial_speed=0.24, initial_banking_angle=30, initial_ground_angle=246, initial_velocity=np.array([0.6, -0.1])),
     }
 
     def linear_drop_off(distance, view):
