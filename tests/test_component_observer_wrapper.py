@@ -81,6 +81,7 @@ def test_position_restricted_observer_wrapper():
         'agent1': 0.54,
         'agent2': -1,
         'agent3': 0.24,
+        'agent4': -1,
         'agent5': 0.89,
         'agent6': -1,
         'agent7': -1, 
@@ -92,6 +93,7 @@ def test_position_restricted_observer_wrapper():
         'agent1': True,
         'agent2': -1,
         'agent3': True,
+        'agent4': -1,
         'agent5': True,
         'agent6': -1,
         'agent7': -1,
@@ -104,6 +106,7 @@ def test_position_restricted_observer_wrapper():
         'agent2': -1,
         'agent3': 1,
         'agent4': -1,
+        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
         'agent8': 0,
@@ -117,8 +120,9 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['position']['agent5'], np.array([4, 0]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent7'], np.array([-1, -1]))
-    assert 'agent8' not in obs['position']
-    assert 'agent9' not in obs['position']
+    np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent9'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['relative_position']['agent0'], np.array([0, 0]))
     np.testing.assert_array_equal(obs['relative_position']['agent1'], np.array([2, 2]))
     np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([2, 0]))
@@ -126,9 +130,8 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([2, -2]))
     np.testing.assert_array_equal(obs['relative_position']['agent6'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-5, -5]))
-    assert 'agent0' not in obs['relative_position']
-    assert 'agent8' not in obs['relative_position']
-    assert 'agent9' not in obs['relative_position']
+    np.testing.assert_array_equal(obs['relative_position']['agent8'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent9'], np.array([-5, -5]))
     assert obs['mask'] == {
         'agent0': True,
         'agent1': True,
@@ -148,6 +151,7 @@ def test_position_restricted_observer_wrapper():
         'agent3': 0.05,
         'agent4': -1,
         'agent5': 0.21,
+        'agent6': -1,
         'agent7': -1,
         'agent8': 0.06,
         'agent9': 0.24,
@@ -159,6 +163,7 @@ def test_position_restricted_observer_wrapper():
         'agent3': 46,
         'agent4': -1,
         'agent5': 276,
+        'agent6': -1,
         'agent7': -1,
         'agent8': 5,
         'agent9': 246
@@ -170,6 +175,7 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.2, 0.3]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.0, 0.0]))
+    np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent9'], np.array([0.6, -0.1]))
 
@@ -180,6 +186,7 @@ def test_position_restricted_observer_wrapper():
         'agent1': 0.54,
         'agent2': -1,
         'agent3': -1,
+        'agent4': -1,
         'agent5': -1,
         'agent6': -1,
         'agent7': -1,
@@ -191,6 +198,7 @@ def test_position_restricted_observer_wrapper():
         'agent1': True,
         'agent2': -1,
         'agent3': -1,
+        'agent4': -1,
         'agent5': -1,
         'agent6': -1,
         'agent7': -1,
@@ -203,6 +211,7 @@ def test_position_restricted_observer_wrapper():
         'agent2': -1,
         'agent3': -1,
         'agent4': -1,
+        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
         'agent8': 0,
@@ -216,18 +225,18 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['position']['agent5'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent7'], np.array([-1, -1]))
-    assert 'agent8' not in obs['position']
-    assert 'agent9' not in obs['position']
+    np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent9'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['relative_position']['agent0'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent1'], np.array([0, 0]))
     np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent4'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent6'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-5, -5]))
-    assert 'agent1' not in obs['relative_position']
-    assert 'agent8' not in obs['relative_position']
-    assert 'agent9' not in obs['relative_position']
+    np.testing.assert_array_equal(obs['relative_position']['agent8'], np.array([-5, -5]))
+    np.testing.assert_array_equal(obs['relative_position']['agent9'], np.array([-5, -5]))
     assert obs['mask'] == {
         'agent0': False,
         'agent1': True,
@@ -247,6 +256,7 @@ def test_position_restricted_observer_wrapper():
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
+        'agent6': -1,
         'agent7': -1,
         'agent8': 0.06,
         'agent9': 0.24,
@@ -258,6 +268,7 @@ def test_position_restricted_observer_wrapper():
         'agent3': -1,
         'agent4': -1,
         'agent5': -1,
+        'agent6': -1,
         'agent7': -1,
         'agent8': 5,
         'agent9': 246
@@ -269,6 +280,7 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.0, 0.0]))
+    np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent9'], np.array([0.6, -0.1]))
 
@@ -279,6 +291,7 @@ def test_position_restricted_observer_wrapper():
         'agent1': 0.54,
         'agent2': 0.36,
         'agent3': 0.24,
+        'agent4': -1,
         'agent5': 0.89,
         'agent6': 0.53,
         'agent7': 0.5,
@@ -290,6 +303,7 @@ def test_position_restricted_observer_wrapper():
         'agent1': True,
         'agent2': True,
         'agent3': True,
+        'agent4': -1,
         'agent5': True,
         'agent6': True,
         'agent7': True,
@@ -302,6 +316,7 @@ def test_position_restricted_observer_wrapper():
         'agent2': 1,
         'agent3': 1,
         'agent4': 2,
+        'agent5': -1,
         'agent6': 0,
         'agent7': 1,
         'agent8': 0,
@@ -315,8 +330,8 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['position']['agent5'], np.array([4, 0]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([1, 1]))
     np.testing.assert_array_equal(obs['position']['agent7'], np.array([0, 4]))
-    assert 'agent8' not in obs['position']
-    assert 'agent9' not in obs['position']
+    np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent9'], np.array([-1, -1]))
     assert obs['mask'] == {
         'agent0': True,
         'agent1': True,
@@ -336,6 +351,7 @@ def test_position_restricted_observer_wrapper():
         'agent3': 0.05,
         'agent4': 0.17,
         'agent5': 0.21,
+        'agent6': -1,
         'agent7': 0.36,
         'agent8': 0.06,
         'agent9': 0.24,
@@ -347,6 +363,7 @@ def test_position_restricted_observer_wrapper():
         'agent3': 46,
         'agent4': 212,
         'agent5': 276,
+        'agent6': -1,
         'agent7': 0,
         'agent8': 5,
         'agent9': 246
@@ -358,6 +375,7 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.1, 0.4]))
     np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.2, 0.3]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.3, 0.2]))
+    np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent9'], np.array([0.6, -0.1]))
 
