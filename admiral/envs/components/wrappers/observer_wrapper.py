@@ -2,7 +2,7 @@
 from gym.spaces import Dict, Discrete
 import numpy as np
 
-from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, ObservingAgent
+from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, ObservingAgent, BroadcastingAgent, TeamAgent
 
 def obs_filter_step(distance, view):
     """
@@ -110,3 +110,33 @@ class PositionRestrictedObservationWrapper:
             return all_obs
         else:
             return {}
+
+
+# Pseudocode for how to do this....
+class TeamBasedCommunicationWrapper:
+    def __init__(self, observers, agents=None, **kwargs):
+        self.observers = observers
+        self.agents = agents
+
+    def get_obs(self, receiving_agent, **kwargs):
+        if isinstance(receiving_agent, ObservingAgent):
+            my_obs = self.observers.get_obs(receiving_agent) # for all observers
+            for broadcasting_agent in self.agents.values():
+                if isinstance(broadcasting_agent, PositionAgent):
+                    distance = np.linalg.norm(broadcasting_agent.position - receiving_agent.position)
+                    if distance > broadcasting_agent.broadcast_range: continue # Too far from this broadcasting agent
+                    elif isinstance(receiving_agent, TeamAgent) and isinstance(broadcasting_agent, TeamAgent) and receiving_agent.team == broadcasting_agent.team:
+                        broadcasting_obs = self.observers.get_obs(broadcasting_agent) # for all observers
+                        my_obs += broadcasting_obs # Fuse my observation with the agent's observation
+                    else:
+                        # I received a message, but we're not on the same team, so I only observe the
+                        # broadcasting agent's information
+                        obs_of_broadcasting_agent = some_forced_wrapper_observer.get_obs(broadcasting_agent)
+                        my_obs += obs_of_broadcasting_agent
+            return my_obs
+        else:
+            return {}
+                
+
+
+
