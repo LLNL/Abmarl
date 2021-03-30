@@ -45,6 +45,7 @@ class PositionRestrictedObservationWrapper:
     def __init__(self, observers, obs_filter=obs_filter_step, obs_norm=np.inf, agents=None, **kwargs):
         assert type(observers) is list, "observers must be in a list."
         self.observers = observers
+        self._channel_observer_map = {observer.channel: observer for observer in self.observers}
 
         assert callable(obs_filter), "obs_filter must be a function."
         self.obs_filter = obs_filter
@@ -110,6 +111,10 @@ class PositionRestrictedObservationWrapper:
             return all_obs
         else:
             return {}
+    
+    def null_value(self, channel):
+        return self._channel_observer_map[channel].null_value
+
 
 
 # Pseudocode for how to do this....
@@ -142,7 +147,7 @@ class TeamBasedCommunicationWrapper:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
                                 for agent_id, obs_value in obs_content.items():
-                                    if my_obs[obs_type][agent_id] == observer.null_value:
+                                    if my_obs[obs_type][agent_id] == observer.null_value(obs_type):
                                         my_obs[obs_type][agent_id] = obs_value
                     else:
                         # I received a message, but we're not on the same team, so I only observe the
@@ -154,7 +159,7 @@ class TeamBasedCommunicationWrapper:
                         for observer in self.observers:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
-                                if my_obs[obs_type][broadcasting_agent.id] == observer.null_value:
+                                if my_obs[obs_type][broadcasting_agent.id] == observer.null_value(obs_type):
                                     my_obs[obs_type][broadcasting_agent.id] = obs_content[broadcasting_agent.id]
             return my_obs
         else:
