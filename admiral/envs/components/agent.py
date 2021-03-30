@@ -117,6 +117,32 @@ class AttackingAgent(ActingAgent):
 
 
 
+# --------------------- #
+# --- Communication --- #
+# --------------------- #
+
+class BroadcastingAgent(ActingAgent):
+    """
+    BroadcastingAgents can broadcast their observation within some range of their
+    position.
+
+    braodcast_range (int):
+        The agent's broadcasting range.
+    """
+    def __init__(self, broadcast_range=None, **kwargs):
+        super().__init__(**kwargs)
+        self.broadcast_range = broadcast_range
+        self.broadcasting = False
+    
+    @property
+    def configured(self):
+        """
+        The agent is successfully configured if the broadcast range is specified.
+        """
+        return super().configured and self.broadcast_range is not None
+
+
+
 # ----------------------- #
 # --- Health and Life --- #
 # ----------------------- #

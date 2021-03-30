@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, HarvestingAgent, \
     SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent, \
-    CollisionAgent
+    CollisionAgent, BroadcastingAgent
 
 # ----------------- #
 # --- Attacking --- #
@@ -137,6 +137,38 @@ class PositionTeamBasedAttackActor:
                     continue
                 else:
                     return attacked_agent
+
+
+# --------------------- #
+# --- Communication --- #
+# --------------------- #
+
+class BroadcastActor:
+    """
+    BroadcastingAgents can choose to broadcast in this step or not.
+
+    broadcast_state (BroadcastState):
+        The broadcast state handler. Needed to modifying the agents' broadcasting state.
+
+    agents (dict):
+        Dictionary of agents.
+    """
+    def __init__(self, broadcast_state=None, agents=None, **kwargs):
+        self.broadcast_state = broadcast_state
+        self.agents = agents
+        for agent in agents.values():
+            if isinstance(agent, BroadcastingAgent):
+                agent.action_space['broadcast'] = Discrete(2)
+    
+    def process_broadcast(self, broadcasting_agent, broadcasting, **kwargs):
+        """
+        Determine the agents new broadcasting state based on its action.
+
+        return: bool
+            The agent's broadcasting state.
+        """
+        self.broadcast_state.modify_broadcast(broadcasting_agent, broadcasting)
+        return broadcasting_agent.broadcasting
 
 
 
