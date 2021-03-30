@@ -3,7 +3,6 @@ from gym.spaces import Dict, Discrete
 import numpy as np
 
 from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, ObservingAgent, BroadcastingAgent, TeamAgent
-from admiral.envs.components.observer import RelativePositionObserver
 
 def obs_filter_step(distance, view):
     """
@@ -133,14 +132,13 @@ class TeamBasedCommunicationWrapper:
             #   but I will still see its own attributes.
             for broadcasting_agent in self.agents.values():
                 if isinstance(broadcasting_agent, PositionAgent) and isinstance(receiving_agent, PositionAgent):
+                    # TODO: AND the broadcasting agent IS broadcasting
                     distance = np.linalg.norm(broadcasting_agent.position - receiving_agent.position, self.obs_norm)
                     if distance > broadcasting_agent.broadcast_range: continue # Too far from this broadcasting agent
                     elif isinstance(receiving_agent, TeamAgent) and isinstance(broadcasting_agent, TeamAgent) and receiving_agent.team == broadcasting_agent.team:
                         # Broadcasting and receiving agent are on the same team, so the receiving agent receives the observation
                         # broadcasting_obs ={}
                         for observer in self.observers:
-                            if isinstance(observer, RelativePositionObserver):
-                                continue # TODO: special handling for relative position observer....
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
                                 for agent_id, obs_value in obs_content.items():
@@ -150,6 +148,9 @@ class TeamBasedCommunicationWrapper:
                         # I received a message, but we're not on the same team, so I only observe the
                         # broadcasting agent's information. Since I don't have a state, I have to go
                         # through the agent's observation of itself.
+                        # NOTE: This is a bit of a hack. It's not fullproof because the broadcasting
+                        # agent might not have information about itself. This is the best we can do
+                        # right now without a re-design.
                         for observer in self.observers:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
