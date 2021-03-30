@@ -26,9 +26,10 @@ class BroadcastObserver:
             obs = {}
             for other in self.agents.values():
                 if isinstance(other, BroadcastingAgent):
-                    obs_space[other.id] = other.broadcasting
+                    obs[other.id] = other.broadcasting
                 else:
-                    obs_space[other.id] = self.null_value
+                    obs[other.id] = self.null_value
+            return {'broadcast': obs}
         else:
             return {}
     
