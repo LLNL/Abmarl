@@ -131,7 +131,7 @@ class TeamBasedCommunicationWrapper:
                     else:
                         # I received a message, but we're not on the same team, so I only observe the
                         # broadcasting agent's information
-                        obs_of_broadcasting_agent = some_forced_wrapper_observer.get_obs(broadcasting_agent)
+                        obs_of_broadcasting_agent = some_direct_wrapper_observer.get_obs(broadcasting_agent)
                         my_obs += obs_of_broadcasting_agent
             return my_obs
         else:

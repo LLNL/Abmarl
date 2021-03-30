@@ -3,7 +3,7 @@ from .wrapper import Wrapper
 
 from gym.spaces import Discrete, Dict
 
-class CommunicationWrapper(Wrapper):
+class CommunicationHandshakeWrapper(Wrapper):
     """
     Agents can share their observations with one another according to this communication
     protocol. We allow agents to send and receive messages from any other agent
