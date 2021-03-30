@@ -3,6 +3,7 @@ from gym.spaces import Dict, Discrete
 import numpy as np
 
 from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, ObservingAgent, BroadcastingAgent, TeamAgent
+from admiral.envs.components.observer import RelativePositionObserver
 
 def obs_filter_step(distance, view):
     """
@@ -114,25 +115,46 @@ class PositionRestrictedObservationWrapper:
 
 # Pseudocode for how to do this....
 class TeamBasedCommunicationWrapper:
-    def __init__(self, observers, agents=None, **kwargs):
+    def __init__(self, observers, agents=None, obs_norm=np.inf, **kwargs):
         self.observers = observers
         self.agents = agents
+        self.obs_norm = obs_norm
 
     def get_obs(self, receiving_agent, **kwargs):
         if isinstance(receiving_agent, ObservingAgent):
-            my_obs = self.observers.get_obs(receiving_agent) # for all observers
+            # Generate my normal observation
+            my_obs = {}
+            for observer in self.observers:
+                my_obs.update(observer.get_obs(receiving_agent, **kwargs))
+
+            # Fuse my observation with information from the broadcasting agent.
+            # If I'm on the same team, then I will see its observation.
+            # If I'm not on the same team, then I will not see its observation,
+            #   but I will still see its own attributes.
             for broadcasting_agent in self.agents.values():
-                if isinstance(broadcasting_agent, PositionAgent):
-                    distance = np.linalg.norm(broadcasting_agent.position - receiving_agent.position)
+                if isinstance(broadcasting_agent, PositionAgent) and isinstance(receiving_agent, PositionAgent):
+                    distance = np.linalg.norm(broadcasting_agent.position - receiving_agent.position, self.obs_norm)
                     if distance > broadcasting_agent.broadcast_range: continue # Too far from this broadcasting agent
                     elif isinstance(receiving_agent, TeamAgent) and isinstance(broadcasting_agent, TeamAgent) and receiving_agent.team == broadcasting_agent.team:
-                        broadcasting_obs = self.observers.get_obs(broadcasting_agent) # for all observers
-                        my_obs += broadcasting_obs # Fuse my observation with the agent's observation
+                        # Broadcasting and receiving agent are on the same team, so the receiving agent receives the observation
+                        # broadcasting_obs ={}
+                        for observer in self.observers:
+                            if isinstance(observer, RelativePositionObserver):
+                                continue # TODO: special handling for relative position observer....
+                            tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
+                            for obs_type, obs_content in tmp_obs.items():
+                                for agent_id, obs_value in obs_content.items():
+                                    if my_obs[obs_type][agent_id] == observer.null_value:
+                                        my_obs[obs_type][agent_id] = obs_value
                     else:
                         # I received a message, but we're not on the same team, so I only observe the
-                        # broadcasting agent's information
-                        obs_of_broadcasting_agent = some_direct_wrapper_observer.get_obs(broadcasting_agent)
-                        my_obs += obs_of_broadcasting_agent
+                        # broadcasting agent's information. Since I don't have a state, I have to go
+                        # through the agent's observation of itself.
+                        for observer in self.observers:
+                            tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
+                            for obs_type, obs_content in tmp_obs.items():
+                                if my_obs[obs_type][broadcasting_agent.id] == observer.null_value:
+                                    my_obs[obs_type][broadcasting_agent.id] = obs_content[broadcasting_agent.id]
             return my_obs
         else:
             return {}
