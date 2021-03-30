@@ -4,8 +4,37 @@ import numpy as np
 
 from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAgent, \
     AgentObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, VelocityObservingAgent, \
-    ResourceObservingAgent, TeamObservingAgent, PositionAgent, LifeAgent, TeamAgent, \
-    SpeedAngleAgent, VelocityAgent
+    ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, PositionAgent, LifeAgent, \
+    TeamAgent, SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+
+# --------------------- #
+# --- Communication --- #
+# --------------------- #
+
+class BroadcastObserver:
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+
+        for agent in agents.values():
+            if isinstance(agent, BroadcastObservingAgent):
+                agent.observation_space['broadcast'] = Dict({
+                    other: Box(-1, 1, (1,)) for other in self.agents.values()
+                })
+        
+    def get_obs(self, agent, **kwargs):
+        if isinstance(agent, BroadcastObservingAgent):
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, BroadcastingAgent):
+                    obs_space[other.id] = other.broadcasting
+                else:
+                    obs_space[other.id] = self.null_value
+        else:
+            return {}
+    
+    @property
+    def null_value(self):
+        return -1
 
 # ----------------------- #
 # --- Health and Life --- #

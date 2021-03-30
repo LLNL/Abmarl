@@ -141,6 +141,8 @@ class BroadcastingAgent(ActingAgent):
         """
         return super().configured and self.broadcast_range is not None
 
+class BroadcastObservingAgent(ObservingAgent): pass
+
 
 
 # ----------------------- #
