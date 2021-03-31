@@ -167,8 +167,9 @@ class BroadcastActor:
         return: bool
             The agent's broadcasting state.
         """
-        self.broadcast_state.modify_broadcast(broadcasting_agent, broadcasting)
-        return broadcasting_agent.broadcasting
+        if isinstance(broadcasting_agent, BroadcastingAgent):
+            self.broadcast_state.modify_broadcast(broadcasting_agent, broadcasting)
+            return broadcasting_agent.broadcasting
 
 
 
