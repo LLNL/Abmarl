@@ -113,7 +113,10 @@ class PositionRestrictedObservationWrapper:
             return {}
     
     def null_value(self, channel):
-        return self._channel_observer_map[channel].null_value
+        if channel == 'mask':
+            return 0
+        else:
+            return self._channel_observer_map[channel].null_value
 
 
 
@@ -147,7 +150,7 @@ class TeamBasedCommunicationWrapper:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
                                 for agent_id, obs_value in obs_content.items():
-                                    if my_obs[obs_type][agent_id] == observer.null_value(obs_type):
+                                    if np.all(my_obs[obs_type][agent_id] == observer.null_value(obs_type)):
                                         my_obs[obs_type][agent_id] = obs_value
                     else:
                         # I received a message, but we're not on the same team, so I only observe the
@@ -159,7 +162,7 @@ class TeamBasedCommunicationWrapper:
                         for observer in self.observers:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
-                                if my_obs[obs_type][broadcasting_agent.id] == observer.null_value(obs_type):
+                                if np.all(my_obs[obs_type][broadcasting_agent.id] == observer.null_value(obs_type)):
                                     my_obs[obs_type][broadcasting_agent.id] = obs_content[broadcasting_agent.id]
             return my_obs
         else:
