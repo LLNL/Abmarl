@@ -118,16 +118,42 @@ class PositionRestrictedObservationWrapper:
         else:
             return self._channel_observer_map[channel].null_value
 
-
-
-# Pseudocode for how to do this....
 class TeamBasedCommunicationWrapper:
+    """
+    Agents can broadcast their observations for other agents to see. Other agents
+    that are on the same team will receive the observation, and it will be fused
+    in with their own observations. Other agents that are on a different team will
+    not receive the message contents but will receive information about the broadcasting
+    agent, such as its location.
+
+    Note: This wrapper only works with channel observers that are keyed off the
+    agents' ids.
+
+    observers (list of PositionRestrictedObservationWrapper):
+        The PositionRestrictedObservationWrapper masks agents from one another,
+        making it necessary for communications to occur in order to reveal observations.
+    
+    agents (dict):
+        The dictionary of agents.
+    
+    obs_norm (int):
+        The norm to use for measuring the distance between agents.
+        Default np.inf.
+    """
     def __init__(self, observers, agents=None, obs_norm=np.inf, **kwargs):
         self.observers = observers
         self.agents = agents
         self.obs_norm = obs_norm
 
     def get_obs(self, receiving_agent, **kwargs):
+        """
+        If the receiving is within range of a broadcasting agent, it will receive
+        a message. If they're on the same team, then the receiving agent will augment
+        its observation with the observation of the broadcasting agent. If they
+        are not different teams, then the receiving agent will not receive the
+        observation of the broadcasting agent but will receive information about
+        that agent itself.
+        """
         if isinstance(receiving_agent, ObservingAgent):
             # Generate my normal observation
             my_obs = {}
