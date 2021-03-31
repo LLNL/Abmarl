@@ -1,11 +1,12 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent
-from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState, VelocityState
+from admiral.envs.components.agent import PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState, VelocityState, BroadcastState
 from admiral.envs.components.observer import HealthObserver, LifeObserver, PositionObserver, \
     RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, TeamObserver
-from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
+from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
+from admiral.envs.components.actor import BroadcastActor
 
 from admiral.envs.components.agent import AgentObservingAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent
 class AllObservingAgent(AgentObservingAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
@@ -376,3 +377,82 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent9'], np.array([0.6, -0.1]))
+
+
+
+class CommunicatingAgent(PositionAgent, TeamAgent, BroadcastingAgent, PositionObservingAgent, TeamObservingAgent, AgentObservingAgent): pass
+
+def test_broadcast_communication_observer_wrapper():
+    agents = {
+        'agent0': CommunicatingAgent(id='agent0', initial_position=np.array([1, 7]), team=0, broadcast_range=0, agent_view=0),
+        'agent1': CommunicatingAgent(id='agent1', initial_position=np.array([3, 3]), team=0, broadcast_range=4, agent_view=3),
+        'agent2': CommunicatingAgent(id='agent2', initial_position=np.array([5, 0]), team=1, broadcast_range=4, agent_view=2),
+        'agent3': CommunicatingAgent(id='agent3', initial_position=np.array([6, 9]), team=1, broadcast_range=4, agent_view=2),
+        'agent4': CommunicatingAgent(id='agent4', initial_position=np.array([4, 7]), team=1, broadcast_range=4, agent_view=3),
+    }
+    
+    position_state = GridPositionState(region=10, agents=agents)
+    team_state = TeamState(agents=agents, number_of_teams=2)
+    broadcast_state = BroadcastState(agents=agents)
+
+    position_observer = PositionObserver(position=position_state, agents=agents)
+    team_observer = TeamObserver(team=team_state, agents=agents)
+    partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer], agents=agents)
+    comms_observer = TeamBasedCommunicationWrapper([partial_observer], agents=agents)
+
+    broadcast_actor = BroadcastActor(broadcast_state=broadcast_state, agents=agents)
+
+    position_state.reset()
+    broadcast_state.reset()
+
+    action_dict = {
+        'agent0': {'broadcast': 0},
+        'agent1': {'broadcast': 1},
+        'agent2': {'broadcast': 0},
+        'agent3': {'broadcast': 0},
+        'agent4': {'broadcast': 1},
+    }
+    for agent_id, action in action_dict.items():
+        broadcast_actor.process_broadcast(agents[agent_id], action['broadcast'])
+    
+    obs = partial_observer.get_obs(agents['agent0'])
+    assert obs['mask'] == {
+        'agent0': 1,
+        'agent1': 0,
+        'agent2': 0,
+        'agent3': 0,
+        'agent4': 0,
+    }
+    assert obs['team'] == {
+        'agent0': 0,
+        'agent1': -1,
+        'agent2': -1,
+        'agent3': -1,
+        'agent4': -1,
+    }
+    np.testing.assert_array_equal(obs['position']['agent0'], np.array([1, 7]))
+    np.testing.assert_array_equal(obs['position']['agent1'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent2'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent4'], np.array([-1, -1]))
+
+    obs = comms_observer.get_obs(agents['agent0'])
+    assert obs['mask'] == {
+        'agent0': 1,
+        'agent1': 1,
+        'agent2': 1,
+        'agent3': 0,
+        'agent4': 1,
+    }
+    assert obs['team'] == {
+        'agent0': 0,
+        'agent1': 0,
+        'agent2': 1,
+        'agent3': -1,
+        'agent4': 1,
+    }
+    np.testing.assert_array_equal(obs['position']['agent0'], np.array([1, 7]))
+    np.testing.assert_array_equal(obs['position']['agent1'], np.array([3, 3]))
+    np.testing.assert_array_equal(obs['position']['agent2'], np.array([5, 0]))
+    np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent4'], np.array([4, 7]))
