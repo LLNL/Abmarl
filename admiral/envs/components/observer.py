@@ -4,8 +4,45 @@ import numpy as np
 
 from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAgent, \
     AgentObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, VelocityObservingAgent, \
-    ResourceObservingAgent, TeamObservingAgent, PositionAgent, LifeAgent, TeamAgent, \
-    SpeedAngleAgent, VelocityAgent
+    ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, PositionAgent, LifeAgent, \
+    TeamAgent, SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+
+# --------------------- #
+# --- Communication --- #
+# --------------------- #
+
+class BroadcastObserver:
+    """
+    Observe the broadcast state of broadcasting agents.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+
+        for agent in agents.values():
+            if isinstance(agent, BroadcastObservingAgent):
+                agent.observation_space[self.channel] = Dict({
+                    other: Box(-1, 1, (1,)) for other in self.agents.values()
+                })
+        
+    def get_obs(self, agent, **kwargs):
+        if isinstance(agent, BroadcastObservingAgent):
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, BroadcastingAgent):
+                    obs[other.id] = other.broadcasting
+                else:
+                    obs[other.id] = self.null_value
+            return {self.channel: obs}
+        else:
+            return {}
+    
+    @property
+    def channel(self):
+        return 'broadcast'
+    
+    @property
+    def null_value(self):
+        return -1
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -26,7 +63,7 @@ class HealthObserver:
                         obs_space[other.id] = Box(-1, other.max_health, (1,))
                     else:
                         obs_space[other.id] = Box(-1, -1, (1,))
-                agent.observation_space['health'] = Dict(obs_space)
+                agent.observation_space[self.channel] = Dict(obs_space)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -42,9 +79,13 @@ class HealthObserver:
                     obs[other.id] = other.health
                 else:
                     obs[other.id] = self.null_value
-            return {'health': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'health'
     
     @property
     def null_value(self):
@@ -60,7 +101,7 @@ class LifeObserver:
 
         for agent in agents.values():
             if isinstance(agent, LifeObservingAgent):
-                agent.observation_space['life'] = Dict({
+                agent.observation_space[self.channel] = Dict({
                     other.id: Box(-1, 1, (1,), np.int) for other in self.agents.values()
                 })
     
@@ -78,9 +119,13 @@ class LifeObserver:
                     obs[other.id] = other.is_alive
                 else:
                     obs[other.id] = self.null_value
-            return {'life': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'life'
     
     @property
     def null_value(self):
@@ -102,7 +147,7 @@ class PositionObserver:
         
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent):
-                agent.observation_space['position'] = Dict({
+                agent.observation_space[self.channel] = Dict({
                     other.id: Box(-1, self.position.region, (2,), np.int) for other in agents.values()
                 })
 
@@ -117,9 +162,13 @@ class PositionObserver:
                     obs[other.id] = other.position
                 else:
                     obs[other.id] = self.null_value
-            return {'position': obs}
+            return {self.channel: obs}
         else:
             return {}   
+    
+    @property
+    def channel(self):
+        return 'position'
     
     @property
     def null_value(self):
@@ -137,7 +186,7 @@ class RelativePositionObserver:
         for agent in agents.values():
             if isinstance(agent, PositionObservingAgent) and \
                isinstance(agent, PositionAgent):
-                agent.observation_space['relative_position'] = Dict({
+                agent.observation_space[self.channel] = Dict({
                     other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values()
                 })
 
@@ -155,9 +204,13 @@ class RelativePositionObserver:
                     obs[other.id] = np.array([r_diff, c_diff])
                 else:
                     obs[other.id] = self.null_value
-            return {'relative_position': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'relative_position'
     
     @property
     def null_value(self):
@@ -317,7 +370,7 @@ class SpeedObserver:
                         obs_space[other.id] = Box(-1, other.max_speed, (1,))
                     else:
                         obs_space[other.id] = Box(-1, -1, (1,))
-                agent.observation_space['speed'] = Dict(obs_space)
+                agent.observation_space[self.channel] = Dict(obs_space)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -330,9 +383,13 @@ class SpeedObserver:
                     obs[other.id] = other.speed
                 else:
                     obs[other.id] = self.null_value
-            return {'speed': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'speed'
     
     @property
     def null_value(self):
@@ -348,7 +405,7 @@ class AngleObserver:
 
         for agent in agents.values():
             if isinstance(agent, SpeedAngleObservingAgent):
-                agent.observation_space['ground_angle'] = Dict({
+                agent.observation_space[self.channel] = Dict({
                     other.id: Box(-1, 360, (1,)) for other in agents.values()
                 })
 
@@ -363,9 +420,13 @@ class AngleObserver:
                     obs[other.id] = other.ground_angle
                 else:
                     obs[other.id] = self.null_value
-            return {'ground_angle': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'ground_angle'
     
     @property
     def null_value(self):
@@ -387,7 +448,7 @@ class VelocityObserver:
                         obs_space[other.id] = Box(-agent.max_speed, agent.max_speed, (2,))
                     else:
                         obs_space[other.id] = Box(0, 0, (2,))
-                agent.observation_space['velocity'] = Dict(obs_space)
+                agent.observation_space[self.channel] = Dict(obs_space)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -400,9 +461,13 @@ class VelocityObserver:
                     obs[other.id] = other.velocity
                 else:
                     obs[other.id] = self.null_value
-            return {'velocity': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'velocity'
     
     @property
     def null_value(self):
@@ -472,7 +537,7 @@ class TeamObserver:
     
         for agent in agents.values():
             if isinstance(agent, TeamObservingAgent):
-                agent.observation_space['team'] = Dict({
+                agent.observation_space[self.channel] = Dict({
                     other.id: Box(-1, self.team.number_of_teams-1, (1,), np.int) for other in agents.values()
                 })
     
@@ -487,9 +552,13 @@ class TeamObserver:
                     obs[other.id] = other.team
                 else:
                     obs[other.id] = self.null_value
-            return {'team': obs}
+            return {self.channel: obs}
         else:
             return {}
+    
+    @property
+    def channel(self):
+        return 'team'
     
     @property
     def null_value(self):

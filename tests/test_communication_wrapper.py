@@ -2,7 +2,7 @@
 from gym.spaces import Discrete
 import numpy as np
 
-from admiral.envs.wrappers import CommunicationWrapper
+from admiral.envs.wrappers import CommunicationHandshakeWrapper
 from admiral.envs import Agent
 
 from .helpers import MultiAgentGymSpacesEnv
@@ -32,7 +32,7 @@ class CommsEnv(MultiAgentGymSpacesEnv):
         
 def test_communication_wrapper_init():
     env = CommsEnv()
-    wrapped_env = CommunicationWrapper(env)
+    wrapped_env = CommunicationHandshakeWrapper(env)
     assert wrapped_env.env == env
     assert wrapped_env.agents != env.agents
     assert wrapped_env.unwrapped == env
@@ -48,7 +48,7 @@ def test_communication_wrapper_init():
             assert agent.observation_space['message_buffer'][other_agent] == Discrete(2)
 
 def test_communication_wrapper_reset():
-    env = CommunicationWrapper(CommsEnv())
+    env = CommunicationHandshakeWrapper(CommsEnv())
     env.reset()
     for values in env.message_buffer.values():
         assert all([True if val == False else False for val in values.values()])
@@ -60,7 +60,7 @@ def test_communication_wrapper_reset():
     assert env.message_buffer == {agent_id: env.get_obs(agent_id)['message_buffer'] for agent_id in env.agents}
 
 def test_communication_wrapper_step():
-    env = CommunicationWrapper(CommsEnv())
+    env = CommunicationHandshakeWrapper(CommsEnv())
     env.reset()
 
     action_0 = {
