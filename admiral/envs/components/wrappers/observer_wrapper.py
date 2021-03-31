@@ -170,7 +170,6 @@ class TeamBasedCommunicationWrapper:
                     if distance > broadcasting_agent.broadcast_range: continue # Too far from this broadcasting agent
                     elif isinstance(receiving_agent, TeamAgent) and isinstance(broadcasting_agent, TeamAgent) and receiving_agent.team == broadcasting_agent.team:
                         # Broadcasting and receiving agent are on the same team, so the receiving agent receives the observation
-                        # broadcasting_obs ={}
                         for observer in self.observers:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)
                             for obs_type, obs_content in tmp_obs.items():
