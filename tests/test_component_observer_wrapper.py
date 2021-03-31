@@ -456,3 +456,35 @@ def test_broadcast_communication_observer_wrapper():
     np.testing.assert_array_equal(obs['position']['agent2'], np.array([5, 0]))
     np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent4'], np.array([4, 7]))
+
+
+    action_dict = {
+        'agent0': {'broadcast': 0},
+        'agent1': {'broadcast': 0},
+        'agent2': {'broadcast': 1},
+        'agent3': {'broadcast': 1},
+        'agent4': {'broadcast': 0},
+    }
+    for agent_id, action in action_dict.items():
+        broadcast_actor.process_broadcast(agents[agent_id], action['broadcast'])
+
+    obs = comms_observer.get_obs(agents['agent0'])
+    assert obs['mask'] == {
+        'agent0': 1,
+        'agent1': 0,
+        'agent2': 0,
+        'agent3': 0,
+        'agent4': 0,
+    }
+    assert obs['team'] == {
+        'agent0': 0,
+        'agent1': -1,
+        'agent2': -1,
+        'agent3': -1,
+        'agent4': -1,
+    }
+    np.testing.assert_array_equal(obs['position']['agent0'], np.array([1, 7]))
+    np.testing.assert_array_equal(obs['position']['agent1'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent2'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
+    np.testing.assert_array_equal(obs['position']['agent4'], np.array([-1, -1]))
