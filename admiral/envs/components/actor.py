@@ -16,11 +16,13 @@ class AttackActor:
     attackable agents in the radius, then one will be randomly chosen. Attackable
     agents are determiend by the team_matrix.
 
-    team_state (TeamState):
-        Needed to know the number of teams.
-
     agents (dict of Agents):
         The dictionary of agents.
+    
+    attack_norm (int):
+        Norm used to measure the distance between agents. For example, you might
+        use a norm of 1 or np.inf in a Gird space, while 2 might be used in a Continuous
+        space. Default is np.inf.
     
     team_attack_matrix (np.ndarray):
         A matrix that indicates which teams can attack which other team using the
@@ -30,16 +32,19 @@ class AttackActor:
         Default None, meaning that any team can attack any other team, and no team
         can attack itself.
     
-    attack_norm (int):
-        Norm used to measure the distance between agents. For example, you might
-        use a norm of 1 or np.inf in a Gird space, while 2 might be used in a Continuous
-        space. Default is np.inf.
+    number_of_teams (int):
+        Specify the number of teams in the simulation for building the team_attack_matrix
+        if that is not specified here.
+        Default 0, indicating that there are no teams and its a free-for-all battle.
     """
-    def __init__(self, team_state=None, agents=None, team_attack_matrix=None, attack_norm=np.inf, **kwargs):
-        self.team_state = team_state
-        
+    def __init__(self, agents=None, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):      
         if team_attack_matrix is None:
-            self.team_attack_matrix = -np.diag(np.ones(team_state.number_of_teams+1)) + 1
+            # Default: teams can attack all other teams but not themselves. Agents
+            # that are "on team 0" are actually teamless, so they can be attacked
+            # by and can attack agents from any other team, including "team 0"
+            # agents.
+            team_attack_matrix = -np.diag(np.ones(number_of_teams+1)) + 1
+            self.team_attack_matrix[0,0] = 1
         else:
             self.team_attack_matrix = team_attack_matrix
 
@@ -84,7 +89,7 @@ class AttackActor:
                 else:
                     # The agent was successfully attacked!
                     return attacked_agent
-                    
+
 class PositionBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and processes such
