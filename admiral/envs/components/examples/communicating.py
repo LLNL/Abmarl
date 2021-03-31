@@ -94,7 +94,7 @@ if __name__ == "__main__":
         'agent1': CommunicatingAgent(id='agent1', initial_position=np.array([3, 3]), team=0, broadcast_range=4, agent_view=3),
         'agent2': CommunicatingAgent(id='agent2', initial_position=np.array([5, 0]), team=1, broadcast_range=4, agent_view=2),
         'agent3': CommunicatingAgent(id='agent3', initial_position=np.array([6, 9]), team=1, broadcast_range=4, agent_view=2),
-        'agent4': CommunicatingAgent(id='agent4', initial_position=np.array([4, 6]), team=1, broadcast_range=4, agent_view=3),
+        'agent4': CommunicatingAgent(id='agent4', initial_position=np.array([4, 7]), team=1, broadcast_range=4, agent_view=3),
     }
     env = BroadcastCommunicationEnv(
         region=10,
@@ -106,6 +106,7 @@ if __name__ == "__main__":
     env.render(fig=fig)
 
     action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values()}
+    # action_dict = {agent.id: {'broadcast': 0} for agent in env.agents.values()}
     print('\nActions:')
     print(action_dict)
     env.step(action_dict)
