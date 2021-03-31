@@ -10,6 +10,81 @@ from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, Har
 # --- Attacking --- #
 # ----------------- #
 
+class AttackActor:
+    """
+    Agents can attack other agents within their attack radius. If there are multiple
+    attackable agents in the radius, then one will be randomly chosen. Attackable
+    agents are determiend by the team_matrix.
+
+    team_state (TeamState):
+        Needed to know the number of teams.
+
+    agents (dict of Agents):
+        The dictionary of agents.
+    
+    team_attack_matrix (np.ndarray):
+        A matrix that indicates which teams can attack which other team using the
+        value at the index, like so:
+            team_matrix[attacking_team, attacked_team] = 0 or 1.
+        0 indicates it cannot attack, 1 indicates that it can.
+        Default None, meaning that any team can attack any other team, and no team
+        can attack itself.
+    
+    attack_norm (int):
+        Norm used to measure the distance between agents. For example, you might
+        use a norm of 1 or np.inf in a Gird space, while 2 might be used in a Continuous
+        space. Default is np.inf.
+    """
+    def __init__(self, team_state=None, agents=None, team_attack_matrix=None, attack_norm=np.inf, **kwargs):
+        self.team_state = team_state
+        
+        if team_attack_matrix is None:
+            self.team_attack_matrix = -np.diag(np.ones(team_state.number_of_teams+1)) + 1
+        else:
+            self.team_attack_matrix = team_attack_matrix
+
+        self.attack_norm = attack_norm
+        self.agents = agents
+        
+        for agent in agents.values():
+            if isinstance(agent, AttackingAgent):
+                agent.action_space['attack'] = Discrete(2)
+    
+    def process_attack(self, attacking_agent, attack, **kwargs):
+        """
+        If the agent has chosen to attack, then determine which agent got attacked.
+
+        attacking_agent (AttackingAgent):
+            The agent that we are processing.
+
+        attack (bool):
+            True if the agent has chosen to attack, otherwise False.
+
+        return (Agent):
+            Return the attacked agent object. This can be None if no agent was
+            attacked.
+        """
+        if isinstance(attacking_agent, AttackingAgent) and attack:
+            for attacked_agent in self.agents.values():
+                if attacked_agent.id == attacking_agent.id:
+                    # Cannot attack yourself
+                    continue
+                elif not attacked_agent.is_alive:
+                    # Cannot attack a dead agent
+                    continue
+                elif np.linalg.norm(attacking_agent.position - attacked_agent.position, self.attack_norm) > attacking_agent.attack_range:
+                    # Agent is too far away
+                    continue
+                elif not self.team_attack_matrix[attacking_agent.team, attacked_agent.team]:
+                    # Attacking agent cannot attack this agent
+                    continue
+                elif np.random.uniform() > attacking_agent.attack_accuracy:
+                    # Attempted attack, but it failed
+                    continue
+                else:
+                    # The agent was successfully attacked!
+                    return attacked_agent
+                    
 class PositionBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and processes such
@@ -137,6 +212,7 @@ class PositionTeamBasedAttackActor:
                     continue
                 else:
                     return attacked_agent
+
 
 
 # --------------------- #
