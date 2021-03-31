@@ -12,6 +12,9 @@ from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAge
 # --------------------- #
 
 class BroadcastObserver:
+    """
+    Observe the broadcast state of broadcasting agents.
+    """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
 
