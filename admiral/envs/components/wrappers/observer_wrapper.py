@@ -147,7 +147,7 @@ class TeamBasedCommunicationWrapper:
 
     def get_obs(self, receiving_agent, **kwargs):
         """
-        If the receiving is within range of a broadcasting agent, it will receive
+        If the receiving agent is within range of a broadcasting agent, it will receive
         a message. If they're on the same team, then the receiving agent will augment
         its observation with the observation of the broadcasting agent. If they
         are not different teams, then the receiving agent will not receive the
