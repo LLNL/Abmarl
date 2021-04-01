@@ -7,7 +7,7 @@ from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from admiral.envs.components.actor import GridMovementActor, AttackActor
-from admiral.envs.components.done import TeamDeadDone # TODO: Done when a single team has been completely wiped out. Need to implement this.
+from admiral.envs.components.done import AnyTeamDeadDone
 
 # Environment needs a corresponding agent component
 from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
@@ -62,8 +62,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # done when either:
         # (1) All the hunter have killed all the foragers.
         # (2) All the foragers have killed all the resources.
-        # TODO: Use the new done
-        self.done = TeamDeadDone(**kwargs)
+        self.done = AnyTeamDeadDone(**kwargs)
 
         # This is needed at the end of init in every environment. It ensures that
         # agents have been configured correctly.
@@ -154,27 +153,27 @@ class HuntingForagingEnv(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    food = {f'food{i}': FoodAgent(id=f'food{i}') for i in range(12)}
-    foragers = {f'forager{i}': HuntingForagingAgent(id=f'forager{i}', agent_view=5, team=1, move_range=1, attack_range=1, attack_strength=1) for i in range(7)}
-    hunters =  {f'hunter{i}':  HuntingForagingAgent(id=f'hunter{i}',  agent_view=2, team=2, move_range=1, attack_range=1, attack_strength=1) for i in range(2)}
+    food = {f'food{i}': FoodAgent(id=f'food{i}', team=1) for i in range(12)}
+    foragers = {f'forager{i}': HuntingForagingAgent(id=f'forager{i}', agent_view=5, team=2, move_range=1, attack_range=1, attack_strength=1) for i in range(7)}
+    hunters =  {f'hunter{i}':  HuntingForagingAgent(id=f'hunter{i}',  agent_view=2, team=3, move_range=1, attack_range=1, attack_strength=1) for i in range(2)}
     agents = {**food, **foragers, **hunters}
 
     region = 20
-    team_attack_matrix = np.zeros((3,3))
-    team_attack_matrix[1,0] = 1
-    team_attack_matrix[2,1] = 1
+    team_attack_matrix = np.zeros((4, 4))
+    team_attack_matrix[2, 1] = 1
+    team_attack_matrix[3, 2] = 1
     env = HuntingForagingEnv(
         region=region,
         agents=agents,
         team_attack_matrix=team_attack_matrix,
-        number_of_teams=2,
+        number_of_teams=3,
     )
     env.reset()
 
     shape_dict = {
-        0: 's',
-        1: 'o',
-        2: 'd'
+        1: 's',
+        2: 'o',
+        3: 'd'
     }
 
     import pprint; pprint.pprint({agent_id: env.get_obs(agent_id) for agent_id in env.agents})

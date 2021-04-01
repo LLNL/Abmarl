@@ -84,7 +84,7 @@ class TeamDeadDone:
 
     def get_all_done(self, **kwargs):
         """
-        Return true if the only agent left alive are all on the same team. Otherwise,
+        Return true if the only agents left alive are all on the same team. Otherwise,
         return false.
         """
         team = np.zeros(self.number_of_teams)
@@ -92,6 +92,45 @@ class TeamDeadDone:
             if agent.is_alive:
                 team[agent.team] += 1
         return sum(team != 0) <= 1
+
+class AnyTeamDeadDone:
+    """
+    Dead agents are indicated as done. Additionally, the simulation ends if any
+    team, except for team 0 because it's not a real team, completely dies.
+
+    agents (dict):
+        The dictionary of agents. Because the done condition is determined by the
+        agent's life status, all agents must be LifeAgents; and because the done
+        condition is determined by the agents' teams, all agents must be TeamAgents.
+
+    number_of_teams (int):
+        The fixed number of teams in this simulation.
+        Default 0.
+    """
+    def __init__(self, agents=None, number_of_teams=0, **kwargs):
+        for agent in agents.values():
+            assert isinstance(agent, TeamAgent)
+            assert isinstance(agent, LifeAgent)
+        self.agents = agents
+        assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
+        self.number_of_teams = number_of_teams
+    
+    def get_done(self, agent, **kwargs):
+        """
+        Return True if the agent is dead. Otherwise, return False.
+        """
+        return not agent.is_alive
+
+    def get_all_done(self, **kwargs):
+        """
+        Return true if any team is wiped out, except for team 0 because it's not
+        a real team. Otherwise, return false.
+        """
+        team = np.zeros(self.number_of_teams)
+        for agent in self.agents.values():
+            if agent.is_alive:
+                team[agent.team-1] += 1
+        return any(team == 0)
 
 class TooCloseDone:
     """
