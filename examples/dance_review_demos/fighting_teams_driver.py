@@ -17,7 +17,7 @@ agents = {f'agent{i}': FightingTeamAgent(
     attack_range=1, # How far this agent's attack will reach.
     attack_strength=1.0, # How powerful the agent's attack is.
     attack_accuracy=1.0, # Probability of successful attack
-    team=i%number_of_teams, # Every agent is on a team
+    team=i%number_of_teams+1, # Every agent is on a team
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
     max_health=1.0, # Agent's health cannot grow above this value.
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     from matplotlib import pyplot as plt
     fig = plt.gcf()
     env.reset()
-    shape_dict={0: 's', 1:'o', 2:'d'}
+    shape_dict={1: 's', 2:'o', 3:'d'}
     env.render(fig=fig, shape_dict=shape_dict)
 
     for _ in range(100):
