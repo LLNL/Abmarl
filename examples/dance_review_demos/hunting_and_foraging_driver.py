@@ -6,48 +6,63 @@
 # --- Create the agents and the environment --- #
 
 # Import the simulation environment and agents
-from admiral.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, ForagingAgent, HuntingAgent
+from admiral.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
 
 # Instatiate the agents that will operate in this environment. All possible agent
 # attributes are listed below.
-foragers = {f'forager{i}': ForagingAgent(
+
+# Food agents are not really agents in the RL sense. They're just entites for the
+# foragers to eat.
+food = {f'food{i}': FoodAgent(id=f'food{i}', team=1) for i in range(12)}
+
+# Foragers try to eat all the food agents before they die
+foragers = {f'forager{i}': HuntingForagingAgent(
     id=f'forager{i}',
     agent_view=5, # Partial Observation Mask: how far away this agent can see other agents.
-    team=0, # Which team this agent is on
-    move_range=1, # How far the agent can move within a single step.
-    min_health=0.0, # If the agent's health falls below this value, it will die.
-    max_health=1.0, # Agent's health cannot grow above this value.
-    min_harvest=1, # Max amount the agent can harvest in a single step
-    max_harvest=1, # Min amount the agent can harvest in a single step
-    resource_view=5, # How far away can this agent see resources.
-    initial_health=None, # Episode-starting health. If None, then random between min and max health. 
-    initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(7)}
-
-hunters =  {f'hunter{i}': HuntingAgent(
-    id=f'hunter{i}', 
-    agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
-    team=1, # Which team this agent is on
+    team=2, # Which team this agent is on
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
     max_health=1.0, # Agent's health cannot grow above this value.
     attack_range=1, # How far this agent's attack will reach.
     attack_strength=1.0, # How powerful the agent's attack is.
     attack_accuracy=1.0, # Probability of successful attack
-    initial_health=None, # Episode-starting health. If None, then random between min and max health. 
+    initial_position=None # Episode-starting position. If None, then random within the region.
+) for i in range(7)}
+
+# Hunters try to eat all the foraging agents before all the food disappears.
+hunters =  {f'hunter{i}': HuntingForagingAgent(
+    id=f'hunter{i}', 
+    agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
+    team=3, # Which team this agent is on
+    move_range=1, # How far the agent can move within a single step.
+    min_health=0.0, # If the agent's health falls below this value, it will die.
+    max_health=1.0, # Agent's health cannot grow above this value.
+    attack_range=1, # How far this agent's attack will reach.
+    attack_strength=1.0, # How powerful the agent's attack is.
+    attack_accuracy=1.0, # Probability of successful attack
     initial_position=None # Episode-starting position. If None, then random within the region.
 ) for i in range(2)}
 
-agents = {**foragers, **hunters}
+agents = {**food, **foragers, **hunters}
 
 # Instantiate the environment
+
+# Set the size of the map
+region = 20
+
+# Determine which teams can "attack" each other. In this scenario, team 2 is the
+# foragers, and they can attack the food, which is team 1. Team 3 is the hunters
+# and they can attack the foragers. So we setup a matrix that represents this.
+import numpy as np
+team_attack_matrix = np.zeros((4, 4))
+team_attack_matrix[2, 1] = 1 # Foragers can attack food
+team_attack_matrix[3, 2] = 1 # Hunters can attack foragers
 env = HuntingForagingEnv(
-    region=10, # The size of the region, both x and y
-    number_of_teams=2, # The number of teams
-    min_value=1.0, # The minimum value of the resource before it is marked as depleted, useful if regrow feature is used.
-    max_value=1.0, # The max value the resource can attain to, useful if the regrow feature is used
+    region=region, # The size of the region, both x and y
+    number_of_teams=3, # The number of teams
+    agents=agents, # Give the environment the dictionary of agents we created above
+    team_attack_matrix=team_attack_matrix,
     # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
-    agents=agents # Give the environment the dictionary of agents we created above
 )
 
 # --- Prepare the environment for use with RLlib --- #
@@ -80,7 +95,7 @@ policies = {
     'hunters': (None, agents['hunter0'].observation_space, agents['hunter0'].action_space, {}),
 }
 def policy_mapping_fn(agent_id):
-    if isinstance(agents[agent_id], ForagingAgent):
+    if agents[agent_id].team == 2:
         return 'foragers'
     else:
         return 'hunters'
@@ -142,12 +157,18 @@ params = {
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
     fig = plt.gcf()
+    shape_dict = {
+        1: 's',
+        2: 'o',
+        3: 'd'
+    }
+
     obs = env.reset()
-    env.render(fig=fig)
+    env.render(fig=fig, shape_dict=shape_dict)
 
     for _ in range(100):
-        action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
+        action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive and isinstance(agent, HuntingForagingAgent)}
         _, _, done, _ = env.step(action_dict)
-        env.render(fig=fig)
+        env.render(fig=fig, shape_dict=shape_dict)
         if done['__all__']:
             break
