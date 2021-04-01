@@ -90,68 +90,6 @@ class AttackActor:
                     # The agent was successfully attacked!
                     return attacked_agent
 
-class PositionBasedAttackActor:
-    """
-    Provide the necessary action space for agents who can attack and processes such
-    attacks. The attack is unsuccessful if the attacked agent is dead or out of
-    range. If alive and in range, the attack may be successful, depending on the
-    attacking agent's accuracy. The action space is appended with a Discrete(2),
-    allowing the agent to attack or not attack.
-
-    agents (dict):
-        The dictionary of agents. Because attacks are distance-based, all agents must
-        be PositionAgents; becuase the attacked agent must be alive, all agents
-        must be LifeAgents.
-    
-    attack_norm (int):
-        Norm used to measure the distance between agents. For example, you might
-        use a norm of 1 or np.inf in a Gird space, while 2 might be used in a Contnuous
-        space. Default is np.inf.
-    """
-    def __init__(self, agents=None, attack_norm=np.inf, **kwargs):
-        assert type(agents) is dict, "agents must be a dict"
-        for agent in agents.values():
-            assert isinstance(agent, PositionAgent)
-            assert isinstance(agent, LifeAgent)
-        self.agents = agents
-
-        for agent in self.agents.values():
-            if isinstance(agent, AttackingAgent):
-                agent.action_space['attack'] = Discrete(2)
-        
-        self.attack_norm = attack_norm
-
-    def process_attack(self, attacking_agent, attack, **kwargs):
-        """
-        Determine which agent the attacking agent successfully attacks.
-
-        attacking_agent (AttackingAgent):
-            The agent that we are processing.
-
-        attack (bool):
-            True if the agent has chosen to attack, otherwise False.
-
-        return (Agent):
-            Return the attacked agent object. This can be None if no agent was
-            attacked.
-        """
-        if isinstance(attacking_agent, AttackingAgent) and attack:
-            for attacked_agent in self.agents.values():
-                if attacked_agent.id == attacking_agent.id:
-                    # Cannot attack yourself
-                    continue
-                elif not attacked_agent.is_alive:
-                    # Cannot attack dead agents
-                    continue
-                elif np.linalg.norm(attacking_agent.position - attacked_agent.position, self.attack_norm) > attacking_agent.attack_range:
-                    # Agent too far away
-                    continue
-                elif np.random.uniform() > attacking_agent.attack_accuracy:
-                    # Attempted attack, but it failed due to inaccuracy.
-                    continue
-                else:
-                    return attacked_agent
-
 class PositionTeamBasedAttackActor:
     """
     Provide the necessary action space for agents who can attack and process such

@@ -7,7 +7,7 @@ from admiral.envs.components.agent import \
     AttackingAgent, BroadcastingAgent, GridMovementAgent, \
     PositionObservingAgent, LifeObservingAgent, TeamObservingAgent, AgentObservingAgent
 from admiral.envs.components.state import GridPositionState, BroadcastState, LifeState
-from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, BroadcastActor
+from admiral.envs.components.actor import GridMovementActor, AttackActor, BroadcastActor
 from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver
 from admiral.envs.components.done import TeamDeadDone
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
@@ -37,7 +37,7 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
 
         # actor
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        self.attack_actor = PositionTeamBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
         self.broadcast_actor = BroadcastActor(broadcast_state=self.broadcast_state, **kwargs)
 
         # done

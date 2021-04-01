@@ -3,7 +3,7 @@ from gym.spaces import MultiBinary
 import numpy as np
 
 from admiral.envs.components.agent import AttackingAgent, PositionAgent, TeamAgent, LifeAgent
-from admiral.envs.components.actor import AttackActor, PositionTeamBasedAttackActor
+from admiral.envs.components.actor import AttackActor
 
 
 class AttackTestAgent(AttackingAgent, PositionAgent, LifeAgent, TeamAgent):
@@ -94,7 +94,7 @@ def test_position_team_based_attack_actor():
 
     for agent in agents.values():
         agent.position = agent.initial_position
-    actor = PositionTeamBasedAttackActor(agents=agents)
+    actor = AttackActor(agents=agents, number_of_teams=3)
 
     assert actor.process_attack(agents['agent0'], True).id == 'agent1'
     assert actor.process_attack(agents['agent1'], True).id == 'agent0'

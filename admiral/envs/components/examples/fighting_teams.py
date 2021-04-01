@@ -4,7 +4,7 @@ import numpy as np
 
 from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver
-from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
+from admiral.envs.components.actor import GridMovementActor, AttackActor
 from admiral.envs.components.done import TeamDeadDone
 from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent
 from admiral.envs import AgentBasedSimulation
@@ -29,7 +29,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
 
         # Actor Components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        self.attack_actor = PositionTeamBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
 
         # Done components
         self.done = TeamDeadDone(**kwargs)
