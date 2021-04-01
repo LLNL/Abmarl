@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import TeamState, GridPositionState, LifeState
+from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver
 from admiral.envs.components.actor import GridMovementActor
 from admiral.envs.components.agent import TeamAgent, PositionAgent, PositionObservingAgent, AgentObservingAgent, GridMovementAgent, LifeAgent
@@ -19,13 +19,12 @@ class SimpleGridObservations(AgentBasedSimulation):
         # State components
         self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
-        self.team_state = TeamState(**kwargs)
 
         # Actor components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
 
         # Observers
-        self.observer = GridPositionTeamBasedObserver(position=self.position_state, team_state=self.team_state, **kwargs)
+        self.observer = GridPositionTeamBasedObserver(position=self.position_state, **kwargs)
 
         self.finalize()
 
@@ -48,9 +47,9 @@ class SimpleGridObservations(AgentBasedSimulation):
 
         # Draw the agents
         team_shapes = {
-            0: 'o',
-            1: 's',
-            2: 'd'
+            1: 'o',
+            2: 's',
+            3: 'd'
         }
 
         ax = fig.gca()
@@ -89,12 +88,12 @@ class SimpleGridObservations(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {
-        'agent0': ObservingTeamMovementAgent(id='agent0', team=0, agent_view=1, move_range=1, initial_position=np.array([2, 1])),
-        'agent1': ObservingTeamMovementAgent(id='agent1', team=0, agent_view=1, move_range=0, initial_position=np.array([2, 2])),
-        'agent2': ObservingTeamMovementAgent(id='agent2', team=1, agent_view=1, move_range=0, initial_position=np.array([0, 4])),
-        'agent3': ObservingTeamMovementAgent(id='agent3', team=1, agent_view=1, move_range=0, initial_position=np.array([0, 0])),
-        'agent4': ObservingTeamMovementAgent(id='agent4', team=2, agent_view=1, move_range=0, initial_position=np.array([4, 0])),
-        'agent5': ObservingTeamMovementAgent(id='agent5', team=2, agent_view=1, move_range=0, initial_position=np.array([4, 4])),
+        'agent0': ObservingTeamMovementAgent(id='agent0', team=1, agent_view=1, move_range=1, initial_position=np.array([2, 1])),
+        'agent1': ObservingTeamMovementAgent(id='agent1', team=1, agent_view=1, move_range=0, initial_position=np.array([2, 2])),
+        'agent2': ObservingTeamMovementAgent(id='agent2', team=2, agent_view=1, move_range=0, initial_position=np.array([0, 4])),
+        'agent3': ObservingTeamMovementAgent(id='agent3', team=2, agent_view=1, move_range=0, initial_position=np.array([0, 0])),
+        'agent4': ObservingTeamMovementAgent(id='agent4', team=3, agent_view=1, move_range=0, initial_position=np.array([4, 0])),
+        'agent5': ObservingTeamMovementAgent(id='agent5', team=3, agent_view=1, move_range=0, initial_position=np.array([4, 4])),
     }
     env = SimpleGridObservations(
         region=5,
@@ -107,6 +106,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([-1, 0])}})
@@ -114,6 +114,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([0, 1])}})
@@ -121,6 +122,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([0, 1])}})
@@ -128,6 +130,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([1, 0])}})
@@ -135,6 +138,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([1, 0])}})
@@ -142,6 +146,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([0, -1])}})
@@ -149,6 +154,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([0, -1])}})
@@ -156,6 +162,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     obs = env.step({'agent0': {'move': np.array([-1, 0])}})
@@ -163,6 +170,7 @@ if __name__ == '__main__':
     print(obs['agent0']['position'][:,:,0])
     print(obs['agent0']['position'][:,:,1])
     print(obs['agent0']['position'][:,:,2])
+    print(obs['agent0']['position'][:,:,3])
     print()
 
     plt.show()

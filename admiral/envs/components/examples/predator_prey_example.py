@@ -3,9 +3,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.state import TeamState, GridPositionState, LifeState, GridResourceState
+from admiral.envs.components.state import GridPositionState, LifeState, GridResourceState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
-from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, GridResourcesActor
+from admiral.envs.components.actor import GridMovementActor, AttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone
 from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AgentObservingAgent, PositionObservingAgent, ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
 from admiral.envs import AgentBasedSimulation
@@ -25,16 +25,15 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
         self.resource_state = GridResourceState(**kwargs)
-        self.team_state = TeamState(**kwargs)
 
         # Observer components
-        self.position_observer = GridPositionTeamBasedObserver(position=self.position_state, team_state=self.team_state, **kwargs)
+        self.position_observer = GridPositionTeamBasedObserver(position=self.position_state, **kwargs)
         self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
 
         # Actor components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
         self.resource_actor = GridResourcesActor(resources=self.resource_state, **kwargs)
-        self.attack_actor = PositionTeamBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
 
         # Done components
         self.done = TeamDeadDone(**kwargs)
@@ -116,8 +115,8 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         return {}
 
 if __name__ == '__main__':
-    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     agent_view=5, team=0, move_range=1, max_harvest=0.5, resource_view=5) for i in range(7)}
-    predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', agent_view=2, team=1, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
+    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     agent_view=5, team=1, move_range=1, max_harvest=0.5, resource_view=5) for i in range(7)}
+    predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', agent_view=2, team=2, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
     agents = {**prey, **predators}
     region = 10
     env = PredatorPreyEnvGridBased(

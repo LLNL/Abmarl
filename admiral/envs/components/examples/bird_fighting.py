@@ -3,14 +3,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.state import ContinuousPositionState, SpeedAngleState, LifeState
-from admiral.envs.components.actor import SpeedAngleMovementActor, PositionBasedAttackActor
+from admiral.envs.components.actor import SpeedAngleMovementActor, AttackActor
 from admiral.envs.components.observer import SpeedObserver, AngleObserver, PositionObserver, LifeObserver, HealthObserver
 from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent
+from admiral.envs.components.agent import TeamAgent, PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightingBirdAgent(PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
+class FightingBirdAgent(TeamAgent, PositionAgent, SpeedAngleAgent, SpeedAngleActingAgent, LifeAgent, AttackingAgent, SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
 
 class FightingBirdsEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -23,7 +23,7 @@ class FightingBirdsEnv(AgentBasedSimulation):
 
         # Actor
         self.move_actor = SpeedAngleMovementActor(position=self.position_state, speed_angle=self.speed_angle_state, **kwargs)
-        self.attack_actor = PositionBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
 
         # Observer
         self.position_observer = PositionObserver(position=self.position_state, **kwargs)

@@ -437,10 +437,16 @@ class TeamAgent(Agent):
     """
     Agents are on a team, which will affect their ability to perform certain actions,
     such as who they can attack.
+
+    team (int):
+        The agent's team. Teams are indexed starting from 1, with team 0 reserved
+        for agents that are not on a team.
     """
     def __init__(self, team=None, **kwargs):
         super().__init__(**kwargs)
-        assert team is not None, "team must be an integer"
+        assert team != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
+        if team is None:
+            team = 0
         self.team = team
     
     @property

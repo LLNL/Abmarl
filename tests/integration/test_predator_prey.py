@@ -7,9 +7,9 @@ from admiral.managers import AllStepManager
 
 def test_all_step_grid_based_predator_prey():
     agents = {
-        'prey0': PreyAgent(id='prey0', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view=4),
-        'prey1': PreyAgent(id='prey1', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=0, move_range=1, max_harvest=0.5, resource_view=4),
-        'predator0': PredatorAgent(id='predator0', initial_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=1, move_range=1, attack_range=1, attack_strength=2.0)
+        'prey0': PreyAgent(id='prey0', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=1, move_range=1, max_harvest=0.5, resource_view=4),
+        'prey1': PreyAgent(id='prey1', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=1, move_range=1, max_harvest=0.5, resource_view=4),
+        'predator0': PredatorAgent(id='predator0', initial_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=2, move_range=1, attack_range=1, attack_strength=2.0)
     }
     initial_resources = np.array([
         [0.43, 0.  , 0.  , 0.37, 0.32],
@@ -27,7 +27,7 @@ def test_all_step_grid_based_predator_prey():
     ))
 
     obs = env.reset()
-    np.testing.assert_array_equal(obs['prey0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
@@ -38,7 +38,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1.,  1.,  0.,  0.,  0.,  0., -1., -1.],
@@ -61,7 +61,7 @@ def test_all_step_grid_based_predator_prey():
         [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ]
     ]))
 
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
@@ -72,7 +72,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1.,  1.,  0.,  0.,  0.,  0., -1., -1.],
@@ -95,14 +95,14 @@ def test_all_step_grid_based_predator_prey():
         [-1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,   -1.,  ]
     ]))
 
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1.],
         [-1., -1.,  0.,  0.,  0.],
         [-1., -1.,  0.,  0.,  0.],
         [-1., -1.,  0.,  0.,  2.]
     ]))
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1.],
         [-1., -1.,  0.,  0.,  0.],
@@ -118,7 +118,7 @@ def test_all_step_grid_based_predator_prey():
     })
     # TODO: Add and tests rewards
 
-    np.testing.assert_array_equal(obs['prey0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -129,7 +129,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -153,7 +153,7 @@ def test_all_step_grid_based_predator_prey():
     ]))
     assert not done['prey0']
     
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -164,7 +164,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1.,  0.,  0.,  0.,  0.,  0., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -188,14 +188,14 @@ def test_all_step_grid_based_predator_prey():
     ]))
     assert not done['prey1']
 
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.],
         [-1.,  0.,  1.,  1.,  0.],
         [-1.,  0.,  0.,  0.,  0.],
         [-1.,  0.,  0.,  0.,  0.]
     ]))
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.],
         [-1.,  0.,  0.,  0.,  0.],
@@ -212,7 +212,7 @@ def test_all_step_grid_based_predator_prey():
         'predator0': {'move': np.array([0, 0]), 'attack': True},
     })
 
-    np.testing.assert_array_equal(obs['prey0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -223,7 +223,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1., -1.,  0.,  0.,  0.,  0.,  0., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey0']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -247,7 +247,7 @@ def test_all_step_grid_based_predator_prey():
     ]))
     assert done['prey0']
 
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -258,7 +258,7 @@ def test_all_step_grid_based_predator_prey():
         [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -282,14 +282,14 @@ def test_all_step_grid_based_predator_prey():
     ]))
     assert not done['prey1']
 
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.],
         [-1.,  0.,  0.,  0.,  1.],
         [-1.,  0.,  0.,  0.,  0.],
         [-1.,  0.,  0.,  0.,  0.]
     ]))
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.],
         [-1.,  0.,  0.,  0.,  0.],
@@ -306,7 +306,7 @@ def test_all_step_grid_based_predator_prey():
     })
 
     assert 'prey0' not in obs
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
@@ -317,7 +317,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
@@ -341,14 +341,14 @@ def test_all_step_grid_based_predator_prey():
     ]))
     assert not done['prey1']
 
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 1., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.]
     ]))
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,2], np.array([
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
@@ -364,7 +364,7 @@ def test_all_step_grid_based_predator_prey():
         'predator0': {'move': np.array([0, 0]), 'attack': True},
     })
 
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
@@ -375,7 +375,7 @@ def test_all_step_grid_based_predator_prey():
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.]
     ]))
-    np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['prey1']['position'][:,:,2], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1.,  0.,  0.,  0.,  0.,  0., -1., -1., -1.],
@@ -399,14 +399,14 @@ def test_all_step_grid_based_predator_prey():
     ]))
     assert done['prey1']
 
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,0], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.]
     ]))
-    np.testing.assert_array_equal(obs['predator0']['position'][:,:,1], np.array([
+    np.testing.assert_array_equal(obs['predator0']['position'][:,:,2], np.array([
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],
         [0., 0., 0., 0., 0.],

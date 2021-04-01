@@ -5,13 +5,13 @@ import seaborn as sns
 
 from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
-from admiral.envs.components.actor import GridMovementActor, GridResourcesActor, PositionBasedAttackActor
+from admiral.envs.components.actor import GridMovementActor, GridResourcesActor, AttackActor
 from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
+from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightForResourcesAgent(PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent):
+class FightForResourcesAgent(TeamAgent, PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent):
     pass
 
 class FightForResourcesEnv(AgentBasedSimulation):
@@ -32,7 +32,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
         # Actor components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
         self.resource_actor = GridResourcesActor(resources=self.resource_state, **kwargs)
-        self.attack_actor = PositionBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
 
         # Done components
         self.done = DeadDone(**kwargs)

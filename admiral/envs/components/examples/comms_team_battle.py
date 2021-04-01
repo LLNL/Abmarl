@@ -6,8 +6,8 @@ from admiral.envs.components.agent import \
     PositionAgent, LifeAgent, TeamAgent, \
     AttackingAgent, BroadcastingAgent, GridMovementAgent, \
     PositionObservingAgent, LifeObservingAgent, TeamObservingAgent, AgentObservingAgent
-from admiral.envs.components.state import GridPositionState, BroadcastState, LifeState, TeamState
-from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor, BroadcastActor
+from admiral.envs.components.state import GridPositionState, BroadcastState, LifeState
+from admiral.envs.components.actor import GridMovementActor, AttackActor, BroadcastActor
 from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver
 from admiral.envs.components.done import TeamDeadDone
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
@@ -26,19 +26,18 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
         # state
         self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
-        self.team_state = TeamState(**kwargs)
         self.broadcast_state = BroadcastState(**kwargs)
         
         # observer
         position_observer = PositionObserver(position=self.position_state, **kwargs)
         life_observer = LifeObserver(**kwargs)
-        team_observer = TeamObserver(team=self.team_state, **kwargs)
+        team_observer = TeamObserver(**kwargs)
         partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)
         self.comms_observer = TeamBasedCommunicationWrapper([partial_observer], **kwargs)
 
         # actor
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        self.attack_actor = PositionTeamBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
         self.broadcast_actor = BroadcastActor(broadcast_state=self.broadcast_state, **kwargs)
 
         # done
@@ -106,13 +105,13 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
 
 if __name__ == "__main__":
     agents = {
-        'agent0': CommunicatingAgent(id='agent0', initial_position=np.array([7, 7]), team=0, broadcast_range=11, agent_view=11),
-        'agent1': BattleAgent(id='agent1', initial_position=np.array([0, 4]), team=0, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
-        'agent2': BattleAgent(id='agent2', initial_position=np.array([0, 7]), team=0, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
-        'agent3': BattleAgent(id='agent3', initial_position=np.array([0, 10]), team=0, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
-        'agent4': BattleAgent(id='agent4', initial_position=np.array([14, 4]), team=1, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
-        'agent5': BattleAgent(id='agent5', initial_position=np.array([14, 7]), team=1, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
-        'agent6': BattleAgent(id='agent6', initial_position=np.array([14, 10]), team=1, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
+        'agent0': CommunicatingAgent(id='agent0', initial_position=np.array([7, 7]), team=1, broadcast_range=11, agent_view=11),
+        'agent1': BattleAgent(id='agent1', initial_position=np.array([0, 4]), team=1, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
+        'agent2': BattleAgent(id='agent2', initial_position=np.array([0, 7]), team=1, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
+        'agent3': BattleAgent(id='agent3', initial_position=np.array([0, 10]), team=1, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
+        'agent4': BattleAgent(id='agent4', initial_position=np.array([14, 4]), team=2, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
+        'agent5': BattleAgent(id='agent5', initial_position=np.array([14, 7]), team=2, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
+        'agent6': BattleAgent(id='agent6', initial_position=np.array([14, 10]), team=2, agent_view=2, attack_range=1, move_range=1, attack_strength=1),
     }
     env = TeamBattleCommsEnv(
         region=15,
