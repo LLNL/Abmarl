@@ -55,7 +55,6 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # These components handle the actions in the step function. This environment
         # supports agents that can move around and attack agents from other teams.
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        # TODO: Make a team_attack_matrix
         self.attack_actor = AttackActor(**kwargs)
 
         # Done components
@@ -161,9 +160,13 @@ if __name__ == '__main__':
     agents = {**food, **foragers, **hunters}
 
     region = 20
+    team_attack_matrix = np.zeros((3,3))
+    team_attack_matrix[1,0] = 1
+    team_attack_matrix[2,1] = 1
     env = HuntingForagingEnv(
         region=region,
         agents=agents,
+        team_attack_matrix=team_attack_matrix,
         number_of_teams=2,
     )
     env.reset()
