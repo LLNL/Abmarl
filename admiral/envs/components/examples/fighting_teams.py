@@ -3,10 +3,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 # Import all the features that we need from the simulation components
-from admiral.envs.components.state import TeamState, GridPositionState, LifeState
+from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import TeamObserver, PositionObserver, LifeObserver
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
-from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
+from admiral.envs.components.actor import GridMovementActor, AttackActor
 from admiral.envs.components.done import TeamDeadDone
 # Each env component needs a corresponding agent component
 from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, TeamObservingAgent, PositionObservingAgent, LifeObservingAgent, AgentObservingAgent, GridMovementAgent, AttackingAgent
@@ -36,7 +36,6 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # agents with positions, life, and team.
         self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
-        self.team_state = TeamState(**kwargs)
 
         # Observer Components
         # These components handle the observations that the agents receive whenever
@@ -45,14 +44,14 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # those observations based on our partial observation filter settings.
         position_observer = PositionObserver(position=self.position_state, **kwargs)
         life_observer = LifeObserver(**kwargs)
-        team_observer = TeamObserver(team=self.team_state, **kwargs)
+        team_observer = TeamObserver(**kwargs)
         self.observer = PositionRestrictedObservationWrapper([position_observer, life_observer, team_observer], **kwargs)
 
         # Actor Components
         # These components handle the actions in the step function. This environment
         # supports agents that can move around and attack agents from other teams.
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        self.attack_actor = PositionTeamBasedAttackActor(**kwargs)
+        self.attack_actor = AttackActor(**kwargs)
 
         # Done components
         # This component tracks when the simulation is done. This env is done when
@@ -157,7 +156,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
 # teams battling, each agent taking random actions.
 if __name__ == '__main__':
     agents = {f'agent{i}': FightingTeamAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1, agent_view=2
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2+1, move_range=1, agent_view=2
     ) for i in range(24)}
     env = FightingTeamsEnv(
         region=12,

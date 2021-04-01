@@ -42,12 +42,12 @@ def test_dead_done_condition():
 
 def test_team_dead_done_condition():
     agents = {
-        'agent0': DoneTestAgent(id='agent0', team=0),
-        'agent1': DoneTestAgent(id='agent1', team=1),
-        'agent2': DoneTestAgent(id='agent2', team=0),
-        'agent3': DoneTestAgent(id='agent3', team=1),
-        'agent4': DoneTestAgent(id='agent4', team=0),
-        'agent5': DoneTestAgent(id='agent5', team=2),
+        'agent0': DoneTestAgent(id='agent0', team=1),
+        'agent1': DoneTestAgent(id='agent1', team=2),
+        'agent2': DoneTestAgent(id='agent2', team=1),
+        'agent3': DoneTestAgent(id='agent3', team=2),
+        'agent4': DoneTestAgent(id='agent4', team=1),
+        'agent5': DoneTestAgent(id='agent5', team=3),
     }
     state = LifeState(agents=agents)
     done = TeamDeadDone(agents=agents, number_of_teams=3)

@@ -4,7 +4,44 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent, VelocityAgent, \
-    CollisionAgent
+    CollisionAgent, BroadcastingAgent
+
+# --------------------- #
+# --- Communication --- #
+# --------------------- #
+
+class BroadcastState:
+    """
+    Tracks which agents have broadcasted in this step.
+
+    agents (dict):
+        The dictionary of agents.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+    
+    def reset(self, **kwargs):
+        """
+        Reset the broadcasting state of all applicable agents.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, BroadcastingAgent):
+                agent.broadcasting = False
+        
+    def set_broadcast(self, agent, _broadcast):
+        """
+        Set the broadcasting state of the agent.
+        """
+        if isinstance(agent, BroadcastingAgent):
+            agent.broadcasting = _broadcast
+        
+    def modify_broadcast(self, agent, value):
+        """
+        Set the broadcasting state of the agent.
+        """
+        self.set_broadcast(agent, value)
+
+
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -426,21 +463,3 @@ class GridResourceState:
         """
         self.resources[self.resources >= self.min_value] += self.regrow_rate
         self.resources[self.resources >= self.max_value] = self.max_value
-
-
-
-# ------------ #
-# --- Team --- #
-# ------------ #
-
-class TeamState:
-    """
-    Team state manages the state of agents' teams. Since these are not changing,
-    there is not much to manage. It really just keeps track of the number_of_teams.
-
-    number_of_teams (int):
-        The number of teams in this simulation.
-    """
-    def __init__(self, agents=None, number_of_teams=None, **kwargs):
-        self.number_of_teams = number_of_teams
-        self.agents = agents

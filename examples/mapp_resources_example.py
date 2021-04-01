@@ -1,6 +1,6 @@
 
 from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
-from admiral.envs.wrappers import CommunicationWrapper, RavelDiscreteWrapper
+from admiral.envs.wrappers import CommunicationHandshakeWrapper, RavelDiscreteWrapper
 from admiral.managers import TurnBasedManager, AllStepManager
 
 region = 6
@@ -12,8 +12,8 @@ env_config = {
     'region': region,
     'agents': agents,
 }
-env = AllStepManager(CommunicationWrapper(PredatorPreyEnv.build(env_config)))
-# env = TurnBasedManager(CommunicationWrapper(PredatorPreyEnv.build(env_config)))
+env = AllStepManager(CommunicationHandshakeWrapper(PredatorPreyEnv.build(env_config)))
+# env = TurnBasedManager(CommunicationHandshakeWrapper(PredatorPreyEnv.build(env_config)))
 obs = env.reset()
 done = {agent_id: False for agent_id in env.agents}
 env.render()

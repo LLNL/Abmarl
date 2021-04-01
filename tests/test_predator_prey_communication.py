@@ -2,7 +2,7 @@
 import numpy as np
 
 from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
-from admiral.envs.wrappers import CommunicationWrapper
+from admiral.envs.wrappers import CommunicationHandshakeWrapper
 
 def test_communication():
     np.random.seed(24)
@@ -13,7 +13,7 @@ def test_communication():
         Prey(id='prey2', view=5)
     ]
     env = PredatorPreyEnv.build({'agents': agents, 'observation_mode': PredatorPreyEnv.ObservationMode.DISTANCE})
-    env = CommunicationWrapper(env)
+    env = CommunicationHandshakeWrapper(env)
 
 
     env.reset()
