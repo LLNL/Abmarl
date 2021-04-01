@@ -43,7 +43,7 @@ class AttackActor:
             # that are "on team 0" are actually teamless, so they can be attacked
             # by and can attack agents from any other team, including "team 0"
             # agents.
-            team_attack_matrix = -np.diag(np.ones(number_of_teams+1)) + 1
+            self.team_attack_matrix = -np.diag(np.ones(number_of_teams+1)) + 1
             self.team_attack_matrix[0,0] = 1
         else:
             self.team_attack_matrix = team_attack_matrix
