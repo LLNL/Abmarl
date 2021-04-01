@@ -66,14 +66,15 @@ class TeamDeadDone:
 
     number_of_teams (int):
         The fixed number of teams in this simulation.
+        Default 0.
     """
-    def __init__(self, agents=None, number_of_teams=None, **kwargs):
+    def __init__(self, agents=None, number_of_teams=0, **kwargs):
         for agent in agents.values():
             assert isinstance(agent, TeamAgent)
             assert isinstance(agent, LifeAgent)
         self.agents = agents
         assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
-        self.number_of_teams = number_of_teams
+        self.number_of_teams = number_of_teams + 1 # +1 because team 0 is default team and not counted.
     
     def get_done(self, agent, **kwargs):
         """

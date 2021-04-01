@@ -2,7 +2,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import TeamState, GridPositionState, LifeState
+from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, PositionTeamBasedAttackActor
 from admiral.envs.components.done import TeamDeadDone
@@ -20,13 +20,12 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # State Components
         self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
-        self.team_state = TeamState(**kwargs)
 
         # Observer Components
         self.position_observer = PositionObserver(position=self.position_state, **kwargs)
         self.health_observer = HealthObserver(**kwargs)
         self.life_observer = LifeObserver(**kwargs)
-        self.team_observer = TeamObserver(team=self.team_state, **kwargs)
+        self.team_observer = TeamObserver(**kwargs)
 
         # Actor Components
         self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
@@ -99,7 +98,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
 
 if __name__ == '__main__':
     agents = {f'agent{i}': FightingTeamsAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2, move_range=1
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i%2+1, move_range=1
     ) for i in range(24)}
     env = FightingTeamsEnv(
         region=12,

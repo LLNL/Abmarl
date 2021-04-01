@@ -2,7 +2,7 @@
 import numpy as np
 
 from admiral.envs.components.agent import PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent, BroadcastingAgent
-from admiral.envs.components.state import GridPositionState, LifeState, TeamState, ContinuousPositionState, SpeedAngleState, VelocityState, BroadcastState
+from admiral.envs.components.state import GridPositionState, LifeState, ContinuousPositionState, SpeedAngleState, VelocityState, BroadcastState
 from admiral.envs.components.observer import HealthObserver, LifeObserver, PositionObserver, \
     RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, TeamObserver
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
@@ -15,22 +15,20 @@ class NonViewAgent(VelocityObservingAgent, PositionObservingAgent, SpeedAngleObs
 class AllAgent(           AllObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
 class PositionlessAgent(  NonViewAgent,                     LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
 class LifelessAgent(      AllObservingAgent, PositionAgent,            TeamAgent, SpeedAngleAgent, VelocityAgent): pass
-class TeamlessAgent(      AllObservingAgent, PositionAgent, LifeAgent,            SpeedAngleAgent, VelocityAgent): pass
 class SpeedAnglelessAgent(AllObservingAgent, PositionAgent, LifeAgent, TeamAgent,                  VelocityAgent): pass
 class VelocitylessAgent(  AllObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent               ): pass
 
 def test_position_restricted_observer_wrapper():
     agents = {
-        'agent0': AllAgent(           id='agent0', agent_view=2, initial_position=np.array([2, 2]), initial_health=0.67, team=0, max_speed=1, initial_speed=0.30, initial_banking_angle=7,  initial_ground_angle=123, initial_velocity=np.array([-0.3, 0.8])),
-        'agent1': AllAgent(           id='agent1', agent_view=1, initial_position=np.array([4, 4]), initial_health=0.54, team=1, max_speed=2, initial_speed=0.00, initial_banking_angle=0,  initial_ground_angle=126, initial_velocity=np.array([-0.2, 0.7])),
-        'agent2': AllAgent(           id='agent2', agent_view=1, initial_position=np.array([4, 3]), initial_health=0.36, team=1, max_speed=1, initial_speed=0.12, initial_banking_angle=30, initial_ground_angle=180, initial_velocity=np.array([-0.1, 0.6])),
-        'agent3': AllAgent(           id='agent3', agent_view=1, initial_position=np.array([4, 2]), initial_health=0.24, team=1, max_speed=4, initial_speed=0.05, initial_banking_angle=13, initial_ground_angle=46,  initial_velocity=np.array([0.0,  0.5])),
-        'agent4': LifelessAgent(      id='agent4', agent_view=1, initial_position=np.array([4, 1]),                      team=2, max_speed=3, initial_speed=0.17, initial_banking_angle=15, initial_ground_angle=212, initial_velocity=np.array([0.1,  0.4])),
-        'agent5': TeamlessAgent(      id='agent5', agent_view=1, initial_position=np.array([4, 0]), initial_health=0.89,         max_speed=2, initial_speed=0.21, initial_banking_angle=23, initial_ground_angle=276, initial_velocity=np.array([0.2,  0.3])),
-        'agent6': SpeedAnglelessAgent(id='agent6', agent_view=0, initial_position=np.array([1, 1]), initial_health=0.53, team=0, max_speed=1,                                                                         initial_velocity=np.array([0.3,  0.2])),
-        'agent7': VelocitylessAgent(  id='agent7', agent_view=5, initial_position=np.array([0, 4]), initial_health=0.50, team=1, max_speed=1, initial_speed=0.36, initial_banking_angle=24, initial_ground_angle=0                                          ),
-        'agent8': PositionlessAgent(  id='agent8',                                                  initial_health=0.26, team=0, max_speed=2, initial_speed=0.06, initial_banking_angle=16, initial_ground_angle=5,   initial_velocity=np.array([0.5,  0.0])),
-        'agent9': PositionlessAgent(  id='agent9',                                                  initial_health=0.08, team=2, max_speed=0, initial_speed=0.24, initial_banking_angle=30, initial_ground_angle=246, initial_velocity=np.array([0.6, -0.1])),
+        'agent0': AllAgent(           id='agent0', agent_view=2, initial_position=np.array([2, 2]), initial_health=0.67, team=1, max_speed=1, initial_speed=0.30, initial_banking_angle=7,  initial_ground_angle=123, initial_velocity=np.array([-0.3, 0.8])),
+        'agent1': AllAgent(           id='agent1', agent_view=1, initial_position=np.array([4, 4]), initial_health=0.54, team=2, max_speed=2, initial_speed=0.00, initial_banking_angle=0,  initial_ground_angle=126, initial_velocity=np.array([-0.2, 0.7])),
+        'agent2': AllAgent(           id='agent2', agent_view=1, initial_position=np.array([4, 3]), initial_health=0.36, team=2, max_speed=1, initial_speed=0.12, initial_banking_angle=30, initial_ground_angle=180, initial_velocity=np.array([-0.1, 0.6])),
+        'agent3': AllAgent(           id='agent3', agent_view=1, initial_position=np.array([4, 2]), initial_health=0.24, team=2, max_speed=4, initial_speed=0.05, initial_banking_angle=13, initial_ground_angle=46,  initial_velocity=np.array([0.0,  0.5])),
+        'agent4': LifelessAgent(      id='agent4', agent_view=1, initial_position=np.array([4, 1]),                      team=3, max_speed=3, initial_speed=0.17, initial_banking_angle=15, initial_ground_angle=212, initial_velocity=np.array([0.1,  0.4])),
+        'agent6': SpeedAnglelessAgent(id='agent6', agent_view=0, initial_position=np.array([1, 1]), initial_health=0.53, team=1, max_speed=1,                                                                         initial_velocity=np.array([0.3,  0.2])),
+        'agent7': VelocitylessAgent(  id='agent7', agent_view=5, initial_position=np.array([0, 4]), initial_health=0.50, team=2, max_speed=1, initial_speed=0.36, initial_banking_angle=24, initial_ground_angle=0                                          ),
+        'agent8': PositionlessAgent(  id='agent8',                                                  initial_health=0.26, team=1, max_speed=2, initial_speed=0.06, initial_banking_angle=16, initial_ground_angle=5,   initial_velocity=np.array([0.5,  0.0])),
+        'agent9': PositionlessAgent(  id='agent9',                                                  initial_health=0.08, team=3, max_speed=0, initial_speed=0.24, initial_banking_angle=30, initial_ground_angle=246, initial_velocity=np.array([0.6, -0.1])),
     }
 
     def linear_drop_off(distance, view):
@@ -39,7 +37,6 @@ def test_position_restricted_observer_wrapper():
     np.random.seed(12)
     position_state = GridPositionState(agents=agents, region=5)
     life_state = LifeState(agents=agents)
-    team_state = TeamState(agents=agents, number_of_teams=3)
     speed_state = SpeedAngleState(agents=agents)
     angle_state = SpeedAngleState(agents=agents)
     velocity_state = VelocityState(agents=agents)
@@ -48,7 +45,7 @@ def test_position_restricted_observer_wrapper():
     relative_position_observer = RelativePositionObserver(position=position_state, agents=agents)
     health_observer = HealthObserver(agents=agents)
     life_observer = LifeObserver(agents=agents)
-    team_observer = TeamObserver(team=team_state, agents=agents)
+    team_observer = TeamObserver(number_of_teams=3, agents=agents)
     speed_observer = SpeedObserver(agents=agents)
     angle_observer = AngleObserver(agents=agents)
     velocity_observer = VelocityObserver(agents=agents)
@@ -81,9 +78,8 @@ def test_position_restricted_observer_wrapper():
         'agent2': 0.36,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
-        'agent7': 0.5, 
+        'agent7': -1, 
         'agent8': 0.26,
         'agent9': 0.08,
     }
@@ -93,32 +89,29 @@ def test_position_restricted_observer_wrapper():
         'agent2': True,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
-        'agent7': True,
+        'agent7': -1,
         'agent8': True,
         'agent9': True,
     }
     assert obs['team'] == {
-        'agent0': 0,
+        'agent0': 1,
         'agent1': -1,
-        'agent2': 1,
+        'agent2': 2,
         'agent3': -1,
-        'agent4': 2,
-        'agent5': -1,
+        'agent4': 3,
         'agent6': -1,
-        'agent7': 1,
-        'agent8': 0,
-        'agent9': 2,
+        'agent7': -1,
+        'agent8': 1,
+        'agent9': 3,
     }
     np.testing.assert_array_equal(obs['position']['agent0'], np.array([2, 2]))
     np.testing.assert_array_equal(obs['position']['agent1'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent2'], np.array([4, 3]))
     np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent4'], np.array([4, 1]))
-    np.testing.assert_array_equal(obs['position']['agent5'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([-1, -1]))
-    np.testing.assert_array_equal(obs['position']['agent7'], np.array([0, 4]))
+    np.testing.assert_array_equal(obs['position']['agent7'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent9'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['relative_position']['agent0'], np.array([0, 0]))
@@ -126,9 +119,8 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([2, 1]))
     np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent4'], np.array([2, -1]))
-    np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent6'], np.array([-5, -5]))
-    np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-2, 2]))
+    np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent8'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent9'], np.array([-5, -5]))
     assert obs['mask'] == {
@@ -137,9 +129,8 @@ def test_position_restricted_observer_wrapper():
         'agent2': 1,
         'agent3': 0,
         'agent4': 1,
-        'agent5': 0,
         'agent6': 0,
-        'agent7': 1,
+        'agent7': 0,
         'agent8': 1,
         'agent9': 1,
     }
@@ -149,9 +140,8 @@ def test_position_restricted_observer_wrapper():
         'agent2': 0.12,
         'agent3': -1,
         'agent4': 0.17,
-        'agent5': -1,
         'agent6': -1,
-        'agent7': 0.36,
+        'agent7': -1,
         'agent8': 0.06,
         'agent9': 0.24,
     }
@@ -161,9 +151,8 @@ def test_position_restricted_observer_wrapper():
         'agent2': 180,
         'agent3': -1,
         'agent4': 212,
-        'agent5': -1,
         'agent6': -1,
-        'agent7': 0,
+        'agent7': -1,
         'agent8': 5,
         'agent9': 246
     }
@@ -172,7 +161,6 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([-0.1, 0.6]))
     np.testing.assert_array_equal(obs['velocity']['agent3'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.1, 0.4]))
-    np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
@@ -186,7 +174,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 0.36,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
         'agent8': 0.26,
@@ -198,7 +185,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': True,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
         'agent8': True,
@@ -206,22 +192,20 @@ def test_position_restricted_observer_wrapper():
     }
     assert obs['team'] == {
         'agent0': -1,
-        'agent1': 1,
-        'agent2': 1,
+        'agent1': 2,
+        'agent2': 2,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
-        'agent8': 0,
-        'agent9': 2,
+        'agent8': 1,
+        'agent9': 3,
     }
     np.testing.assert_array_equal(obs['position']['agent0'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent1'], np.array([4, 4]))
     np.testing.assert_array_equal(obs['position']['agent2'], np.array([4, 3]))
     np.testing.assert_array_equal(obs['position']['agent3'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent4'], np.array([-1, -1]))
-    np.testing.assert_array_equal(obs['position']['agent5'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent7'], np.array([-1, -1]))
     np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
@@ -231,7 +215,6 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['relative_position']['agent2'], np.array([0, -1]))
     np.testing.assert_array_equal(obs['relative_position']['agent3'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent4'], np.array([-5, -5]))
-    np.testing.assert_array_equal(obs['relative_position']['agent5'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent6'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent7'], np.array([-5, -5]))
     np.testing.assert_array_equal(obs['relative_position']['agent8'], np.array([-5, -5]))
@@ -242,7 +225,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 1,
         'agent3': 0,
         'agent4': 0,
-        'agent5': 0,
         'agent6': 0,
         'agent7': 0,
         'agent8': 1,
@@ -254,7 +236,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 0.12,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
         'agent8': 0.06,
@@ -266,7 +247,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 180,
         'agent3': -1,
         'agent4': -1,
-        'agent5': -1,
         'agent6': -1,
         'agent7': -1,
         'agent8': 5,
@@ -277,7 +257,6 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([-0.1, 0.6]))
     np.testing.assert_array_equal(obs['velocity']['agent3'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.0, 0.0]))
-    np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
@@ -291,7 +270,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 0.36,
         'agent3': 0.24,
         'agent4': -1,
-        'agent5': 0.89,
         'agent6': 0.53,
         'agent7': 0.5,
         'agent8': 0.26,
@@ -303,30 +281,27 @@ def test_position_restricted_observer_wrapper():
         'agent2': True,
         'agent3': True,
         'agent4': -1,
-        'agent5': True,
         'agent6': True,
         'agent7': True,
         'agent8': True,
         'agent9': True,
     }
     assert obs['team'] == {
-        'agent0': 0,
-        'agent1': 1,
-        'agent2': 1,
-        'agent3': 1,
-        'agent4': 2,
-        'agent5': -1,
-        'agent6': 0,
-        'agent7': 1,
-        'agent8': 0,
-        'agent9': 2,
+        'agent0': 1,
+        'agent1': 2,
+        'agent2': 2,
+        'agent3': 2,
+        'agent4': 3,
+        'agent6': 1,
+        'agent7': 2,
+        'agent8': 1,
+        'agent9': 3,
     }
     np.testing.assert_array_equal(obs['position']['agent0'], np.array([2, 2]))
     np.testing.assert_array_equal(obs['position']['agent1'], np.array([4, 4]))
     np.testing.assert_array_equal(obs['position']['agent2'], np.array([4, 3]))
     np.testing.assert_array_equal(obs['position']['agent3'], np.array([4, 2]))
     np.testing.assert_array_equal(obs['position']['agent4'], np.array([4, 1]))
-    np.testing.assert_array_equal(obs['position']['agent5'], np.array([4, 0]))
     np.testing.assert_array_equal(obs['position']['agent6'], np.array([1, 1]))
     np.testing.assert_array_equal(obs['position']['agent7'], np.array([0, 4]))
     np.testing.assert_array_equal(obs['position']['agent8'], np.array([-1, -1]))
@@ -337,7 +312,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 1,
         'agent3': 1,
         'agent4': 1,
-        'agent5': 1,
         'agent6': 1,
         'agent7': 1,
         'agent8': 1,
@@ -349,7 +323,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 0.12,
         'agent3': 0.05,
         'agent4': 0.17,
-        'agent5': 0.21,
         'agent6': -1,
         'agent7': 0.36,
         'agent8': 0.06,
@@ -361,7 +334,6 @@ def test_position_restricted_observer_wrapper():
         'agent2': 180,
         'agent3': 46,
         'agent4': 212,
-        'agent5': 276,
         'agent6': -1,
         'agent7': 0,
         'agent8': 5,
@@ -372,7 +344,6 @@ def test_position_restricted_observer_wrapper():
     np.testing.assert_array_equal(obs['velocity']['agent2'], np.array([-0.1, 0.6]))
     np.testing.assert_array_equal(obs['velocity']['agent3'], np.array([0.0, 0.5]))
     np.testing.assert_array_equal(obs['velocity']['agent4'], np.array([0.1, 0.4]))
-    np.testing.assert_array_equal(obs['velocity']['agent5'], np.array([0.2, 0.3]))
     np.testing.assert_array_equal(obs['velocity']['agent6'], np.array([0.3, 0.2]))
     np.testing.assert_array_equal(obs['velocity']['agent7'], np.array([0.0, 0.0]))
     np.testing.assert_array_equal(obs['velocity']['agent8'], np.array([0.5, 0.0]))
@@ -384,19 +355,18 @@ class CommunicatingAgent(PositionAgent, TeamAgent, BroadcastingAgent, PositionOb
 
 def test_broadcast_communication_observer_wrapper():
     agents = {
-        'agent0': CommunicatingAgent(id='agent0', initial_position=np.array([1, 7]), team=0, broadcast_range=0, agent_view=0),
-        'agent1': CommunicatingAgent(id='agent1', initial_position=np.array([3, 3]), team=0, broadcast_range=4, agent_view=3),
-        'agent2': CommunicatingAgent(id='agent2', initial_position=np.array([5, 0]), team=1, broadcast_range=4, agent_view=2),
-        'agent3': CommunicatingAgent(id='agent3', initial_position=np.array([6, 9]), team=1, broadcast_range=4, agent_view=2),
-        'agent4': CommunicatingAgent(id='agent4', initial_position=np.array([4, 7]), team=1, broadcast_range=4, agent_view=3),
+        'agent0': CommunicatingAgent(id='agent0', initial_position=np.array([1, 7]), team=1, broadcast_range=0, agent_view=0),
+        'agent1': CommunicatingAgent(id='agent1', initial_position=np.array([3, 3]), team=1, broadcast_range=4, agent_view=3),
+        'agent2': CommunicatingAgent(id='agent2', initial_position=np.array([5, 0]), team=2, broadcast_range=4, agent_view=2),
+        'agent3': CommunicatingAgent(id='agent3', initial_position=np.array([6, 9]), team=2, broadcast_range=4, agent_view=2),
+        'agent4': CommunicatingAgent(id='agent4', initial_position=np.array([4, 7]), team=2, broadcast_range=4, agent_view=3),
     }
     
     position_state = GridPositionState(region=10, agents=agents)
-    team_state = TeamState(agents=agents, number_of_teams=2)
     broadcast_state = BroadcastState(agents=agents)
 
     position_observer = PositionObserver(position=position_state, agents=agents)
-    team_observer = TeamObserver(team=team_state, agents=agents)
+    team_observer = TeamObserver(number_of_teams=2, agents=agents)
     partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer], agents=agents)
     comms_observer = TeamBasedCommunicationWrapper([partial_observer], agents=agents)
 
@@ -424,7 +394,7 @@ def test_broadcast_communication_observer_wrapper():
         'agent4': 0,
     }
     assert obs['team'] == {
-        'agent0': 0,
+        'agent0': 1,
         'agent1': -1,
         'agent2': -1,
         'agent3': -1,
@@ -445,11 +415,11 @@ def test_broadcast_communication_observer_wrapper():
         'agent4': 1,
     }
     assert obs['team'] == {
-        'agent0': 0,
-        'agent1': 0,
-        'agent2': 1,
+        'agent0': 1,
+        'agent1': 1,
+        'agent2': 2,
         'agent3': -1,
-        'agent4': 1,
+        'agent4': 2,
     }
     np.testing.assert_array_equal(obs['position']['agent0'], np.array([1, 7]))
     np.testing.assert_array_equal(obs['position']['agent1'], np.array([3, 3]))
@@ -477,7 +447,7 @@ def test_broadcast_communication_observer_wrapper():
         'agent4': 0,
     }
     assert obs['team'] == {
-        'agent0': 0,
+        'agent0': 1,
         'agent1': -1,
         'agent2': -1,
         'agent3': -1,

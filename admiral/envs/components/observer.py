@@ -291,15 +291,16 @@ class GridPositionTeamBasedObserver:
     position (PositionState):
         The position state handler, which contains the region.
 
-    team_state (TeamState):
-        The team state handler, which contains the number of teams.
+    number_of_teams (int):
+        The number of teams in this simuation.
+        Default 0.
     
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, team_state=None, agents=None, **kwargs):
+    def __init__(self, position=None, number_of_teams=0, agents=None, **kwargs):
         self.position = position
-        self.team_state = team_state
+        self.number_of_teams = number_of_teams + 1
         for agent in agents.values():
             assert isinstance(agent, PositionAgent)
             assert isinstance(agent, TeamAgent)
@@ -309,7 +310,7 @@ class GridPositionTeamBasedObserver:
             if isinstance(agent, AgentObservingAgent) and \
                isinstance(agent, PositionAgent) and \
                isinstance(agent, PositionObservingAgent):
-                agent.observation_space['position'] = Box(-1, np.inf, (agent.agent_view*2+1, agent.agent_view*2+1, self.team_state.number_of_teams), np.int)
+                agent.observation_space['position'] = Box(-1, np.inf, (agent.agent_view*2+1, agent.agent_view*2+1, self.number_of_teams), np.int)
     
     def get_obs(self, my_agent, **kwargs):
         """
@@ -336,7 +337,7 @@ class GridPositionTeamBasedObserver:
                 signal[:, self.position.region - my_agent.position[1] - my_agent.agent_view - 1:] = -1
 
             # Repeat the boundaries signal for all teams
-            signal = np.repeat(signal[:, :, np.newaxis], self.team_state.number_of_teams, axis=2)
+            signal = np.repeat(signal[:, :, np.newaxis], self.number_of_teams, axis=2)
 
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
@@ -531,14 +532,14 @@ class TeamObserver:
     """
     Observe the team of each agent in the simulator.
     """
-    def __init__(self, team=None, agents=None, **kwargs):
-        self.team = team
+    def __init__(self, number_of_teams=0, agents=None, **kwargs):
+        self.number_of_teams = number_of_teams
         self.agents = agents
     
         for agent in agents.values():
             if isinstance(agent, TeamObservingAgent):
                 agent.observation_space[self.channel] = Dict({
-                    other.id: Box(-1, self.team.number_of_teams-1, (1,), np.int) for other in agents.values()
+                    other.id: Box(-1, self.number_of_teams, (1,), np.int) for other in agents.values()
                 })
     
     def get_obs(self, agent, **kwargs):
@@ -546,13 +547,7 @@ class TeamObserver:
         Get the team of each agent in the simulator.
         """
         if isinstance(agent, TeamObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, TeamAgent):
-                    obs[other.id] = other.team
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
+            return {'team': {other.id: other.team for other in self.agents.values()}}
         else:
             return {}
     
