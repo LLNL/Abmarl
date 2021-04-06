@@ -60,9 +60,9 @@ register_env(env_name, lambda env_config: env)
 # Because every agent has the same observation and action space, we can just use
 # the specs from one of the agent to define the policies' inputs and outputs.
 policies = {
-    'team0': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
     'team1': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
-    'team2': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
+    'team2': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
+    'team3': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
 }
 def policy_mapping_fn(agent_id):
     return f'team{agents[agent_id].team}'
@@ -90,7 +90,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('TeamBattle'),
+        'title': '{}'.format('TeamBattle_NEW'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
