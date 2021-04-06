@@ -49,6 +49,8 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
         self.position_state.reset(**kwargs)
         self.life_state.reset(**kwargs)
         self.broadcast_state.reset(**kwargs)
+
+        self.rewards = {agent: 0 for agent in self.agents}
     
     def step(self, action_dict, **kwargs):
         # Process attacking
@@ -57,15 +59,27 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
             attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
+                # Reward every agent on the team for the kill
+                for agent in self.agents.values():
+                    if agent.team == attacking_agent.team:
+                        self.rewards[agent.id] += 1
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
+            proposed_amount_move = action.get('move', np.zeros(2))
+            amount_moved = self.move_actor.process_move(self.agents[agent_id], proposed_amount_move, **kwargs)
+            if np.any(proposed_amount_move != amount_moved):
+                # This was a rejected move, so we penalize a bit for it
+                self.rewards[agent_id] -= 0.1
 
         # Process broadcasting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             self.broadcast_actor.process_broadcast(agent, action.get('broadcast', 0), **kwargs)
+        
+        # Small penalty for every agent that acted in this time step to incentive rapid actions
+        for agent_id in action_dict:
+            self.rewards[agent_id] -= 0.01
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -92,7 +106,9 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
         return self.comms_observer.get_obs(agent, **kwargs)
     
     def get_reward(self, agent_id, **kwargs):
-        pass
+        reward_out = self.rewards[agent_id]
+        self.rewards[agent_id] = 0
+        return reward_out
     
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(self.agents[agent_id], **kwargs)
