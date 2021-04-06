@@ -165,7 +165,7 @@ class TeamBasedCommunicationWrapper:
             # If I'm not on the same team, then I will not see its observation,
             #   but I will still see its own attributes.
             for broadcasting_agent in self.agents.values():
-                if isinstance(broadcasting_agent, PositionAgent) and isinstance(receiving_agent, PositionAgent) and broadcasting_agent.broadcasting:
+                if isinstance(broadcasting_agent, PositionAgent) and isinstance(receiving_agent, PositionAgent) and isinstance(broadcasting_agent, BroadcastingAgent) and broadcasting_agent.broadcasting:
                     distance = np.linalg.norm(broadcasting_agent.position - receiving_agent.position, self.obs_norm)
                     if distance > broadcasting_agent.broadcast_range: continue # Too far from this broadcasting agent
                     elif isinstance(receiving_agent, TeamAgent) and isinstance(broadcasting_agent, TeamAgent) and receiving_agent.team == broadcasting_agent.team:
