@@ -63,6 +63,9 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
                 for agent in self.agents.values():
                     if agent.team == attacking_agent.team:
                         self.rewards[agent.id] += 1
+            elif action.get('attack', False):
+                # The agent attacked, but it failed. Penalize to discourage random attacking.
+                self.rewards[attacking_agent.id] -= 0.1
 
         # Process movement
         for agent_id, action in action_dict.items():
