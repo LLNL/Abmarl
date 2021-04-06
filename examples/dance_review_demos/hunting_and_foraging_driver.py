@@ -23,7 +23,7 @@ foragers = {f'forager{i}': HuntingForagingAgent(
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
     max_health=1.0, # Agent's health cannot grow above this value.
-    attack_range=1, # How far this agent's attack will reach.
+    attack_range=0, # How far this agent's attack will reach.
     attack_strength=1.0, # How powerful the agent's attack is.
     attack_accuracy=1.0, # Probability of successful attack
     initial_position=None # Episode-starting position. If None, then random within the region.
@@ -125,7 +125,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('HuntingForaging'),
+        'title': '{}'.format('HuntingForaging_NEW'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,

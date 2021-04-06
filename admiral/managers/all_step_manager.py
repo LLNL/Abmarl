@@ -1,6 +1,8 @@
 
 from itertools import cycle
 
+from admiral.envs.components.agent import ObservingAgent, ActingAgent
+
 from .simulation_manager import SimulationManager
 
 class AllStepManager(SimulationManager):
@@ -13,9 +15,9 @@ class AllStepManager(SimulationManager):
         """
         Reset the environment and return the observation of all the agents.
         """
-        self.done_agents = set()
+        self.done_agents = set(agent.id for agent in self.agents.values() if not (isinstance(agent, ObservingAgent) and isinstance(agent, ActingAgent)))
         self.env.reset(**kwargs)
-        return {agent.id: self.env.get_obs(agent.id) for agent in self.agents.values()}
+        return {agent.id: self.env.get_obs(agent.id) for agent in self.agents.values() if agent.id not in self.done_agents}
     
     def step(self, action_dict, **kwargs):
         """
