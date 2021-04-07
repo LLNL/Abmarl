@@ -383,7 +383,7 @@ def test_broadcast_communication_observer_wrapper():
         'agent4': {'broadcast': 1},
     }
     for agent_id, action in action_dict.items():
-        broadcast_actor.process_broadcast(agents[agent_id], action['broadcast'])
+        broadcast_actor.process_action(agents[agent_id], action)
     
     obs = partial_observer.get_obs(agents['agent0'])
     assert obs['mask'] == {
@@ -436,7 +436,7 @@ def test_broadcast_communication_observer_wrapper():
         'agent4': {'broadcast': 0},
     }
     for agent_id, action in action_dict.items():
-        broadcast_actor.process_broadcast(agents[agent_id], action['broadcast'])
+        broadcast_actor.process_action(agents[agent_id], action)
 
     obs = comms_observer.get_obs(agents['agent0'])
     assert obs['mask'] == {

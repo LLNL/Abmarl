@@ -42,20 +42,20 @@ def test_position_based_attack_actor():
     for agent in agents.values():
         agent.position = agent.initial_position
 
-    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
-    assert actor.process_attack(agents['agent1'], True).id == 'agent0'
-    assert actor.process_attack(agents['agent2'], True).id == 'agent3'
-    assert actor.process_attack(agents['agent3'], True).id == 'agent2'
-    assert actor.process_attack(agents['agent4'], True) is None
-    assert actor.process_attack(agents['agent5'], True).id == 'agent2'
+    assert actor.process_action(agents['agent0'], {'attack': True}).id == 'agent1'
+    assert actor.process_action(agents['agent1'], {'attack': True}).id == 'agent0'
+    assert actor.process_action(agents['agent2'], {'attack': True}).id == 'agent3'
+    assert actor.process_action(agents['agent3'], {'attack': True}).id == 'agent2'
+    assert actor.process_action(agents['agent4'], {'attack': True}) is None
+    assert actor.process_action(agents['agent5'], {'attack': True}).id == 'agent2'
 
     agents['agent0'].is_alive = False
     agents['agent2'].is_alive = False
 
-    assert actor.process_attack(agents['agent1'], True) is None
-    assert actor.process_attack(agents['agent3'], True).id == 'agent4'
-    assert actor.process_attack(agents['agent4'], True) is None
-    assert actor.process_attack(agents['agent5'], True).id == 'agent4'
+    assert actor.process_action(agents['agent1'], {'attack': True}) is None
+    assert actor.process_action(agents['agent3'], {'attack': True}).id == 'agent4'
+    assert actor.process_action(agents['agent4'], {'attack': True}) is None
+    assert actor.process_action(agents['agent5'], {'attack': True}).id == 'agent4'
 
 def test_position_team_based_attack_actor():
     agents = {
@@ -96,20 +96,20 @@ def test_position_team_based_attack_actor():
         agent.position = agent.initial_position
     actor = AttackActor(agents=agents, number_of_teams=3)
 
-    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
-    assert actor.process_attack(agents['agent1'], True).id == 'agent0'
-    assert actor.process_attack(agents['agent2'], True).id == 'agent4'
-    assert actor.process_attack(agents['agent3'], True).id == 'agent4'
-    assert actor.process_attack(agents['agent4'], True) is None
-    assert actor.process_attack(agents['agent5'], True).id == 'agent4'
+    assert actor.process_action(agents['agent0'], {'attack': True}).id == 'agent1'
+    assert actor.process_action(agents['agent1'], {'attack': True}).id == 'agent0'
+    assert actor.process_action(agents['agent2'], {'attack': True}).id == 'agent4'
+    assert actor.process_action(agents['agent3'], {'attack': True}).id == 'agent4'
+    assert actor.process_action(agents['agent4'], {'attack': True}) is None
+    assert actor.process_action(agents['agent5'], {'attack': True}).id == 'agent4'
 
     agents['agent4'].is_alive = False
     agents['agent0'].is_alive = False
 
-    assert actor.process_attack(agents['agent1'], True) is None
-    assert actor.process_attack(agents['agent2'], True) is None
-    assert actor.process_attack(agents['agent3'], True) is None
-    assert actor.process_attack(agents['agent5'], True) is None
+    assert actor.process_action(agents['agent1'], {'attack': True}) is None
+    assert actor.process_action(agents['agent2'], {'attack': True}) is None
+    assert actor.process_action(agents['agent3'], {'attack': True}) is None
+    assert actor.process_action(agents['agent5'], {'attack': True}) is None
 
 def test_attack_accuracy():
     np.random.seed(24)
@@ -125,15 +125,15 @@ def test_attack_accuracy():
         agent.position = agent.initial_position
 
     actor = AttackActor(agents=agents)
-    assert actor.process_attack(agents['agent0'], True) is None # Action failed because low accuracy
+    assert actor.process_action(agents['agent0'], {'attack': True}) is None # Action failed because low accuracy
 
     agents['agent0'].attack_accuracy = 0.5
-    assert actor.process_attack(agents['agent0'], True) is None
-    assert actor.process_attack(agents['agent0'], True) is None
-    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
-    assert actor.process_attack(agents['agent0'], True).id == 'agent1'
-    assert actor.process_attack(agents['agent0'], True) is None
-    assert actor.process_attack(agents['agent0'], True) is None
+    assert actor.process_action(agents['agent0'], {'attack': True}) is None
+    assert actor.process_action(agents['agent0'], {'attack': True}) is None
+    assert actor.process_action(agents['agent0'], {'attack': True}).id == 'agent1'
+    assert actor.process_action(agents['agent0'], {'attack': True}).id == 'agent1'
+    assert actor.process_action(agents['agent0'], {'attack': True}) is None
+    assert actor.process_action(agents['agent0'], {'attack': True}) is None
 
 def test_team_matrix():
     agents = {
@@ -154,9 +154,9 @@ def test_team_matrix():
     team_attack_matrix[2, 3] = 1
     
     actor = AttackActor(agents=agents, number_of_teams=3, team_attack_matrix=team_attack_matrix)
-    assert actor.process_attack(agents['agent0'], True) is None
-    assert actor.process_attack(agents['agent1'], True).id == 'agent4'
-    assert actor.process_attack(agents['agent2'], True).id == 'agent3'
-    assert actor.process_attack(agents['agent3'], True).id == 'agent2'
-    assert actor.process_attack(agents['agent4'], True) is None
-    assert actor.process_attack(agents['agent5'], True) is None
+    assert actor.process_action(agents['agent0'], {'attack': True}) is None
+    assert actor.process_action(agents['agent1'], {'attack': True}).id == 'agent4'
+    assert actor.process_action(agents['agent2'], {'attack': True}).id == 'agent3'
+    assert actor.process_action(agents['agent3'], {'attack': True}).id == 'agent2'
+    assert actor.process_action(agents['agent4'], {'attack': True}) is None
+    assert actor.process_action(agents['agent5'], {'attack': True}) is None
