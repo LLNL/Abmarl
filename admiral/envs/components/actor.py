@@ -147,7 +147,6 @@ class BroadcastActor(Actor):
         """
         broadcasting = self._get_action_from_dict(action_dict)
         self.broadcast_state.modify_broadcast(agent, broadcasting)
-        return agent.broadcasting
         
     @property
     def channel(self):
