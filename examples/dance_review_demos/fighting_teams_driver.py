@@ -79,7 +79,7 @@ def policy_mapping_fn(agent_id):
 # --- Setup the algorithm --- #
 # --------------------------- #
 
-# Full list of supported algorithms here: https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
+# Full list of supported algorithms here: https://docs.ray.io/en/releases-1.2.0/rllib-algorithms.html
 algo_name = 'PG'
 
 
@@ -90,7 +90,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('TeamBattle_NEW'),
+        'title': '{}'.format('TeamBattle'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
@@ -116,6 +116,10 @@ params = {
     }
 }
 
+
+# ---------------------------- #
+# --- Random demonstration --- #
+# ---------------------------- #
 
 if __name__ == '__main__':
     from matplotlib import pyplot as plt

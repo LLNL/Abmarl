@@ -125,7 +125,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('HuntingForaging_NEW'),
+        'title': '{}'.format('HuntingForaging'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
@@ -152,7 +152,9 @@ params = {
 }
 
 
-
+# ---------------------------- #
+# --- Random demonstration --- #
+# ---------------------------- #
 
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
