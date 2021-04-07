@@ -62,7 +62,7 @@ class AttackActor(Actor):
     """
     def __init__(self, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):
         super().__init__(
-            isinstance=AttackingAgent,
+            instance=AttackingAgent,
             space_func=lambda agent: Discrete(2),
             **kwargs
         )
