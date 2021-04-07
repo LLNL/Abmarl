@@ -80,12 +80,6 @@ class AttackActor(Actor):
         """
         If the agent has chosen to attack, then determine which agent got attacked.
 
-        attacking_agent (AttackingAgent):
-            The agent that we are processing.
-
-        action_dict (dict):
-            If the agent has chosen to attack, then we will process that attack.
-
         return (Agent):
             Return the attacked agent object. This can be None if no agent was
             attacked.
@@ -125,7 +119,7 @@ class AttackActor(Actor):
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastActor:
+class BroadcastActor(Actor):
     """
     BroadcastingAgents can choose to broadcast in this step or not.
 
@@ -135,23 +129,31 @@ class BroadcastActor:
     agents (dict):
         Dictionary of agents.
     """
-    def __init__(self, broadcast_state=None, agents=None, **kwargs):
+    def __init__(self, broadcast_state=None, **kwargs):
+        super().__init__(**kwargs)
         self.broadcast_state = broadcast_state
-        self.agents = agents
-        for agent in agents.values():
+        for agent in self.agents.values():
             if isinstance(agent, BroadcastingAgent):
-                agent.action_space['broadcast'] = Discrete(2)
+                agent.action_space[self.channel] = Discrete(2)
     
-    def process_broadcast(self, broadcasting_agent, broadcasting, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Determine the agents new broadcasting state based on its action.
 
         return: bool
             The agent's broadcasting state.
         """
-        if isinstance(broadcasting_agent, BroadcastingAgent):
-            self.broadcast_state.modify_broadcast(broadcasting_agent, broadcasting)
-            return broadcasting_agent.broadcasting
+        broadcasting = self._get_action_from_dict(action_dict)
+        self.broadcast_state.modify_broadcast(agent, broadcasting)
+        return agent.broadcasting
+        
+    @property
+    def channel(self):
+        return 'broadcast'
+    
+    @property
+    def null_value(self):
+        return False
 
 
 
@@ -159,7 +161,7 @@ class BroadcastActor:
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class GridMovementActor:
+class GridMovementActor(Actor):
     """
     Provides the necessary action space for agents who can move and processes such
     movements.
@@ -170,34 +172,36 @@ class GridMovementActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, agents=None, **kwargs):
-        self.position = position
-        self.agents = agents
-        # Not all agents need to be PositionAgents; only the ones who can move.
-
+    def __init__(self, position_state=None, **kwargs):
+        super().__init__(**kwargs)
+        self.position_state = position_state
         for agent in self.agents.values():
             if isinstance(agent, GridMovementAgent):
-                agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
+                agent.action_space[self.channel] = Box(-agent.move_range, agent.move_range, (2,), np.int)
 
-    def process_move(self, moving_agent, move, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Determine the agent's new position based on its move action.
-
-        moving_agent (GridMovementAgent):
-            The agent that moves.
-        
-        move (np.array):
-            How much the agent would like to move in row and column.
         
         return (np.array):
             How much the agent has moved in row and column. This can be different
             from the desired move if the position update was invalid.
         """
-        if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
-            position_before = moving_agent.position
-            self.position.modify_position(moving_agent, move, **kwargs)
-            return moving_agent.position - position_before
+        move = self._get_action_from_dict(action_dict)
+        position_before = agent.position
+        self.position.modify_position(agent, move, **kwargs)
+        return agent.position - position_before
+    
+    @property
+    def channel(self):
+        return 'move'
+    
+    @property
+    def null_value(self):
+        return np.zeros(2)
 
+# TODO: SpeedAngleMovementActor is the only one that doesn't follow the actor
+# interface because it has two channels. Modify it so that it fits the interface.
 class SpeedAngleMovementActor:
     """
     Process acceleration and angle changes for SpeedAngleAgents. Update the agents'
@@ -253,7 +257,7 @@ class SpeedAngleMovementActor:
             self.position.modify_position(agent, np.array([x_position, y_position]))
             return agent.position - position_before
 
-class AccelerationMovementActor:
+class AccelerationMovementActor(Actor):
     """
     Process x,y accelerations for AcceleratingAgents, which are given an 'accelerate'
     action. Update the agents' positions based on their new velocity.
@@ -267,35 +271,36 @@ class AccelerationMovementActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position_state=None, velocity_state=None, agents=None, **kwargs):
+    def __init__(self, position_state=None, velocity_state=None, **kwargs):
+        super().__init__(**kwargs)
         self.position_state = position_state
         self.velocity_state = velocity_state
-        self.agents = agents
 
-        for agent in agents.values():
+        for agent in self.agents.values():
             if isinstance(agent, AcceleratingAgent):
-                agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
+                agent.action_space[self.channel] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
     
-    def process_move(self, agent, acceleration, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Update the agent's velocity by applying the acceleration. Then use the
         updated velocity to determine the agent's next position.
-
-        agent (AcceleratingAgent):
-            Agent that is attempting to move.
-        
-        acceleration (np.array):
-            A two-element float array that changes the agent's velocity. New velocity
-            must be within the agent's max speed.
         
         return (np.array):
             Return the change in position.
         """
-        if isinstance(agent, VelocityAgent) and isinstance(agent, PositionAgent):
-            self.velocity_state.modify_velocity(agent, acceleration)
-            position_before = agent.position
-            self.position_state.modify_position(agent, agent.velocity, **kwargs)
-            return agent.position - position_before
+        acceleration = self._get_action_from_dict(action_dict)
+        self.velocity_state.modify_velocity(agent, acceleration)
+        position_before = agent.position
+        self.position_state.modify_position(agent, agent.velocity, **kwargs)
+        return agent.position - position_before
+        
+    @property
+    def channel(self):
+        return 'accelerate'
+    
+    @property
+    def null_value(self):
+        return np.zeros(2)
                 
 
 
@@ -303,7 +308,7 @@ class AccelerationMovementActor:
 # --- Resources and Harvesting --- #
 # -------------------------------- #
 
-class GridResourcesActor:
+class GridResourcesActor(Actor):
     """
     Provides the necessary action space for agents who can harvest resources and
     processes the harvesting action.
@@ -314,33 +319,35 @@ class GridResourcesActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, resources=None, agents=None, **kwargs):
-        self.resources = resources
-        self.agents = agents
+    def __init__(self, resource_state=None, agents=None, **kwargs):
+        super().__init__(**kwargs)
+        self.resource_state = resource_state
 
         for agent in agents.values():
             if isinstance(agent, HarvestingAgent):
                 agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,))
 
-    def process_harvest(self, agent, amount, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Harvest some amount of resources at the agent's position.
-
-        agent (HarvestingAgent):
-            The agent who has chosen to harvest the resource.
-
-        amount (float):
-            The amount of resource the agent wants to harvest.
         
         return (float):
             Return the amount of resources that was actually harvested. This can
             be less than the desired amount if the cell does not have enough resources.
         """
-        if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
-            location = tuple(agent.position)
-            resource_before = self.resources.resources[location]
-            self.resources.modify_resources(location, -amount)
-            return resource_before - self.resources.resources[location]
+        amount = self._get_action_from_dict(action_dict)
+        location = tuple(agent.position)
+        resource_before = self.resource_state.resources[location]
+        self.resource_state.modify_resources(location, -amount)
+        return resource_before - self.resource_state.resources[location]
+    
+    @property
+    def channel(self):
+        return 'harvest'
+    
+    @property
+    def null_value(self):
+        return 0
 
 
 
