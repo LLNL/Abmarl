@@ -192,7 +192,7 @@ class GridMovementActor(Actor):
         """
         move = self._get_action_from_dict(action_dict)
         position_before = agent.position
-        self.position.modify_position(agent, move, **kwargs)
+        self.position_state.modify_position(agent, move, **kwargs)
         return agent.position - position_before
     
     @property
