@@ -219,9 +219,9 @@ class SpeedAngleMovementActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, speed_angle=None, agents=None, **kwargs):
-        self.position = position
-        self.speed_angle = speed_angle
+    def __init__(self, position_state=None, speed_angle_state=None, agents=None, **kwargs):
+        self.position_state = position_state
+        self.speed_angle_state = speed_angle_state
         self.agents = agents
 
         for agent in agents.values():
@@ -250,14 +250,14 @@ class SpeedAngleMovementActor:
             Return the change in position.
         """
         if isinstance(agent, SpeedAngleAgent):
-            self.speed_angle.modify_speed(agent, acceleration[0])
-            self.speed_angle.modify_banking_angle(agent, angle[0])
+            self.speed_angle_state.modify_speed(agent, acceleration[0])
+            self.speed_angle_state.modify_banking_angle(agent, angle[0])
             
             x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
             y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
             
             position_before = agent.position
-            self.position.modify_position(agent, np.array([x_position, y_position]))
+            self.position_state.modify_position(agent, np.array([x_position, y_position]))
             return agent.position - position_before
 
 class AccelerationMovementActor(Actor):
