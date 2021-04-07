@@ -11,8 +11,11 @@ class Actor(ABC):
     """
     Base actor class provides the interface required of all actors.
     """
-    def __init__(self, agents=None, **kwargs):
+    def __init__(self, agents=None, instance=None, space_func=None, **kwargs):
         self.agents = agents
+        for agent in self.agents.values():
+            if isinstance(agent, instance):
+                agent.action_space[self.channel] = space_func(agent)
     
     @abstractmethod
     def process_action(self, agent, action_dict, **kwargs): pass
@@ -58,8 +61,11 @@ class AttackActor(Actor):
         Default 0, indicating that there are no teams and its a free-for-all battle.
     """
     def __init__(self, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):
-        super().__init__(**kwargs)
-
+        super().__init__(
+            isinstance=AttackingAgent,
+            space_func=lambda agent: Discrete(2),
+            **kwargs
+        )
         if team_attack_matrix is None:
             # Default: teams can attack all other teams but not themselves. Agents
             # that are "on team 0" are actually teamless, so they can be attacked
@@ -69,12 +75,7 @@ class AttackActor(Actor):
             self.team_attack_matrix[0,0] = 1
         else:
             self.team_attack_matrix = team_attack_matrix
-
         self.attack_norm = attack_norm
-        
-        for agent in self.agents.values():
-            if isinstance(agent, AttackingAgent):
-                agent.action_space[self.channel] = Discrete(2)
     
     def process_action(self, attacking_agent, action_dict, **kwargs):
         """
@@ -130,11 +131,12 @@ class BroadcastActor(Actor):
         Dictionary of agents.
     """
     def __init__(self, broadcast_state=None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(
+            instance=BroadcastingAgent,
+            space_func=lambda agent: Discrete(2),
+            **kwargs
+        )
         self.broadcast_state = broadcast_state
-        for agent in self.agents.values():
-            if isinstance(agent, BroadcastingAgent):
-                agent.action_space[self.channel] = Discrete(2)
     
     def process_action(self, agent, action_dict, **kwargs):
         """
@@ -173,11 +175,12 @@ class GridMovementActor(Actor):
         The dictionary of agents.
     """
     def __init__(self, position_state=None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(
+            instance=GridMovementAgent,
+            space_func=lambda agent: Box(-agent.move_range, agent.move_range, (2,), np.int),
+            **kwargs
+        )
         self.position_state = position_state
-        for agent in self.agents.values():
-            if isinstance(agent, GridMovementAgent):
-                agent.action_space[self.channel] = Box(-agent.move_range, agent.move_range, (2,), np.int)
 
     def process_action(self, agent, action_dict, **kwargs):
         """
@@ -272,13 +275,13 @@ class AccelerationMovementActor(Actor):
         The dictionary of agents.
     """
     def __init__(self, position_state=None, velocity_state=None, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(
+            instance=AcceleratingAgent,
+            space_func=lambda agent: Box(-agent.max_acceleration, agent.max_acceleration, (2,)),
+            **kwargs
+        )
         self.position_state = position_state
         self.velocity_state = velocity_state
-
-        for agent in self.agents.values():
-            if isinstance(agent, AcceleratingAgent):
-                agent.action_space[self.channel] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
     
     def process_action(self, agent, action_dict, **kwargs):
         """
@@ -319,13 +322,13 @@ class GridResourcesActor(Actor):
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, resource_state=None, agents=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, resource_state=None, **kwargs):
+        super().__init__(
+            instance=HarvestingAgent,
+            space_func=lambda agent: Box(0, agent.max_harvest, (1,)),
+            **kwargs
+        )
         self.resource_state = resource_state
-
-        for agent in agents.values():
-            if isinstance(agent, HarvestingAgent):
-                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,))
 
     def process_action(self, agent, action_dict, **kwargs):
         """
