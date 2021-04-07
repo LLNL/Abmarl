@@ -17,24 +17,24 @@ class Flight(AgentBasedSimulation):
         self.agents = kwargs['agents']
 
         # State
-        self.position = ContinuousPositionState(**kwargs)
-        self.speed_angle = SpeedAngleState(**kwargs)
+        self.position_state = ContinuousPositionState(**kwargs)
+        self.speed_angle_state = SpeedAngleState(**kwargs)
 
         # Actor
-        self.move_actor = SpeedAngleMovementActor(position=self.position, speed_angle=self.speed_angle, **kwargs)
+        self.move_actor = SpeedAngleMovementActor(position_state=self.position_state, speed_angle_state=self.speed_angle_state, **kwargs)
 
         # Observer
         self.speed_observer = SpeedObserver(**kwargs)
         self.angle_observer = AngleObserver(**kwargs)
 
         # Done
-        self.done = TooCloseDone(position=self.position, **kwargs)
+        self.done = TooCloseDone(position=self.position_state, **kwargs)
 
         self.finalize()
 
     def reset(self, **kwargs):
-        self.position.reset(**kwargs)
-        self.speed_angle.reset(**kwargs)
+        self.position_state.reset(**kwargs)
+        self.speed_angle_state.reset(**kwargs)
     
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
@@ -47,9 +47,9 @@ class Flight(AgentBasedSimulation):
         ax = fig.gca()
 
         # Draw the agents
-        ax.set(xlim=(0, self.position.region), ylim=(0, self.position.region))
-        ax.set_xticks(np.arange(0, self.position.region, 1))
-        ax.set_yticks(np.arange(0, self.position.region, 1))
+        ax.set(xlim=(0, self.position_state.region), ylim=(0, self.position_state.region))
+        ax.set_xticks(np.arange(0, self.position_state.region, 1))
+        ax.set_yticks(np.arange(0, self.position_state.region, 1))
 
         agents_x = [agent.position[0] for agent in self.agents.values()]
         agents_y = [agent.position[1] for agent in self.agents.values()]

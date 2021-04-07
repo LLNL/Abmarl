@@ -28,7 +28,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.team_observer = TeamObserver(**kwargs)
 
         # Actor Components
-        self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
+        self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)
         self.attack_actor = AttackActor(**kwargs)
 
         # Done components
@@ -44,13 +44,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
+            attacked_agent = self.attack_actor.process_action(attacking_agent, action, **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
     
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
+            self.move_actor.process_action(self.agents[agent_id], action, **kwargs)
     
     def render(self, fig=None, **kwargs):
         fig.clear()

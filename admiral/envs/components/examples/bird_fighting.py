@@ -22,7 +22,7 @@ class FightingBirdsEnv(AgentBasedSimulation):
         self.life_state = LifeState(**kwargs)
 
         # Actor
-        self.move_actor = SpeedAngleMovementActor(position=self.position_state, speed_angle=self.speed_angle_state, **kwargs)
+        self.move_actor = SpeedAngleMovementActor(position_state=self.position_state, speed_angle_state=self.speed_angle_state, **kwargs)
         self.attack_actor = AttackActor(**kwargs)
 
         # Observer
@@ -46,7 +46,7 @@ class FightingBirdsEnv(AgentBasedSimulation):
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
+            attacked_agent = self.attack_actor.process_action(attacking_agent, action, **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
 

@@ -21,7 +21,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.life_state = LifeState(**kwargs)
 
         # Actor components
-        self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
+        self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)
 
         # Observers
         self.observer = GridPositionTeamBasedObserver(position=self.position_state, **kwargs)
@@ -38,7 +38,7 @@ class SimpleGridObservations(AgentBasedSimulation):
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
+            self.move_actor.process_action(self.agents[agent_id], action, **kwargs)
 
         return {'agent0': self.get_obs('agent0')}
     
