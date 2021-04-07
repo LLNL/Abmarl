@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod, abstractproperty
 
 from gym.spaces import Discrete, Box
 import numpy as np
@@ -6,11 +7,30 @@ from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, Har
     SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent, \
     CollisionAgent, BroadcastingAgent
 
+class Actor(ABC):
+    """
+    Base actor class provides the interface required of all actors.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+    
+    @abstractmethod
+    def process_action(self, agent, action_dict, **kwargs): pass
+
+    def _get_action_from_dict(self, action_dict, **kwargs):
+        return action_dict.get(self.channel, self.null_value)
+
+    @abstractproperty
+    def channel(self): pass
+
+    @abstractproperty
+    def null_value(self): pass
+
 # ----------------- #
 # --- Attacking --- #
 # ----------------- #
 
-class AttackActor:
+class AttackActor(Actor):
     """
     Agents can attack other agents within their attack radius. If there are multiple
     attackable agents in the radius, then one will be randomly chosen. Attackable
@@ -37,7 +57,9 @@ class AttackActor:
         if that is not specified here.
         Default 0, indicating that there are no teams and its a free-for-all battle.
     """
-    def __init__(self, agents=None, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):      
+    def __init__(self, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):
+        super().__init__(**kwargs)
+
         if team_attack_matrix is None:
             # Default: teams can attack all other teams but not themselves. Agents
             # that are "on team 0" are actually teamless, so they can be attacked
@@ -49,27 +71,26 @@ class AttackActor:
             self.team_attack_matrix = team_attack_matrix
 
         self.attack_norm = attack_norm
-        self.agents = agents
         
-        for agent in agents.values():
+        for agent in self.agents.values():
             if isinstance(agent, AttackingAgent):
-                agent.action_space['attack'] = Discrete(2)
+                agent.action_space[self.channel] = Discrete(2)
     
-    def process_attack(self, attacking_agent, attack, **kwargs):
+    def process_action(self, attacking_agent, action_dict, **kwargs):
         """
         If the agent has chosen to attack, then determine which agent got attacked.
 
         attacking_agent (AttackingAgent):
             The agent that we are processing.
 
-        attack (bool):
-            True if the agent has chosen to attack, otherwise False.
+        action_dict (dict):
+            If the agent has chosen to attack, then we will process that attack.
 
         return (Agent):
             Return the attacked agent object. This can be None if no agent was
             attacked.
         """
-        if isinstance(attacking_agent, AttackingAgent) and attack:
+        if self._get_action_from_dict(action_dict):
             for attacked_agent in self.agents.values():
                 if attacked_agent.id == attacking_agent.id:
                     # Cannot attack yourself
@@ -89,6 +110,14 @@ class AttackActor:
                 else:
                     # The agent was successfully attacked!
                     return attacked_agent
+    
+    @property
+    def channel(self):
+        return 'attack'
+    
+    @property
+    def null_value(self):
+        return False
 
 
 
