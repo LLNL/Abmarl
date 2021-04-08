@@ -20,11 +20,10 @@ class Actor(ABC):
             the agent will receive the action channel.
         
         space_func (function):
-            A function 
+            A function that takes the agent as input and outputs the action space.
     """
     def __init__(self, agents=None, instance=None, space_func=None, **kwargs):
         self.agents = agents
-        
         for agent in self.agents.values():
             if isinstance(agent, instance):
                 agent.action_space[self.channel] = space_func(agent)

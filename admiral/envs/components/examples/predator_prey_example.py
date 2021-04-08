@@ -27,8 +27,8 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         self.resource_state = GridResourceState(**kwargs)
 
         # Observer components
-        self.position_observer = GridPositionTeamBasedObserver(position=self.position_state, **kwargs)
-        self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
+        self.position_observer = GridPositionTeamBasedObserver(position_state=self.position_state, **kwargs)
+        self.resource_observer = GridResourceObserver(resource_state=self.resource_state, **kwargs)
 
         # Actor components
         self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)

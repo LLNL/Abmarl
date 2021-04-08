@@ -1,4 +1,6 @@
 
+from abc import ABC, abstractmethod, abstractproperty
+
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
@@ -7,22 +9,54 @@ from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAge
     ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, SpeedAngleAgent, \
     VelocityAgent, BroadcastingAgent
 
+class Observer(ABC):
+    """
+    Base observer class provides the interface required of all observers. Setup
+    the agents' observation space according to the Observer's channel.
+
+        agents (dict):
+            The dictionary of agents.
+
+        instance (Agent):
+            An Agent class. This is used in the isinstance check to determine if
+            the agent will receive the observation channel.
+        
+        space_func (function):
+            A function that takes the agent and other as input and outputs the
+            observation space.
+    """
+    def __init__(self, agents=None, instance=None, space_func=None, **kwargs):
+        self.agents = agents
+        for agent in self.agents.values():
+            if isinstance(agent, instance):
+                agent.observation_space[self.channel] = space_func(agent)
+    
+    @abstractmethod
+    def get_obs(self, agent, **kwargs): pass
+
+    @abstractproperty
+    def channel(self): pass
+
+    @abstractproperty
+    def null_value(self): pass
+    
+
 # --------------------- #
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastObserver:
+class BroadcastObserver(Observer):
     """
     Observe the broadcast state of broadcasting agents.
     """
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-
-        for agent in agents.values():
-            if isinstance(agent, BroadcastObservingAgent):
-                agent.observation_space[self.channel] = Dict({
-                    other: Box(-1, 1, (1,)) for other in self.agents.values()
-                })
+    def __init__(self, **kwargs):
+        super().__init__(
+            instance=BroadcastObservingAgent,
+            space_func=lambda agent: Dict({
+                other.id: Box(-1, 1, (1,)) for other in self.agents.values()
+            }),
+            **kwargs
+        )
         
     def get_obs(self, agent, **kwargs):
         if isinstance(agent, BroadcastObservingAgent):
@@ -48,18 +82,18 @@ class BroadcastObserver:
 # --- Health and Life --- #
 # ----------------------- #
 
-class HealthObserver:
+class HealthObserver(Observer):
     """
     Observe the health state of all the agents in the simulator.
     """
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-
-        for agent in agents.values():
-            if isinstance(agent, HealthObservingAgent):
-                agent.observation_space[self.channel] = Dict(
-                    {other.id: Box(-1, other.max_health, (1,)) for other in self.agents.values()}
-                )
+    def __init__(self, **kwargs):
+        super().__init__(
+            instance=HealthObservingAgent,
+            space_func=lambda agent: Dict(
+                {other.id: Box(-1, other.max_health, (1,)) for other in self.agents.values()}
+            ),
+            **kwargs
+        )
     
     def get_obs(self, agent, **kwargs):
         """
@@ -82,18 +116,18 @@ class HealthObserver:
         return -1
 
 
-class LifeObserver:
+class LifeObserver(Observer):
     """
     Observe the life state of all the agents in the simulator.
     """
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-
-        for agent in agents.values():
-            if isinstance(agent, LifeObservingAgent):
-                agent.observation_space[self.channel] = Dict({
-                    other.id: Box(-1, 1, (1,), np.int) for other in self.agents.values()
-                })
+    def __init__(self, **kwargs):
+        super().__init__(
+            instance=LifeObservingAgent,
+            space_func=lambda agent: Dict({
+                other.id: Box(-1, 1, (1,), np.int) for other in self.agents.values()
+            }),
+            **kwargs
+        )
     
     def get_obs(self, agent, **kwargs):
         """
@@ -121,19 +155,19 @@ class LifeObserver:
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionObserver:
+class PositionObserver(Observer):
     """
     Observe the positions of all the agents in the simulator.
     """
-    def __init__(self, position=None, agents=None, **kwargs):
-        self.position = position
-        self.agents = agents
-        
-        for agent in agents.values():
-            if isinstance(agent, PositionObservingAgent):
-                agent.observation_space[self.channel] = Dict({
-                    other.id: Box(-1, self.position.region, (2,), np.int) for other in agents.values()
-                })
+    def __init__(self, position_state=None, **kwargs):
+        self.position_state = position_state
+        super().__init__(
+            instance=PositionObservingAgent,
+            space_func=lambda agent: Dict({
+                other.id: Box(-1, self.position_state.region, (2,), np.int) for other in self.agents.values()
+            }),
+            **kwargs
+        )
 
     def get_obs(self, agent, **kwargs):
         """
@@ -153,19 +187,19 @@ class PositionObserver:
         return np.array([-1, -1])
 
 
-class RelativePositionObserver:
+class RelativePositionObserver(Observer):
     """
     Observe the relative positions of agents in the simulator.
     """
-    def __init__(self, position=None, agents=None, **kwargs):
-        self.position = position
-        self.agents = agents
-        
-        for agent in agents.values():
-            if isinstance(agent, PositionObservingAgent):
-                agent.observation_space[self.channel] = Dict({
-                    other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values()
-                })
+    def __init__(self, position_state=None, **kwargs):
+        self.position_state = position_state
+        super().__init__(
+            instance=PositionObservingAgent,
+            space_func=lambda agent: Dict({
+                other.id: Box(-self.position_state.region, self.position_state.region, (2,), np.int) for other in self.agents.values()
+            }),
+            **kwargs
+        )
 
     def get_obs(self, agent, **kwargs):
         """
@@ -187,7 +221,7 @@ class RelativePositionObserver:
     
     @property
     def null_value(self):
-        return np.array([-self.position.region, -self.position.region])
+        return np.array([-self.position_state.region, -self.position_state.region])
 
 
 class GridPositionBasedObserver:
@@ -204,8 +238,8 @@ class GridPositionBasedObserver:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, agents=None, **kwargs):
-        self.position = position
+    def __init__(self, position_state=None, agents=None, **kwargs):
+        self.position_state = position_state
         self.agents = agents
         
         for agent in agents.values():
@@ -229,10 +263,10 @@ class GridPositionBasedObserver:
                 signal[0:my_agent.agent_view - my_agent.position[0], :] = -1
             if my_agent.agent_view - my_agent.position[1] >= 0: # Left end
                 signal[:, 0:my_agent.agent_view - my_agent.position[1]] = -1
-            if self.position.region - my_agent.position[0] - my_agent.agent_view - 1 < 0: # Bottom end
-                signal[self.position.region - my_agent.position[0] - my_agent.agent_view - 1:,:] = -1
-            if self.position.region - my_agent.position[1] - my_agent.agent_view - 1 < 0: # Right end
-                signal[:, self.position.region - my_agent.position[1] - my_agent.agent_view - 1:] = -1
+            if self.position_state.region - my_agent.position[0] - my_agent.agent_view - 1 < 0: # Bottom end
+                signal[self.position_state.region - my_agent.position[0] - my_agent.agent_view - 1:,:] = -1
+            if self.position_state.region - my_agent.position[1] - my_agent.agent_view - 1 < 0: # Right end
+                signal[:, self.position_state.region - my_agent.position[1] - my_agent.agent_view - 1:] = -1
 
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
@@ -266,8 +300,8 @@ class GridPositionTeamBasedObserver:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, number_of_teams=0, agents=None, **kwargs):
-        self.position = position
+    def __init__(self, position_state=None, number_of_teams=0, agents=None, **kwargs):
+        self.position_state = position_state
         self.number_of_teams = number_of_teams + 1
         self.agents = agents
 
@@ -293,10 +327,10 @@ class GridPositionTeamBasedObserver:
                 signal[0:my_agent.agent_view - my_agent.position[0], :] = -1
             if my_agent.agent_view - my_agent.position[1] >= 0: # Left end
                 signal[:, 0:my_agent.agent_view - my_agent.position[1]] = -1
-            if self.position.region - my_agent.position[0] - my_agent.agent_view - 1 < 0: # Bottom end
-                signal[self.position.region - my_agent.position[0] - my_agent.agent_view - 1:,:] = -1
-            if self.position.region - my_agent.position[1] - my_agent.agent_view - 1 < 0: # Right end
-                signal[:, self.position.region - my_agent.position[1] - my_agent.agent_view - 1:] = -1
+            if self.position_state.region - my_agent.position[0] - my_agent.agent_view - 1 < 0: # Bottom end
+                signal[self.position_state.region - my_agent.position[0] - my_agent.agent_view - 1:,:] = -1
+            if self.position_state.region - my_agent.position[1] - my_agent.agent_view - 1 < 0: # Right end
+                signal[:, self.position_state.region - my_agent.position[1] - my_agent.agent_view - 1:] = -1
 
             # Repeat the boundaries signal for all teams
             signal = np.repeat(signal[:, :, np.newaxis], self.number_of_teams, axis=2)
@@ -316,22 +350,25 @@ class GridPositionTeamBasedObserver:
         else:
             return {}
 
-class SpeedObserver:
+class SpeedObserver(Observer):
     """
     Observe the speed of all the agents in the simulator.
     """
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-        
-        for agent in agents.values():
-            if isinstance(agent, SpeedAngleObservingAgent):
-                obs_space = {}
-                for other in self.agents.values():
-                    if isinstance(other, SpeedAngleAgent):
-                        obs_space[other.id] = Box(-1, other.max_speed, (1,))
-                    else:
-                        obs_space[other.id] = Box(-1, -1, (1,))
-                agent.observation_space[self.channel] = Dict(obs_space)
+    def __init__(self, **kwargs):
+        super().__init__(
+            instance=SpeedAngleObservingAgent,
+            space_func=self._space_func,
+            **kwargs
+        )
+    
+    def _space_func(self, agent):
+        obs_space = {}
+        for other in self.agents.values():
+            if isinstance(other, SpeedAngleAgent):
+                obs_space[other.id] = Box(-1, other.max_speed, (1,))
+            else:
+                obs_space[other.id] = Box(-1, -1, (1,))
+        return Dict(obs_space)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -357,18 +394,18 @@ class SpeedObserver:
         return -1
 
 
-class AngleObserver:
+class AngleObserver(Observer):
     """
     Observe the angle of all the agents in the simulator.
     """
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-
-        for agent in agents.values():
-            if isinstance(agent, SpeedAngleObservingAgent):
-                agent.observation_space[self.channel] = Dict({
-                    other.id: Box(-1, 360, (1,)) for other in agents.values()
-                })
+    def __init__(self, **kwargs):
+        super().__init__(
+            instance=SpeedAngleObservingAgent,
+            space_func=lambda agent: Dict({
+                other.id: Box(-1, 360, (1,)) for other in self.agents.values()
+            }),
+            **kwargs
+        )
 
     def get_obs(self, agent, **kwargs):
         """
@@ -394,22 +431,25 @@ class AngleObserver:
         return -1
 
 
-class VelocityObserver:
+class VelocityObserver(Observer):
     """
     Observe the velocity of all the agents in the simulator.
     """
-    def __init__(self, agents=None, **kwargs):
-        self.agents = agents
-        
-        for agent in agents.values():
-            if isinstance(agent, VelocityObservingAgent):
-                obs_space = {}
-                for other in self.agents.values():
-                    if isinstance(other, VelocityAgent):
-                        obs_space[other.id] = Box(-agent.max_speed, agent.max_speed, (2,))
-                    else:
-                        obs_space[other.id] = Box(0, 0, (2,))
-                agent.observation_space[self.channel] = Dict(obs_space)
+    def __init__(self, **kwargs):
+        super().__init__(
+            instance=VelocityObservingAgent,
+            space_func=self._space_func,
+            **kwargs
+        )
+    
+    def _space_func(self, agent):
+        obs_space = {}
+        for other in self.agents.values():
+            if isinstance(other, VelocityAgent):
+                obs_space[other.id] = Box(-agent.max_speed, agent.max_speed, (2,))
+            else:
+                obs_space[other.id] = Box(0, 0, (2,))
+        return Dict(obs_space)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -452,13 +492,13 @@ class GridResourceObserver:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, resources=None, agents=None, **kwargs):
-        self.resources = resources
+    def __init__(self, resource_state=None, agents=None, **kwargs):
+        self.resource_state = resource_state
         self.agents = agents
 
         for agent in agents.values():
             if isinstance(agent, ResourceObservingAgent):
-                agent.observation_space['resources'] = Box(-1, self.resources.max_value, (agent.resource_view*2+1, agent.resource_view*2+1))
+                agent.observation_space['resources'] = Box(-1, self.resource_state.max_value, (agent.resource_view*2+1, agent.resource_view*2+1))
 
     def get_obs(self, agent, **kwargs):
         """
@@ -473,11 +513,11 @@ class GridResourceObserver:
             # can be written in the below vectorized form.
             (r,c) = agent.position
             r_lower = max([0, r-agent.resource_view])
-            r_upper = min([self.resources.region-1, r+agent.resource_view])+1
+            r_upper = min([self.resource_state.region-1, r+agent.resource_view])+1
             c_lower = max([0, c-agent.resource_view])
-            c_upper = min([self.resources.region-1, c+agent.resource_view])+1
+            c_upper = min([self.resource_state.region-1, c+agent.resource_view])+1
             signal[(r_lower+agent.resource_view-r):(r_upper+agent.resource_view-r),(c_lower+agent.resource_view-c):(c_upper+agent.resource_view-c)] = \
-                self.resources.resources[r_lower:r_upper, c_lower:c_upper]
+                self.resource_state.resources[r_lower:r_upper, c_lower:c_upper]
             return {'resources': signal}
         else:
             return {}
@@ -488,19 +528,19 @@ class GridResourceObserver:
 # --- Team --- #
 # ------------ #
 
-class TeamObserver:
+class TeamObserver(Observer):
     """
     Observe the team of each agent in the simulator.
     """
-    def __init__(self, number_of_teams=0, agents=None, **kwargs):
+    def __init__(self, number_of_teams=0, **kwargs):
         self.number_of_teams = number_of_teams
-        self.agents = agents
-    
-        for agent in agents.values():
-            if isinstance(agent, TeamObservingAgent):
-                agent.observation_space[self.channel] = Dict({
-                    other.id: Box(-1, self.number_of_teams, (1,), np.int) for other in agents.values()
-                })
+        super().__init__(
+            instance=TeamObservingAgent,
+            space_func=lambda agent: Dict({
+                other.id: Box(-1, self.number_of_teams, (1,), np.int) for other in self.agents.values()
+            }),
+            **kwargs
+        )
     
     def get_obs(self, agent, **kwargs):
         """

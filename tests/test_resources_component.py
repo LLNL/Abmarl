@@ -27,7 +27,7 @@ def test_grid_resources_components():
 
     state = GridResourceState(agents=agents, initial_resources=initial_resources, regrow_rate=0.4)
     actor = GridResourcesActor(resource_state=state, agents=agents)
-    observer = GridResourceObserver(resources=state, agents=agents)
+    observer = GridResourceObserver(resource_state=state, agents=agents)
 
     state.reset()
     for agent in agents.values():

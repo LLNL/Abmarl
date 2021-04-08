@@ -22,7 +22,7 @@ def test_grid_position_observer():
     
     state = GridPositionState(agents=agents, region=5)
     life = LifeState(agents=agents)
-    observer = GridPositionBasedObserver(position=state, agents=agents)
+    observer = GridPositionBasedObserver(position_state=state, agents=agents)
     state.reset()
     life.reset()
 
@@ -76,7 +76,7 @@ def test_grid_team_position_observer():
     
     state = GridPositionState(agents=agents, region=5)
     life = LifeState(agents=agents)
-    observer = GridPositionTeamBasedObserver(position=state, number_of_teams=3, agents=agents)
+    observer = GridPositionTeamBasedObserver(position_state=state, number_of_teams=3, agents=agents)
     state.reset()
     life.reset()
 
@@ -212,7 +212,7 @@ def test_relative_position_observer():
     }
     
     state = GridPositionState(agents=agents, region=5)
-    observer = RelativePositionObserver(position=state, agents=agents)
+    observer = RelativePositionObserver(position_state=state, agents=agents)
     state.reset()
 
     assert observer.get_obs(agents['agent0'])['relative_position']['agent1'][0] == 2
