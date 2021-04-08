@@ -22,10 +22,10 @@ def test_collision():
     movement_actor = AccelerationMovementActor(position_state=position_state, velocity_state=velocity_state, agents=agents)
     collision_actor = ContinuousCollisionActor(position_state=position_state, velocity_state=velocity_state, agents=agents)
     
-    np.testing.assert_array_equal(movement_actor.process_move(agents['agent0'], np.zeros(2)), np.array([1., 1.]))
+    np.testing.assert_array_equal(movement_actor.process_action(agents['agent0'], {'accelerate': np.zeros(2)}), np.array([1., 1.]))
     np.testing.assert_array_equal(agents['agent0'].position, np.array([2., 2.]))
     np.testing.assert_array_equal(agents['agent0'].velocity, np.array([1., 1.]))
-    np.testing.assert_array_equal(movement_actor.process_move(agents['agent1'], np.zeros(2)), np.array([-1., 1.]))
+    np.testing.assert_array_equal(movement_actor.process_action(agents['agent1'], {'accelerate': np.zeros(2)}), np.array([-1., 1.]))
     np.testing.assert_array_equal(agents['agent1'].position, np.array([3., 2.]))
     np.testing.assert_array_equal(agents['agent1'].velocity, np.array([-1., 1.]))
 
@@ -35,5 +35,5 @@ def test_collision():
     np.testing.assert_array_equal(agents['agent0'].velocity, np.array([-1., 1.]))
     np.testing.assert_array_equal(agents['agent1'].velocity, np.array([1., 1.]))
 
-    np.testing.assert_array_equal(movement_actor.process_move(agents['agent0'], np.zeros(2)), np.array([-1., 1.]))
-    np.testing.assert_array_equal(movement_actor.process_move(agents['agent1'], np.zeros(2)), np.array([1., 1.]))
+    np.testing.assert_array_equal(movement_actor.process_action(agents['agent0'], {'accelerate': np.zeros(2)}), np.array([-1., 1.]))
+    np.testing.assert_array_equal(movement_actor.process_action(agents['agent1'], {'accelerate': np.zeros(2)}), np.array([1., 1.]))

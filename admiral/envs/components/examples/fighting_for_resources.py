@@ -30,8 +30,8 @@ class FightForResourcesEnv(AgentBasedSimulation):
         self.life_observer = LifeObserver(**kwargs)
 
         # Actor components
-        self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        self.resource_actor = GridResourcesActor(resources=self.resource_state, **kwargs)
+        self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)
+        self.resource_actor = GridResourcesActor(resource_state=self.resource_state, **kwargs)
         self.attack_actor = AttackActor(**kwargs)
 
         # Done components
@@ -48,20 +48,20 @@ class FightForResourcesEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            harvested_amount = self.resource_actor.process_harvest(agent, action.get('harvest', 0), **kwargs)
+            harvested_amount = self.resource_actor.process_action(agent, action, **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
         
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
+            attacked_agent = self.attack_actor.process_action(agent, action, **kwargs)
             if attacked_agent is not None:
                 self.life_state.modify_health(attacked_agent, -attacking_agent.attack_strength)
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
+            self.move_actor.process_action(self.agents[agent_id], action, **kwargs)
 
         # Apply entropy to all agents
         for agent_id in action_dict:

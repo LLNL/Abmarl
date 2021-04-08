@@ -16,26 +16,26 @@ def test_grid_movement_component():
         'agent3': GridMovementTestAgent(id='agent3', initial_position=np.array([8, 4]), move_range=1),
     }
     state = GridPositionState(region=10, agents=agents)
-    actor = GridMovementActor(position=state, agents=agents)
+    actor = GridMovementActor(position_state=state, agents=agents)
 
     for agent in agents.values():
         assert 'move' in agent.action_space
 
     state.reset()
 
-    np.testing.assert_array_equal(actor.process_move(agents['agent0'], np.array([-1,  1])), np.array([-1,  1]))
-    np.testing.assert_array_equal(actor.process_move(agents['agent1'], np.array([ 0,  1])), np.array([ 0,  1]))
-    np.testing.assert_array_equal(actor.process_move(agents['agent2'], np.array([ 0, -1])), np.array([ 0, -1]))
-    np.testing.assert_array_equal(actor.process_move(agents['agent3'], np.array([ 1,  0])), np.array([ 1,  0]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent0'], {'move': np.array([-1,  1])}), np.array([-1,  1]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent1'], {'move': np.array([ 0,  1])}), np.array([ 0,  1]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent2'], {'move': np.array([ 0, -1])}), np.array([ 0, -1]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent3'], {'move': np.array([ 1,  0])}), np.array([ 1,  0]))
     np.testing.assert_array_equal(agents['agent0'].position, np.array([5, 5]))
     np.testing.assert_array_equal(agents['agent1'].position, np.array([3, 4]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 0]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([9, 4]))
 
-    np.testing.assert_array_equal(actor.process_move(agents['agent0'], np.array([ 2, -2])), np.array([ 2, -2]))
-    np.testing.assert_array_equal(actor.process_move(agents['agent1'], np.array([-3,  0])), np.array([-3,  0]))
-    np.testing.assert_array_equal(actor.process_move(agents['agent2'], np.array([-1,  0])), np.array([ 0,  0]))
-    np.testing.assert_array_equal(actor.process_move(agents['agent3'], np.array([ 1,  1])), np.array([ 0,  0]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent0'], {'move': np.array([ 2, -2])}), np.array([ 2, -2]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent1'], {'move': np.array([-3,  0])}), np.array([-3,  0]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent2'], {'move': np.array([-1,  0])}), np.array([ 0,  0]))
+    np.testing.assert_array_equal(actor.process_action(agents['agent3'], {'move': np.array([ 1,  1])}), np.array([ 0,  0]))
     np.testing.assert_array_equal(agents['agent0'].position, np.array([7, 3]))
     np.testing.assert_array_equal(agents['agent1'].position, np.array([0, 4]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 0]))
@@ -64,7 +64,7 @@ def test_speed_angle_movement_component():
     }
     position_state = ContinuousPositionState(region=10, agents=agents)
     speed_angle_state = SpeedAngleState(agents=agents)
-    actor = SpeedAngleMovementActor(position=position_state, speed_angle=speed_angle_state, agents=agents)
+    actor = SpeedAngleMovementActor(position_state=position_state, speed_angle_state=speed_angle_state, agents=agents)
 
     for agent in agents.values():
         assert 'accelerate' in agent.action_space
@@ -120,11 +120,11 @@ def test_acceleration_movement_component():
         np.testing.assert_array_equal(agent.velocity, agent.initial_velocity)
 
     
-    assert np.allclose(actor.process_move(agents['agent0'], np.array([-1, 0])), np.array([0., 0.]))
+    assert np.allclose(actor.process_action(agents['agent0'], {'accelerate': np.array([-1, 0])}), np.array([0., 0.]))
     assert np.allclose(agents['agent0'].position, np.array([2.3, 4.5]))
-    assert np.allclose(actor.process_move(agents['agent1'], np.array([-1, 1])), np.array([-0.70710678,  0.70710678]))
+    assert np.allclose(actor.process_action(agents['agent1'], {'accelerate': np.array([-1, 1])}), np.array([-0.70710678,  0.70710678]))
     assert np.allclose(agents['agent1'].position, np.array([7.79289322, 1.70710678]))
-    assert np.allclose(actor.process_move(agents['agent2'], np.array([0, 0])), np.array([-1, -1]))
+    assert np.allclose(actor.process_action(agents['agent2'], {'accelerate': np.array([0, 0])}), np.array([-1, -1]))
     assert np.allclose(agents['agent2'].position, np.array([4, 4]))
 
     velocity_state.apply_friction(agents['agent0'])

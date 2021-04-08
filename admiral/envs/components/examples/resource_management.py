@@ -30,8 +30,8 @@ class ResourceManagementEnv(AgentBasedSimulation):
         self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
 
         # Actor components
-        self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
-        self.resource_actor = GridResourcesActor(resources=self.resource_state, **kwargs)
+        self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)
+        self.resource_actor = GridResourcesActor(resource_state=self.resource_state, **kwargs)
 
         # Done components
         self.done = DeadDone(**kwargs)
@@ -47,13 +47,13 @@ class ResourceManagementEnv(AgentBasedSimulation):
         # Process harvesting
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            harvested_amount = self.resource_actor.process_harvest(agent, action.get('harvest', 0), **kwargs)
+            harvested_amount = self.resource_actor.process_action(agent, action, **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
 
         # Process movement
         for agent_id, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent_id], action.get('move', np.zeros(2)), **kwargs)
+            self.move_actor.process_action(self.agents[agent_id], action, **kwargs)
 
         # Apply entropy to all agents
         for agent_id in action_dict:
