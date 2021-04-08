@@ -16,12 +16,40 @@ class Observer(ABC):
 
         agents (dict):
             The dictionary of agents.
+    """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
+    
+    # TODO: WE hsould probably make two types of observers, one for simple space
+    # and another for complex space.
+    def _set_obs_space_simple(self, instance, space_func, **kwargs):
+        """
+        Observers that don't depend on the type of the other agents can use this
+        method.
+
+        instance (Agent):
+            An Agent class. This is used in the isinstance check to determine if
+            the agent will receive the observation channel.
+        
+        space_func (function):
+            A function that takes the other agent as input and outputs the
+            observation space.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, instance):
+                agent.observation_space[self.channel] = Dict({
+                    other.id: space_func(other) for other in self.agents.values()
+                })
+
+    def _set_obs_space(self, instance, other_instance, space_func, alt_space_func, **kwargs):
+        """
+        Observers that depend on the type of the other agents must use this method.
 
         instance (Agent):
             An Agent class. This is used in the isinstance check to determine if
             the agent will receive the observation channel.
 
-        instance (Agent):
+        other_instance (Agent):
             An Agent class. This is used in the isinstance check on the other agents
             to determine whether to use the space_func or the alt_space_func.
         
@@ -32,9 +60,7 @@ class Observer(ABC):
         alt_space_func (function):
             Use this function for cases when the isinstance check fails on the
             other agent. Function does not have inputs and outputs observation space.
-    """
-    def __init__(self, agents=None, instance=None, other_instance=Agent, space_func=None, alt_space_func=None, **kwargs):
-        self.agents = agents
+        """
         for agent in self.agents.values():
             if isinstance(agent, instance):
                 obs_space = {}
@@ -81,11 +107,8 @@ class BroadcastObserver(Observer):
     Observe the broadcast state of broadcasting agents.
     """
     def __init__(self, **kwargs):
-        super().__init__(
-            instance=BroadcastObservingAgent,
-            space_func=lambda *args: Box(-1, 1, (1,)),
-            **kwargs
-        )
+        super().__init__(**kwargs)
+        self._set_obs_space_simple(BroadcastObservingAgent, lambda *args: Box(-1, 1, (1,)), **kwargs)
         
     def get_obs(self, agent, **kwargs):
         return self._get_obs(
@@ -113,11 +136,8 @@ class HealthObserver(Observer):
     Observe the health state of all the agents in the simulator.
     """
     def __init__(self, **kwargs):
-        super().__init__(
-            instance=HealthObservingAgent,
-            space_func=lambda other: Box(-1, other.max_health, (1,)),
-            **kwargs
-        )
+        super().__init__(**kwargs)
+        self._set_obs_space_simple(HealthObservingAgent, lambda other: Box(-1, other.max_health, (1,)), **kwargs)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -147,11 +167,8 @@ class LifeObserver(Observer):
     Observe the life state of all the agents in the simulator.
     """
     def __init__(self, **kwargs):
-        super().__init__(
-            instance=LifeObservingAgent,
-            space_func=lambda *args: Box(-1, 1, (1,), np.int),
-            **kwargs
-        )
+        super().__init__(**kwargs)
+        self._set_obs_space_simple(LifeObservingAgent, lambda *args: Box(-1, 1, (1,), np.int), **kwargs)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -186,12 +203,9 @@ class PositionObserver(Observer):
     Observe the positions of all the agents in the simulator.
     """
     def __init__(self, position_state=None, **kwargs):
+        super().__init__(**kwargs)
         self.position_state = position_state
-        super().__init__(
-            instance=PositionObservingAgent,
-            space_func=lambda *args: Box(-1, self.position_state.region, (2,), np.int),
-            **kwargs
-        )
+        self._set_obs_space_simple(PositionObservingAgent, lambda *args: Box(-1, self.position_state.region, (2,), np.int), **kwargs)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -217,12 +231,9 @@ class RelativePositionObserver(Observer):
     Observe the relative positions of agents in the simulator.
     """
     def __init__(self, position_state=None, **kwargs):
+        super().__init__(**kwargs)
         self.position_state = position_state
-        super().__init__(
-            instance=PositionObservingAgent,
-            space_func=lambda *args: Box(-self.position_state.region, self.position_state.region, (2,), np.int),
-            **kwargs
-        )
+        self._set_obs_space_simple(PositionObservingAgent, lambda *args: Box(-self.position_state.region, self.position_state.region, (2,), np.int), **kwargs)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -378,13 +389,8 @@ class SpeedObserver(Observer):
     Observe the speed of all the agents in the simulator.
     """
     def __init__(self, **kwargs):
-        super().__init__(
-            instance=SpeedAngleObservingAgent,
-            other_instance=SpeedAngleAgent,
-            space_func=lambda other: Box(-1, other.max_speed, (1,)),
-            alt_space_func=lambda: Box(-1, -1, (1,)),
-            **kwargs
-        )
+        super().__init__(**kwargs)
+        self._set_obs_space(SpeedAngleObservingAgent, SpeedAngleAgent, lambda other: Box(-1, other.max_speed, (1,)), lambda: Box(-1, -1, (1,)), **kwargs)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -412,11 +418,8 @@ class AngleObserver(Observer):
     Observe the angle of all the agents in the simulator.
     """
     def __init__(self, **kwargs):
-        super().__init__(
-            instance=SpeedAngleObservingAgent,
-            space_func=lambda *args: Box(-1, 360, (1,)),
-            **kwargs
-        )
+        super().__init__(**kwargs)
+        self._set_obs_space(SpeedAngleObservingAgent, SpeedAngleAgent, lambda *args: Box(-1, 360, (1,)), lambda *args: Box(-1, -1, (1,)), **kwargs)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -444,13 +447,8 @@ class VelocityObserver(Observer):
     Observe the velocity of all the agents in the simulator.
     """
     def __init__(self, **kwargs):
-        super().__init__(
-            instance=VelocityObservingAgent,
-            other_instance=VelocityAgent,
-            space_func=lambda other: Box(-other.max_speed, other.max_speed, (2,)),
-            alt_space_func=lambda: Box(0, 0, (2,)),
-            **kwargs
-        )
+        super().__init__(**kwargs)
+        self._set_obs_space(VelocityObservingAgent, VelocityAgent, lambda other: Box(-other.max_speed, other.max_speed, (2,)), lambda: Box(0, 0, (2,)), **kwargs)
     
     def get_obs(self, agent, **kwargs):
         """
@@ -531,12 +529,9 @@ class TeamObserver(Observer):
     Observe the team of each agent in the simulator.
     """
     def __init__(self, number_of_teams=0, **kwargs):
+        super().__init__(**kwargs)
         self.number_of_teams = number_of_teams
-        super().__init__(
-            instance=TeamObservingAgent,
-            space_func=lambda *args: Box(-1, self.number_of_teams, (1,), np.int),
-            **kwargs
-        )
+        self._set_obs_space_simple(TeamObservingAgent, lambda *args: Box(-1, self.number_of_teams, (1,), np.int), **kwargs)
     
     def get_obs(self, agent, **kwargs):
         """
