@@ -26,7 +26,7 @@ class Observer(ABC):
             to determine whether to use the space_func or the alt_space_func.
         
         space_func (function):
-            A function that takes the agent and other as input and outputs the
+            A function that takes the other agent as input and outputs the
             observation space.
         
         alt_space_func (function):
@@ -40,7 +40,7 @@ class Observer(ABC):
                 obs_space = {}
                 for other in self.agents.values():
                     if isinstance(other, other_instance):
-                        obs_space[other.id] = space_func(agent, other)
+                        obs_space[other.id] = space_func(other)
                     else:
                         obs_space[other.id ] = alt_space_func()
                 agent.observation_space[self.channel] = Dict(obs_space)
@@ -66,7 +66,7 @@ class BroadcastObserver(Observer):
     def __init__(self, **kwargs):
         super().__init__(
             instance=BroadcastObservingAgent,
-            space_func=lambda agent, other: Box(-1, 1, (1,)),
+            space_func=lambda *args: Box(-1, 1, (1,)),
             **kwargs
         )
         
@@ -101,7 +101,7 @@ class HealthObserver(Observer):
     def __init__(self, **kwargs):
         super().__init__(
             instance=HealthObservingAgent,
-            space_func=lambda agent, other: Box(-1, other.max_health, (1,)),
+            space_func=lambda other: Box(-1, other.max_health, (1,)),
             **kwargs
         )
     
@@ -133,7 +133,7 @@ class LifeObserver(Observer):
     def __init__(self, **kwargs):
         super().__init__(
             instance=LifeObservingAgent,
-            space_func=lambda agent, other: Box(-1, 1, (1,), np.int),
+            space_func=lambda *args: Box(-1, 1, (1,), np.int),
             **kwargs
         )
     
@@ -171,7 +171,7 @@ class PositionObserver(Observer):
         self.position_state = position_state
         super().__init__(
             instance=PositionObservingAgent,
-            space_func=lambda agent, other: Box(-1, self.position_state.region, (2,), np.int),
+            space_func=lambda *args: Box(-1, self.position_state.region, (2,), np.int),
             **kwargs
         )
 
@@ -201,7 +201,7 @@ class RelativePositionObserver(Observer):
         self.position_state = position_state
         super().__init__(
             instance=PositionObservingAgent,
-            space_func=lambda agent, other: Box(-self.position_state.region, self.position_state.region, (2,), np.int),
+            space_func=lambda *args: Box(-self.position_state.region, self.position_state.region, (2,), np.int),
             **kwargs
         )
 
@@ -362,7 +362,7 @@ class SpeedObserver(Observer):
         super().__init__(
             instance=SpeedAngleObservingAgent,
             other_instance=SpeedAngleAgent,
-            space_func=lambda agent, other: Box(-1, other.max_speed, (1,)),
+            space_func=lambda other: Box(-1, other.max_speed, (1,)),
             alt_space_func=lambda: Box(-1, -1, (1,)),
             **kwargs
         )
@@ -398,7 +398,7 @@ class AngleObserver(Observer):
     def __init__(self, **kwargs):
         super().__init__(
             instance=SpeedAngleObservingAgent,
-            space_func=lambda agent, other: Box(-1, 360, (1,)),
+            space_func=lambda *args: Box(-1, 360, (1,)),
             **kwargs
         )
 
@@ -434,7 +434,7 @@ class VelocityObserver(Observer):
         super().__init__(
             instance=VelocityObservingAgent,
             other_instance=VelocityAgent,
-            space_func=lambda agent, other: Box(-other.max_speed, other.max_speed, (2,)),
+            space_func=lambda other: Box(-other.max_speed, other.max_speed, (2,)),
             alt_space_func=lambda: Box(0, 0, (2,)),
             **kwargs
         )
@@ -524,7 +524,7 @@ class TeamObserver(Observer):
         self.number_of_teams = number_of_teams
         super().__init__(
             instance=TeamObservingAgent,
-            space_func=lambda agent, other: Box(-1, self.number_of_teams, (1,), np.int),
+            space_func=lambda *args: Box(-1, self.number_of_teams, (1,), np.int),
             **kwargs
         )
     
