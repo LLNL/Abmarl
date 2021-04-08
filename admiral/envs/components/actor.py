@@ -9,19 +9,37 @@ from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, Har
 
 class Actor(ABC):
     """
-    Base actor class provides the interface required of all actors.
+    Base actor class provides the interface required of all actors. Setup the agents'
+    action space according to the Actor's channel.
+
+        agents (dict):
+            The dictionary of agents.
+
+        instance (Agent):
+            An Agent class. This is used in the isinstance check to determine if
+            the agent will receive the action channel.
+        
+        space_func (function):
+            A function 
     """
     def __init__(self, agents=None, instance=None, space_func=None, **kwargs):
         self.agents = agents
+        
         for agent in self.agents.values():
             if isinstance(agent, instance):
                 agent.action_space[self.channel] = space_func(agent)
-    
-    @abstractmethod
-    def process_action(self, agent, action_dict, **kwargs): pass
 
     def _get_action_from_dict(self, action_dict, **kwargs):
+        """
+        The action dict passed to an AgentBasedSimulation will be keyed off the 
+        agent id's. This action dict, however, is just the specific agent's actions,
+        which is a dictionary keyed off the action channels. This function extracts
+        that action if available, otherwise returning the Actor's null_value.
+        """
         return action_dict.get(self.channel, self.null_value)
+
+    @abstractmethod
+    def process_action(self, agent, action_dict, **kwargs): pass
 
     @abstractproperty
     def channel(self): pass
