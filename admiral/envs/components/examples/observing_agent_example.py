@@ -5,11 +5,11 @@ import numpy as np
 from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import GridPositionTeamBasedObserver
 from admiral.envs.components.actor import GridMovementActor
-from admiral.envs.components.agent import TeamAgent, PositionAgent, PositionObservingAgent, AgentObservingAgent, GridMovementAgent, LifeAgent
+from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, GridMovementAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ObservingTeamMovementAgent(TeamAgent, PositionAgent, PositionObservingAgent, AgentObservingAgent, GridMovementAgent, LifeAgent):
+class ObservingTeamMovementAgent(PositionObservingAgent, AgentObservingAgent, GridMovementAgent):
     pass
 
 class SimpleGridObservations(AgentBasedSimulation):

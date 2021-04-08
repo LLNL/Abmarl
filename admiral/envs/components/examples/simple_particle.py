@@ -5,13 +5,13 @@ import numpy as np
 from admiral.envs.components.state import VelocityState, ContinuousPositionState
 from admiral.envs.components.actor import AccelerationMovementActor, ContinuousCollisionActor
 from admiral.envs.components.observer import VelocityObserver, PositionObserver
-from admiral.envs.components.agent import VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, ActingAgent, CollisionAgent
+from admiral.envs.components.agent import VelocityAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, ActingAgent, CollisionAgent, Agent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ParticleAgent(VelocityAgent, PositionAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, CollisionAgent): pass
-class FixedLandmark(PositionAgent): pass
-class MovingLandmark(VelocityAgent, PositionAgent): pass
+class ParticleAgent(VelocityAgent, AcceleratingAgent, VelocityObservingAgent, PositionObservingAgent, CollisionAgent): pass
+class FixedLandmark(Agent): pass
+class MovingLandmark(VelocityAgent): pass
 
 class ParticleEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
