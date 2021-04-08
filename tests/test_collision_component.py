@@ -3,9 +3,9 @@ import numpy as np
 
 from admiral.envs.components.state import VelocityState, ContinuousPositionState
 from admiral.envs.components.actor import AccelerationMovementActor, ContinuousCollisionActor
-from admiral.envs.components.actor import VelocityAgent, PositionAgent, AcceleratingAgent, CollisionAgent
+from admiral.envs.components.actor import VelocityAgent, AcceleratingAgent, CollisionAgent
 
-class ParticleAgent(VelocityAgent, PositionAgent, AcceleratingAgent, CollisionAgent): pass
+class ParticleAgent(VelocityAgent, AcceleratingAgent, CollisionAgent): pass
 
 def test_collision():
 

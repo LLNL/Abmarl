@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, BroadcastingAgent
 from admiral.envs.components.state import GridPositionState, LifeState, ContinuousPositionState, SpeedAngleState, VelocityState, BroadcastState
 from admiral.envs.components.observer import HealthObserver, LifeObserver, PositionObserver, \
     RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, TeamObserver
@@ -12,11 +12,9 @@ from admiral.envs.components.agent import AgentObservingAgent, VelocityObserving
 class AllObservingAgent(AgentObservingAgent, VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
 class NonViewAgent(VelocityObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, HealthObservingAgent): pass
 
-class AllAgent(           AllObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
-class PositionlessAgent(  NonViewAgent,                     LifeAgent, TeamAgent, SpeedAngleAgent, VelocityAgent): pass
-class LifelessAgent(      AllObservingAgent, PositionAgent,            TeamAgent, SpeedAngleAgent, VelocityAgent): pass
-class SpeedAnglelessAgent(AllObservingAgent, PositionAgent, LifeAgent, TeamAgent,                  VelocityAgent): pass
-class VelocitylessAgent(  AllObservingAgent, PositionAgent, LifeAgent, TeamAgent, SpeedAngleAgent               ): pass
+class AllAgent(           AllObservingAgent, SpeedAngleAgent, VelocityAgent): pass
+class SpeedAnglelessAgent(AllObservingAgent,                  VelocityAgent): pass
+class VelocitylessAgent(  AllObservingAgent, SpeedAngleAgent               ): pass
 
 def test_position_restricted_observer_wrapper():
     agents = {
@@ -24,11 +22,11 @@ def test_position_restricted_observer_wrapper():
         'agent1': AllAgent(           id='agent1', agent_view=1, initial_position=np.array([4, 4]), initial_health=0.54, team=2, max_speed=2, initial_speed=0.00, initial_banking_angle=0,  initial_ground_angle=126, initial_velocity=np.array([-0.2, 0.7])),
         'agent2': AllAgent(           id='agent2', agent_view=1, initial_position=np.array([4, 3]), initial_health=0.36, team=2, max_speed=1, initial_speed=0.12, initial_banking_angle=30, initial_ground_angle=180, initial_velocity=np.array([-0.1, 0.6])),
         'agent3': AllAgent(           id='agent3', agent_view=1, initial_position=np.array([4, 2]), initial_health=0.24, team=2, max_speed=4, initial_speed=0.05, initial_banking_angle=13, initial_ground_angle=46,  initial_velocity=np.array([0.0,  0.5])),
-        'agent4': LifelessAgent(      id='agent4', agent_view=1, initial_position=np.array([4, 1]),                      team=3, max_speed=3, initial_speed=0.17, initial_banking_angle=15, initial_ground_angle=212, initial_velocity=np.array([0.1,  0.4])),
+        'agent4': AllAgent(           id='agent4', agent_view=1, initial_position=np.array([4, 1]),                      team=3, max_speed=3, initial_speed=0.17, initial_banking_angle=15, initial_ground_angle=212, initial_velocity=np.array([0.1,  0.4])),
         'agent6': SpeedAnglelessAgent(id='agent6', agent_view=0, initial_position=np.array([1, 1]), initial_health=0.53, team=1, max_speed=1,                                                                         initial_velocity=np.array([0.3,  0.2])),
         'agent7': VelocitylessAgent(  id='agent7', agent_view=5, initial_position=np.array([0, 4]), initial_health=0.50, team=2, max_speed=1, initial_speed=0.36, initial_banking_angle=24, initial_ground_angle=0                                          ),
-        'agent8': PositionlessAgent(  id='agent8',                                                  initial_health=0.26, team=1, max_speed=2, initial_speed=0.06, initial_banking_angle=16, initial_ground_angle=5,   initial_velocity=np.array([0.5,  0.0])),
-        'agent9': PositionlessAgent(  id='agent9',                                                  initial_health=0.08, team=3, max_speed=0, initial_speed=0.24, initial_banking_angle=30, initial_ground_angle=246, initial_velocity=np.array([0.6, -0.1])),
+        'agent8': AllAgent(           id='agent8',                                                  initial_health=0.26, team=1, max_speed=2, initial_speed=0.06, initial_banking_angle=16, initial_ground_angle=5,   initial_velocity=np.array([0.5,  0.0])),
+        'agent9': AllAgent(           id='agent9',                                                  initial_health=0.08, team=3, max_speed=0, initial_speed=0.24, initial_banking_angle=30, initial_ground_angle=246, initial_velocity=np.array([0.6, -0.1])),
     }
 
     def linear_drop_off(distance, view):
@@ -351,7 +349,7 @@ def test_position_restricted_observer_wrapper():
 
 
 
-class CommunicatingAgent(PositionAgent, TeamAgent, BroadcastingAgent, PositionObservingAgent, TeamObservingAgent, AgentObservingAgent): pass
+class CommunicatingAgent(BroadcastingAgent, PositionObservingAgent, TeamObservingAgent, AgentObservingAgent): pass
 
 def test_broadcast_communication_observer_wrapper():
     agents = {

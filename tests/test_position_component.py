@@ -5,12 +5,11 @@ import numpy as np
 
 from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver, RelativePositionObserver
-from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, PositionObservingAgent, AgentObservingAgent
+from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, Agent
 
-class PositionTestAgent(PositionAgent, PositionObservingAgent, LifeAgent, AgentObservingAgent): pass
-class PositionTeamTestAgent(PositionAgent, PositionObservingAgent, TeamAgent, LifeAgent, AgentObservingAgent): pass
-class PositionTeamNoViewTestAgent(PositionAgent, TeamAgent, LifeAgent): pass
-class PositionLifeAgent(PositionAgent, LifeAgent): pass
+class PositionTestAgent(PositionObservingAgent, AgentObservingAgent): pass
+class PositionTeamTestAgent(PositionObservingAgent, AgentObservingAgent): pass
+class PositionTeamNoViewTestAgent(Agent): pass
 
 def test_grid_position_observer():
     agents = {
@@ -18,7 +17,7 @@ def test_grid_position_observer():
         'agent1': PositionTestAgent(id='agent1', initial_position=np.array([2, 2]), agent_view=2),
         'agent2': PositionTestAgent(id='agent2', initial_position=np.array([3, 2]), agent_view=3),
         'agent3': PositionTestAgent(id='agent3', initial_position=np.array([1, 4]), agent_view=4),
-        'agent4': PositionLifeAgent(id='agent4', initial_position=np.array([1, 4])),
+        'agent4': Agent(id='agent4', initial_position=np.array([1, 4])),
     }
     
     state = GridPositionState(agents=agents, region=5)
@@ -209,7 +208,7 @@ def test_relative_position_observer():
         'agent1': PositionTestAgent(id='agent1', initial_position=np.array([2, 2]), agent_view=2),
         'agent2': PositionTestAgent(id='agent2', initial_position=np.array([3, 2]), agent_view=3),
         'agent3': PositionTestAgent(id='agent3', initial_position=np.array([1, 4]), agent_view=4),
-        'agent4': PositionAgent(id='agent4', initial_position=np.array([1, 4])),
+        'agent4': Agent(id='agent4', initial_position=np.array([1, 4])),
     }
     
     state = GridPositionState(agents=agents, region=5)

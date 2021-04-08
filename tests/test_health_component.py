@@ -1,13 +1,13 @@
 
-from admiral.envs.components.agent import LifeAgent
+from admiral.envs.components.agent import Agent
 from admiral.envs.components.state import LifeState
 
 def test_health_agents():
     agents = {
-        'agent0': LifeAgent(id='agent0', min_health=0.0, max_health=5.0, initial_health=3.4),
-        'agent1': LifeAgent(id='agent1', min_health=0.0, max_health=5.0, initial_health=2.4),
-        'agent2': LifeAgent(id='agent2', min_health=0.0, max_health=5.0),
-        'agent3': LifeAgent(id='agent3', min_health=0.0, max_health=5.0),
+        'agent0': Agent(id='agent0', min_health=0.0, max_health=5.0, initial_health=3.4),
+        'agent1': Agent(id='agent1', min_health=0.0, max_health=5.0, initial_health=2.4),
+        'agent2': Agent(id='agent2', min_health=0.0, max_health=5.0),
+        'agent3': Agent(id='agent3', min_health=0.0, max_health=5.0),
     }
 
     assert agents['agent0'].min_health == 0.0
@@ -27,10 +27,10 @@ def test_health_agents():
 
 def test_life_state():
     agents = {
-        'agent0': LifeAgent(id='agent0', min_health=0.0, max_health=5.0, initial_health=3.4),
-        'agent1': LifeAgent(id='agent1', min_health=0.0, max_health=5.0, initial_health=2.4),
-        'agent2': LifeAgent(id='agent2', min_health=0.0, max_health=5.0),
-        'agent3': LifeAgent(id='agent3', min_health=0.0, max_health=5.0),
+        'agent0': Agent(id='agent0', min_health=0.0, max_health=5.0, initial_health=3.4),
+        'agent1': Agent(id='agent1', min_health=0.0, max_health=5.0, initial_health=2.4),
+        'agent2': Agent(id='agent2', min_health=0.0, max_health=5.0),
+        'agent3': Agent(id='agent3', min_health=0.0, max_health=5.0),
     }
 
     assert agents['agent0'].min_health == 0.0
