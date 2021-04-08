@@ -3,7 +3,7 @@ from gym.spaces import Discrete, Box
 import numpy as np
 
 from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, HarvestingAgent, \
-    SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent, \
+    SpeedAngleAgent, AcceleratingAgent, VelocityAgent, \
     CollisionAgent, BroadcastingAgent
 
 # ----------------- #
@@ -144,7 +144,6 @@ class GridMovementActor:
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
         self.agents = agents
-        # Not all agents need to be PositionAgents; only the ones who can move.
 
         for agent in self.agents.values():
             if isinstance(agent, GridMovementAgent):
@@ -164,7 +163,7 @@ class GridMovementActor:
             How much the agent has moved in row and column. This can be different
             from the desired move if the position update was invalid.
         """
-        if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
+        if isinstance(moving_agent, GridMovementAgent):
             position_before = moving_agent.position
             self.position.modify_position(moving_agent, move, **kwargs)
             return moving_agent.position - position_before
@@ -262,7 +261,7 @@ class AccelerationMovementActor:
         return (np.array):
             Return the change in position.
         """
-        if isinstance(agent, VelocityAgent) and isinstance(agent, PositionAgent):
+        if isinstance(agent, VelocityAgent):
             self.velocity_state.modify_velocity(agent, acceleration)
             position_before = agent.position
             self.position_state.modify_position(agent, agent.velocity, **kwargs)
@@ -307,7 +306,7 @@ class GridResourcesActor:
             Return the amount of resources that was actually harvested. This can
             be less than the desired amount if the cell does not have enough resources.
         """
-        if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
+        if isinstance(agent, HarvestingAgent):
             location = tuple(agent.position)
             resource_before = self.resources.resources[location]
             self.resources.modify_resources(location, -amount)
@@ -346,10 +345,10 @@ class ContinuousCollisionActor:
         """
         checked_agents = set()
         for agent1 in self.agents.values():
-            if not (isinstance(agent1, CollisionAgent) and isinstance(agent1, PositionAgent) and isinstance(agent1, VelocityAgent)): continue
+            if not (isinstance(agent1, CollisionAgent) and isinstance(agent1, VelocityAgent)): continue
             checked_agents.add(agent1.id)
             for agent2 in self.agents.values():
-                if not (isinstance(agent2, PositionAgent) and isinstance(agent1, VelocityAgent) and isinstance(agent2, CollisionAgent)): continue
+                if not (isinstance(agent1, VelocityAgent) and isinstance(agent2, CollisionAgent)): continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
                 if agent2.id in checked_agents: continue # Already checked this agent
                 dist = np.linalg.norm(agent1.position - agent2.position)

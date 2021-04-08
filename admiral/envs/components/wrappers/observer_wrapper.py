@@ -2,7 +2,7 @@
 from gym.spaces import Dict, Discrete
 import numpy as np
 
-from admiral.envs.components.agent import PositionAgent, AgentObservingAgent, ObservingAgent, BroadcastingAgent, TeamAgent
+from admiral.envs.components.agent import AgentObservingAgent, ObservingAgent, BroadcastingAgent
 
 def obs_filter_step(distance, view):
     """
@@ -81,7 +81,7 @@ class PositionRestrictedObservationWrapper:
 
             # If the observing agent does not have a position and view, then we cannot filter
             # it here, so we just return the observations from the wrapped observers.
-            if not (isinstance(agent, PositionAgent) and isinstance(agent, AgentObservingAgent)):
+            if not isinstance(agent, AgentObservingAgent):
                 mask = {other: 1 for other in self.agents}
                 all_obs['mask'] = mask
                 for observer in self.observers:
@@ -91,8 +91,7 @@ class PositionRestrictedObservationWrapper:
             # Determine which other agents the observing agent sees. Add the observation mask.
             mask = {}
             for other in self.agents.values():
-                if not isinstance(other, PositionAgent) or \
-                    np.random.uniform() <= self.obs_filter(np.linalg.norm(agent.position - other.position, self.obs_norm), agent.agent_view):
+                if not np.random.uniform() <= self.obs_filter(np.linalg.norm(agent.position - other.position, self.obs_norm), agent.agent_view):
                     mask[other.id] = 1 # We perfectly observed this agent
                 else:
                     mask[other.id] = 0 # We did not observe this agent
@@ -165,10 +164,10 @@ class TeamBasedCommunicationWrapper:
             # If I'm not on the same team, then I will not see its observation,
             #   but I will still see its own attributes.
             for broadcasting_agent in self.agents.values():
-                if isinstance(broadcasting_agent, PositionAgent) and isinstance(receiving_agent, PositionAgent) and broadcasting_agent.broadcasting:
+                if broadcasting_agent.broadcasting:
                     distance = np.linalg.norm(broadcasting_agent.position - receiving_agent.position, self.obs_norm)
                     if distance > broadcasting_agent.broadcast_range: continue # Too far from this broadcasting agent
-                    elif isinstance(receiving_agent, TeamAgent) and isinstance(broadcasting_agent, TeamAgent) and receiving_agent.team == broadcasting_agent.team:
+                    elif receiving_agent.team == broadcasting_agent.team:
                         # Broadcasting and receiving agent are on the same team, so the receiving agent receives the observation
                         for observer in self.observers:
                             tmp_obs = observer.get_obs(broadcasting_agent, **kwargs)

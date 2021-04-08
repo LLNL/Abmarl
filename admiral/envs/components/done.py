@@ -1,8 +1,6 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, TeamAgent, PositionAgent
-
 class ResourcesDepletedDone:
     """
     Simulation ends when all the resources are depleted.
@@ -31,12 +29,9 @@ class DeadDone:
     all the agents are dead.
 
     agents (dict):
-        The dictionary of agents. Because the done condition is determined by
-        the agent's life status, all agents must be LifeAgents.
+        The dictionary of agents.
     """
     def __init__(self, agents=None, **kwargs):
-        for agent in agents.values():
-            assert isinstance(agent, LifeAgent)
         self.agents = agents
     
     def get_done(self, agent, **kwargs):
@@ -60,18 +55,13 @@ class TeamDeadDone:
     the only agents remaining are on the same team.
 
     agents (dict):
-        The dictionary of agents. Because the done condition is determined by the
-        agent's life status, all agents must be LifeAgents; and because the done
-        condition is determined by the agents' teams, all agents must be TeamAgents.
+        The dictionary of agents.
 
     number_of_teams (int):
         The fixed number of teams in this simulation.
         Default 0.
     """
     def __init__(self, agents=None, number_of_teams=0, **kwargs):
-        for agent in agents.values():
-            assert isinstance(agent, TeamAgent)
-            assert isinstance(agent, LifeAgent)
         self.agents = agents
         assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
         self.number_of_teams = number_of_teams + 1 # +1 because team 0 is default team and not counted.
@@ -115,8 +105,6 @@ class TooCloseDone:
     def __init__(self, position=None, agents=None, collision_distance=None, collision_norm=2, **kwargs):
         assert position is not None
         self.position = position
-        for agent in agents.values():
-            assert isinstance(agent, PositionAgent)
         self.agents = agents
         assert collision_distance is not None
         self.collision_distance = collision_distance
