@@ -220,8 +220,6 @@ class GridMovementActor(Actor):
     def null_value(self):
         return np.zeros(2)
 
-# TODO: SpeedAngleMovementActor is the only one that doesn't follow the actor
-# interface because it has two channels. Modify it so that it fits the interface.
 class SpeedAngleMovementActor:
     """
     Process acceleration and angle changes for SpeedAngleAgents. Update the agents'
