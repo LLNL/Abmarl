@@ -43,7 +43,7 @@ class Agent:
         if initial_health is not None:
             assert min_health <= initial_health <= max_health
         self.initial_health = initial_health
-        self.min_health = min_health # TODO: State handles the min and max health.
+        self.min_health = min_health
         self.max_health = max_health
         self.is_alive = True
         assert team != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
