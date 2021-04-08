@@ -4,8 +4,8 @@ import numpy as np
 
 from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAgent, \
     AgentObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, VelocityObservingAgent, \
-    ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, PositionAgent, LifeAgent, \
-    TeamAgent, SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+    ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, SpeedAngleAgent, \
+    VelocityAgent, BroadcastingAgent
 
 # --------------------- #
 # --- Communication --- #
@@ -57,13 +57,9 @@ class HealthObserver:
 
         for agent in agents.values():
             if isinstance(agent, HealthObservingAgent):
-                obs_space = {}
-                for other in self.agents.values():
-                    if isinstance(other, LifeAgent):
-                        obs_space[other.id] = Box(-1, other.max_health, (1,))
-                    else:
-                        obs_space[other.id] = Box(-1, -1, (1,))
-                agent.observation_space[self.channel] = Dict(obs_space)
+                agent.observation_space[self.channel] = Dict(
+                    {other.id: Box(-1, other.max_health, (1,)) for other in self.agents.values()}
+                )
     
     def get_obs(self, agent, **kwargs):
         """
@@ -73,13 +69,7 @@ class HealthObserver:
             The agent making the observation.
         """
         if isinstance(agent, HealthObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, LifeAgent):
-                    obs[other.id] = other.health
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
+            return {self.channel: {other.id: other.health for other in self.agents.values()}}
         else:
             return {}
     
@@ -113,13 +103,7 @@ class LifeObserver:
             The agent making the observation.
         """
         if isinstance(agent, LifeObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, LifeAgent):
-                    obs[other.id] = other.is_alive
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
+            return {self.channel: {other.id: other.is_alive for other in self.agents.values()}}
         else:
             return {}
     
@@ -156,13 +140,7 @@ class PositionObserver:
         Get the positions of all the agents in the simulator.
         """
         if isinstance(agent, PositionObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, PositionAgent):
-                    obs[other.id] = other.position
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
+            return {self.channel: {other.id: other.position for other in self.agents.values()}}
         else:
             return {}   
     
@@ -184,8 +162,7 @@ class RelativePositionObserver:
         self.agents = agents
         
         for agent in agents.values():
-            if isinstance(agent, PositionObservingAgent) and \
-               isinstance(agent, PositionAgent):
+            if isinstance(agent, PositionObservingAgent):
                 agent.observation_space[self.channel] = Dict({
                     other.id: Box(-position.region, position.region, (2,), np.int) for other in agents.values()
                 })
@@ -194,16 +171,12 @@ class RelativePositionObserver:
         """
         Get the relative positions of all the agents in the simulator.
         """
-        if isinstance(agent, PositionObservingAgent) and \
-           isinstance(agent, PositionAgent):
+        if isinstance(agent, PositionObservingAgent):
             obs = {}
             for other in self.agents.values():
-                if isinstance(other, PositionAgent):
-                    r_diff = other.position[0] - agent.position[0]
-                    c_diff = other.position[1] - agent.position[1]
-                    obs[other.id] = np.array([r_diff, c_diff])
-                else:
-                    obs[other.id] = self.null_value
+                r_diff = other.position[0] - agent.position[0]
+                c_diff = other.position[1] - agent.position[1]
+                obs[other.id] = np.array([r_diff, c_diff])
             return {self.channel: obs}
         else:
             return {}
@@ -233,13 +206,10 @@ class GridPositionBasedObserver:
     """
     def __init__(self, position=None, agents=None, **kwargs):
         self.position = position
-        for agent in agents.values():
-            assert isinstance(agent, PositionAgent)
         self.agents = agents
         
         for agent in agents.values():
             if isinstance(agent, AgentObservingAgent) and \
-               isinstance(agent, PositionAgent) and \
                isinstance(agent, PositionObservingAgent):
                 agent.observation_space['position'] = Box(-1, 1, (agent.agent_view*2+1, agent.agent_view*2+1), np.int)
 
@@ -249,7 +219,6 @@ class GridPositionBasedObserver:
         position.
         """
         if isinstance(my_agent, AgentObservingAgent) and \
-           isinstance(my_agent, PositionAgent) and \
            isinstance(my_agent, PositionObservingAgent):
             signal = np.zeros((my_agent.agent_view*2+1, my_agent.agent_view*2+1))
 
@@ -268,8 +237,7 @@ class GridPositionBasedObserver:
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
                 if other_id == my_agent.id: continue # Don't observe yourself
-                if not isinstance(other_agent, PositionAgent): continue # Can only observe position of PositionAgents
-                if not (isinstance(other_agent, LifeAgent) and other_agent.is_alive): continue # Can only observe alive agents
+                if not other_agent.is_alive: continue # Can only observe alive agents
                 r_diff = other_agent.position[0] - my_agent.position[0]
                 c_diff = other_agent.position[1] - my_agent.position[1]
                 if -my_agent.agent_view <= r_diff <= my_agent.agent_view and -my_agent.agent_view <= c_diff <= my_agent.agent_view:
@@ -301,14 +269,10 @@ class GridPositionTeamBasedObserver:
     def __init__(self, position=None, number_of_teams=0, agents=None, **kwargs):
         self.position = position
         self.number_of_teams = number_of_teams + 1
-        for agent in agents.values():
-            assert isinstance(agent, PositionAgent)
-            assert isinstance(agent, TeamAgent)
         self.agents = agents
 
         for agent in self.agents.values():
             if isinstance(agent, AgentObservingAgent) and \
-               isinstance(agent, PositionAgent) and \
                isinstance(agent, PositionObservingAgent):
                 agent.observation_space['position'] = Box(-1, np.inf, (agent.agent_view*2+1, agent.agent_view*2+1, self.number_of_teams), np.int)
     
@@ -319,8 +283,6 @@ class GridPositionTeamBasedObserver:
         of agents of that team occupying the same square.
         """
         if isinstance(my_agent, AgentObservingAgent) and \
-           isinstance(my_agent, TeamAgent) and \
-           isinstance(my_agent, PositionAgent) and \
            isinstance(my_agent, PositionObservingAgent):
             signal = np.zeros((my_agent.agent_view*2+1, my_agent.agent_view*2+1))
 
@@ -342,9 +304,7 @@ class GridPositionTeamBasedObserver:
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
                 if other_id == my_agent.id: continue # Don't observe yourself
-                if not isinstance(other_agent, PositionAgent): continue # Cannot observe agent without position
-                if not isinstance(other_agent, TeamAgent): continue # Cannot observe agent without team.
-                if not (isinstance(other_agent, LifeAgent) and other_agent.is_alive): continue # Can only observe alive agents
+                if not other_agent.is_alive: continue # Can only observe alive agents
                 r_diff = other_agent.position[0] - my_agent.position[0]
                 c_diff = other_agent.position[1] - my_agent.position[1]
                 if -my_agent.agent_view <= r_diff <= my_agent.agent_view and -my_agent.agent_view <= c_diff <= my_agent.agent_view:
@@ -547,7 +507,7 @@ class TeamObserver:
         Get the team of each agent in the simulator.
         """
         if isinstance(agent, TeamObservingAgent):
-            return {'team': {other.id: other.team for other in self.agents.values()}}
+            return {self.channel: {other.id: other.team for other in self.agents.values()}}
         else:
             return {}
     

@@ -3,7 +3,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from admiral.envs.components.agent import \
-    PositionAgent, LifeAgent, TeamAgent, \
     AttackingAgent, BroadcastingAgent, GridMovementAgent, \
     PositionObservingAgent, LifeObservingAgent, TeamObservingAgent, AgentObservingAgent
 from admiral.envs.components.state import GridPositionState, BroadcastState, LifeState
@@ -15,9 +14,8 @@ from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 class AllChannelsObservingAgent(PositionObservingAgent, LifeObservingAgent, TeamObservingAgent, AgentObservingAgent): pass
-class AttributeAgent(PositionAgent, TeamAgent, LifeAgent): pass
-class CommunicatingAgent(BroadcastingAgent, AttributeAgent, AllChannelsObservingAgent): pass
-class BattleAgent(AttackingAgent, GridMovementAgent, AttributeAgent, AllChannelsObservingAgent): pass
+class CommunicatingAgent(BroadcastingAgent, AllChannelsObservingAgent): pass
+class BattleAgent(AttackingAgent, GridMovementAgent, AllChannelsObservingAgent): pass
 
 class TeamBattleCommsEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):

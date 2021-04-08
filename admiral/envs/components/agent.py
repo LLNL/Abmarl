@@ -8,17 +8,48 @@ from gym.spaces import Dict
 class Agent:
     """
     Base Agent class for agents that live in an environment. Agents require an
-    id in in order to even be constructed.
+    id in in order to even be constructed. All agents have a position, life, and
+    team.
+
+    initial_position (np.array):
+        The desired starting position for this agent.
+
+    min_health (float):
+        The minimum value the health can reach before the agent dies.
+    
+    max_health (float):
+        The maximum value the health can reach.
+
+    initial_health (float):
+        The initial health of the agent. The health will be set to this initial
+        option at reset time.
+
+    team (int):
+        The agent's team. Teams are indexed starting from 1, with team 0 reserved
+        for agents that are not on a team.
 
     seed (int):
         Seed this agent's rng. Default value is None.
     """
-    def __init__(self, id=None, seed=None, **kwargs):
+    def __init__(self, id=None, seed=None, initial_position=None, \
+                 min_health=0.0, max_health=1.0, initial_health=None, \
+                 team=None, **kwargs):
         if id is None:
             raise TypeError("Agents must be constructed with an id.")
         else:
             self.id = id
         self.seed = seed
+        self.initial_position = initial_position
+        if initial_health is not None:
+            assert min_health <= initial_health <= max_health
+        self.initial_health = initial_health
+        self.min_health = min_health
+        self.max_health = max_health
+        self.is_alive = True
+        assert team != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
+        if team is None:
+            team = 0
+        self.team = team
         
     def finalize(self, **kwargs):
         pass
@@ -28,7 +59,11 @@ class Agent:
         """
         Determine if the agent has been successfully configured.
         """
-        return self.id is not None
+        return self.id is not None and \
+            self.min_health is not None and \
+            self.max_health is not None and \
+            self.is_alive is not None and \
+            self.team is not None
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
@@ -149,38 +184,6 @@ class BroadcastObservingAgent(ObservingAgent): pass
 # --- Health and Life --- #
 # ----------------------- #
 
-class LifeAgent(Agent):
-    """
-    Agents have health and are alive or dead.
-
-    min_health (float):
-        The minimum value the health can reach before the agent dies.
-    
-    max_health (float):
-        The maximum value the health can reach.
-
-    initial_health (float):
-        The initial health of the agent. The health will be set to this initial
-        option at reset time.
-    """
-    def __init__(self, min_health=0.0, max_health=1.0, initial_health=None, **kwargs):
-        super().__init__(**kwargs)
-        if initial_health is not None:
-            assert min_health <= initial_health <= max_health
-        self.initial_health = initial_health
-        self.min_health = min_health
-        self.max_health = max_health
-        self.is_alive = True
-        self.health = None
-
-    @property
-    def configured(self):
-        """
-        The agent is successfully configured if the min and max health are specified
-        and if is_alive is specified.
-        """
-        return super().configured and self.min_health is not None and self.max_health is not None and self.is_alive is not None
-
 class LifeObservingAgent(ObservingAgent): pass
 class HealthObservingAgent(ObservingAgent): pass
 
@@ -218,22 +221,6 @@ class AgentObservingAgent(ObservingAgent):
 # ----------------------------- #
 # --- Position and Movement --- #
 # ----------------------------- #
-
-class PositionAgent(Agent):
-    """
-    Agents have a position in the environment.
-
-    initial_position (np.array):
-        The desired starting position for this agent.
-
-    Warning: You should consider the positional state of the environment when
-    working with the agent's position because states interpret the elements of
-    the array differently.
-    """
-    def __init__(self, initial_position=None, **kwargs):
-        super().__init__(**kwargs)
-        self.initial_position = initial_position
-        self.position = None
 
 class PositionObservingAgent(ObservingAgent): pass
 
@@ -432,28 +419,5 @@ class ResourceObservingAgent(ObservingAgent):
 # ------------ #
 # --- Team --- #
 # ------------ #
-
-class TeamAgent(Agent):
-    """
-    Agents are on a team, which will affect their ability to perform certain actions,
-    such as who they can attack.
-
-    team (int):
-        The agent's team. Teams are indexed starting from 1, with team 0 reserved
-        for agents that are not on a team.
-    """
-    def __init__(self, team=None, **kwargs):
-        super().__init__(**kwargs)
-        assert team != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
-        if team is None:
-            team = 0
-        self.team = team
-    
-    @property
-    def configured(self):
-        """
-        Agent is configured if team is set.
-        """
-        return super().configured and self.team is not None
 
 class TeamObservingAgent(ObservingAgent): pass

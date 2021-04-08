@@ -7,11 +7,11 @@ from admiral.envs.components.state import GridPositionState, GridResourceState, 
 from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, GridResourcesActor
 from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent
+from admiral.envs.components.agent import PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class ResourceManagementAgent(PositionAgent, LifeAgent, PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent):
+class ResourceManagementAgent(PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent):
     pass
 
 class ResourceManagementEnv(AgentBasedSimulation):

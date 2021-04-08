@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import LifeAgent, PositionAgent, SpeedAngleAgent, VelocityAgent, \
+from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, \
     CollisionAgent, BroadcastingAgent
 
 # --------------------- #
@@ -73,12 +73,11 @@ class LifeState:
         Reset the health and life state of all applicable agents.
         """
         for agent in self.agents.values():
-            if isinstance(agent, LifeAgent):
-                if agent.initial_health is not None:
-                    agent.health = agent.initial_health
-                else:
-                    agent.health = np.random.uniform(agent.min_health, agent.max_health)
-                agent.is_alive = True
+            if agent.initial_health is not None:
+                agent.health = agent.initial_health
+            else:
+                agent.health = np.random.uniform(agent.min_health, agent.max_health)
+            agent.is_alive = True
     
     def set_health(self, agent, _health):
         """
@@ -86,28 +85,25 @@ class LifeState:
         min and max health-value. If that value is less than the agent's health,
         then the agent dies.
         """
-        if isinstance(agent, LifeAgent):
-            if _health <= agent.min_health:
-                agent.health = 0
-                agent.is_alive = False
-            elif _health >= agent.max_health:
-                agent.health = agent.max_health
-            else:
-                agent.health = _health
+        if _health <= agent.min_health:
+            agent.health = 0
+            agent.is_alive = False
+        elif _health >= agent.max_health:
+            agent.health = agent.max_health
+        else:
+            agent.health = _health
     
     def modify_health(self, agent, value):
         """
         Add some value to the health of the agent.
         """
-        if isinstance(agent, LifeAgent):
-            self.set_health(agent, agent.health + value)
+        self.set_health(agent, agent.health + value)
 
     def apply_entropy(self, agent, **kwargs):
         """
         Apply entropy to the agent, decreasing its health by a small amount.
         """
-        if isinstance(agent, LifeAgent):
-            self.modify_health(agent, -self.entropy, **kwargs)
+        self.modify_health(agent, -self.entropy, **kwargs)
 
 
 
@@ -138,15 +134,13 @@ class PositionState(ABC):
         """
         # Invalidate all the agents' positions from last episode
         for agent in self.agents.values():
-            if isinstance(agent, PositionAgent):
-                agent.position = None
+            agent.position = None
 
         for agent in self.agents.values():
-            if isinstance(agent, PositionAgent):
-                if agent.initial_position is not None:
-                    agent.position = agent.initial_position
-                else:
-                    self.random_reset(agent)
+            if agent.initial_position is not None:
+                agent.position = agent.initial_position
+            else:
+                self.random_reset(agent)
     
     @abstractmethod
     def random_reset(self, agent, **kwargs):
@@ -168,8 +162,7 @@ class PositionState(ABC):
         """
         Add some value to the position of the agent.
         """
-        if isinstance(agent, PositionAgent):
-            self.set_position(agent, agent.position + value)
+        self.set_position(agent, agent.position + value)
 
 class GridPositionState(PositionState):
     """
@@ -182,9 +175,8 @@ class GridPositionState(PositionState):
         Set the agent's position to the incoming value only if the new position
         is within the region.
         """
-        if isinstance(agent, PositionAgent):
-            if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
-                agent.position = _position
+        if 0 <= _position[0] < self.region and 0 <= _position[1] < self.region:
+            agent.position = _position
 
     def random_reset(self, agent, **kwargs):
         """
@@ -206,8 +198,7 @@ class ContinuousPositionState(PositionState):
         """
         Set the agent's position to the incoming value.
         """
-        if isinstance(agent, PositionAgent):
-            agent.position = _position
+        agent.position = _position
 
     def random_reset(self, agent, **kwargs):
         """
