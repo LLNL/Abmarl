@@ -91,7 +91,7 @@ class PositionRestrictedObservationWrapper:
             # Determine which other agents the observing agent sees. Add the observation mask.
             mask = {}
             for other in self.agents.values():
-                if not np.random.uniform() <= self.obs_filter(np.linalg.norm(agent.position - other.position, self.obs_norm), agent.agent_view):
+                if np.random.uniform() <= self.obs_filter(np.linalg.norm(agent.position - other.position, self.obs_norm), agent.agent_view):
                     mask[other.id] = 1 # We perfectly observed this agent
                 else:
                     mask[other.id] = 0 # We did not observe this agent
