@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod, abstractproperty
 
 from gym.spaces import Discrete, Box
 import numpy as np
@@ -6,11 +7,51 @@ from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, Har
     SpeedAngleAgent, AcceleratingAgent, LifeAgent, TeamAgent, PositionAgent, VelocityAgent, \
     CollisionAgent, BroadcastingAgent
 
+class Actor(ABC):
+    """
+    Base actor class provides the interface required of all actors. Setup the agents'
+    action space according to the Actor's channel.
+
+        agents (dict):
+            The dictionary of agents.
+
+        instance (Agent):
+            An Agent class. This is used in the isinstance check to determine if
+            the agent will receive the action channel.
+        
+        space_func (function):
+            A function 
+    """
+    def __init__(self, agents=None, instance=None, space_func=None, **kwargs):
+        self.agents = agents
+        
+        for agent in self.agents.values():
+            if isinstance(agent, instance):
+                agent.action_space[self.channel] = space_func(agent)
+
+    def _get_action_from_dict(self, action_dict, **kwargs):
+        """
+        The action dict passed to an AgentBasedSimulation will be keyed off the 
+        agent id's. This action dict, however, is just the specific agent's actions,
+        which is a dictionary keyed off the action channels. This function extracts
+        that action if available, otherwise returning the Actor's null_value.
+        """
+        return action_dict.get(self.channel, self.null_value)
+
+    @abstractmethod
+    def process_action(self, agent, action_dict, **kwargs): pass
+
+    @abstractproperty
+    def channel(self): pass
+
+    @abstractproperty
+    def null_value(self): pass
+
 # ----------------- #
 # --- Attacking --- #
 # ----------------- #
 
-class AttackActor:
+class AttackActor(Actor):
     """
     Agents can attack other agents within their attack radius. If there are multiple
     attackable agents in the radius, then one will be randomly chosen. Attackable
@@ -37,7 +78,12 @@ class AttackActor:
         if that is not specified here.
         Default 0, indicating that there are no teams and its a free-for-all battle.
     """
-    def __init__(self, agents=None, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):      
+    def __init__(self, attack_norm=np.inf, team_attack_matrix=None, number_of_teams=0, **kwargs):
+        super().__init__(
+            instance=AttackingAgent,
+            space_func=lambda agent: Discrete(2),
+            **kwargs
+        )
         if team_attack_matrix is None:
             # Default: teams can attack all other teams but not themselves. Agents
             # that are "on team 0" are actually teamless, so they can be attacked
@@ -47,29 +93,17 @@ class AttackActor:
             self.team_attack_matrix[0,0] = 1
         else:
             self.team_attack_matrix = team_attack_matrix
-
         self.attack_norm = attack_norm
-        self.agents = agents
-        
-        for agent in agents.values():
-            if isinstance(agent, AttackingAgent):
-                agent.action_space['attack'] = Discrete(2)
     
-    def process_attack(self, attacking_agent, attack, **kwargs):
+    def process_action(self, attacking_agent, action_dict, **kwargs):
         """
         If the agent has chosen to attack, then determine which agent got attacked.
-
-        attacking_agent (AttackingAgent):
-            The agent that we are processing.
-
-        attack (bool):
-            True if the agent has chosen to attack, otherwise False.
 
         return (Agent):
             Return the attacked agent object. This can be None if no agent was
             attacked.
         """
-        if isinstance(attacking_agent, AttackingAgent) and attack:
+        if self._get_action_from_dict(action_dict):
             for attacked_agent in self.agents.values():
                 if attacked_agent.id == attacking_agent.id:
                     # Cannot attack yourself
@@ -89,6 +123,14 @@ class AttackActor:
                 else:
                     # The agent was successfully attacked!
                     return attacked_agent
+    
+    @property
+    def channel(self):
+        return 'attack'
+    
+    @property
+    def null_value(self):
+        return False
 
 
 
@@ -96,7 +138,7 @@ class AttackActor:
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastActor:
+class BroadcastActor(Actor):
     """
     BroadcastingAgents can choose to broadcast in this step or not.
 
@@ -106,23 +148,31 @@ class BroadcastActor:
     agents (dict):
         Dictionary of agents.
     """
-    def __init__(self, broadcast_state=None, agents=None, **kwargs):
+    def __init__(self, broadcast_state=None, **kwargs):
+        super().__init__(
+            instance=BroadcastingAgent,
+            space_func=lambda agent: Discrete(2),
+            **kwargs
+        )
         self.broadcast_state = broadcast_state
-        self.agents = agents
-        for agent in agents.values():
-            if isinstance(agent, BroadcastingAgent):
-                agent.action_space['broadcast'] = Discrete(2)
     
-    def process_broadcast(self, broadcasting_agent, broadcasting, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Determine the agents new broadcasting state based on its action.
 
         return: bool
             The agent's broadcasting state.
         """
-        if isinstance(broadcasting_agent, BroadcastingAgent):
-            self.broadcast_state.modify_broadcast(broadcasting_agent, broadcasting)
-            return broadcasting_agent.broadcasting
+        broadcasting = self._get_action_from_dict(action_dict)
+        self.broadcast_state.modify_broadcast(agent, broadcasting)
+        
+    @property
+    def channel(self):
+        return 'broadcast'
+    
+    @property
+    def null_value(self):
+        return False
 
 
 
@@ -130,7 +180,7 @@ class BroadcastActor:
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class GridMovementActor:
+class GridMovementActor(Actor):
     """
     Provides the necessary action space for agents who can move and processes such
     movements.
@@ -141,33 +191,34 @@ class GridMovementActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, agents=None, **kwargs):
-        self.position = position
-        self.agents = agents
-        # Not all agents need to be PositionAgents; only the ones who can move.
+    def __init__(self, position_state=None, **kwargs):
+        super().__init__(
+            instance=GridMovementAgent,
+            space_func=lambda agent: Box(-agent.move_range, agent.move_range, (2,), np.int),
+            **kwargs
+        )
+        self.position_state = position_state
 
-        for agent in self.agents.values():
-            if isinstance(agent, GridMovementAgent):
-                agent.action_space['move'] = Box(-agent.move_range, agent.move_range, (2,), np.int)
-
-    def process_move(self, moving_agent, move, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Determine the agent's new position based on its move action.
-
-        moving_agent (GridMovementAgent):
-            The agent that moves.
-        
-        move (np.array):
-            How much the agent would like to move in row and column.
         
         return (np.array):
             How much the agent has moved in row and column. This can be different
             from the desired move if the position update was invalid.
         """
-        if isinstance(moving_agent, GridMovementAgent) and isinstance(moving_agent, PositionAgent):
-            position_before = moving_agent.position
-            self.position.modify_position(moving_agent, move, **kwargs)
-            return moving_agent.position - position_before
+        move = self._get_action_from_dict(action_dict)
+        position_before = agent.position
+        self.position_state.modify_position(agent, move, **kwargs)
+        return agent.position - position_before
+    
+    @property
+    def channel(self):
+        return 'move'
+    
+    @property
+    def null_value(self):
+        return np.zeros(2)
 
 class SpeedAngleMovementActor:
     """
@@ -183,9 +234,9 @@ class SpeedAngleMovementActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position=None, speed_angle=None, agents=None, **kwargs):
-        self.position = position
-        self.speed_angle = speed_angle
+    def __init__(self, position_state=None, speed_angle_state=None, agents=None, **kwargs):
+        self.position_state = position_state
+        self.speed_angle_state = speed_angle_state
         self.agents = agents
 
         for agent in agents.values():
@@ -214,17 +265,17 @@ class SpeedAngleMovementActor:
             Return the change in position.
         """
         if isinstance(agent, SpeedAngleAgent):
-            self.speed_angle.modify_speed(agent, acceleration[0])
-            self.speed_angle.modify_banking_angle(agent, angle[0])
+            self.speed_angle_state.modify_speed(agent, acceleration[0])
+            self.speed_angle_state.modify_banking_angle(agent, angle[0])
             
             x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
             y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
             
             position_before = agent.position
-            self.position.modify_position(agent, np.array([x_position, y_position]))
+            self.position_state.modify_position(agent, np.array([x_position, y_position]))
             return agent.position - position_before
 
-class AccelerationMovementActor:
+class AccelerationMovementActor(Actor):
     """
     Process x,y accelerations for AcceleratingAgents, which are given an 'accelerate'
     action. Update the agents' positions based on their new velocity.
@@ -238,35 +289,36 @@ class AccelerationMovementActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, position_state=None, velocity_state=None, agents=None, **kwargs):
+    def __init__(self, position_state=None, velocity_state=None, **kwargs):
+        super().__init__(
+            instance=AcceleratingAgent,
+            space_func=lambda agent: Box(-agent.max_acceleration, agent.max_acceleration, (2,)),
+            **kwargs
+        )
         self.position_state = position_state
         self.velocity_state = velocity_state
-        self.agents = agents
-
-        for agent in agents.values():
-            if isinstance(agent, AcceleratingAgent):
-                agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (2,))
     
-    def process_move(self, agent, acceleration, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Update the agent's velocity by applying the acceleration. Then use the
         updated velocity to determine the agent's next position.
-
-        agent (AcceleratingAgent):
-            Agent that is attempting to move.
-        
-        acceleration (np.array):
-            A two-element float array that changes the agent's velocity. New velocity
-            must be within the agent's max speed.
         
         return (np.array):
             Return the change in position.
         """
-        if isinstance(agent, VelocityAgent) and isinstance(agent, PositionAgent):
-            self.velocity_state.modify_velocity(agent, acceleration)
-            position_before = agent.position
-            self.position_state.modify_position(agent, agent.velocity, **kwargs)
-            return agent.position - position_before
+        acceleration = self._get_action_from_dict(action_dict)
+        self.velocity_state.modify_velocity(agent, acceleration)
+        position_before = agent.position
+        self.position_state.modify_position(agent, agent.velocity, **kwargs)
+        return agent.position - position_before
+        
+    @property
+    def channel(self):
+        return 'accelerate'
+    
+    @property
+    def null_value(self):
+        return np.zeros(2)
                 
 
 
@@ -274,7 +326,7 @@ class AccelerationMovementActor:
 # --- Resources and Harvesting --- #
 # -------------------------------- #
 
-class GridResourcesActor:
+class GridResourcesActor(Actor):
     """
     Provides the necessary action space for agents who can harvest resources and
     processes the harvesting action.
@@ -285,33 +337,35 @@ class GridResourcesActor:
     agents (dict):
         The dictionary of agents.
     """
-    def __init__(self, resources=None, agents=None, **kwargs):
-        self.resources = resources
-        self.agents = agents
+    def __init__(self, resource_state=None, **kwargs):
+        super().__init__(
+            instance=HarvestingAgent,
+            space_func=lambda agent: Box(0, agent.max_harvest, (1,)),
+            **kwargs
+        )
+        self.resource_state = resource_state
 
-        for agent in agents.values():
-            if isinstance(agent, HarvestingAgent):
-                agent.action_space['harvest'] = Box(0, agent.max_harvest, (1,))
-
-    def process_harvest(self, agent, amount, **kwargs):
+    def process_action(self, agent, action_dict, **kwargs):
         """
         Harvest some amount of resources at the agent's position.
-
-        agent (HarvestingAgent):
-            The agent who has chosen to harvest the resource.
-
-        amount (float):
-            The amount of resource the agent wants to harvest.
         
         return (float):
             Return the amount of resources that was actually harvested. This can
             be less than the desired amount if the cell does not have enough resources.
         """
-        if isinstance(agent, HarvestingAgent) and isinstance(agent, PositionAgent):
-            location = tuple(agent.position)
-            resource_before = self.resources.resources[location]
-            self.resources.modify_resources(location, -amount)
-            return resource_before - self.resources.resources[location]
+        amount = self._get_action_from_dict(action_dict)
+        location = tuple(agent.position)
+        resource_before = self.resource_state.resources[location]
+        self.resource_state.modify_resources(location, -amount)
+        return resource_before - self.resource_state.resources[location]
+    
+    @property
+    def channel(self):
+        return 'harvest'
+    
+    @property
+    def null_value(self):
+        return 0
 
 
 

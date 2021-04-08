@@ -39,13 +39,13 @@ class ParticleEnv(AgentBasedSimulation):
     
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent], action.get("accelerate", np.zeros(2)), **kwargs)
+            self.move_actor.process_action(self.agents[agent], action, **kwargs)
             self.velocity_state.apply_friction(self.agents[agent], **kwargs)
             
         self.collision_actor.detect_collisions_and_modify_states(**kwargs)
         
         if 'moving_landmark0' in self.agents:
-            self.move_actor.process_move(self.agents['moving_landmark0'], np.ones(2), **kwargs)
+            self.move_actor.process_action(self.agents['moving_landmark0'], {}, **kwargs)
 
     def render(self, fig=None, **kwargs):
         fig.clear()
