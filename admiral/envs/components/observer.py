@@ -45,6 +45,23 @@ class Observer(ABC):
                         obs_space[other.id ] = alt_space_func()
                 agent.observation_space[self.channel] = Dict(obs_space)
     
+    def _get_obs(self, agent, instance=None, other_instance=Agent, attr=None, **kwargs):
+        """
+        Many observers just directly query the corresponding state field from the
+        agent. This function does exactly that, checking the instance of the observing
+        agent and the other agents and setting the observation value accordingly.
+        """
+        if isinstance(agent, instance):
+            obs = {}
+            for other in self.agents.values():
+                if isinstance(other, other_instance):
+                    obs[other.id] = getattr(other, attr)
+                else:
+                    obs[other.id] = self.null_value
+            return {self.channel: obs}
+        else:
+            return {}
+    
     @abstractmethod
     def get_obs(self, agent, **kwargs): pass
 
@@ -71,16 +88,13 @@ class BroadcastObserver(Observer):
         )
         
     def get_obs(self, agent, **kwargs):
-        if isinstance(agent, BroadcastObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, BroadcastingAgent):
-                    obs[other.id] = other.broadcasting
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=BroadcastObservingAgent,
+            other_instance=BroadcastingAgent,
+            attr='broadcasting',
+            **kwargs
+        )
     
     @property
     def channel(self):
@@ -112,10 +126,12 @@ class HealthObserver(Observer):
         agent (HealthObservingAgent):
             The agent making the observation.
         """
-        if isinstance(agent, HealthObservingAgent):
-            return {self.channel: {other.id: other.health for other in self.agents.values()}}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=HealthObservingAgent,
+            attr='health',
+            **kwargs
+        )
     
     @property
     def channel(self):
@@ -144,10 +160,12 @@ class LifeObserver(Observer):
         agent (LifeObservingAgent):
             The agent making the observation.
         """
-        if isinstance(agent, LifeObservingAgent):
-            return {self.channel: {other.id: other.is_alive for other in self.agents.values()}}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=LifeObservingAgent,
+            attr='is_alive',
+            **kwargs
+        )
     
     @property
     def channel(self):
@@ -179,10 +197,11 @@ class PositionObserver(Observer):
         """
         Get the positions of all the agents in the simulator.
         """
-        if isinstance(agent, PositionObservingAgent):
-            return {self.channel: {other.id: other.position for other in self.agents.values()}}
-        else:
-            return {}   
+        return self._get_obs(
+            agent,
+            instance=PositionObservingAgent,
+            attr='position'
+        ) 
     
     @property
     def channel(self):
@@ -371,16 +390,13 @@ class SpeedObserver(Observer):
         """
         Get the speed of all the agents in the simulator.
         """
-        if isinstance(agent, SpeedAngleObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, SpeedAngleAgent):
-                    obs[other.id] = other.speed
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=SpeedAngleObservingAgent,
+            other_instance=SpeedAngleAgent,
+            attr='speed',
+            **kwargs
+        )
     
     @property
     def channel(self):
@@ -406,16 +422,13 @@ class AngleObserver(Observer):
         """
         Get the angle of all the agents in the simulator.
         """
-        if isinstance(agent, SpeedAngleObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, SpeedAngleAgent):
-                    obs[other.id] = other.ground_angle
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=SpeedAngleObservingAgent,
+            other_instance=SpeedAngleAgent,
+            attr='ground_angle',
+            **kwargs
+        )
     
     @property
     def channel(self):
@@ -443,16 +456,13 @@ class VelocityObserver(Observer):
         """
         Get the velocity of all the agents in the simulator.
         """
-        if isinstance(agent, VelocityObservingAgent):
-            obs = {}
-            for other in self.agents.values():
-                if isinstance(other, VelocityAgent):
-                    obs[other.id] = other.velocity
-                else:
-                    obs[other.id] = self.null_value
-            return {self.channel: obs}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=VelocityObservingAgent,
+            other_instance=VelocityAgent,
+            attr='velocity',
+            **kwargs
+        )
     
     @property
     def channel(self):
@@ -532,10 +542,12 @@ class TeamObserver(Observer):
         """
         Get the team of each agent in the simulator.
         """
-        if isinstance(agent, TeamObservingAgent):
-            return {self.channel: {other.id: other.team for other in self.agents.values()}}
-        else:
-            return {}
+        return self._get_obs(
+            agent,
+            instance=TeamObservingAgent,
+            attr='team',
+            **kwargs
+        )
     
     @property
     def channel(self):
