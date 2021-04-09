@@ -24,8 +24,8 @@ class FightForResourcesEnv(AgentBasedSimulation):
         self.resource_state = GridResourceState(**kwargs)
 
         # Observer components
-        self.position_observer = PositionObserver(position=self.position_state, **kwargs)
-        self.resource_observer = GridResourceObserver(resources=self.resource_state, **kwargs)
+        self.position_observer = PositionObserver(position_state=self.position_state, **kwargs)
+        self.resource_observer = GridResourceObserver(resource_state=self.resource_state, **kwargs)
         self.health_observer = HealthObserver(**kwargs)
         self.life_observer = LifeObserver(**kwargs)
 

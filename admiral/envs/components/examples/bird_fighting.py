@@ -26,7 +26,7 @@ class FightingBirdsEnv(AgentBasedSimulation):
         self.attack_actor = AttackActor(**kwargs)
 
         # Observer
-        self.position_observer = PositionObserver(position=self.position_state, **kwargs)
+        self.position_observer = PositionObserver(position_state=self.position_state, **kwargs)
         self.speed_observer = SpeedObserver(**kwargs)
         self.angle_observer = AngleObserver(**kwargs)
         self.health_observer = HealthObserver(**kwargs)

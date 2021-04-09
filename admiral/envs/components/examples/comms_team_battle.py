@@ -27,7 +27,7 @@ class TeamBattleCommsEnv(AgentBasedSimulation):
         self.broadcast_state = BroadcastState(**kwargs)
         
         # observer
-        position_observer = PositionObserver(position=self.position_state, **kwargs)
+        position_observer = PositionObserver(position_state=self.position_state, **kwargs)
         life_observer = LifeObserver(**kwargs)
         team_observer = TeamObserver(**kwargs)
         partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)

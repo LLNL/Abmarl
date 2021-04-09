@@ -24,7 +24,7 @@ class SimpleGridObservations(AgentBasedSimulation):
         self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)
 
         # Observers
-        self.observer = GridPositionTeamBasedObserver(position=self.position_state, **kwargs)
+        self.observer = GridPositionTeamBasedObserver(position_state=self.position_state, **kwargs)
 
         self.finalize()
 

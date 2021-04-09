@@ -98,6 +98,7 @@ class Observer(ABC):
     def null_value(self): pass
     
 
+
 # --------------------- #
 # --- Communication --- #
 # --------------------- #
@@ -126,6 +127,8 @@ class BroadcastObserver(Observer):
     @property
     def null_value(self):
         return -1
+
+
 
 # ----------------------- #
 # --- Health and Life --- #
@@ -317,6 +320,7 @@ class GridPositionBasedObserver:
         else:
             return {}
 
+
 class GridPositionTeamBasedObserver:
     """
     Agents observe a grid of size agent_view centered on their
@@ -383,6 +387,7 @@ class GridPositionTeamBasedObserver:
             return {'position': signal}
         else:
             return {}
+
 
 class SpeedObserver(Observer):
     """

@@ -22,7 +22,7 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.life_state = LifeState(**kwargs)
 
         # Observer Components
-        self.position_observer = PositionObserver(position=self.position_state, **kwargs)
+        self.position_observer = PositionObserver(position_state=self.position_state, **kwargs)
         self.health_observer = HealthObserver(**kwargs)
         self.life_observer = LifeObserver(**kwargs)
         self.team_observer = TeamObserver(**kwargs)
