@@ -36,8 +36,8 @@ def test_position_restricted_observer_wrapper():
     angle_state = SpeedAngleState(agents=agents)
     velocity_state = VelocityState(agents=agents)
 
-    position_observer = PositionObserver(position=position_state, agents=agents)
-    relative_position_observer = RelativePositionObserver(position=position_state, agents=agents)
+    position_observer = PositionObserver(position_state=position_state, agents=agents)
+    relative_position_observer = RelativePositionObserver(position_state=position_state, agents=agents)
     health_observer = HealthObserver(agents=agents)
     life_observer = LifeObserver(agents=agents)
     team_observer = TeamObserver(number_of_teams=3, agents=agents)
@@ -219,7 +219,7 @@ def test_broadcast_communication_observer_wrapper():
     position_state = GridPositionState(region=10, agents=agents)
     broadcast_state = BroadcastState(agents=agents)
 
-    position_observer = PositionObserver(position=position_state, agents=agents)
+    position_observer = PositionObserver(position_state=position_state, agents=agents)
     team_observer = TeamObserver(number_of_teams=2, agents=agents)
     partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer], agents=agents)
     comms_observer = TeamBasedCommunicationWrapper([partial_observer], agents=agents)

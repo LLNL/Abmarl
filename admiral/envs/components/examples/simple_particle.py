@@ -29,7 +29,7 @@ class ParticleEnv(AgentBasedSimulation):
         
         # Observer
         self.velocity_observer = VelocityObserver(**kwargs)
-        self.position_observer = PositionObserver(position=self.position_state, **kwargs)
+        self.position_observer = PositionObserver(position_state=self.position_state, **kwargs)
     
         self.finalize()
 
