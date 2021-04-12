@@ -8,7 +8,8 @@
 # Import the simulation environment and agents
 from admiral.envs.components.examples.fighting_teams import FightingTeamsEnv, FightingTeamAgent
 
-number_of_teams = 3
+number_of_teams = 2
+region = 15
 
 # Instatiate the agents that will operate in this environment. All possible agent
 # attributes are listed below
@@ -21,15 +22,25 @@ agents = {f'agent{i}': FightingTeamAgent(
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
     max_health=1.0, # Agent's health cannot grow above this value.
-    agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
+    agent_view=region, # Partial Observation Mask: how far away this agent can see other agents.
     initial_health=None, # Episode-starting health. If None, then random between min and max health. 
     initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(24)}
+) for i in range(2)}
+
+# Adjust the team to make the learning agents "underdogs"
+# import numpy as np
+# for agent in agents.values():
+#     if np.random.uniform() > 0.6:
+#         agent.team = 1
+#         agent.initial_position = np.array([np.random.randint(region), 0])
+#     else:
+#         agent.team = 2
+#         agent.initial_position = np.array([np.random.randint(region), region-1])
 
 # Instantiate the environment
 env = FightingTeamsEnv(
     number_of_teams=number_of_teams, # Environment must be told the number of teams
-    region=10, # Size of the region, in both x and y
+    region=region, # Size of the region, in both x and y
     # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
     agents=agents # Give the environment the dictionary of agents we created above
 )
@@ -59,10 +70,11 @@ register_env(env_name, lambda env_config: env)
 # Here we have it setup so that every agent on a team trains the same policy.
 # Because every agent has the same observation and action space, we can just use
 # the specs from one of the agent to define the policies' inputs and outputs.
+# from admiral.pols import RandomAction
+from ray.rllib.examples.policy.random_policy import RandomPolicy
 policies = {
     'team1': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
-    'team2': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
-    'team3': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
+    'team2': (RandomPolicy, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
 }
 def policy_mapping_fn(agent_id):
     return f'team{agents[agent_id].team}'
@@ -97,7 +109,7 @@ params = {
         'checkpoint_freq': 100,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 20_000,
+            'episodes_total': 20,
         },
         'verbose': 2,
         'config': {
@@ -110,8 +122,9 @@ params = {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 7,
+            "num_workers": 1,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
+            "rollout_fragment_length": 1,
         },
     }
 }
@@ -124,9 +137,11 @@ params = {
 if __name__ == '__main__':
     from matplotlib import pyplot as plt
     fig = plt.gcf()
-    env.reset()
+    obs = env.reset()
     shape_dict={1: 's', 2:'o', 3:'d'}
     env.render(fig=fig, shape_dict=shape_dict)
+
+    import pprint; pprint.pprint(obs['agent0'])
 
     for _ in range(100):
         action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive}
