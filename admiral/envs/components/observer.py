@@ -20,8 +20,6 @@ class Observer(ABC):
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
     
-    # TODO: WE hsould probably make two types of observers, one for simple space
-    # and another for complex space.
     def _set_obs_space_simple(self, instance, space_func, **kwargs):
         """
         Observers that don't depend on the type of the other agents can use this
