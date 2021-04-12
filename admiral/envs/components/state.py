@@ -78,7 +78,7 @@ class LifeState:
                     agent.health = agent.initial_health
                 else:
                     agent.health = np.random.uniform(agent.min_health, agent.max_health)
-                agent.is_alive = True
+                agent.is_alive = 1
     
     def set_health(self, agent, _health):
         """
@@ -89,7 +89,7 @@ class LifeState:
         if isinstance(agent, LifeAgent):
             if _health <= agent.min_health:
                 agent.health = 0
-                agent.is_alive = False
+                agent.is_alive = 0
             elif _health >= agent.max_health:
                 agent.health = agent.max_health
             else:

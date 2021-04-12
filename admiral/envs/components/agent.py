@@ -170,7 +170,7 @@ class LifeAgent(Agent):
         self.initial_health = initial_health
         self.min_health = min_health
         self.max_health = max_health
-        self.is_alive = True
+        self.is_alive = 1
         self.health = None
 
     @property
