@@ -1,2 +1,2 @@
 tensorflow
-ray==1.2
+ray==1.0
