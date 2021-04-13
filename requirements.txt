@@ -1,2 +1,2 @@
-tensorflow
-ray[rllib]
+tensorflow==2.4.1
+ray==1.2.0
