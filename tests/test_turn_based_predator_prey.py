@@ -20,7 +20,7 @@ def test_turn_based_predator_prey_distance():
     # Little hackish here because I have to explicitly set their values
     obs = env.reset()
     env.agents['predator0'].position = np.array([2, 3])
-    env.agents['predator1'].position = np.array([0, 1])
+    env.agents['predator1'].position = n.array([0, 1])
     env.agents['prey0'].position = np.array([1, 1])
     env.agents['prey1'].position = np.array([4, 3])
     env.agents['prey2'].position = np.array([4, 3])
