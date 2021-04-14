@@ -7,7 +7,8 @@ def run(env, agent):
 
     # Run the simulation with actions chosen from the trained policies
     policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
-    for episode in range(num_episodes):
+    # for episode in range(num_episodes):
+    for episode in range(100):
         print('Episode: {}'.format(episode))
         obs = env.reset()
         while True: # Run until the episode ends
