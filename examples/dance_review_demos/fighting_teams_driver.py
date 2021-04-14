@@ -25,7 +25,7 @@ agents = {f'agent{i}': FightingTeamAgent(
     agent_view=region, # Partial Observation Mask: how far away this agent can see other agents.
     initial_health=None, # Episode-starting health. If None, then random between min and max health. 
     initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(2)}
+) for i in range(24)}
 
 # Adjust the team to make the learning agents "underdogs"
 # import numpy as np
@@ -102,7 +102,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('TeamBattle-team_2_no_reward'),
+        'title': '{}'.format('TeamBattle-team_2_no_reward-24_agents'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
