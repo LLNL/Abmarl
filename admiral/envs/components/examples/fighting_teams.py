@@ -75,6 +75,13 @@ class FightingTeamsEnv(AgentBasedSimulation):
         self.rewards = {agent: 0 for agent in self.agents}
     
     def step(self, action_dict, **kwargs):
+
+        # # Hack for team 2
+        # for agent_id in action_dict:
+        #     agent = self.agents[agent_id]
+        #     if agent.team == 2:
+        #         action_dict[agent_id] = agent.action_space.sample()
+
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
@@ -107,6 +114,11 @@ class FightingTeamsEnv(AgentBasedSimulation):
         # Small penalty for every agent that acted in this time step to incentive rapid actions
         for agent_id in action_dict:
             self.rewards[agent_id] -= 0.01
+
+        # Hack for team 2 no reward
+        for agent in self.agents.values():
+            if agent.team == 2:
+                self.rewards[agent.id] = 0
     
     def render(self, fig=None, shape_dict=None, **kwargs):
         fig.clear()

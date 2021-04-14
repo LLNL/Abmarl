@@ -102,7 +102,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('TeamBattle'),
+        'title': '{}'.format('TeamBattle-team_2_no_reward'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
@@ -122,7 +122,7 @@ params = {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 35,
+            "num_workers": 71,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             # "rollout_fragment_length": 200,
         },
