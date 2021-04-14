@@ -74,7 +74,7 @@ register_env(env_name, lambda env_config: env)
 from ray.rllib.examples.policy.random_policy import RandomPolicy
 policies = {
     'team1': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
-    'team2': (RandomPolicy, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
+    'team2': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
 }
 def policy_mapping_fn(agent_id):
     return f'team{agents[agent_id].team}'
@@ -106,10 +106,10 @@ params = {
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
-        'checkpoint_freq': 100,
+        'checkpoint_freq': 100_000,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 20,
+            'episodes_total': 2_000_000,
         },
         'verbose': 2,
         'config': {
@@ -122,9 +122,9 @@ params = {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 1,
+            "num_workers": 35,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
-            "rollout_fragment_length": 1,
+            # "rollout_fragment_length": 200,
         },
     }
 }
