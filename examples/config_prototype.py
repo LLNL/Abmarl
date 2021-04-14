@@ -24,7 +24,8 @@ from admiral.pols import HeuristicPolicy
 class CustomHeuristicPolicy(HeuristicPolicy):
     """A custom heuristic policy for you the design"""
     def compute_actions(self, obs_batch, *args, **kwargs):
-        return [some_action for _ in obs_batch], [], {}
+        # return [some_action for _ in obs_batch], [], {}
+        return [0 for _ in obs_batch], [], {}
 
 policies = {
     'policy_0_name': (None, agents[0].observation_space, agents[0].action_space, {}),
