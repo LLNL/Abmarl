@@ -257,24 +257,24 @@ class GridPositionBasedObserver:
             # For left and top, we just do: view - x,y >= 0
             # For the right and bottom, we just do region - x,y - 1 - view > 0
             if my_agent.agent_view - my_agent.position[0] >= 0: # Top end
-                signal[0:(my_agent.agent_view - my_agent.position[0]), :] = -1
+                signal[0:int(my_agent.agent_view - my_agent.position[0]), :] = -1
             if my_agent.agent_view - my_agent.position[1] >= 0: # Left end
-                signal[:, 0:(my_agent.agent_view - my_agent.position[1])] = -1
+                signal[:, 0:int(my_agent.agent_view - my_agent.position[1])] = -1
             if self.position.region - my_agent.position[0] - my_agent.agent_view - 1 < 0: # Bottom end
-                signal[(self.position.region - my_agent.position[0] - my_agent.agent_view - 1):,:] = -1
+                signal[int(self.position.region - my_agent.position[0] - my_agent.agent_view - 1):,:] = -1
             if self.position.region - my_agent.position[1] - my_agent.agent_view - 1 < 0: # Right end
-                signal[:, (self.position.region - my_agent.position[1] - my_agent.agent_view - 1):] = -1
+                signal[:, int(self.position.region - my_agent.position[1] - my_agent.agent_view - 1):] = -1
 
             # --- Determine the positions of all the other alive agents --- #
             for other_id, other_agent in self.agents.items():
                 if other_id == my_agent.id: continue # Don't observe yourself
                 if not isinstance(other_agent, PositionAgent): continue # Can only observe position of PositionAgents
                 if not (isinstance(other_agent, LifeAgent) and other_agent.is_alive): continue # Can only observe alive agents
-                r_diff = other_agent.position[0] - my_agent.position[0]
-                c_diff = other_agent.position[1] - my_agent.position[1]
+                r_diff = int(other_agent.position[0] - my_agent.position[0])
+                c_diff = int(other_agent.position[1] - my_agent.position[1])
                 if -my_agent.agent_view <= r_diff <= my_agent.agent_view and -my_agent.agent_view <= c_diff <= my_agent.agent_view:
-                    r_diff += my_agent.agent_view
-                    c_diff += my_agent.agent_view
+                    r_diff += int(my_agent.agent_view)
+                    c_diff += int(my_agent.agent_view)
                     signal[r_diff, c_diff] = 1 # There is an agent at this location.
 
             return {'position': signal}
