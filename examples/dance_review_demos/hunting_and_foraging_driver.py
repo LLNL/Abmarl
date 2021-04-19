@@ -59,7 +59,7 @@ team_attack_matrix[2, 1] = 1 # Foragers can attack food
 team_attack_matrix[3, 2] = 1 # Hunters can attack foragers
 env = HuntingForagingEnv(
     region=region, # The size of the region, both x and y
-    number_of_teams=3, # The number of teams
+    number_of_teams=2, # The number of teams
     agents=agents, # Give the environment the dictionary of agents we created above
     # team_attack_matrix=team_attack_matrix,
     # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
@@ -115,7 +115,7 @@ def policy_mapping_fn(agent_id):
 # --------------------------- #
 
 # Full list of supported algorithms here: https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
-algo_name = 'PG'
+algo_name = 'PPO'
 
 
 # ------------------ #
@@ -125,7 +125,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('SingleForager-RelativePositionObserver'),
+        'title': '{}'.format('SingleForager'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
