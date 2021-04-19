@@ -7,7 +7,7 @@ from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from admiral.envs.components.actor import GridMovementActor, AttackActor
-from admiral.envs.components.done import AnyTeamDeadDone
+from admiral.envs.components.done import AnyTeamDeadDone, TeamDeadDone
 
 # Environment needs a corresponding agent component
 from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
@@ -62,7 +62,8 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # done when either:
         # (1) All the hunter have killed all the foragers.
         # (2) All the foragers have killed all the resources.
-        self.done = AnyTeamDeadDone(**kwargs)
+        # self.done = AnyTeamDeadDone(**kwargs)
+        self.done = TeamDeadDone(**kwargs)
 
         # This is needed at the end of init in every environment. It ensures that
         # agents have been configured correctly.
