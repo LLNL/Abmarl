@@ -125,7 +125,7 @@ algo_name = 'PG'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('SingleForager'),
+        'title': '{}'.format('SingleForager-RelativePositionObserver'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
