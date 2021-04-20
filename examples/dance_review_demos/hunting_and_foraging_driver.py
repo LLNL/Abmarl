@@ -19,7 +19,7 @@ food = {f'food{i}': FoodAgent(id=f'food{i}', team=1) for i in range(12)}
 # Foragers try to eat all the food agents before they die
 foragers = {f'forager{i}': HuntingForagingAgent(
     id=f'forager{i}',
-    agent_view=19, # Partial Observation Mask: how far away this agent can see other agents.
+    agent_view=3, # Partial Observation Mask: how far away this agent can see other agents.
     team=2, # Which team this agent is on
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
@@ -131,7 +131,8 @@ algo_name = 'A2C'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('SingleForager'),
+        'title': '{}'.format('SingleForager-GridTeamObs-View_3'),
+        # 'title': '{}'.format('TestRun'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
