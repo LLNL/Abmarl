@@ -47,9 +47,9 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # get_obs is called. In this environment supports agents that can observe
         # the position, health, and team of other agents and itself.
         # self.partial_observer = GridPositionBasedObserver(position=self.position_state, **kwargs)
-        # position_observer = PositionObserver(position=self.position_state, **kwargs)
-        # team_observer = TeamObserver(**kwargs)
-        # life_observer = LifeObserver(**kwargs)
+        position_observer = PositionObserver(position=self.position_state, **kwargs)
+        team_observer = TeamObserver(**kwargs)
+        life_observer = LifeObserver(**kwargs)
         self.partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)
 
         # Actor components
@@ -139,7 +139,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
     
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
-        return self.position_observer.get_obs(agent, **kwargs)
+        return self.partial_observer.get_obs(agent, **kwargs)
     
     def get_reward(self, agent_id, **kwargs):
         """
