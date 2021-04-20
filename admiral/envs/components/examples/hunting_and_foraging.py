@@ -5,7 +5,7 @@ import numpy as np
 # Import all the features that we need from the simulation components
 from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
-# from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
+from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from admiral.envs.components.actor import GridMovementActor, AttackActor
 from admiral.envs.components.done import AnyTeamDeadDone, TeamDeadDone
 
@@ -46,7 +46,8 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # These components handle the observations that the agents receive whenever
         # get_obs is called. In this environment supports agents that can observe
         # the position, health, and team of other agents and itself.
-        self.position_observer = GridPositionBasedObserver(position=self.position_state, **kwargs)
+        self.partial_observer = GridPositionBasedObserver(position=self.position_state, **kwargs)
+        # position_observer = PositionObserver(position=self.position_state, **kwargs)
         # team_observer = TeamObserver(**kwargs)
         # life_observer = LifeObserver(**kwargs)
         # self.partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)
@@ -134,7 +135,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
     
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
-        return self.position_observer.get_obs(agent, **kwargs)
+        return self.partial_observer.get_obs(agent, **kwargs)
     
     def get_reward(self, agent_id, **kwargs):
         """

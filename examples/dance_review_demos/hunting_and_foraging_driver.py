@@ -125,15 +125,14 @@ algo_name = 'A2C'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('SingleForger-GridObservation'),
+        'title': '{}'.format('SingleForager-GridObs'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
-        'checkpoint_freq': 100_000,
-        'checkpoint_at_end': True,
+        'checkpoint_freq': 1,
+        'checkpoint_at_end': False,
         'stop': {
             'episodes_total': 1_000_000,
-            # 'episodes_total': 1,
         },
         'verbose': 2,
         'config': {

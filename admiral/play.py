@@ -59,7 +59,8 @@ def run(full_trained_directory, parameters):
 
     # Render the environment
     from ray.rllib.env import MultiAgentEnv
-    env = agent.workers.local_worker().env
+    env = experiment_mod.env
+    # env = agent.workers.local_worker().env
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):
