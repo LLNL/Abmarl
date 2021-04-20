@@ -6,7 +6,8 @@
 # --- Create the agents and the environment --- #
 
 # Import the simulation environment and agents
-from admiral.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
+# from admiral.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
+from admiral.envs.simple_env import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
 
 # Instatiate the agents that will operate in this environment. All possible agent
 # attributes are listed below.
@@ -64,6 +65,11 @@ env = HuntingForagingEnv(
     # team_attack_matrix=team_attack_matrix,
     # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
 )
+
+# Hack the action space
+from gym.spaces import Discrete
+for agent in agents.values():
+    agent.action_space = Discrete(10)
 
 # --- Prepare the environment for use with RLlib --- #
 
@@ -125,11 +131,11 @@ algo_name = 'A2C'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('SingleForager-GridObs'),
+        'title': '{}'.format('SingleForager'),
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
-        'checkpoint_freq': 1,
+        'checkpoint_freq': 10,
         'checkpoint_at_end': False,
         'stop': {
             'episodes_total': 1_000_000,
