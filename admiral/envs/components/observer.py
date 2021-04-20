@@ -310,7 +310,7 @@ class GridPositionTeamBasedObserver:
             if isinstance(agent, AgentObservingAgent) and \
                isinstance(agent, PositionAgent) and \
                isinstance(agent, PositionObservingAgent):
-                agent.observation_space['position'] = Box(-1, np.inf, (agent.agent_view*2+1, agent.agent_view*2+1, self.number_of_teams), np.int)
+                agent.observation_space['position'] = Box(-1, len(self.agents), (agent.agent_view*2+1, agent.agent_view*2+1, self.number_of_teams), np.int)
     
     def get_obs(self, my_agent, **kwargs):
         """
@@ -328,13 +328,13 @@ class GridPositionTeamBasedObserver:
             # For left and top, we just do: view - x,y >= 0
             # For the right and bottom, we just do region - x,y - 1 - view > 0
             if my_agent.agent_view - my_agent.position[0] >= 0: # Top end
-                signal[0:my_agent.agent_view - my_agent.position[0], :] = -1
+                signal[0:int(my_agent.agent_view - my_agent.position[0]), :] = -1
             if my_agent.agent_view - my_agent.position[1] >= 0: # Left end
-                signal[:, 0:my_agent.agent_view - my_agent.position[1]] = -1
+                signal[:, 0:int(my_agent.agent_view - my_agent.position[1])] = -1
             if self.position.region - my_agent.position[0] - my_agent.agent_view - 1 < 0: # Bottom end
-                signal[self.position.region - my_agent.position[0] - my_agent.agent_view - 1:,:] = -1
+                signal[int(self.position.region - my_agent.position[0] - my_agent.agent_view - 1):,:] = -1
             if self.position.region - my_agent.position[1] - my_agent.agent_view - 1 < 0: # Right end
-                signal[:, self.position.region - my_agent.position[1] - my_agent.agent_view - 1:] = -1
+                signal[:, int(self.position.region - my_agent.position[1] - my_agent.agent_view - 1):] = -1
 
             # Repeat the boundaries signal for all teams
             signal = np.repeat(signal[:, :, np.newaxis], self.number_of_teams, axis=2)
@@ -345,11 +345,11 @@ class GridPositionTeamBasedObserver:
                 if not isinstance(other_agent, PositionAgent): continue # Cannot observe agent without position
                 if not isinstance(other_agent, TeamAgent): continue # Cannot observe agent without team.
                 if not (isinstance(other_agent, LifeAgent) and other_agent.is_alive): continue # Can only observe alive agents
-                r_diff = other_agent.position[0] - my_agent.position[0]
-                c_diff = other_agent.position[1] - my_agent.position[1]
+                r_diff = int(other_agent.position[0] - my_agent.position[0])
+                c_diff = int(other_agent.position[1] - my_agent.position[1])
                 if -my_agent.agent_view <= r_diff <= my_agent.agent_view and -my_agent.agent_view <= c_diff <= my_agent.agent_view:
-                    r_diff += my_agent.agent_view
-                    c_diff += my_agent.agent_view
+                    r_diff += int(my_agent.agent_view)
+                    c_diff += int(my_agent.agent_view)
                     signal[r_diff, c_diff, other_agent.team] += 1
 
             return {'position': signal}
