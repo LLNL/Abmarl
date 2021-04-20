@@ -1,45 +1,198 @@
 
+from matplotlib import pyplot as plt
 import numpy as np
 
+# Import all the features that we need from the simulation components
 from admiral.envs.components.state import GridPositionState, LifeState
-from admiral.envs.components.actor import AttackActor
+from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
+# from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
+from admiral.envs.components.actor import GridMovementActor, AttackActor
+from admiral.envs.components.done import AnyTeamDeadDone, TeamDeadDone
 
-from admiral.envs import AgentBasedSimulation, Agent
+# Environment needs a corresponding agent component
+from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
 
-class MySimpleEnv(AgentBasedSimulation):
+# Import the interface
+from admiral.envs import AgentBasedSimulation
+
+# Import extra tools
+from admiral.tools.matplotlib_utils import mscatter
+
+# All HuntingForagingAgents
+# have a position, team, and life/death state
+# can observe positions, teams, and life state of other agents
+# can move around the grid and attack other agents
+class HuntingForagingAgent(TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent): pass
+
+# All FoodAgents
+# have a tema, position, and life
+# They are not really "agents" in the RL sense, they're just entities in the simulation for the foragers to gather.
+class FoodAgent(TeamAgent, PositionAgent, LifeAgent): pass
+
+# Create the simulation environment from the components
+class HuntingForagingEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
+        # Explicitly pull out the the dictionary of agents. This makes the env
+        # easier to work with.
         self.agents = kwargs['agents']
-        
-        # state
+
+        # State components
+        # These components track the state of the agents. This environment supports
+        # agents with positions, life, and team.
         self.position_state = GridPositionState(**kwargs)
         self.life_state = LifeState(**kwargs)
 
-        # actor
+        # Observer components
+        # These components handle the observations that the agents receive whenever
+        # get_obs is called. In this environment supports agents that can observe
+        # the position, health, and team of other agents and itself.
+        self.position_observer = GridPositionBasedObserver(position=self.position_state, **kwargs)
+        # team_observer = TeamObserver(**kwargs)
+        # life_observer = LifeObserver(**kwargs)
+        # self.partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)
+
+        # Actor components
+        # These components handle the actions in the step function. This environment
+        # supports agents that can move around and attack agents from other teams.
+        self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
         self.attack_actor = AttackActor(**kwargs)
 
-        # observers
+        # Done components
+        # This component tracks when the simulation is done. This environment is
+        # done when either:
+        # (1) All the hunter have killed all the foragers.
+        # (2) All the foragers have killed all the resources.
+        # self.done = AnyTeamDeadDone(**kwargs)
+        self.done = TeamDeadDone(**kwargs)
 
+        # This is needed at the end of init in every environment. It ensures that
+        # agents have been configured correctly.
+        self.finalize()
+
+        # Shortcut for action mapping to movements
+        self._action_mapping_dict = {
+            1: np.array([0, 1]),
+            2: np.array([1, 1]),
+            3: np.array([1, 0]),
+            4: np.array([1, -1]),
+            5: np.array([0, -1]),
+            6: np.array([-1, -1]),
+            7: np.array([-1, 0]),
+            8: np.array([-1, 1]),
+        }
+    
+    def reset(self, **kwargs):
+        # The state handlers need to reset. Since the agents' teams do not change
+        # throughout the episode, the team state does not need to reset.
+        self.position_state.reset(**kwargs)
+        self.life_state.reset(**kwargs)
+
+        # We haven't designed the rewards handling yet, so we'll do it manually for now.
+        # An important principle to follow in MARL: track the rewards of all the agents
+        # and report them when get_reward is called. Once the reward is reported,
+        # reset it to zero.
+        self.rewards = {agent: 0 for agent in self.agents}
 
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if action == 0: # don't move anywhere
                 pass
-            if action == 1: # move up
-                self.position_state.modify_position(agent, np.array([0, 1]))
-            if action == 2: # move up-right
-                self.position_state.modify_position(agent, np.array([1, 1]))
-            if action == 3: # move right
-                self.position_state.modify_position(agent, np.array([1, 0]))
-            if action == 4: # move down-right
-                self.position_state.modify_position(agent, np.array([1, -1]))
-            if action == 5: # move down
-                self.position_state.modify_position(agent, np.array([0, -1]))
-            if action == 6: # move down-left
-                self.position_state.modify_position(agent, np.array([-1, -1]))
-            if action == 7: # move left
-                self.position_state.modify_position(agent, np.array([-1, 0]))
-            if action == 8: # move up-left
-                self.position_state.modify_position(agent, np.array([-1, 1]))
-            if action == 9: # attack
+            elif action == 9: # attack
                 attacked_agent = self.attack_actor.process_attack(agent, 1)
+                if attacked_agent is not None:
+                    self.life_state.modify_health(attacked_agent, -agent.attack_strength)
+                    # Reward the attacking agent for its successful attack
+                    self.rewards[agent.id] += 1
+            else:
+                proposed_move = self._action_mapping_dict[action]
+                amount_moved = self.move_actor.process_move(agent, proposed_move)
+                if np.any(proposed_move != amount_moved):
+                    self.rewards[agent.id] -= 0.1
+        
+        # Small penalty for every agent that acted in this time step to incentive rapid actions
+        for agent_id in action_dict:
+            self.rewards[agent_id] -= 0.01
+    
+    def render(self, fig=None, shape_dict=None, **kwargs):
+        fig.clear()
+        render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
+
+        ax = fig.gca()
+        ax.set(xlim=(0, self.position_state.region), ylim=(0, self.position_state.region))
+        ax.set_xticks(np.arange(0, self.position_state.region, 1))
+        ax.set_yticks(np.arange(0, self.position_state.region, 1))
+        ax.grid()
+
+        agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
+        agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+
+        if shape_dict:
+            shape = [shape_dict[agent.team] for agent in self.agents.values() if render_condition[agent.id]]
+        else:
+            shape = 'o'
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=100, edgecolor='black', facecolor='gray')
+
+        plt.plot()
+        plt.pause(1e-6)
+    
+    def get_obs(self, agent_id, **kwargs):
+        agent = self.agents[agent_id]
+        return self.position_observer.get_obs(agent, **kwargs)
+    
+    def get_reward(self, agent_id, **kwargs):
+        """
+        Return the agents reward and reset it to zero.
+        """
+        reward_out = self.rewards[agent_id]
+        self.rewards[agent_id] = 0
+        return reward_out
+
+    def get_done(self, agent_id, **kwargs):
+        return self.done.get_done(self.agents[agent_id], **kwargs)
+    
+    def get_all_done(self, **kwargs):
+        return self.done.get_all_done(**kwargs)
+    
+    def get_info(self, *args, **kwargs):
+        return {}
+
+if __name__ == '__main__':
+    food = {f'food{i}': FoodAgent(id=f'food{i}', team=1) for i in range(12)}
+    foragers = {f'forager{i}': HuntingForagingAgent(id=f'forager{i}', agent_view=5, team=2, move_range=1, attack_range=1, attack_strength=1) for i in range(7)}
+    hunters =  {f'hunter{i}':  HuntingForagingAgent(id=f'hunter{i}',  agent_view=2, team=3, move_range=1, attack_range=1, attack_strength=1) for i in range(2)}
+    agents = {**food, **foragers, **hunters}
+
+    region = 20
+    team_attack_matrix = np.zeros((4, 4))
+    team_attack_matrix[2, 1] = 1
+    team_attack_matrix[3, 2] = 1
+    env = HuntingForagingEnv(
+        region=region,
+        agents=agents,
+        team_attack_matrix=team_attack_matrix,
+        number_of_teams=3,
+    )
+
+    from gym.spaces import Discrete
+    # Hack the action space
+    for agent in agents.values():
+        agent.action_space = Discrete(10)
+
+    env.reset()
+
+    shape_dict = {
+        1: 's',
+        2: 'o',
+        3: 'd'
+    }
+
+    import pprint; pprint.pprint({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    fig = plt.gcf()
+    env.render(fig=fig, shape_dict=shape_dict)
+
+    for _ in range(50):
+        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive and isinstance(agent, HuntingForagingAgent)}
+        env.step(action_dict)
+        env.render(fig=fig, shape_dict=shape_dict)
+        print(env.get_all_done())
