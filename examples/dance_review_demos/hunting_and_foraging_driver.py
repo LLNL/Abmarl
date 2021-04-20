@@ -24,7 +24,7 @@ foragers = {f'forager{i}': HuntingForagingAgent(
     move_range=1, # How far the agent can move within a single step.
     min_health=0.0, # If the agent's health falls below this value, it will die.
     max_health=1.0, # Agent's health cannot grow above this value.
-    attack_range=0, # How far this agent's attack will reach.
+    attack_range=1, # How far this agent's attack will reach.
     attack_strength=1.0, # How powerful the agent's attack is.
     attack_accuracy=1.0, # Probability of successful attack
     initial_position=None # Episode-starting position. If None, then random within the region.
@@ -180,7 +180,11 @@ if __name__ == "__main__":
 
     for _ in range(100):
         action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive and isinstance(agent, HuntingForagingAgent)}
-        _, _, done, _ = env.step(action_dict)
+        obs, _, done, _ = env.step(action_dict)
         env.render(fig=fig, shape_dict=shape_dict)
         if done['__all__']:
             break
+        if action_dict['forager0'] == 9:
+            print('Attack occured!')
+            # print(obs['forager0']['life'])
+            plt.pause(1)
