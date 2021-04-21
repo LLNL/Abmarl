@@ -28,23 +28,23 @@ foragers = {f'forager{i}': HuntingForagingAgent(
     attack_strength=1.0, # How powerful the agent's attack is.
     attack_accuracy=1.0, # Probability of successful attack
     initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(1)}
+) for i in range(5)}
 
 # # Hunters try to eat all the foraging agents before all the food disappears.
-# hunters =  {f'hunter{i}': HuntingForagingAgent(
-#     id=f'hunter{i}', 
-#     agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
-#     team=3, # Which team this agent is on
-#     move_range=1, # How far the agent can move within a single step.
-#     min_health=0.0, # If the agent's health falls below this value, it will die.
-#     max_health=1.0, # Agent's health cannot grow above this value.
-#     attack_range=1, # How far this agent's attack will reach.
-#     attack_strength=1.0, # How powerful the agent's attack is.
-#     attack_accuracy=1.0, # Probability of successful attack
-#     initial_position=None # Episode-starting position. If None, then random within the region.
-# ) for i in range(2)}
+hunters =  {f'hunter{i}': HuntingForagingAgent(
+    id=f'hunter{i}', 
+    agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
+    team=3, # Which team this agent is on
+    move_range=1, # How far the agent can move within a single step.
+    min_health=0.0, # If the agent's health falls below this value, it will die.
+    max_health=1.0, # Agent's health cannot grow above this value.
+    attack_range=1, # How far this agent's attack will reach.
+    attack_strength=1.0, # How powerful the agent's attack is.
+    attack_accuracy=1.0, # Probability of successful attack
+    initial_position=None # Episode-starting position. If None, then random within the region.
+) for i in range(1)}
 
-agents = {**food, **foragers} #, **hunters}
+agents = {**food, **foragers, **hunters}
 
 # Instantiate the environment
 
@@ -60,9 +60,9 @@ team_attack_matrix[2, 1] = 1 # Foragers can attack food
 team_attack_matrix[3, 2] = 1 # Hunters can attack foragers
 env = HuntingForagingEnv(
     region=region, # The size of the region, both x and y
-    number_of_teams=2, # The number of teams
+    number_of_teams=3, # The number of teams
     agents=agents, # Give the environment the dictionary of agents we created above
-    # team_attack_matrix=team_attack_matrix,
+    team_attack_matrix=team_attack_matrix,
     # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
 )
 
@@ -98,7 +98,7 @@ register_env(env_name, lambda env_config: env)
 # the specs from one of the agent to define the policies' inputs and outputs.
 policies = {
     'foragers': (None, agents['forager0'].observation_space, agents['forager0'].action_space, {}),
-    # 'hunters': (None, agents['hunter0'].observation_space, agents['hunter0'].action_space, {}),
+    'hunters': (None, agents['hunter0'].observation_space, agents['hunter0'].action_space, {}),
 }
 def policy_mapping_fn(agent_id):
     if agents[agent_id].team == 2:
@@ -131,7 +131,7 @@ algo_name = 'A2C'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('SingleForager-GridTeamObs-View_3'),
+        'title': '{}'.format('ManyRandomForager_5-SinglePredator-GridTeamObs-View_3'),
         # 'title': '{}'.format('TestRun'),
     },
     'ray_tune': {
@@ -172,7 +172,7 @@ if __name__ == "__main__":
     shape_dict = {
         1: 's',
         2: 'o',
-        # 3: 'd'
+        3: 'd'
     }
 
     obs = env.reset()
@@ -185,7 +185,7 @@ if __name__ == "__main__":
         env.render(fig=fig, shape_dict=shape_dict)
         if done['__all__']:
             break
-        if action_dict['forager0'] == 9:
-            print('Attack occured!')
+        # if action_dict['forager0'] == 9:
+        #     print('Attack occured!')
             # print(obs['forager0']['life'])
-            plt.pause(1)
+            # plt.pause(1)

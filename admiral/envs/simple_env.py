@@ -4,7 +4,7 @@ import numpy as np
 
 # Import all the features that we need from the simulation components
 from admiral.envs.components.state import GridPositionState, LifeState
-from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionTeamBasedObserver
+from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionTeamBasedObserver, GridPositionBasedObserver
 from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from admiral.envs.components.actor import GridMovementActor, AttackActor
 from admiral.envs.components.done import AnyTeamDeadDone, TeamDeadDone
@@ -47,6 +47,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # get_obs is called. In this environment supports agents that can observe
         # the position, health, and team of other agents and itself.
         self.partial_observer = GridPositionTeamBasedObserver(position=self.position_state, **kwargs)
+        # self.partial_observer = GridPositionBasedObserver(position=self.position_state, **kwargs)
         # position_observer = PositionObserver(position=self.position_state, **kwargs)
         # team_observer = TeamObserver(**kwargs)
         # life_observer = LifeObserver(**kwargs)
@@ -63,8 +64,8 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # done when either:
         # (1) All the hunter have killed all the foragers.
         # (2) All the foragers have killed all the resources.
-        # self.done = AnyTeamDeadDone(**kwargs)
-        self.done = TeamDeadDone(**kwargs)
+        self.done = AnyTeamDeadDone(**kwargs)
+        # self.done = TeamDeadDone(**kwargs)
 
         # This is needed at the end of init in every environment. It ensures that
         # agents have been configured correctly.
@@ -114,6 +115,11 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # Small penalty for every agent that acted in this time step to incentive rapid actions
         for agent_id in action_dict:
             self.rewards[agent_id] -= 0.01
+        
+        # Hack for hunters to not learn anything
+        for agent in self.agents.values():
+            if agent.team == 3: # Hunter team
+                self.rewards[agent.id] = 0
     
     def render(self, fig=None, shape_dict=None, **kwargs):
         fig.clear()
