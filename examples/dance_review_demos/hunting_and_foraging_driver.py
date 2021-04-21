@@ -131,7 +131,7 @@ algo_name = 'A2C'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('ManyForager_5-ManySmartPredator_2-GridTeamObs-View_3'),
+        'title': '{}'.format('ManyForager_5-ManySmartPredator_2-GridTeamObs-View_3-PenalizeDeath'),
         # 'title': '{}'.format('TestRun'),
     },
     'ray_tune': {

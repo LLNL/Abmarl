@@ -106,6 +106,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
                     self.life_state.modify_health(attacked_agent, -agent.attack_strength)
                     # Reward the attacking agent for its successful attack
                     self.rewards[agent.id] += 1
+                    self.rewards[attacked_agent.id] -= 1
             else:
                 proposed_move = self._action_mapping_dict[action]
                 amount_moved = self.move_actor.process_move(agent, proposed_move)
