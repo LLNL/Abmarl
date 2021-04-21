@@ -117,9 +117,9 @@ class HuntingForagingEnv(AgentBasedSimulation):
             self.rewards[agent_id] -= 0.01
         
         # Hack for hunters to not learn anything
-        for agent in self.agents.values():
-            if agent.team == 3: # Hunter team
-                self.rewards[agent.id] = 0
+        # for agent in self.agents.values():
+        #     if agent.team == 3: # Hunter team
+        #         self.rewards[agent.id] = 0
     
     def render(self, fig=None, shape_dict=None, **kwargs):
         fig.clear()

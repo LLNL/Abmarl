@@ -42,7 +42,7 @@ hunters =  {f'hunter{i}': HuntingForagingAgent(
     attack_strength=1.0, # How powerful the agent's attack is.
     attack_accuracy=1.0, # Probability of successful attack
     initial_position=None # Episode-starting position. If None, then random within the region.
-) for i in range(1)}
+) for i in range(2)}
 
 agents = {**food, **foragers, **hunters}
 
@@ -131,7 +131,7 @@ algo_name = 'A2C'
 # List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
-        'title': '{}'.format('ManyRandomForager_5-SinglePredator-GridTeamObs-View_3'),
+        'title': '{}'.format('ManyForager_5-ManySmartPredator_2-GridTeamObs-View_3'),
         # 'title': '{}'.format('TestRun'),
     },
     'ray_tune': {
