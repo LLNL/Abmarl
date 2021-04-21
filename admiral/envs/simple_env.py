@@ -126,6 +126,17 @@ class HuntingForagingEnv(AgentBasedSimulation):
         fig.clear()
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
 
+        shape_dict = {
+            1: 's',
+            2: 'o',
+            3: 'd',
+        }
+        color_dict = {
+            1: 'green',
+            2: 'blue',
+            3: 'red',
+        }
+
         ax = fig.gca()
         ax.set(xlim=(0, self.position_state.region), ylim=(0, self.position_state.region))
         ax.set_xticks(np.arange(0, self.position_state.region, 1))
@@ -135,11 +146,9 @@ class HuntingForagingEnv(AgentBasedSimulation):
         agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
         agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
 
-        if shape_dict:
-            shape = [shape_dict[agent.team] for agent in self.agents.values() if render_condition[agent.id]]
-        else:
-            shape = 'o'
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=100, edgecolor='black', facecolor='gray')
+        shape = [shape_dict[agent.team] for agent in self.agents.values() if render_condition[agent.id]]
+        color = [color_dict[agent.team] for agent in self.agents.values() if render_condition[agent.id]]
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=100, edgecolor='black', c=color)
 
         plt.plot()
         plt.pause(1e-6)
