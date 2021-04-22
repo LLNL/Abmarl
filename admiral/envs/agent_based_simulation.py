@@ -1,6 +1,40 @@
 
 from abc import ABC, abstractmethod
 
+class Agent:
+    """
+    Base Agent class for agents that live in an environment. All agents require
+    a string id.
+
+    id (str):
+        The agent's id.
+
+    seed (int):
+        Seed this agent's rng. Default value is None.
+    """
+    def __init__(self, id=None, seed=None, **kwargs):
+        self.id = id
+        self.seed = seed
+    
+    @property
+    def id(self):
+        return self._id
+    
+    @id.setter
+    def id(self, value):
+        assert type(id) is str, "Agents must be constructed with an id."
+        self._id = value
+
+    @property
+    def configured(self):
+        """
+        Determine if the agent has been successfully configured.
+        """
+        return self.id is not None
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
+
 class AgentBasedSimulation(ABC):
     """
     AgentBasedSimulation defines the interface that agent-based simulations will
