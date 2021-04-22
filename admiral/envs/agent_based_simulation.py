@@ -24,6 +24,9 @@ class Agent:
     def id(self, value):
         assert type(id) is str, "Agents must be constructed with an id."
         self._id = value
+    
+    def finalize(self, **kwargs):
+        pass
 
     @property
     def configured(self):
@@ -72,9 +75,17 @@ class AgentBasedSimulation(ABC):
     the single-agent environment as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
     """
-    @abstractmethod
-    def __init__(self):
-        pass
+    @property
+    def agents(self):
+        return self._agents
+
+    @agents.setter
+    def agents(self, value_agents):
+        assert type(value_agents) is dict, "Agents must be a dictionary."
+        for agent_id, agent in value_agents.items():
+            assert isinstance(agent, Agent), "Values of agents dictionary must be of type Agent."
+            assert agent_id == agent.id, "Keys of the dictionary must be the same as the Agent's id."
+        self._agents = value_agents
 
     def finalize(self):
         """
@@ -110,20 +121,35 @@ class AgentBasedSimulation(ABC):
     
     @abstractmethod
     def get_obs(self, agent_id, **kwargs):
+        """
+        Return the agent's observation.
+        """
         pass
     
     @abstractmethod
     def get_reward(self, agent_id, **kwargs):
+        """
+        Return the agent's reward.
+        """
         pass
     
     @abstractmethod
     def get_done(self, agent_id, **kwargs):
+        """
+        Return the agent's done status.
+        """
         pass
     
     @abstractmethod
     def get_all_done(self, **kwargs):
+        """
+        Return the environment's done status.
+        """
         pass
     
     @abstractmethod
     def get_info(self, agent_id, **kwargs):
+        """
+        Return the agent's info.
+        """
         pass
