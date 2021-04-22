@@ -22,8 +22,17 @@ class Agent:
     
     @id.setter
     def id(self, value):
-        assert type(id) is str, "Agents must be constructed with an id."
+        assert type(value) is str, "id must be a string."
         self._id = value
+    
+    @property
+    def seed(self):
+        return self._seed
+    
+    @seed.setter
+    def seed(self, value):
+        assert value is None or type(value) is int, "Seed must be an integer."
+        self._seed = value
     
     def finalize(self, **kwargs):
         pass
