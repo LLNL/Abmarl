@@ -79,6 +79,38 @@ class ActingAgent(Agent):
             self.action_space = Dict(self.action_space)
         self.action_space.seed(self.seed)
 
+class ObservingAgent(Agent):
+    """
+    ObservingAgents are Agents that are expected to receive observations and therefore
+    should have an observation space in order to be successfully configured.
+    """
+    def __init__(self, observation_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.observation_space = observation_space
+
+    @property
+    def observation_space(self):
+        return self._observation_space
+    
+    @observation_space.setter
+    def observation_space(self, value):
+        self._observation_space = {} if value is None else value
+    
+    @property
+    def configured(self):
+        return super().configured and self.observation_space is not None
+
+    def finalize(self, **kwargs):
+        """
+        Wrap all the observation spaces with a Dict and seed it if the agent was
+        created with a seed.
+        """
+        super().finalize(**kwargs)
+        if type(self.observation_space) is dict:
+            from gym.spaces import Dict
+            self.observation_space = Dict(self.observation_space)
+        self.observation_space.seed(self.seed)
+
 
 
 class AgentBasedSimulation(ABC):

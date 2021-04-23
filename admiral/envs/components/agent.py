@@ -92,28 +92,6 @@ class ComponentAgent(Agent):
             self.is_alive is not None and \
             self.team is not None
 
-class ObservingAgent(Agent):
-    """
-    ObservingAgents are Agents that are expected to receive observations and therefore
-    should have an observation space in order to be successfully configured.
-    """
-    def __init__(self, observation_space=None, **kwargs):
-        super().__init__(**kwargs)
-        self.observation_space = {} if observation_space is None else observation_space
-
-    def finalize(self, **kwargs):
-        """
-        Wrap all the observation spaces with a Dict and seed it if the agent was
-        created with a seed.
-        """
-        super().finalize(**kwargs)
-        self.observation_space = Dict(self.observation_space)
-        self.observation_space.seed(self.seed)
-    
-    @property
-    def configured(self):
-        return super().configured and self.observation_space
-
 
 
 # ----------------- #
