@@ -33,9 +33,6 @@ class Agent:
     def seed(self, value):
         assert value is None or type(value) is int, "Seed must be an integer."
         self._seed = value
-    
-    def finalize(self, **kwargs):
-        pass
 
     @property
     def configured(self):
@@ -43,9 +40,46 @@ class Agent:
         Determine if the agent has been successfully configured.
         """
         return self.id is not None
+    
+    def finalize(self, **kwargs):
+        pass
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
+
+class ActingAgent(Agent):
+    """
+    ActingAgents are Agents that are expected to produce actions and therefore
+    should have an action space in order to be successfully configured.
+    """
+    def __init__(self, action_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.action_space = action_space
+    
+    @property
+    def action_space(self):
+        return self._action_space
+    
+    @action_space.setter
+    def action_space(self, value):
+        self._action_space = {} if value is None else value
+    
+    @property
+    def configured(self):
+        return super().configured and self.action_space is not None
+            
+    def finalize(self, **kwargs):
+        """
+        Wrap all the action spaces with a Dict if applicable and seed it if the agent was
+        created with a seed.
+        """
+        super().finalize(**kwargs)
+        if type(self.action_space) is dict:
+            from gym.spaces import Dict
+            self.action_space = Dict(self.action_space)
+        self.action_space.seed(self.seed)
+
+
 
 class AgentBasedSimulation(ABC):
     """

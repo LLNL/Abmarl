@@ -92,28 +92,6 @@ class ComponentAgent(Agent):
             self.is_alive is not None and \
             self.team is not None
 
-class ActingAgent(Agent):
-    """
-    ActingAgents are Agents that are expected to produce actions and therefore
-    should have an action space in order to be successfully configured.
-    """
-    def __init__(self, action_space=None, **kwargs):
-        super().__init__(**kwargs)
-        self.action_space = {} if action_space is None else action_space
-
-    def finalize(self, **kwargs):
-        """
-        Wrap all the action spaces with a Dict and seed it if the agent was
-        created with a seed.
-        """
-        super().finalize(**kwargs)
-        self.action_space = Dict(self.action_space)
-        self.action_space.seed(self.seed)
-    
-    @property
-    def configured(self):
-        return super().configured and self.action_space
-
 class ObservingAgent(Agent):
     """
     ObservingAgents are Agents that are expected to receive observations and therefore
