@@ -1,7 +1,7 @@
 
 import pytest
 
-from admiral.envs import Agent, AgentBasedSimulation
+from admiral.envs import AgentBasedSimulation, Agent, ActingAgent, ObservingAgent
 
 def test_agent_id():
     with pytest.raises(AssertionError):
@@ -38,6 +38,51 @@ def test_agents_equal():
     agent_2.id = '1'
     agent_2.seed = 12
     assert agent_1 != agent_2
+
+def test_acting_agent_action_space():
+    with pytest.raises(AssertionError):
+        ActingAgent(id='agent', action_space=13)
+    
+    with pytest.raises(AssertionError):
+        agent = ActingAgent(id='agent', action_space={'key': 'value'})
+    
+    agent = ActingAgent(id='agent')
+    assert not agent.configured
+    
+    from gym.spaces import Discrete
+    agent = ActingAgent(id='agent', action_space={'key': Discrete(12)})
+    assert not agent.configured
+    agent.finalize()
+    assert agent.configured
+
+def test_acting_agent_seed():
+    from gym.spaces import Discrete
+    agent = ActingAgent(id='agent', seed=24, action_space={
+        1: Discrete(12),
+        2: Discrete(3),
+    })
+    agent.finalize()
+    assert agent.configured
+    assert agent.action_space.sample() == {1: 6, 2: 2}
+
+def test_observing_agent_action_space():
+    with pytest.raises(AssertionError):
+        ObservingAgent(id='agent', observation_space=13)
+    
+    with pytest.raises(AssertionError):
+        agent = ObservingAgent(id='agent', observation_space={'key': 'value'})
+    
+    agent = ObservingAgent(id='agent')
+    assert not agent.configured
+    
+    from gym.spaces import Discrete
+    agent = ObservingAgent(id='agent', observation_space={'key': Discrete(12)})
+    assert not agent.configured
+    agent.finalize()
+    assert agent.configured
+
+# TODO: test a combination of acting and observing agents, esp with seeded action
+    
 
 def test_agent_based_simulation_agents():
     class ABS(AgentBasedSimulation):
