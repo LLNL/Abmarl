@@ -1,6 +1,9 @@
 
 from abc import ABC, abstractmethod
 
+from gym.spaces import Space
+from admiral.tools import gym_utils as gu
+
 class Agent:
     """
     Base Agent class for agents that live in an environment. All agents require
@@ -62,11 +65,13 @@ class ActingAgent(Agent):
     
     @action_space.setter
     def action_space(self, value):
+        assert value is None or gu.check_space(value), \
+            "The action space must be None, a gym Space, or a dict of gym Spaces."
         self._action_space = {} if value is None else value
     
     @property
     def configured(self):
-        return super().configured and self.action_space is not None
+        return super().configured and gu.check_space(self.action_space, strict=True)
             
     def finalize(self, **kwargs):
         """
@@ -75,8 +80,7 @@ class ActingAgent(Agent):
         """
         super().finalize(**kwargs)
         if type(self.action_space) is dict:
-            from gym.spaces import Dict
-            self.action_space = Dict(self.action_space)
+            self.action_space = gu.make_dict(self.action_space)
         self.action_space.seed(self.seed)
 
 class ObservingAgent(Agent):
@@ -94,11 +98,13 @@ class ObservingAgent(Agent):
     
     @observation_space.setter
     def observation_space(self, value):
+        assert value is None or gu.check_space(value), \
+            "The observation space must be None, a gym Space, or a dict of gym Spaces."
         self._observation_space = {} if value is None else value
     
     @property
     def configured(self):
-        return super().configured and self.observation_space is not None
+        return super().configured and gu.check_space(self.observation_space, strict=True)
 
     def finalize(self, **kwargs):
         """
@@ -107,8 +113,7 @@ class ObservingAgent(Agent):
         """
         super().finalize(**kwargs)
         if type(self.observation_space) is dict:
-            from gym.spaces import Dict
-            self.observation_space = Dict(self.observation_space)
+            self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
 
