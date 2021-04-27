@@ -88,7 +88,8 @@ def test_pure_agent():
     agent.finalize()
     assert agent.configured
 
-    assert agent.action_space.sample() == {'act': 0}    
+    assert agent.action_space.sample() == {'act': 0}
+    assert agent.observation_space.sample() == {'obs': 0}
 
 def test_agent_based_simulation_agents():
     class ABS(AgentBasedSimulation):
