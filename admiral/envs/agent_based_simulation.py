@@ -116,6 +116,12 @@ class ObservingAgent(Agent):
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
+class PureAgent(ObservingAgent, ActingAgent):
+    """
+    A PureAgent can observe and act.
+    """
+    pass
+
 
 
 class AgentBasedSimulation(ABC):
