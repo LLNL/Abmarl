@@ -1,5 +1,5 @@
 
-from .agent_based_simulation import AgentBasedSimulation, Agent
+from .agent_based_simulation import AgentBasedSimulation, Agent, ActingAgent, ObservingAgent
 # from admiral.envs.components.agent import Agent, ObservingAgent, ActingAgent
 
 # class SimpleAgent(ObservingAgent, ActingAgent):
