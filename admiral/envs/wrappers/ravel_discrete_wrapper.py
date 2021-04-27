@@ -113,6 +113,7 @@ def _isbounded(space):
         not (space.high == np.iinfo(space.dtype).min).any() and \
         not (space.high == np.iinfo(space.dtype).max).any()
 
+# TODO: should I add bounded feature to gym util and use that instead?
 def check_space(space):
     """
     Ensure that the space is of type that can be ravelled to discrete value.
