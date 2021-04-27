@@ -1,7 +1,7 @@
 
 import pytest
 
-from admiral.envs import AgentBasedSimulation, Agent, ActingAgent, ObservingAgent
+from admiral.envs import AgentBasedSimulation, Agent, ActingAgent, ObservingAgent, PureAgent
 
 def test_agent_id():
     with pytest.raises(AssertionError):
@@ -81,8 +81,14 @@ def test_observing_agent_action_space():
     agent.finalize()
     assert agent.configured
 
-# TODO: test a combination of acting and observing agents, esp with seeded action
-    
+def test_pure_agent():
+    from gym.spaces import Discrete
+    agent = PureAgent(id='agent', seed=7, observation_space={'obs': Discrete(2)}, action_space={'act': Discrete(5)})
+    assert not agent.configured
+    agent.finalize()
+    assert agent.configured
+
+    assert agent.action_space.sample() == {'act': 0}    
 
 def test_agent_based_simulation_agents():
     class ABS(AgentBasedSimulation):
