@@ -27,11 +27,11 @@ class ComponentAgent(Agent):
         The agent's team. Teams are indexed starting from 1, with team 0 reserved
         for agents that are not on a team (None).
     """
-    def __init__(self, initial_position=None, min_max_health=np.array([0., 1.]), initial_health=None, \
+    def __init__(self, initial_position=None, min_health=0.0, max_health=1.0, initial_health=None, \
                  team=None, **kwargs):
         super().__init__(**kwargs)
         self.initial_position = initial_position
-        self.min_max_health = min_max_health
+        self.min_max_health = np.array([min_health, max_health])
         self.initial_health = initial_health
         self.is_alive = True
         self.team = team
@@ -58,6 +58,14 @@ class ComponentAgent(Agent):
         assert value.shape == (2,), "MinMax health must be a 2-dimensional array."
         assert value[0] <= value[1], "MinMax health must have the first element (the min health) less than or equal to the second (the max health)."
         self._min_max_health = value
+    
+    @property
+    def min_health(self):
+        return self.min_max_health[0]
+    
+    @property
+    def max_health(self):
+        return self.min_max_health[1]
     
     @property
     def initial_health(self):
