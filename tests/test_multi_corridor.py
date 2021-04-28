@@ -2,7 +2,7 @@
 from gym.spaces import Box, MultiBinary, Discrete, Dict
 import numpy as np
 
-from admiral.envs import SimpleAgent as Agent
+from admiral.envs import PureAgent as Agent
 from admiral.envs.corridor import MultiCorridor as Corridor
 
 

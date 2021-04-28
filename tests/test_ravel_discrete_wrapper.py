@@ -2,7 +2,7 @@
 from admiral.envs import AgentBasedSimulation
 from admiral.envs.wrappers.ravel_discrete_wrapper import ravel, unravel
 from admiral.envs.wrappers import RavelDiscreteWrapper
-from admiral.envs import SimpleAgent as Agent
+from admiral.envs import PureAgent as Agent
 
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np

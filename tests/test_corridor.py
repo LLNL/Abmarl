@@ -1,7 +1,7 @@
 
 from gym.spaces import Discrete
 
-from admiral.envs import SimpleAgent as Agent
+from admiral.envs import PureAgent as Agent
 from admiral.envs.corridor import Corridor
 
 def test_corridor_attributes():
