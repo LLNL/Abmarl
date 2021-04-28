@@ -2,7 +2,7 @@
 from gym.spaces import Dict
 import numpy as np
 
-from admiral.envs import Agent
+from admiral.envs import Agent, ActingAgent, ObservingAgent
 
 # ------------------ #
 # --- Base Agent --- #
@@ -45,6 +45,7 @@ class ComponentAgent(Agent):
         if value is not None:
             assert type(value) is np.ndarray, "Initial position must be a numpy array."
             assert value.shape == (2,), "Initial position must be a 2-dimensional array."
+            assert value.dtype in [np.int, np.float]
         self._initial_position = value
     
     @property
