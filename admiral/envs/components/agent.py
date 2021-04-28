@@ -99,7 +99,7 @@ class ComponentAgent(Agent):
 # --- Attacking --- #
 # ----------------- #
 
-class AttackingAgent(ActingAgent):
+class AttackingAgent(ActingAgent, ComponentAgent):
     """
     Agents that can attack other agents.
 
@@ -137,7 +137,7 @@ class AttackingAgent(ActingAgent):
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastingAgent(ActingAgent):
+class BroadcastingAgent(ActingAgent, ComponentAgent):
     """
     BroadcastingAgents can broadcast their observation within some range of their
     position.
@@ -157,7 +157,7 @@ class BroadcastingAgent(ActingAgent):
         """
         return super().configured and self.broadcast_range is not None
 
-class BroadcastObservingAgent(ObservingAgent): pass
+class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 
@@ -165,8 +165,8 @@ class BroadcastObservingAgent(ObservingAgent): pass
 # --- Health and Life --- #
 # ----------------------- #
 
-class LifeObservingAgent(ObservingAgent): pass
-class HealthObservingAgent(ObservingAgent): pass
+class LifeObservingAgent(ObservingAgent, ComponentAgent): pass
+class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 # ----------------- #
@@ -174,7 +174,7 @@ class HealthObservingAgent(ObservingAgent): pass
 # ----------------- #
 
 # TODO: move this to a more specific location
-class AgentObservingAgent(ObservingAgent):
+class AgentObservingAgent(ObservingAgent, ComponentAgent):
     """
     Agents can observe other agents.
 
@@ -203,9 +203,9 @@ class AgentObservingAgent(ObservingAgent):
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionObservingAgent(ObservingAgent): pass
+class PositionObservingAgent(ObservingAgent, ComponentAgent): pass
 
-class GridMovementAgent(ActingAgent):
+class GridMovementAgent(ActingAgent, ComponentAgent):
     """
     Agents can move up to some number of spaces away.
 
@@ -224,7 +224,7 @@ class GridMovementAgent(ActingAgent):
         """
         return super().configured and self.move_range is not None
 
-class SpeedAngleAgent(Agent):
+class SpeedAngleAgent(ComponentAgent):
     """
     Agents have a speed and a banking angle which are used to determine how the
     agent moves around a continuous field.
@@ -289,7 +289,7 @@ class SpeedAngleActingAgent(ActingAgent):
 
 class SpeedAngleObservingAgent(ObservingAgent): pass
 
-class VelocityAgent(Agent):
+class VelocityAgent(ComponentAgent):
     """
     Agents have a velocity which determines how it moves around in a continuous
     field. Agents can accelerate to modify their velocities.
@@ -401,4 +401,4 @@ class ResourceObservingAgent(ObservingAgent):
 # --- Team --- #
 # ------------ #
 
-class TeamObservingAgent(ObservingAgent): pass
+class TeamObservingAgent(ObservingAgent, ComponentAgent): pass
