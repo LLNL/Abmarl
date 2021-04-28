@@ -66,7 +66,7 @@ class ComponentAgent(Agent):
     @initial_health.setter
     def initial_health(self, value):
         if value is not None:
-            assert type(value) is float, "Initial health must be a float."
+            assert type(value) in [float, int], "Initial health must be a float."
             assert self.min_max_health[0] <= value <= self.min_max_health[1], "Initial health must be between the min and max health."
         self._initial_health = value
     
