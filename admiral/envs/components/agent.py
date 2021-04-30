@@ -98,7 +98,7 @@ class ComponentAgent(Agent):
 # --- Attacking --- #
 # ----------------- #
 
-class AttackingAgent(ActingAgent, ComponentAgent):
+class AttackingAgent(ActingAgent):
     """
     Agents that can attack other agents.
 
@@ -136,7 +136,7 @@ class AttackingAgent(ActingAgent, ComponentAgent):
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastingAgent(ActingAgent, ComponentAgent):
+class BroadcastingAgent(ActingAgent):
     """
     BroadcastingAgents can broadcast their observation within some range of their
     position.
@@ -156,7 +156,7 @@ class BroadcastingAgent(ActingAgent, ComponentAgent):
         """
         return super().configured and self.broadcast_range is not None
 
-class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
+class BroadcastObservingAgent(ObservingAgent): pass
 
 
 
@@ -164,8 +164,8 @@ class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
 # --- Health and Life --- #
 # ----------------------- #
 
-class LifeObservingAgent(ObservingAgent, ComponentAgent): pass
-class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
+class LifeObservingAgent(ObservingAgent): pass
+class HealthObservingAgent(ObservingAgent): pass
 
 
 # ----------------- #
@@ -173,7 +173,7 @@ class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
 # ----------------- #
 
 # TODO: move this to a more specific location
-class AgentObservingAgent(ObservingAgent, ComponentAgent):
+class AgentObservingAgent(ObservingAgent):
     """
     Agents can observe other agents.
 
@@ -202,9 +202,9 @@ class AgentObservingAgent(ObservingAgent, ComponentAgent):
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionObservingAgent(ObservingAgent, ComponentAgent): pass
+class PositionObservingAgent(ObservingAgent): pass
 
-class GridMovementAgent(ActingAgent, ComponentAgent):
+class GridMovementAgent(ActingAgent):
     """
     Agents can move up to some number of spaces away.
 
@@ -400,4 +400,4 @@ class ResourceObservingAgent(ObservingAgent):
 # --- Team --- #
 # ------------ #
 
-class TeamObservingAgent(ObservingAgent, ComponentAgent): pass
+class TeamObservingAgent(ObservingAgent): pass

@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, BroadcastingAgent, ComponentAgent
 from admiral.envs.components.state import GridPositionState, LifeState, ContinuousPositionState, SpeedAngleState, VelocityState, BroadcastState
 from admiral.envs.components.observer import HealthObserver, LifeObserver, PositionObserver, \
     RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, TeamObserver
@@ -205,7 +205,7 @@ def test_position_restricted_observer_wrapper():
 
 
 
-class CommunicatingAgent(BroadcastingAgent, PositionObservingAgent, TeamObservingAgent, AgentObservingAgent): pass
+class CommunicatingAgent(BroadcastingAgent, PositionObservingAgent, TeamObservingAgent, AgentObservingAgent, ComponentAgent): pass
 
 def test_broadcast_communication_observer_wrapper():
     agents = {

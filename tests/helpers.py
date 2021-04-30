@@ -32,7 +32,7 @@ class FillInHelper(AgentBasedSimulation):
 
 class MultiAgentEnv(FillInHelper):
     def __init__(self, num_agents=3):
-        self.agents = {'agent' + str(i): Agent(id='agent'+str(i), observation_space=0, action_space=0) for i in range(num_agents)}
+        self.agents = {'agent' + str(i): Agent(id='agent'+str(i), observation_space=Discrete(2), action_space=Discrete(2)) for i in range(num_agents)}
 
     def reset(self):
         self.action = {agent.id: None for agent in self.agents.values()}

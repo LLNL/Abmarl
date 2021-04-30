@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from admiral.envs.components.agent import Agent
+from admiral.envs.components.agent import ComponentAgent as Agent
 from admiral.envs.components.state import LifeState, ContinuousPositionState
 from admiral.envs.components.done import DeadDone, TeamDeadDone, TooCloseDone
 
