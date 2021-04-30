@@ -31,7 +31,9 @@ class ComponentAgent(Agent):
                  team=None, **kwargs):
         super().__init__(**kwargs)
         self.initial_position = initial_position
-        self.min_max_health = np.array([min_health, max_health])
+        assert type(min_health) in [float, int] and type(max_health) in [float, int], "Min and max health must be numerical."
+        assert min_health <= max_health, "The min health must be less than or equal to the max_health."
+        self._min_max_health = np.array([min_health, max_health])
         self.initial_health = initial_health
         self.is_alive = True
         self.team = team
@@ -45,27 +47,16 @@ class ComponentAgent(Agent):
         if value is not None:
             assert type(value) is np.ndarray, "Initial position must be a numpy array."
             assert value.shape == (2,), "Initial position must be a 2-dimensional array."
-            assert value.dtype in [np.int, np.float]
+            assert value.dtype in [np.int, np.float], "Initial position must be numerical."
         self._initial_position = value
     
     @property
-    def min_max_health(self):
-        return self._min_max_health
-    
-    @min_max_health.setter
-    def min_max_health(self, value):
-        assert type(value) is np.ndarray, "MinMax health must be a numpy array."
-        assert value.shape == (2,), "MinMax health must be a 2-dimensional array."
-        assert value[0] <= value[1], "MinMax health must have the first element (the min health) less than or equal to the second (the max health)."
-        self._min_max_health = value
-    
-    @property
     def min_health(self):
-        return self.min_max_health[0]
+        return self._min_max_health[0]
     
     @property
     def max_health(self):
-        return self.min_max_health[1]
+        return self._min_max_health[1]
     
     @property
     def initial_health(self):
@@ -75,7 +66,7 @@ class ComponentAgent(Agent):
     def initial_health(self, value):
         if value is not None:
             assert type(value) in [float, int], "Initial health must be a float."
-            assert self.min_max_health[0] <= value <= self.min_max_health[1], "Initial health must be between the min and max health."
+            assert self.min_health <= value <= self.max_health, "Initial health must be between the min and max health."
         self._initial_health = value
     
     @property
@@ -97,7 +88,7 @@ class ComponentAgent(Agent):
         Determine if the agent has been successfully configured.
         """
         return super().configured and \
-            self.min_max_health is not None and \
+            self._min_max_health is not None and \
             self.is_alive is not None and \
             self.team is not None
 
