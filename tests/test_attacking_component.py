@@ -2,11 +2,11 @@
 from gym.spaces import MultiBinary
 import numpy as np
 
-from admiral.envs.components.agent import AttackingAgent, ComponentAgent
+from admiral.envs.components.agent import AttackingAgent
 from admiral.envs.components.actor import AttackActor
 
 
-class AttackTestAgent(AttackingAgent, ComponentAgent):
+class AttackTestAgent(AttackingAgent):
     pass
 
 def test_position_based_attack_actor():

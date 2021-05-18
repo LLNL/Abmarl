@@ -100,7 +100,7 @@ class ComponentAgent(Agent):
 # --- Attacking --- #
 # ----------------- #
 
-class AttackingAgent(ActingAgent):
+class AttackingAgent(ActingAgent, ComponentAgent):
     """
     Agents that can attack other agents.
 
@@ -138,7 +138,7 @@ class AttackingAgent(ActingAgent):
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastingAgent(ActingAgent):
+class BroadcastingAgent(ActingAgent, ComponentAgent):
     """
     BroadcastingAgents can broadcast their observation within some range of their
     position.
@@ -158,7 +158,7 @@ class BroadcastingAgent(ActingAgent):
         """
         return super().configured and self.broadcast_range is not None
 
-class BroadcastObservingAgent(ObservingAgent): pass
+class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 
@@ -166,8 +166,8 @@ class BroadcastObservingAgent(ObservingAgent): pass
 # --- Health and Life --- #
 # ----------------------- #
 
-class LifeObservingAgent(ObservingAgent): pass
-class HealthObservingAgent(ObservingAgent): pass
+class LifeObservingAgent(ObservingAgent, ComponentAgent): pass
+class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 # ----------------- #
@@ -175,7 +175,7 @@ class HealthObservingAgent(ObservingAgent): pass
 # ----------------- #
 
 # TODO: move this to a more specific location
-class AgentObservingAgent(ObservingAgent):
+class AgentObservingAgent(ObservingAgent, ComponentAgent):
     """
     Agents can observe other agents.
 
@@ -204,9 +204,9 @@ class AgentObservingAgent(ObservingAgent):
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionObservingAgent(ObservingAgent): pass
+class PositionObservingAgent(ObservingAgent, ComponentAgent): pass
 
-class GridMovementAgent(ActingAgent):
+class GridMovementAgent(ActingAgent, ComponentAgent):
     """
     Agents can move up to some number of spaces away.
 
@@ -266,7 +266,7 @@ class SpeedAngleAgent(ComponentAgent):
         return super().configured and self.min_speed is not None and self.max_speed is not None and \
             self.max_banking_angle is not None
 
-class SpeedAngleActingAgent(ActingAgent):
+class SpeedAngleActingAgent(ActingAgent, ComponentAgent):
     """
     Agents can change their speed and banking angles.
     
@@ -288,7 +288,7 @@ class SpeedAngleActingAgent(ActingAgent):
         return super().configured and self.max_acceleration is not None and \
             self.max_banking_angle_change is not None
 
-class SpeedAngleObservingAgent(ObservingAgent): pass
+class SpeedAngleObservingAgent(ObservingAgent, ComponentAgent): pass
 
 class VelocityAgent(ComponentAgent):
     """
@@ -314,7 +314,7 @@ class VelocityAgent(ComponentAgent):
     def configured(self):
         return super().configured and self.max_speed is not None
 
-class AcceleratingAgent(ActingAgent):
+class AcceleratingAgent(ActingAgent, ComponentAgent):
     """
     Agents can accelerate to modify their velocities.
     
@@ -330,7 +330,7 @@ class AcceleratingAgent(ActingAgent):
     def configured(self):
         return super().configured and self.max_acceleration is not None
 
-class VelocityObservingAgent(ObservingAgent): pass
+class VelocityObservingAgent(ObservingAgent, ComponentAgent): pass
 
 class CollisionAgent(Agent):
     """
@@ -357,7 +357,7 @@ class CollisionAgent(Agent):
 # --- Resources and Harvesting --- #
 # -------------------------------- #
 
-class HarvestingAgent(ActingAgent):
+class HarvestingAgent(ActingAgent, ComponentAgent):
     """
     Agents can harvest resources.
 
@@ -377,7 +377,7 @@ class HarvestingAgent(ActingAgent):
         """
         return super().configured and self.max_harvest is not None
 
-class ResourceObservingAgent(ObservingAgent):
+class ResourceObservingAgent(ObservingAgent, ComponentAgent):
     """
     Agents can observe the resources in the environment.
 
@@ -402,4 +402,4 @@ class ResourceObservingAgent(ObservingAgent):
 # --- Team --- #
 # ------------ #
 
-class TeamObservingAgent(ObservingAgent): pass
+class TeamObservingAgent(ObservingAgent, ComponentAgent): pass

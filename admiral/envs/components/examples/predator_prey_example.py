@@ -7,14 +7,14 @@ from admiral.envs.components.state import GridPositionState, LifeState, GridReso
 from admiral.envs.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
 from admiral.envs.components.actor import GridMovementActor, AttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone
-from admiral.envs.components.agent import AgentObservingAgent, PositionObservingAgent, ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent, ComponentAgent
+from admiral.envs.components.agent import AgentObservingAgent, PositionObservingAgent, ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class PreyAgent(ComponentAgent, GridMovementAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent, PositionObservingAgent):
+class PreyAgent(GridMovementAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent, PositionObservingAgent):
     pass
 
-class PredatorAgent(ComponentAgent, GridMovementAgent, AgentObservingAgent, AttackingAgent, PositionObservingAgent):
+class PredatorAgent(GridMovementAgent, AgentObservingAgent, AttackingAgent, PositionObservingAgent):
     pass
 
 class PredatorPreyEnvGridBased(AgentBasedSimulation):

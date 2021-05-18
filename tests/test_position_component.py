@@ -7,8 +7,8 @@ from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver, RelativePositionObserver
 from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, ComponentAgent
 
-class PositionTestAgent(ComponentAgent, PositionObservingAgent, AgentObservingAgent): pass
-class PositionTeamTestAgent(ComponentAgent, PositionObservingAgent, AgentObservingAgent): pass
+class PositionTestAgent(PositionObservingAgent, AgentObservingAgent): pass
+class PositionTeamTestAgent(PositionObservingAgent, AgentObservingAgent): pass
 class PositionTeamNoViewTestAgent(ComponentAgent): pass
 
 def test_grid_position_observer():
