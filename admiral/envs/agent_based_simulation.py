@@ -180,8 +180,8 @@ class AgentBasedSimulation(ABC):
         Dict spaces for interfacing with the trainer.
         """
         for agent in self.agents.values():
-            assert agent.configured
             agent.finalize()
+            assert agent.configured
     
     @abstractmethod
     def reset(self, **kwargs):
