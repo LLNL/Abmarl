@@ -15,9 +15,11 @@ class ComponentAgent(Agent):
     initial_position (np.array or None):
         The desired starting position for this agent.
 
-    min_max_health (np.array):
-        The first element of the array is the minimal health that the agent can
-        reach before it dies. The second element of the array is the maximum health.
+    min_health (float):
+        The minimum health the agent can reach before it dies.
+
+    max_health (float):
+        The maximum health the agent can reach.
 
     initial_health (float or None):
         The initial health of the agent. The health will be set to this initial
