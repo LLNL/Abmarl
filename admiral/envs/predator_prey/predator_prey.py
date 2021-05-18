@@ -4,10 +4,10 @@ from abc import ABC, abstractmethod
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
-from admiral.envs import Agent
+from admiral.envs import PrincipleAgent
 from admiral.envs import AgentBasedSimulation
 
-class PredatorPreyAgent(Agent, ABC):
+class PredatorPreyAgent(PrincipleAgent, ABC):
     """
     In addition to their own agent-type-specific parameters, every Agent in the
     Predator Prey environment will have the following parameters:

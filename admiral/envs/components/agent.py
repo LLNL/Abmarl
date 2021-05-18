@@ -1,116 +1,100 @@
 
 from gym.spaces import Dict
+import numpy as np
+
+from admiral.envs import PrincipleAgent, ActingAgent, ObservingAgent
 
 # ------------------ #
 # --- Base Agent --- #
 # ------------------ #
 
-class Agent:
+class ComponentAgent(PrincipleAgent):
     """
-    Base Agent class for agents that live in an environment. Agents require an
-    id in in order to even be constructed. All agents have a position, life, and
-    team.
+    Component Agents have a position, life, and team.
 
-    initial_position (np.array):
+    initial_position (np.array or None):
         The desired starting position for this agent.
 
     min_health (float):
-        The minimum value the health can reach before the agent dies.
-    
-    max_health (float):
-        The maximum value the health can reach.
+        The minimum health the agent can reach before it dies.
+        Default 0.0.
 
-    initial_health (float):
+    max_health (float):
+        The maximum health the agent can reach.
+        Default 1.0.
+
+    initial_health (float or None):
         The initial health of the agent. The health will be set to this initial
         option at reset time.
 
-    team (int):
+    team (int or None):
         The agent's team. Teams are indexed starting from 1, with team 0 reserved
-        for agents that are not on a team.
-
-    seed (int):
-        Seed this agent's rng. Default value is None.
+        for agents that are not on a team (None).
     """
-    def __init__(self, id=None, seed=None, initial_position=None, \
-                 min_health=0.0, max_health=1.0, initial_health=None, \
+    def __init__(self, initial_position=None, min_health=0.0, max_health=1.0, initial_health=None, \
                  team=None, **kwargs):
-        if id is None:
-            raise TypeError("Agents must be constructed with an id.")
-        else:
-            self.id = id
-        self.seed = seed
+        super().__init__(**kwargs)
         self.initial_position = initial_position
-        if initial_health is not None:
-            assert min_health <= initial_health <= max_health
+        assert type(min_health) in [float, int] and type(max_health) in [float, int], "Min and max health must be numerical."
+        assert min_health <= max_health, "The min health must be less than or equal to the max_health."
+        self._min_max_health = np.array([min_health, max_health])
         self.initial_health = initial_health
-        self.min_health = min_health
-        self.max_health = max_health
         self.is_alive = True
-        assert team != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
-        if team is None:
-            team = 0
         self.team = team
+    
+    @property
+    def initial_position(self):
+        return self._initial_position
+    
+    @initial_position.setter
+    def initial_position(self, value):
+        if value is not None:
+            assert type(value) is np.ndarray, "Initial position must be a numpy array."
+            assert value.shape == (2,), "Initial position must be a 2-dimensional array."
+            assert value.dtype in [np.int, np.float], "Initial position must be numerical."
+        self._initial_position = value
+    
+    @property
+    def min_health(self):
+        return self._min_max_health[0]
+    
+    @property
+    def max_health(self):
+        return self._min_max_health[1]
+    
+    @property
+    def initial_health(self):
+        return self._initial_health
+    
+    @initial_health.setter
+    def initial_health(self, value):
+        if value is not None:
+            assert type(value) in [float, int], "Initial health must be a float."
+            assert self.min_health <= value <= self.max_health, "Initial health must be between the min and max health."
+        self._initial_health = value
+    
+    @property
+    def team(self):
+        return self._team
+    
+    @team.setter
+    def team(self, value):
+        if value is not None:
+            assert type(value) is int, "Team must be an int."
+            assert value != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
+            self._team = value
+        else:
+            self._team = 0
         
-    def finalize(self, **kwargs):
-        pass
-
     @property
     def configured(self):
         """
         Determine if the agent has been successfully configured.
         """
-        return self.id is not None and \
-            self.min_health is not None and \
-            self.max_health is not None and \
+        return super().configured and \
+            self._min_max_health is not None and \
             self.is_alive is not None and \
             self.team is not None
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
-
-class ActingAgent(Agent):
-    """
-    ActingAgents are Agents that are expected to produce actions and therefore
-    should have an action space in order to be successfully configured.
-    """
-    def __init__(self, action_space=None, **kwargs):
-        super().__init__(**kwargs)
-        self.action_space = {} if action_space is None else action_space
-
-    def finalize(self, **kwargs):
-        """
-        Wrap all the action spaces with a Dict and seed it if the agent was
-        created with a seed.
-        """
-        super().finalize(**kwargs)
-        self.action_space = Dict(self.action_space)
-        self.action_space.seed(self.seed)
-    
-    @property
-    def configured(self):
-        return super().configured and self.action_space
-
-class ObservingAgent(Agent):
-    """
-    ObservingAgents are Agents that are expected to receive observations and therefore
-    should have an observation space in order to be successfully configured.
-    """
-    def __init__(self, observation_space=None, **kwargs):
-        super().__init__(**kwargs)
-        self.observation_space = {} if observation_space is None else observation_space
-
-    def finalize(self, **kwargs):
-        """
-        Wrap all the observation spaces with a Dict and seed it if the agent was
-        created with a seed.
-        """
-        super().finalize(**kwargs)
-        self.observation_space = Dict(self.observation_space)
-        self.observation_space.seed(self.seed)
-    
-    @property
-    def configured(self):
-        return super().configured and self.observation_space
 
 
 
@@ -118,7 +102,7 @@ class ObservingAgent(Agent):
 # --- Attacking --- #
 # ----------------- #
 
-class AttackingAgent(ActingAgent):
+class AttackingAgent(ActingAgent, ComponentAgent):
     """
     Agents that can attack other agents.
 
@@ -156,7 +140,7 @@ class AttackingAgent(ActingAgent):
 # --- Communication --- #
 # --------------------- #
 
-class BroadcastingAgent(ActingAgent):
+class BroadcastingAgent(ActingAgent, ComponentAgent):
     """
     BroadcastingAgents can broadcast their observation within some range of their
     position.
@@ -176,7 +160,7 @@ class BroadcastingAgent(ActingAgent):
         """
         return super().configured and self.broadcast_range is not None
 
-class BroadcastObservingAgent(ObservingAgent): pass
+class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 
@@ -184,8 +168,8 @@ class BroadcastObservingAgent(ObservingAgent): pass
 # --- Health and Life --- #
 # ----------------------- #
 
-class LifeObservingAgent(ObservingAgent): pass
-class HealthObservingAgent(ObservingAgent): pass
+class LifeObservingAgent(ObservingAgent, ComponentAgent): pass
+class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 # ----------------- #
@@ -193,7 +177,7 @@ class HealthObservingAgent(ObservingAgent): pass
 # ----------------- #
 
 # TODO: move this to a more specific location
-class AgentObservingAgent(ObservingAgent):
+class AgentObservingAgent(ObservingAgent, ComponentAgent):
     """
     Agents can observe other agents.
 
@@ -222,9 +206,9 @@ class AgentObservingAgent(ObservingAgent):
 # --- Position and Movement --- #
 # ----------------------------- #
 
-class PositionObservingAgent(ObservingAgent): pass
+class PositionObservingAgent(ObservingAgent, ComponentAgent): pass
 
-class GridMovementAgent(ActingAgent):
+class GridMovementAgent(ActingAgent, ComponentAgent):
     """
     Agents can move up to some number of spaces away.
 
@@ -243,7 +227,7 @@ class GridMovementAgent(ActingAgent):
         """
         return super().configured and self.move_range is not None
 
-class SpeedAngleAgent(Agent):
+class SpeedAngleAgent(ComponentAgent):
     """
     Agents have a speed and a banking angle which are used to determine how the
     agent moves around a continuous field.
@@ -284,7 +268,7 @@ class SpeedAngleAgent(Agent):
         return super().configured and self.min_speed is not None and self.max_speed is not None and \
             self.max_banking_angle is not None
 
-class SpeedAngleActingAgent(ActingAgent):
+class SpeedAngleActingAgent(ActingAgent, ComponentAgent):
     """
     Agents can change their speed and banking angles.
     
@@ -306,9 +290,9 @@ class SpeedAngleActingAgent(ActingAgent):
         return super().configured and self.max_acceleration is not None and \
             self.max_banking_angle_change is not None
 
-class SpeedAngleObservingAgent(ObservingAgent): pass
+class SpeedAngleObservingAgent(ObservingAgent, ComponentAgent): pass
 
-class VelocityAgent(Agent):
+class VelocityAgent(ComponentAgent):
     """
     Agents have a velocity which determines how it moves around in a continuous
     field. Agents can accelerate to modify their velocities.
@@ -332,7 +316,7 @@ class VelocityAgent(Agent):
     def configured(self):
         return super().configured and self.max_speed is not None
 
-class AcceleratingAgent(ActingAgent):
+class AcceleratingAgent(ActingAgent, ComponentAgent):
     """
     Agents can accelerate to modify their velocities.
     
@@ -348,9 +332,9 @@ class AcceleratingAgent(ActingAgent):
     def configured(self):
         return super().configured and self.max_acceleration is not None
 
-class VelocityObservingAgent(ObservingAgent): pass
+class VelocityObservingAgent(ObservingAgent, ComponentAgent): pass
 
-class CollisionAgent(Agent):
+class CollisionAgent(PrincipleAgent):
     """
     Agents that have physical size and mass and can be used in collisions.
 
@@ -375,7 +359,7 @@ class CollisionAgent(Agent):
 # --- Resources and Harvesting --- #
 # -------------------------------- #
 
-class HarvestingAgent(ActingAgent):
+class HarvestingAgent(ActingAgent, ComponentAgent):
     """
     Agents can harvest resources.
 
@@ -395,7 +379,7 @@ class HarvestingAgent(ActingAgent):
         """
         return super().configured and self.max_harvest is not None
 
-class ResourceObservingAgent(ObservingAgent):
+class ResourceObservingAgent(ObservingAgent, ComponentAgent):
     """
     Agents can observe the resources in the environment.
 
@@ -420,4 +404,4 @@ class ResourceObservingAgent(ObservingAgent):
 # --- Team --- #
 # ------------ #
 
-class TeamObservingAgent(ObservingAgent): pass
+class TeamObservingAgent(ObservingAgent, ComponentAgent): pass

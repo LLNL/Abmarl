@@ -14,8 +14,6 @@ def test_gym_init():
     env = AllStepManager(MultiAgentEnv(1))
     wrapped_env = GymWrapper(env)
     assert wrapped_env.env == env
-    assert wrapped_env.observation_space == 0
-    assert wrapped_env.action_space == 0
 
 def test_gym_reset_and_step():
     env = GymWrapper(AllStepManager(MultiAgentEnv(1)))

@@ -155,8 +155,7 @@ def test_flatten_space():
 # -- Test flatten wrappers --- #
 
 from .helpers import MultiAgentEnv
-from admiral.envs import AgentBasedSimulation
-from admiral.envs import SimpleAgent as Agent
+from admiral.envs import AgentBasedSimulation, Agent
 from admiral.envs.wrappers import FlattenActionWrapper, FlattenWrapper
 
 class MultiAgentContinuousGymSpaceEnv(MultiAgentEnv):

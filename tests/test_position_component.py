@@ -5,11 +5,11 @@ import numpy as np
 
 from admiral.envs.components.state import GridPositionState, LifeState
 from admiral.envs.components.observer import PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver, RelativePositionObserver
-from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, Agent
+from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, ComponentAgent
 
 class PositionTestAgent(PositionObservingAgent, AgentObservingAgent): pass
 class PositionTeamTestAgent(PositionObservingAgent, AgentObservingAgent): pass
-class PositionTeamNoViewTestAgent(Agent): pass
+class PositionTeamNoViewTestAgent(ComponentAgent): pass
 
 def test_grid_position_observer():
     agents = {
@@ -17,7 +17,7 @@ def test_grid_position_observer():
         'agent1': PositionTestAgent(id='agent1', initial_position=np.array([2, 2]), agent_view=2),
         'agent2': PositionTestAgent(id='agent2', initial_position=np.array([3, 2]), agent_view=3),
         'agent3': PositionTestAgent(id='agent3', initial_position=np.array([1, 4]), agent_view=4),
-        'agent4': Agent(id='agent4', initial_position=np.array([1, 4])),
+        'agent4': ComponentAgent(id='agent4', initial_position=np.array([1, 4])),
     }
     
     state = GridPositionState(agents=agents, region=5)
@@ -208,7 +208,7 @@ def test_relative_position_observer():
         'agent1': PositionTestAgent(id='agent1', initial_position=np.array([2, 2]), agent_view=2),
         'agent2': PositionTestAgent(id='agent2', initial_position=np.array([3, 2]), agent_view=3),
         'agent3': PositionTestAgent(id='agent3', initial_position=np.array([1, 4]), agent_view=4),
-        'agent4': Agent(id='agent4', initial_position=np.array([1, 4])),
+        'agent4': ComponentAgent(id='agent4', initial_position=np.array([1, 4])),
     }
     
     state = GridPositionState(agents=agents, region=5)

@@ -21,12 +21,6 @@ def test_build_fails():
             'agents': None,
             'reward_map': None,
         })
-    
-def test_agent_class_attributes():
-    with pytest.raises(TypeError):
-        Predator()
-    with pytest.raises(TypeError):
-        Prey()
 
 def test_class_attributes():
     assert PredatorPreyEnv.ActionStatus.BAD_MOVE == 0

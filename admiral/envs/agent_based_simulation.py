@@ -1,6 +1,129 @@
 
 from abc import ABC, abstractmethod
 
+from gym.spaces import Space
+from admiral.tools import gym_utils as gu
+
+class PrincipleAgent:
+    """
+    Principle Agent class for agents that live in an environment. All agents require
+    a string id.
+
+    id (str):
+        The agent's id.
+
+    seed (int):
+        Seed this agent's rng. Default value is None.
+    """
+    def __init__(self, id=None, seed=None, **kwargs):
+        self.id = id
+        self.seed = seed
+    
+    @property
+    def id(self):
+        return self._id
+    
+    @id.setter
+    def id(self, value):
+        assert type(value) is str, "id must be a string."
+        self._id = value
+    
+    @property
+    def seed(self):
+        return self._seed
+    
+    @seed.setter
+    def seed(self, value):
+        assert value is None or type(value) is int, "Seed must be an integer."
+        self._seed = value
+
+    @property
+    def configured(self):
+        """
+        Determine if the agent has been successfully configured.
+        """
+        return self.id is not None
+    
+    def finalize(self, **kwargs):
+        pass
+
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
+
+class ActingAgent(PrincipleAgent):
+    """
+    ActingAgents are Agents that are expected to produce actions and therefore
+    should have an action space in order to be successfully configured.
+    """
+    def __init__(self, action_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.action_space = action_space
+    
+    @property
+    def action_space(self):
+        return self._action_space
+    
+    @action_space.setter
+    def action_space(self, value):
+        assert value is None or gu.check_space(value), \
+            "The action space must be None, a gym Space, or a dict of gym Spaces."
+        self._action_space = {} if value is None else value
+    
+    @property
+    def configured(self):
+        return super().configured and gu.check_space(self.action_space, strict=True)
+            
+    def finalize(self, **kwargs):
+        """
+        Wrap all the action spaces with a Dict if applicable and seed it if the agent was
+        created with a seed.
+        """
+        super().finalize(**kwargs)
+        if type(self.action_space) is dict:
+            self.action_space = gu.make_dict(self.action_space)
+        self.action_space.seed(self.seed)
+
+class ObservingAgent(PrincipleAgent):
+    """
+    ObservingAgents are Agents that are expected to receive observations and therefore
+    should have an observation space in order to be successfully configured.
+    """
+    def __init__(self, observation_space=None, **kwargs):
+        super().__init__(**kwargs)
+        self.observation_space = observation_space
+
+    @property
+    def observation_space(self):
+        return self._observation_space
+    
+    @observation_space.setter
+    def observation_space(self, value):
+        assert value is None or gu.check_space(value), \
+            "The observation space must be None, a gym Space, or a dict of gym Spaces."
+        self._observation_space = {} if value is None else value
+    
+    @property
+    def configured(self):
+        return super().configured and gu.check_space(self.observation_space, strict=True)
+
+    def finalize(self, **kwargs):
+        """
+        Wrap all the observation spaces with a Dict and seed it if the agent was
+        created with a seed.
+        """
+        super().finalize(**kwargs)
+        if type(self.observation_space) is dict:
+            self.observation_space = gu.make_dict(self.observation_space)
+        self.observation_space.seed(self.seed)
+
+class Agent(ObservingAgent, ActingAgent):
+    """
+    An Agent can observe and act.
+    """
+    pass
+
+
+
 class AgentBasedSimulation(ABC):
     """
     AgentBasedSimulation defines the interface that agent-based simulations will
@@ -38,9 +161,17 @@ class AgentBasedSimulation(ABC):
     the single-agent environment as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
     """
-    @abstractmethod
-    def __init__(self):
-        pass
+    @property
+    def agents(self):
+        return self._agents
+
+    @agents.setter
+    def agents(self, value_agents):
+        assert type(value_agents) is dict, "Agents must be a dictionary."
+        for agent_id, agent in value_agents.items():
+            assert isinstance(agent, PrincipleAgent), "Values of agents dictionary must be of type Agent."
+            assert agent_id == agent.id, "Keys of the dictionary must be the same as the Agent's id."
+        self._agents = value_agents
 
     def finalize(self):
         """
@@ -49,8 +180,8 @@ class AgentBasedSimulation(ABC):
         Dict spaces for interfacing with the trainer.
         """
         for agent in self.agents.values():
-            assert agent.configured
             agent.finalize()
+            assert agent.configured
     
     @abstractmethod
     def reset(self, **kwargs):
@@ -76,20 +207,35 @@ class AgentBasedSimulation(ABC):
     
     @abstractmethod
     def get_obs(self, agent_id, **kwargs):
+        """
+        Return the agent's observation.
+        """
         pass
     
     @abstractmethod
     def get_reward(self, agent_id, **kwargs):
+        """
+        Return the agent's reward.
+        """
         pass
     
     @abstractmethod
     def get_done(self, agent_id, **kwargs):
+        """
+        Return the agent's done status.
+        """
         pass
     
     @abstractmethod
     def get_all_done(self, **kwargs):
+        """
+        Return the environment's done status.
+        """
         pass
     
     @abstractmethod
     def get_info(self, agent_id, **kwargs):
+        """
+        Return the agent's info.
+        """
         pass
