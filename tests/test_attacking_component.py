@@ -5,23 +5,19 @@ import numpy as np
 from admiral.envs.components.agent import AttackingAgent
 from admiral.envs.components.actor import AttackActor
 
-
-class AttackTestAgent(AttackingAgent):
-    pass
-
 def test_position_based_attack_actor():
     agents = {
-        'agent0': AttackTestAgent(id='agent0', attack_range=1, initial_position=np.array([1, 1]), \
+        'agent0': AttackingAgent(id='agent0', attack_range=1, initial_position=np.array([1, 1]), \
             attack_strength=0.6),
-        'agent1': AttackTestAgent(id='agent1', attack_range=1, initial_position=np.array([0, 1]), \
+        'agent1': AttackingAgent(id='agent1', attack_range=1, initial_position=np.array([0, 1]), \
             attack_strength=0.6),
-        'agent2': AttackTestAgent(id='agent2', attack_range=1, initial_position=np.array([4, 2]), \
+        'agent2': AttackingAgent(id='agent2', attack_range=1, initial_position=np.array([4, 2]), \
             attack_strength=0.6),
-        'agent3': AttackTestAgent(id='agent3', attack_range=1, initial_position=np.array([4, 3]), \
+        'agent3': AttackingAgent(id='agent3', attack_range=1, initial_position=np.array([4, 3]), \
             attack_strength=0.6),
-        'agent4': AttackTestAgent(id='agent4', attack_range=0, initial_position=np.array([3, 2]), \
+        'agent4': AttackingAgent(id='agent4', attack_range=0, initial_position=np.array([3, 2]), \
             attack_strength=0.6),
-        'agent5': AttackTestAgent(id='agent5', attack_range=2, initial_position=np.array([4, 0]), \
+        'agent5': AttackingAgent(id='agent5', attack_range=2, initial_position=np.array([4, 0]), \
             attack_strength=0.6),
     }
 
@@ -59,17 +55,17 @@ def test_position_based_attack_actor():
 
 def test_position_team_based_attack_actor():
     agents = {
-        'agent0': AttackTestAgent(id='agent0', attack_range=1, initial_position=np.array([1, 1]), \
+        'agent0': AttackingAgent(id='agent0', attack_range=1, initial_position=np.array([1, 1]), \
             attack_strength=0.6, team=1),
-        'agent1': AttackTestAgent(id='agent1', attack_range=1, initial_position=np.array([0, 1]), \
+        'agent1': AttackingAgent(id='agent1', attack_range=1, initial_position=np.array([0, 1]), \
             attack_strength=0.6, team=2),
-        'agent2': AttackTestAgent(id='agent2', attack_range=1, initial_position=np.array([4, 2]), \
+        'agent2': AttackingAgent(id='agent2', attack_range=1, initial_position=np.array([4, 2]), \
             attack_strength=0.6, team=1),
-        'agent3': AttackTestAgent(id='agent3', attack_range=1, initial_position=np.array([4, 3]), \
+        'agent3': AttackingAgent(id='agent3', attack_range=1, initial_position=np.array([4, 3]), \
             attack_strength=0.6, team=1),
-        'agent4': AttackTestAgent(id='agent4', attack_range=0, initial_position=np.array([3, 2]), \
+        'agent4': AttackingAgent(id='agent4', attack_range=0, initial_position=np.array([3, 2]), \
             attack_strength=0.6, team=3),
-        'agent5': AttackTestAgent(id='agent5', attack_range=2, initial_position=np.array([4, 0]), \
+        'agent5': AttackingAgent(id='agent5', attack_range=2, initial_position=np.array([4, 0]), \
             attack_strength=0.6, team=1),
     }
 
@@ -114,8 +110,8 @@ def test_position_team_based_attack_actor():
 def test_attack_accuracy():
     np.random.seed(24)
     agents = {
-        'agent0': AttackTestAgent(id='agent0', attack_range=1, attack_strength=0, attack_accuracy=0, initial_position=np.array([1,1])),
-        'agent1': AttackTestAgent(id='agent1', attack_range=0, attack_strength=0, initial_position=np.array([0,0]))
+        'agent0': AttackingAgent(id='agent0', attack_range=1, attack_strength=0, attack_accuracy=0, initial_position=np.array([1,1])),
+        'agent1': AttackingAgent(id='agent1', attack_range=0, attack_strength=0, initial_position=np.array([0,0]))
     }
 
     assert agents['agent0'].attack_accuracy == 0
@@ -137,12 +133,12 @@ def test_attack_accuracy():
 
 def test_team_matrix():
     agents = {
-        'agent0': AttackTestAgent(id='agent0', attack_range=1, initial_position=np.array([1, 1]), attack_strength=0.6, team=1),
-        'agent1': AttackTestAgent(id='agent1', attack_range=4, initial_position=np.array([0, 1]), attack_strength=0.6, team=2),
-        'agent2': AttackTestAgent(id='agent2', attack_range=1, initial_position=np.array([4, 2]), attack_strength=0.6, team=1),
-        'agent3': AttackTestAgent(id='agent3', attack_range=1, initial_position=np.array([4, 3]), attack_strength=0.6),
-        'agent4': AttackTestAgent(id='agent4', attack_range=1, initial_position=np.array([3, 2]), attack_strength=0.6, team=3),
-        'agent5': AttackTestAgent(id='agent5', attack_range=1, initial_position=np.array([4, 0]), attack_strength=0.6, team=1),
+        'agent0': AttackingAgent(id='agent0', attack_range=1, initial_position=np.array([1, 1]), attack_strength=0.6, team=1),
+        'agent1': AttackingAgent(id='agent1', attack_range=4, initial_position=np.array([0, 1]), attack_strength=0.6, team=2),
+        'agent2': AttackingAgent(id='agent2', attack_range=1, initial_position=np.array([4, 2]), attack_strength=0.6, team=1),
+        'agent3': AttackingAgent(id='agent3', attack_range=1, initial_position=np.array([4, 3]), attack_strength=0.6),
+        'agent4': AttackingAgent(id='agent4', attack_range=1, initial_position=np.array([3, 2]), attack_strength=0.6, team=3),
+        'agent5': AttackingAgent(id='agent5', attack_range=1, initial_position=np.array([4, 0]), attack_strength=0.6, team=1),
     }
 
     for agent in agents.values():
