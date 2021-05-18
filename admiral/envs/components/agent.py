@@ -2,13 +2,13 @@
 from gym.spaces import Dict
 import numpy as np
 
-from admiral.envs import Agent, ActingAgent, ObservingAgent
+from admiral.envs import PrincipleAgent, ActingAgent, ObservingAgent
 
 # ------------------ #
 # --- Base Agent --- #
 # ------------------ #
 
-class ComponentAgent(Agent):
+class ComponentAgent(PrincipleAgent):
     """
     Component Agents have a position, life, and team.
 
@@ -332,7 +332,7 @@ class AcceleratingAgent(ActingAgent, ComponentAgent):
 
 class VelocityObservingAgent(ObservingAgent, ComponentAgent): pass
 
-class CollisionAgent(Agent):
+class CollisionAgent(PrincipleAgent):
     """
     Agents that have physical size and mass and can be used in collisions.
 

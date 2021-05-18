@@ -1,6 +1,6 @@
 
 from admiral.envs import AgentBasedSimulation
-from admiral.envs import PureAgent as Agent
+from admiral.envs import Agent
 
 from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
 import numpy as np

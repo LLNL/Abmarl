@@ -7,7 +7,7 @@ import numpy as np
 from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAgent, \
     AgentObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, VelocityObservingAgent, \
     ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, SpeedAngleAgent, \
-    VelocityAgent, BroadcastingAgent, Agent
+    VelocityAgent, BroadcastingAgent, ComponentAgent
 
 class Observer(ABC):
     """
@@ -69,7 +69,7 @@ class Observer(ABC):
                         obs_space[other.id ] = alt_space_func()
                 agent.observation_space[self.channel] = Dict(obs_space)
     
-    def _get_obs(self, agent, instance=None, other_instance=Agent, attr=None, **kwargs):
+    def _get_obs(self, agent, instance=None, other_instance=ComponentAgent, attr=None, **kwargs):
         """
         Many observers just directly query the corresponding state field from the
         agent. This function does exactly that, checking the instance of the observing

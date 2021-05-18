@@ -5,7 +5,7 @@ from gym.spaces import Dict, Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs import Agent
+from admiral.envs import PrincipleAgent
 
 class World:
     def __init__(self, region=None, agents=None, **kwargs):
@@ -115,7 +115,7 @@ class GridResources(Resources):
 
         return ax
 
-class DeathLifeAgent(Agent):
+class DeathLifeAgent(PrincipleAgent):
     count = 0
     def __init__(self, death=None, life=None, **kwargs):
         super().__init__(**kwargs)

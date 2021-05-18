@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from gym.spaces import Space
 from admiral.tools import gym_utils as gu
 
-class Agent:
+class PrincipleAgent:
     """
-    Base Agent class for agents that live in an environment. All agents require
+    Principle Agent class for agents that live in an environment. All agents require
     a string id.
 
     id (str):
@@ -50,7 +50,7 @@ class Agent:
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
 
-class ActingAgent(Agent):
+class ActingAgent(PrincipleAgent):
     """
     ActingAgents are Agents that are expected to produce actions and therefore
     should have an action space in order to be successfully configured.
@@ -83,7 +83,7 @@ class ActingAgent(Agent):
             self.action_space = gu.make_dict(self.action_space)
         self.action_space.seed(self.seed)
 
-class ObservingAgent(Agent):
+class ObservingAgent(PrincipleAgent):
     """
     ObservingAgents are Agents that are expected to receive observations and therefore
     should have an observation space in order to be successfully configured.
@@ -116,9 +116,9 @@ class ObservingAgent(Agent):
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
-class PureAgent(ObservingAgent, ActingAgent):
+class Agent(ObservingAgent, ActingAgent):
     """
-    A PureAgent can observe and act.
+    An Agent can observe and act.
     """
     pass
 
@@ -169,7 +169,7 @@ class AgentBasedSimulation(ABC):
     def agents(self, value_agents):
         assert type(value_agents) is dict, "Agents must be a dictionary."
         for agent_id, agent in value_agents.items():
-            assert isinstance(agent, Agent), "Values of agents dictionary must be of type Agent."
+            assert isinstance(agent, PrincipleAgent), "Values of agents dictionary must be of type Agent."
             assert agent_id == agent.id, "Keys of the dictionary must be the same as the Agent's id."
         self._agents = value_agents
 

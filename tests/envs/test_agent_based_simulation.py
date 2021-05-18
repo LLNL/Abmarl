@@ -1,16 +1,16 @@
 
 import pytest
 
-from admiral.envs import AgentBasedSimulation, Agent, ActingAgent, ObservingAgent, PureAgent
+from admiral.envs import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
 
 def test_agent_id():
     with pytest.raises(AssertionError):
-        Agent()
+        PrincipleAgent()
     
     with pytest.raises(AssertionError):
-        Agent(id=1)
+        PrincipleAgent(id=1)
 
-    agent = Agent(id='my_id')
+    agent = PrincipleAgent(id='my_id')
     assert agent.id == 'my_id'
     assert agent.seed is None
     assert agent.configured
@@ -20,16 +20,16 @@ def test_agent_id():
 
 def test_agent_seed():
     with pytest.raises(AssertionError):
-        Agent(id='my_id', seed=13.5)
-    agent = Agent(id='my_id', seed=12)
+        PrincipleAgent(id='my_id', seed=13.5)
+    agent = PrincipleAgent(id='my_id', seed=12)
     assert agent.seed == 12
 
     with pytest.raises(AssertionError):
         agent.seed = '12'
     
 def test_agents_equal():
-    agent_1 = Agent(id='1', seed=13)
-    agent_2 = Agent(id='1', seed=13)
+    agent_1 = PrincipleAgent(id='1', seed=13)
+    agent_2 = PrincipleAgent(id='1', seed=13)
     assert agent_1 == agent_2
     
     agent_2.id = '2'
@@ -83,7 +83,7 @@ def test_observing_agent_action_space():
 
 def test_pure_agent():
     from gym.spaces import Discrete
-    agent = PureAgent(id='agent', seed=7, observation_space={'obs': Discrete(2)}, action_space={'act': Discrete(5)})
+    agent = Agent(id='agent', seed=7, observation_space={'obs': Discrete(2)}, action_space={'act': Discrete(5)})
     assert not agent.configured
     agent.finalize()
     assert agent.configured
@@ -105,11 +105,11 @@ def test_agent_based_simulation_agents():
         def get_all_done(self, **kwargs): pass    
         def get_info(self, agent_id, **kwargs): pass
 
-    agents_single_object = Agent(id='just_a_simple_agent')
-    agents_list = [Agent(id=f'{i}') for i in range(3)]
-    agents_dict_key_id_no_match = {f'{i-1}': Agent(id=f'{i}') for i in range(3)}
-    agents_dict_bad_values = {f'{i}': 'Agent(id=f"i")' for i in range(3)}
-    agents_dict = {f'{i}': Agent(id=f'{i}') for i in range(3)}
+    agents_single_object = PrincipleAgent(id='just_a_simple_agent')
+    agents_list = [PrincipleAgent(id=f'{i}') for i in range(3)]
+    agents_dict_key_id_no_match = {f'{i-1}': PrincipleAgent(id=f'{i}') for i in range(3)}
+    agents_dict_bad_values = {f'{i}': 'PrincipleAgent(id=f"i")' for i in range(3)}
+    agents_dict = {f'{i}': PrincipleAgent(id=f'{i}') for i in range(3)}
     
     with pytest.raises(AssertionError):
         ABS(agents=agents_single_object)

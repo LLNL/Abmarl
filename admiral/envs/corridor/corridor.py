@@ -3,7 +3,7 @@ from gym.spaces import Discrete
 import numpy as np
 
 from admiral.envs import AgentBasedSimulation
-from admiral.envs import PureAgent as Agent
+from admiral.envs import Agent
 
 class Corridor(AgentBasedSimulation):
     """

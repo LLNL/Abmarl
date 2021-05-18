@@ -3,7 +3,6 @@ from gym.spaces import Discrete
 import numpy as np
 
 from admiral.envs.wrappers import CommunicationHandshakeWrapper
-from admiral.envs import Agent
 
 from .helpers import MultiAgentGymSpacesEnv
 
