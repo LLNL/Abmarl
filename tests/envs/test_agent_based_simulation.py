@@ -3,7 +3,7 @@ import pytest
 
 from admiral.envs import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
 
-def test_agent_id():
+def test_principle_agent_id():
     with pytest.raises(AssertionError):
         PrincipleAgent()
     
@@ -18,7 +18,7 @@ def test_agent_id():
     with pytest.raises(AssertionError):
         agent.id = 4
 
-def test_agent_seed():
+def test_principle_agent_seed():
     with pytest.raises(AssertionError):
         PrincipleAgent(id='my_id', seed=13.5)
     agent = PrincipleAgent(id='my_id', seed=12)
@@ -27,7 +27,7 @@ def test_agent_seed():
     with pytest.raises(AssertionError):
         agent.seed = '12'
     
-def test_agents_equal():
+def test_principle_agents_equal():
     agent_1 = PrincipleAgent(id='1', seed=13)
     agent_2 = PrincipleAgent(id='1', seed=13)
     assert agent_1 == agent_2
@@ -65,7 +65,7 @@ def test_acting_agent_seed():
     assert agent.configured
     assert agent.action_space.sample() == {1: 6, 2: 2}
 
-def test_observing_agent_action_space():
+def test_observing_agent_observation_space():
     with pytest.raises(AssertionError):
         ObservingAgent(id='agent', observation_space=13)
     
@@ -81,7 +81,7 @@ def test_observing_agent_action_space():
     agent.finalize()
     assert agent.configured
 
-def test_pure_agent():
+def test_agent():
     from gym.spaces import Discrete
     agent = Agent(id='agent', seed=7, observation_space={'obs': Discrete(2)}, action_space={'act': Discrete(5)})
     assert not agent.configured
