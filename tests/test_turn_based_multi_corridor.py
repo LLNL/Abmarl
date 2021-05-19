@@ -7,7 +7,7 @@ from admiral.envs.corridor import MultiCorridor as Corridor
 from admiral.managers import TurnBasedManager
 
 def test_init():
-    env = Corridor.build()
+    env = Corridor()
     wrapped_env = TurnBasedManager(env)
     assert wrapped_env.env == env
     assert wrapped_env.unwrapped == env
@@ -20,7 +20,7 @@ def test_init():
 
 def test_reset_and_step():
     np.random.seed(24)
-    env = TurnBasedManager(Corridor.build())
+    env = TurnBasedManager(Corridor())
 
     obs = env.reset()
     assert env.unwrapped.corridor[4].id == 'agent3'
@@ -29,32 +29,32 @@ def test_reset_and_step():
     assert env.unwrapped.corridor[7].id == 'agent1'
     assert env.unwrapped.corridor[8].id == 'agent0'
     assert env.done_agents == set()
-    assert obs == {'agent0': {'left': [True], 'position': 8, 'right': [False]}}
+    assert obs == {'agent0': {'left': [True], 'position': [8], 'right': [False]}}
     
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent1': {'left': [True], 'position': 7, 'right': [False]}}
+    assert obs == {'agent1': {'left': [True], 'position': [7], 'right': [False]}}
     assert reward == {'agent1': 0}
     assert done == {'agent1': False, '__all__': False}
     
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent2': {'left': [True], 'position': 6, 'right': [False]}}
+    assert obs == {'agent2': {'left': [True], 'position': [6], 'right': [False]}}
     assert reward == {'agent2': 0}
     assert done == {'agent2': False, '__all__': False}
     
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 4, 'right': [True]}}
+    assert obs == {'agent3': {'left': [False], 'position': [4], 'right': [True]}}
     assert reward == {'agent3': 0}
     assert done == {'agent3': False, '__all__': False}
     
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent4': {'left': [True], 'position': 5, 'right': [False]}}
+    assert obs == {'agent4': {'left': [True], 'position': [5], 'right': [False]}}
     assert reward == {'agent4': -2}
     assert done == {'agent4': False, '__all__': False}
     
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
     assert obs == {
-        'agent0': {'left': [True], 'position': 9, 'right': [False]},
-        'agent1': {'left': [True], 'position': 8, 'right': [False]}}
+        'agent0': {'left': [True], 'position': [9], 'right': [False]},
+        'agent1': {'left': [True], 'position': [8], 'right': [False]}}
     assert reward == {'agent0': 100, 'agent1': -1}
     assert done == {'agent0': True, 'agent1': False, '__all__': False}
     
@@ -62,44 +62,44 @@ def test_reset_and_step():
         env.step({'agent0': Corridor.Actions.STAY})
         
     obs, reward, done, info = env.step({'agent1': Corridor.Actions.STAY})
-    assert obs == {'agent2': {'left': [True], 'position': 7, 'right': [True]}}
+    assert obs == {'agent2': {'left': [True], 'position': [7], 'right': [True]}}
     assert reward == {'agent2': -1,}
     assert done == {'agent2': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.LEFT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 4, 'right': [False]}}
+    assert obs == {'agent3': {'left': [False], 'position': [4], 'right': [False]}}
     assert reward == {'agent3': -5}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.STAY for agent_id in obs})
-    assert obs == {'agent4': {'left': [False], 'position': 6, 'right': [True]}}
+    assert obs == {'agent4': {'left': [False], 'position': [6], 'right': [True]}}
     assert reward == {'agent4': -3}
     assert done == {'agent4': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.LEFT for agent_id in obs})
-    assert obs == {'agent1': {'left': [True], 'position': 8, 'right': [False]}}
+    assert obs == {'agent1': {'left': [True], 'position': [8], 'right': [False]}}
     assert reward == {'agent1': -1}
     assert done == {'agent1': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent2': {'left': [False], 'position': 7, 'right': [False]}}
+    assert obs == {'agent2': {'left': [False], 'position': [7], 'right': [False]}}
     assert reward == {'agent2': -5}
     assert done == {'agent2': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 4, 'right': [True]}}
+    assert obs == {'agent3': {'left': [False], 'position': [4], 'right': [True]}}
     assert reward == {'agent3': -1}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent4': {'left': [True], 'position': 5, 'right': [False]}}
+    assert obs == {'agent4': {'left': [True], 'position': [5], 'right': [False]}}
     assert reward == {'agent4': -3}
     assert done == {'agent4': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.LEFT for agent_id in obs})
     assert obs == {
-        'agent1': {'left': [True], 'position': 9, 'right': [False]},
-        'agent2': {'left': [False], 'position': 8, 'right': [False]}}
+        'agent1': {'left': [True], 'position': [9], 'right': [False]},
+        'agent2': {'left': [False], 'position': [8], 'right': [False]}}
     assert reward == {'agent1': 100, 'agent2': -1}
     assert done == {'agent1': True, 'agent2': False, '__all__': False}
     
@@ -107,34 +107,34 @@ def test_reset_and_step():
         env.step({'agent1': Corridor.Actions.STAY})
         
     obs, reward, done, info = env.step({'agent2': Corridor.Actions.STAY})
-    assert obs == {'agent3': {'left': [False], 'position': 4, 'right': [True]}}
+    assert obs == {'agent3': {'left': [False], 'position': [4], 'right': [True]}}
     assert reward == {'agent3': -7,}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.LEFT for agent_id in obs})
-    assert obs == {'agent4': {'left': [False], 'position': 5, 'right': [False]}}
+    assert obs == {'agent4': {'left': [False], 'position': [5], 'right': [False]}}
     assert reward == {'agent4': -5,}
     assert done == {'agent4': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent2': {'left': [False], 'position': 8, 'right': [False]}}
+    assert obs == {'agent2': {'left': [False], 'position': [8], 'right': [False]}}
     assert reward == {'agent2': -1,}
     assert done == {'agent2': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 3, 'right': [False]}}
+    assert obs == {'agent3': {'left': [False], 'position': [3], 'right': [False]}}
     assert reward == {'agent3': -1,}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent4': {'left': [False], 'position': 6, 'right': [False]}}
+    assert obs == {'agent4': {'left': [False], 'position': [6], 'right': [False]}}
     assert reward == {'agent4': -1,}
     assert done == {'agent4': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
     assert obs == {
-        'agent2': {'left': [False], 'position': 9, 'right': [False]},
-        'agent3': {'left': [False], 'position': 4, 'right': [False]}}
+        'agent2': {'left': [False], 'position': [9], 'right': [False]},
+        'agent3': {'left': [False], 'position': [4], 'right': [False]}}
     assert reward == {'agent2': 100, 'agent3': -1}
     assert done == {'agent2': True, 'agent3': False, '__all__': False}
     
@@ -142,29 +142,29 @@ def test_reset_and_step():
         env.step({'agent2': Corridor.Actions.STAY})
         
     obs, reward, done, info = env.step({'agent3': Corridor.Actions.RIGHT})
-    assert obs == {'agent4': {'left': [False], 'position': 7, 'right': [False]}}
+    assert obs == {'agent4': {'left': [False], 'position': [7], 'right': [False]}}
     assert reward == {'agent4': -1,}
     assert done == {'agent4': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 5, 'right': [False]}}
+    assert obs == {'agent3': {'left': [False], 'position': [5], 'right': [False]}}
     assert reward == {'agent3': -1,}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent4': {'left': [False], 'position': 8, 'right': [False]}}
+    assert obs == {'agent4': {'left': [False], 'position': [8], 'right': [False]}}
     assert reward == {'agent4': -1,}
     assert done == {'agent4': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 6, 'right': [False]}}
+    assert obs == {'agent3': {'left': [False], 'position': [6], 'right': [False]}}
     assert reward == {'agent3': -1,}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
     assert obs == {
-        'agent4': {'left': [False], 'position': 9, 'right': [False]},
-        'agent3': {'left': [False], 'position': 7, 'right': [False]}}
+        'agent4': {'left': [False], 'position': [9], 'right': [False]},
+        'agent3': {'left': [False], 'position': [7], 'right': [False]}}
     assert reward == {'agent4': 100, 'agent3': -1}
     assert done == {'agent4': True, 'agent3': False, '__all__': False}
     
@@ -172,11 +172,11 @@ def test_reset_and_step():
         env.step({'agent4': Corridor.Actions.STAY})
         
     obs, reward, done, info = env.step({'agent3': Corridor.Actions.RIGHT})
-    assert obs == {'agent3': {'left': [False], 'position': 8, 'right': [False]}}
+    assert obs == {'agent3': {'left': [False], 'position': [8], 'right': [False]}}
     assert reward == {'agent3': -1,}
     assert done == {'agent3': False, '__all__': False}
         
     obs, reward, done, info = env.step({agent_id: Corridor.Actions.RIGHT for agent_id in obs})
-    assert obs == {'agent3': {'left': [False], 'position': 9, 'right': [False]}}
+    assert obs == {'agent3': {'left': [False], 'position': [9], 'right': [False]}}
     assert reward == {'agent3': 100,}
     assert done == {'agent3': True, '__all__': True}

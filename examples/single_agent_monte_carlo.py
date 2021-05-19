@@ -1,9 +1,10 @@
 
-from admiral.envs.corridor import Corridor
+from admiral.envs.corridor import MultiCorridor as Corridor
+from admiral.envs.wrappers import RavelDiscreteWrapper
 from admiral.managers import AllStepManager, TurnBasedManager
 from admiral.algs import monte_carlo
 
-env = AllStepManager(Corridor.build())
+env = AllStepManager(RavelDiscreteWrapper(Corridor(num_agents=1)))
 env, q_table, policy = monte_carlo.off_policy(env, iteration=100, horizon=10)
 
 for i in range(5):
