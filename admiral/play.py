@@ -51,8 +51,10 @@ def run(full_trained_directory, parameters):
     ray.init()
 
     # Get the agent
+    # Modify the number of workers in the configuration for visualization
+    experiment_mod.params['ray_tune']['config']['num_workers'] = 1
+    experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
     alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
-    # alg = ray.rllib.agents.registry.get_agent_class(experiment_mod.params['ray_tune']['run_or_experiment'])
     agent = alg(
         env=experiment_mod.params['ray_tune']['config']['env'],
         config=experiment_mod.params['ray_tune']['config']    
@@ -61,7 +63,7 @@ def run(full_trained_directory, parameters):
 
     # Render the environment
     from ray.rllib.env import MultiAgentEnv
-    env = experiment_mod.params['experiment']['env_creator']()
+    env = experiment_mod.params['experiment']['env_creator'](experiment_mod.params['ray_tune']['config']['env_config'])
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):
