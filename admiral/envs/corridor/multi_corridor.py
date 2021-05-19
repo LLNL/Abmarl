@@ -31,7 +31,7 @@ class MultiCorridor(AgentBasedSimulation):
                 id=f'agent{i}',
                 action_space=Discrete(3),
                 observation_space=Dict({
-                    'position': Box(0, self.end-1, (1,)),
+                    'position': Box(0, self.end-1, (1,), np.int),
                     'left': MultiBinary(1),
                     'right': MultiBinary(1)
                 })
