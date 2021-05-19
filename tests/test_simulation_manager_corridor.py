@@ -3,8 +3,8 @@ from admiral.managers import TurnBasedManager, AllStepManager
 from admiral.envs.corridor import Corridor
 
 def test_managers_are_same_for_single_agent():
-    turn_based_env = TurnBasedManager(Corridor.build())
-    all_step_env = AllStepManager(Corridor.build())
+    turn_based_env = TurnBasedManager(Corridor())
+    all_step_env = AllStepManager(Corridor())
 
     assert turn_based_env.reset() == all_step_env.reset()
 

@@ -7,7 +7,7 @@ from admiral.external import GymWrapper
 from admiral.pols import RandomFirstActionPolicy, EpsilonSoftPolicy, GreedyPolicy
 
 def test_exploring_starts_corridor():
-    env = AllStepManager(Corridor.build())
+    env = AllStepManager(Corridor())
     env, q_table, policy = exploring_starts(env, iteration=100, horizon=10)
     
     assert isinstance(env, GymWrapper)
@@ -18,7 +18,7 @@ def test_exploring_starts_corridor():
     assert isinstance(policy, RandomFirstActionPolicy)
 
 def test_epsilon_soft():
-    env = AllStepManager(Corridor.build())
+    env = AllStepManager(Corridor())
     env, q_table, policy = epsilon_soft(env, iteration=1000, horizon=20)
     
     assert isinstance(env, GymWrapper)
@@ -37,7 +37,7 @@ def test_epsilon_soft():
     assert done
 
 def test_off_policy():
-    env = AllStepManager(Corridor.build())
+    env = AllStepManager(Corridor())
     env, q_table, policy = off_policy(env, iteration=100, horizon=10)
     
     assert isinstance(env, GymWrapper)
