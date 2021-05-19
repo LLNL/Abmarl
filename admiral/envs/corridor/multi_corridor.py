@@ -1,9 +1,10 @@
 
 from itertools import cycle
 
+from gym.spaces import Dict, Box, Discrete, MultiBinary
 import numpy as np
 
-from admiral.envs import AgentBasedSimulation
+from admiral.envs import AgentBasedSimulation, Agent
 
 class MultiCorridor(AgentBasedSimulation):
     """
@@ -22,9 +23,22 @@ class MultiCorridor(AgentBasedSimulation):
         STAY = 1
         RIGHT = 2
     
-    def __init__(self, config):
-        self.agents = config['agents']
-        self.end = config['end']
+    def __init__(self, end=10, num_agents=5):
+        self.end = end
+        agents = {}
+        for i in range(num_agents):
+            agents[f'agent{i}'] = Agent(
+                id=f'agent{i}',
+                action_space=Discrete(3),
+                observation_space=Dict({
+                    'position': Box(0, self.end-1, (1,)),
+                    'left': MultiBinary(1),
+                    'right': MultiBinary(1)
+                })
+            )
+        self.agents = agents
+        
+        self.finalize()
 
     def reset(self, **kwargs):
         """
@@ -46,13 +60,6 @@ class MultiCorridor(AgentBasedSimulation):
         The offending agent receives a larger penalty than the offended agent.
         The agent is done when it reaches the end of the corridor.
         """
-        # We must reset the rewards of the acting agents before processing any
-        # of the actions. The action of the first agent may impact the reward
-        # of the next, but this will be lost if we reset the reward in the action
-        # processing loop. So we process them first here.
-        for agent_id in action_dict:
-            self.reward[agent_id] = 0
-
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if action == self.Actions.LEFT:
@@ -129,7 +136,7 @@ class MultiCorridor(AgentBasedSimulation):
         else:
             right = True
         return {
-            'position': agent_position,
+            'position': [agent_position],
             'left': [left],
             'right': [right],
         }
@@ -153,7 +160,9 @@ class MultiCorridor(AgentBasedSimulation):
         """
         The agent's reward is tracked throughout the simulation and returned here.
         """
-        return self.reward[agent_id]
+        agent_reward = self.reward[agent_id]
+        self.reward[agent_id] = 0
+        return agent_reward
 
     def get_info(self, agent_id, **kwargs):
         """
@@ -161,40 +170,3 @@ class MultiCorridor(AgentBasedSimulation):
         any info.
         """
         return {}
-    
-    @classmethod
-    def build(cls, env_config={}):
-        """
-        Parameters
-        ----------
-        num_agents: int
-            The number agents in the corridor, which must be less than the
-            size of the corridor.
-        
-        end: int
-            The size of the corridor, which must be greater than the number of
-            agents.
-        """
-        config = {
-            'num_agents': 5,
-            'end': 10,
-        }
-
-        for key, value in config.items():
-            config[key] = env_config.get(key, value)
-        
-        from gym.spaces import Box, Discrete, Dict, MultiBinary
-        from admiral.envs import Agent
-        agents = {}
-        for i in range(config['num_agents']):
-            agents['agent{}'.format(i)] = Agent(
-                id='agent{}'.format(i),
-                action_space=Discrete(3),
-                observation_space=Dict({
-                    'position': Box(0, config['end']-1, (1,), np.int),
-                    'left': MultiBinary(1),
-                    'right': MultiBinary(1)
-                })
-            )
-        config['agents'] = agents
-        return cls(config)
