@@ -61,20 +61,7 @@ def run(full_trained_directory, parameters):
 
     # Render the environment
     from ray.rllib.env import MultiAgentEnv
-    
-    # DEBUG
-    print(hasattr(agent, 'workers'))
-    from ray.rllib.evaluation.worker_set import WorkerSet
-    print(isinstance(agent.workers, WorkerSet))
-    import pprint; pprint.pprint(agent.config)
-    # END
-
-    from ray.tune.registry import get_trainable_cls, _global_registry, ENV_CREATOR
-    env_creator = _global_registry.get(ENV_CREATOR,
-                                        agent.config["env"])
-    env = env_creator({})
-
-    # env = agent.workers.local_worker().env
+    env = experiment_mod.params['experiment']['env_creator']()
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):

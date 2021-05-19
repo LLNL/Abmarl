@@ -22,6 +22,7 @@ def policy_mapping_fn(agent_id):
 params = {
     'experiment': {
         'title': f'{env_name}',
+        'env_creator': lambda config=None: env,
     },
     'ray_tune': {
         'run_or_experiment': 'PG',
