@@ -1,9 +1,9 @@
 
 from admiral.envs.corridor import MultiCorridor
-from admiral.managers import TurnBasedManager
+from admiral.managers import TurnBasedManager, AllStepManager
 from admiral.external import MultiAgentWrapper
 
-env = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
+env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
 
 env_name = "MultiCorridor"
 from ray.tune.registry import register_env
@@ -34,6 +34,7 @@ params = {
         'config': {
             # --- Environment ---
             'env': env_name,
+            'horizon': 200,
             # 'env_config': env_config,
             # --- Multiagent ---
             'multiagent': {
