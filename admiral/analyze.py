@@ -43,10 +43,11 @@ def run(full_trained_directory, full_subscript, parameters):
     # Analyze with ray
     import ray
     import ray.rllib
+    from ray.tune.registry import get_trainable_cls
     ray.init()
 
     # Get the agent
-    alg = ray.rllib.agents.registry.get_agent_class(experiment_mod.params['ray_tune']['run_or_experiment'])
+    alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
     agent = alg(
         env=experiment_mod.params['ray_tune']['config']['env'],
         config=experiment_mod.params['ray_tune']['config']    
@@ -54,7 +55,7 @@ def run(full_trained_directory, full_subscript, parameters):
     agent.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
 
     # Get the environment. Probably have to do some fancy stuff for the multiagent case
-    env = agent.workers.local_worker().env
+    env = experiment_mod.params['experiment']['env_creator'](experiment_mod.params['ray_tune']['config']['env_config'])
 
     # Load the analysis module and run it
     analysis_mod = adu.custom_import_module(full_subscript)
