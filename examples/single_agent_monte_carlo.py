@@ -3,7 +3,7 @@ from admiral.envs.corridor import Corridor
 from admiral.managers import AllStepManager, TurnBasedManager
 from admiral.algs import monte_carlo
 
-env = AllStepManager(Corridor.build())
+env = AllStepManager(Corridor())
 env, q_table, policy = monte_carlo.off_policy(env, iteration=100, horizon=10)
 
 for i in range(5):

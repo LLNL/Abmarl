@@ -9,27 +9,27 @@ def test_corridor_attributes():
     assert Corridor.Actions.RIGHT == 2
     assert Corridor.Actions.STAY == 1
 
-def test_corridor_build():
-    env = Corridor.build()
+def test_corridor_init():
+    env = Corridor()
     assert env.start == 0
     assert env.end == 5
     assert env.agents == {'agent0': Agent(id='agent0', observation_space=Discrete(6), action_space=Discrete(3))}
 
-def test_corridor_build_end():
-    env = Corridor.build({'end': 3})
+def test_corridor_init_end():
+    env = Corridor(end=3)
     assert env.start == 0
     assert env.end == 3
     assert env.agents == {'agent0': Agent(id='agent0', observation_space=Discrete(4), action_space=Discrete(3))}
 
 def test_corridor_reset():
-    env = Corridor.build()
+    env = Corridor()
     env.reset()
     assert env.pos == env.start
     obs = env.get_obs('agent0')
     assert obs == 0
 
 def test_corridor_step():
-    env = Corridor.build()
+    env = Corridor()
     env.reset()
 
     env.step({'agent0': 0})

@@ -2,8 +2,7 @@
 from gym.spaces import Discrete
 import numpy as np
 
-from admiral.envs import AgentBasedSimulation
-from admiral.envs import Agent
+from admiral.envs import AgentBasedSimulation, Agent
 
 class Corridor(AgentBasedSimulation):
     """
@@ -20,10 +19,15 @@ class Corridor(AgentBasedSimulation):
         STAY = 1
         RIGHT = 2
 
-    def __init__(self, config): 
+    def __init__(self, end=5): 
         self.start = 0
-        self.end = config['end']
-        self.agents = config['agents']
+        self.end = end
+        self.agents = {'agent0': Agent(
+            id='agent0',
+            observation_space=Discrete(self.end+1),
+            action_space=Discrete(3)
+        )}
+        self.finalize()
     
     def reset(self, **kwargs):
         self.pos = self.start
@@ -73,19 +77,3 @@ class Corridor(AgentBasedSimulation):
     
     def get_info(self, agent_id, **kwargs):
         return {}
-    
-    @classmethod
-    def build(cls, env_config={}):
-        config = {
-            'end': 5,
-            # agents determined after end is set
-        }
-
-        config['end'] = env_config.get('end', config['end'])
-        config['agents'] = {'agent0': Agent(
-            id='agent0',
-            observation_space=Discrete(config['end'] + 1),
-            action_space=Discrete(3)
-        )}
-
-        return cls(config)
