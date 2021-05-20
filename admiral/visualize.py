@@ -1,35 +1,6 @@
 
 from admiral.tools import utils as adu
 
-def _get_checkpoint(full_trained_directory, checkpoint_desired):
-    """
-    Return the checkpoint directory to load the policy. If checkpoint_desired is specified and
-    found, then return that policy. Otherwise, return the last policy.
-    """
-    checkpoint_dirs = adu.find_dirs_in_dir('checkpoint*', full_trained_directory)
-
-    # Try to load the desired checkpoint
-    if checkpoint_desired is not None: # checkpoint specified
-        for checkpoint in checkpoint_dirs:
-            if checkpoint_desired == int(checkpoint.split('/')[-1].split('_')[-1]):
-                return checkpoint, checkpoint_desired
-        import warnings
-        warnings.warn('Could not find checkpoint_{}. Attempting to load the last checkpoint.'.format(checkpoint_desired))
-    
-    # Load the last checkpoint
-    max_checkpoint = None
-    max_checkpoint_value = 0
-    for checkpoint in checkpoint_dirs:
-        checkpoint_value = int(checkpoint.split('/')[-1].split('_')[-1])
-        if checkpoint_value > max_checkpoint_value:
-            max_checkpoint_value = checkpoint_value
-            max_checkpoint = checkpoint
-    
-    if max_checkpoint is None:
-        raise FileNotFoundError("Did not find a checkpoint file in the given directory.")
-    
-    return max_checkpoint, max_checkpoint_value
-
 def run(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
 
@@ -41,7 +12,7 @@ def run(full_trained_directory, parameters):
     full_path_to_config = os.path.join(full_trained_directory, py_files[0])
     experiment_mod = adu.custom_import_module(full_path_to_config)
     
-    checkpoint_dir, checkpoint_value = _get_checkpoint(full_trained_directory, parameters.checkpoint)
+    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(full_trained_directory, parameters.checkpoint)
     print(checkpoint_dir)
 
     # Visualize with ray
