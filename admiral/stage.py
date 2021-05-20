@@ -52,7 +52,7 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
 
     # Load the analysis module and run it
     analysis_mod = adu.custom_import_module(full_subscript)
-    analysis_mod.run(env.unwrapped, agent)
+    analysis_mod.run(env, agent)
 
     _finish()
 
