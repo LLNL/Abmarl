@@ -26,7 +26,7 @@ from admiral.pols import RandomAction, HeuristicPolicy
 
 policies = {
     'predator': (None, agents['predator0'].observation_space, agents['predator0'].action_space, {}),
-    'prey': (RandomAction, agents['prey0'].observation_space, agents['prey0'].action_space, {})
+    'prey': (None, agents['prey0'].observation_space, agents['prey0'].action_space, {})
 }
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('prey'):
@@ -48,14 +48,14 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            # 'episodes_total': 20_000,
-            'episodes_total': 1,
+            'episodes_total': 2000,
         },
         'verbose': 2,
         'config': {
             # --- Environment ---
             'env': env_name,
             'env_config': env_config,
+            'horizon': 200,
             # --- Multiagent ---
             'multiagent': {
                 'policies': policies,
@@ -64,7 +64,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 1,
+            "num_workers": 7,
             # Number of environments that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             # 'simple_optimizer': True,
