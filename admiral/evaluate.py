@@ -1,9 +1,27 @@
 
 import os
 
+import ray
+
 from admiral.tools import utils as adu
 
-def run(full_trained_directory, parameters):
+def _start():
+    """The elements that are common to both analyze and visualize."""
+    pass
+
+def _finish():
+    """Finish off the evaluation run"""
+    ray.shutdown()
+
+def run_analysis(full_trained_directory, full_subscript, parameters):
+    """Analyze MARL policies from a saved policy through an analysis script"""
+    env, agent = adu.extract_env_and_agents_from_experiment(full_trained_directory, parameters.checkpoint)
+
+    # Load the analysis module and run it
+    analysis_mod = adu.custom_import_module(full_subscript)
+    analysis_mod.run(env.unwrapped, agent)
+
+def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
     env, agent = adu.extract_env_and_agents_from_experiment(full_trained_directory, parameters.checkpoint)
 
@@ -76,5 +94,3 @@ def run(full_trained_directory, parameters):
         plt.show(block=False)
         while all_done is False:
             plt.pause(1)
-
-    ray.shutdown()

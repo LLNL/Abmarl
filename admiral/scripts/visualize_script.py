@@ -16,5 +16,5 @@ def create_parser(subparsers):
     return visualize_parser
 
 def run(full_trained_directory, parameters):
-    from admiral import visualize
-    visualize.run(full_trained_directory, parameters)
+    from admiral import evaluate
+    evaluate.run_visualize(full_trained_directory, parameters)

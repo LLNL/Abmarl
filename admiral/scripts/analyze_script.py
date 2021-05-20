@@ -10,5 +10,5 @@ def create_parser(subparsers):
     return analyze_parser
 
 def run(full_trained_directory, full_subscript, parameters):
-    from admiral import analyze
-    analyze.run(full_trained_directory, full_subscript, parameters)
+    from admiral import evaluate
+    evaluate.run_analysis(full_trained_directory, full_subscript, parameters)
