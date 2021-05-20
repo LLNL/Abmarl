@@ -31,7 +31,7 @@ def _get_checkpoint(full_trained_directory, checkpoint_desired):
     return max_checkpoint, max_checkpoint_value
 
 def run(full_trained_directory, parameters):
-    """Play MARL policies from a saved policy"""
+    """Visualize MARL policies from a saved policy"""
 
     # Load the experiment as a module
     # First, we must find the .py file in the directory
@@ -44,7 +44,7 @@ def run(full_trained_directory, parameters):
     checkpoint_dir, checkpoint_value = _get_checkpoint(full_trained_directory, parameters.checkpoint)
     print(checkpoint_dir)
 
-    # Play with ray
+    # Visualize with ray
     import ray
     import ray.rllib
     from ray.tune.registry import get_trainable_cls

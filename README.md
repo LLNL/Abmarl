@@ -46,7 +46,7 @@ To train:
 1. Install ray rllib v0.8.5: `pip install ray[rllib]==0.8.5`
 1. Install Admiral: `pip install .` or `pip install -e .`
 
-To play:
+To visualize:
 1. Install matplotlib: `pip install matplotlib`
 
 To run Predator-Prey example:
@@ -58,7 +58,7 @@ To run Predator-Prey example:
 
 We must define a configuration script that specifies the environment and agent
 parameters. Once we have this script, we can use the command-line interface
-to train, play, and analyze agent behavior. Full examples can be found
+to train, visualize, and analyze agent behavior. Full examples can be found
 [here](examples/).
 
 ### Creating a configuration script
@@ -123,14 +123,14 @@ train. You can view the performance in real time in tensorboard with
 tensorboard --logdir ~/admiral_results
 ```
 
-#### Playing
+#### Visualizing
 The birds have made some progress in learning to fly without crashing into each
 other or the region boundaries. We can vizualize the birds' learned behavior with
-the `play` command, which takes as argument the output directory
+the `visualize` command, which takes as argument the output directory
 from the training session stored in `~/admiral_results`. For example, the command
 
 ```
-admiral play ~/admiral_results/Flight-single-agent-2020-08-25_09-30/ -n 5 --record
+admiral visualize ~/admiral_results/Flight-single-agent-2020-08-25_09-30/ -n 5 --record
 ```
 
 will load the training session (notice that the directory name is the experiment
