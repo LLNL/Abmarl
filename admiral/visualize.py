@@ -1,40 +1,11 @@
 
+import os
+
 from admiral.tools import utils as adu
 
 def run(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
-
-    # Load the experiment as a module
-    # First, we must find the .py file in the directory
-    import os
-    py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
-    assert len(py_files) == 1
-    full_path_to_config = os.path.join(full_trained_directory, py_files[0])
-    experiment_mod = adu.custom_import_module(full_path_to_config)
-    
-    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(full_trained_directory, parameters.checkpoint)
-    print(checkpoint_dir)
-
-    # Visualize with ray
-    import ray
-    import ray.rllib
-    from ray.tune.registry import get_trainable_cls
-    ray.init()
-
-    # Get the agent
-    # Modify the number of workers in the configuration for visualization
-    experiment_mod.params['ray_tune']['config']['num_workers'] = 1
-    experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
-    alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
-    agent = alg(
-        env=experiment_mod.params['ray_tune']['config']['env'],
-        config=experiment_mod.params['ray_tune']['config']    
-    )
-    agent.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
-
-    # Render the environment
-    from ray.rllib.env import MultiAgentEnv
-    env = experiment_mod.params['experiment']['env_creator'](experiment_mod.params['ray_tune']['config']['env_config'])
+    env, agent = adu.extract_env_and_agents_from_experiment(full_trained_directory, parameters.checkpoint)
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):
@@ -59,6 +30,7 @@ def run(full_trained_directory, parameters):
         return done
     
     policy_agent_mapping = None
+    from ray.rllib.env import MultiAgentEnv
     if isinstance(env, MultiAgentEnv):
         policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
         _get_action = _multi_get_action
