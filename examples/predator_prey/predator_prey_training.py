@@ -17,9 +17,9 @@ env_name = 'PredatorPrey'
 
 from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
 from ray.tune.registry import register_env
-env = AllStepManager(PredatorPreyEnv.build(env_config))
-agents = env.agents
-register_env(env_name, lambda env_config: MultiAgentWrapper(env))
+env = MultiAgentWrapper(AllStepManager(PredatorPreyEnv.build(env_config)))
+agents = env.unwrapped.agents
+register_env(env_name, lambda env_config: env)
 
 # Set up heuristic policies
 from admiral.pols import RandomAction, HeuristicPolicy
@@ -41,6 +41,7 @@ algo_name = 'PG'
 params = {
     'experiment': {
         'title': '{}'.format('PredatorPrey'),
+        'env_creator': lambda config=None: env,
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
@@ -48,7 +49,7 @@ params = {
         'checkpoint_at_end': True,
         'stop': {
             # 'episodes_total': 20_000,
-            'episodes_total': 20,
+            'episodes_total': 1,
         },
         'verbose': 2,
         'config': {
@@ -63,7 +64,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 7,
+            "num_workers": 1,
             # Number of environments that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             # 'simple_optimizer': True,
