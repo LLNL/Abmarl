@@ -22,6 +22,7 @@ def policy_mapping_fn(agent_id):
 params = {
     'experiment': {
         'title': f'{env_name}',
+        'env_creator': lambda config=None: env,
     },
     'ray_tune': {
         'run_or_experiment': 'PG',
@@ -35,7 +36,7 @@ params = {
             # --- Environment ---
             'env': env_name,
             'horizon': 200,
-            # 'env_config': env_config,
+            'env_config': {},
             # --- Multiagent ---
             'multiagent': {
                 'policies': policies,
@@ -44,7 +45,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 1,
+            "num_workers": 7,
             # Number of environments that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },

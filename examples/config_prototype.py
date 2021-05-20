@@ -52,6 +52,7 @@ algo_name = 'PG'
 params = {
     'experiment': {
         'title': '{}'.format('The-title-of-this-experiment'),
+        'env_creator': lambda config=None: env,
     },
     'ray_tune': {
         'run_or_experiment': algo_name,

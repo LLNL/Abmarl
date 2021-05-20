@@ -188,14 +188,14 @@ admiral train predator_prey_training.py
 Once this is done training, we can do the same with the runaway policy to
 obtain trained behavior in all three experiments.
 
-### Playing
+### Visualizing
 Having successfully trained a predator to hunt prey with various heuristic
-behavior, we can vizualize the agent's learned behavior with the `play` command,
+behavior, we can vizualize the agent's learned behavior with the `visualize` command,
 which takes as argument the output directory from the training session stored
 in `~/admiral_results`. For example, the command
 
 ```
-admiral play ~/admiral_results/PredatorPrey-runaway-2020-08-25_09-30/ -n 5 --record
+admiral visualize ~/admiral_results/PredatorPrey-runaway-2020-08-25_09-30/ -n 5 --record
 ```
 
 will load the training session when the prey did not move (notice that the

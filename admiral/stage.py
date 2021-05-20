@@ -1,65 +1,64 @@
 
+import os
+
+
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import ray
+import ray.rllib
+from ray.rllib.env import MultiAgentEnv
+from ray.tune.registry import get_trainable_cls
+
 from admiral.tools import utils as adu
 
-def _get_checkpoint(full_trained_directory, checkpoint_desired):
-    """
-    Return the checkpoint directory to load the policy. If checkpoint_desired is specified and
-    found, then return that policy. Otherwise, return the last policy.
-    """
-    checkpoint_dirs = adu.find_dirs_in_dir('checkpoint*', full_trained_directory)
-
-    # Try to load the desired checkpoint
-    if checkpoint_desired is not None: # checkpoint specified
-        for checkpoint in checkpoint_dirs:
-            if checkpoint_desired == int(checkpoint.split('/')[-1].split('_')[-1]):
-                return checkpoint, checkpoint_desired
-        import warnings
-        warnings.warn('Could not find checkpoint_{}. Attempting to load the last checkpoint.'.format(checkpoint_desired))
-    
-    # Load the last checkpoint
-    max_checkpoint = None
-    max_checkpoint_value = 0
-    for checkpoint in checkpoint_dirs:
-        checkpoint_value = int(checkpoint.split('/')[-1].split('_')[-1])
-        if checkpoint_value > max_checkpoint_value:
-            max_checkpoint_value = checkpoint_value
-            max_checkpoint = checkpoint
-    
-    if max_checkpoint is None:
-        raise FileNotFoundError("Did not find a checkpoint file in the given directory.")
-    
-    return max_checkpoint, max_checkpoint_value
-
-def run(full_trained_directory, parameters):
-    """Play MARL policies from a saved policy"""
-
+def _start(full_trained_directory, requested_checkpoint):
+    """The elements that are common to both analyze and visualize."""
     # Load the experiment as a module
     # First, we must find the .py file in the directory
-    import os
     py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
     assert len(py_files) == 1
     full_path_to_config = os.path.join(full_trained_directory, py_files[0])
     experiment_mod = adu.custom_import_module(full_path_to_config)
-    
-    checkpoint_dir, checkpoint_value = _get_checkpoint(full_trained_directory, parameters.checkpoint)
+    # Modify the number of workers in the configuration
+    experiment_mod.params['ray_tune']['config']['num_workers'] = 1
+    experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
+
+    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(full_trained_directory, requested_checkpoint)
     print(checkpoint_dir)
 
-    # Play with ray
-    import ray
-    import ray.rllib
+    # Setup ray
     ray.init()
 
     # Get the agent
-    alg = ray.rllib.agents.registry.get_agent_class(experiment_mod.params['ray_tune']['run_or_experiment'])
+    alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
     agent = alg(
         env=experiment_mod.params['ray_tune']['config']['env'],
         config=experiment_mod.params['ray_tune']['config']    
     )
     agent.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
 
-    # Render the environment
-    from ray.rllib.env import MultiAgentEnv
-    env = agent.workers.local_worker().env
+    # Get the environment
+    env = experiment_mod.params['experiment']['env_creator'](experiment_mod.params['ray_tune']['config']['env_config'])
+
+    return env, agent
+
+def _finish():
+    """Finish off the evaluation run."""
+    ray.shutdown()
+
+def run_analysis(full_trained_directory, full_subscript, parameters):
+    """Analyze MARL policies from a saved policy through an analysis script"""
+    env, agent = _start(full_trained_directory, parameters.checkpoint)
+
+    # Load the analysis module and run it
+    analysis_mod = adu.custom_import_module(full_subscript)
+    analysis_mod.run(env.unwrapped, agent)
+
+    _finish()
+
+def run_visualize(full_trained_directory, parameters):
+    """Visualize MARL policies from a saved policy"""
+    env, agent = _start(full_trained_directory, parameters.checkpoint)
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):
@@ -91,9 +90,6 @@ def run(full_trained_directory, parameters):
     else:
         _get_action = _single_get_action
         _get_done = _single_get_done
-
-    import matplotlib.pyplot as plt
-    from matplotlib.animation import FuncAnimation
 
     for episode in range(parameters.episodes):
         print('Episode: {}'.format(episode))
@@ -130,4 +126,4 @@ def run(full_trained_directory, parameters):
         while all_done is False:
             plt.pause(1)
 
-    ray.shutdown()
+    _finish()
