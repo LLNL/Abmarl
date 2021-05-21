@@ -7,7 +7,7 @@ interface for training, visualizing, and analyzing agent behavior. We define an
 [Simulation Managers](/admiral/managers/), which control which agents interact
 with the environment at each step. We support integration with several popular
 environment interfaces, including [gym.Env](/admiral/external/gym_env_wrapper.py) and
-[MultiAgentEnv](/admiral/external/rllib_multiagent_wrapper.py).
+[MultiAgentEnv](/admiral/external/rllib_multiagentenv_wrapper.py).
 
 Admiral is a layer in the Reinforcement Learning stack that sits on top of RLlib.
 We leverage RLlib's framework for training agents and extend it to more easily
