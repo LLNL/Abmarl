@@ -4,7 +4,7 @@ Admiral is a package for developing agent based simulations and training them
 with multiagent reinforcement learning. We provide an intuitive command line
 interface for training, visualizing, and analyzing agent behavior. We define an
 [Agent Based Simulation interface](/admiral/envs/agent_based_simulation.py) and
-[Simulation Managers](/admiral/mangers/), which control which agents interact
+[Simulation Managers](/admiral/managers/), which control which agents interact
 with the environment at each step. We support integration with several popular
 environment interfaces, including [gym.Env](/admiral/external/gym_env_wrapper.py) and
 [MultiAgentEnv](/admiral/external/rllib_multiagent_wrapper.py).
