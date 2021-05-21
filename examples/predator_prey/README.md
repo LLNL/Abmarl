@@ -117,10 +117,9 @@ tensorboard --logdir ~/admiral_results
 ```
 We can find the rewards associated with the policies on the second page of tensorboard.
 
-![predator_reward](/.images/predator_reward.png)
 
 ### Visualizing
-Having successfully trained predators to hunt prey, we can vizualize the agents'
+Having successfully trained predators to attack prey, we can vizualize the agents'
 learned behavior with the `visualize` command,
 which takes as argument the output directory from the training session stored
 in `~/admiral_results`. For example, the command
@@ -135,14 +134,14 @@ timestamp) and display an animation of 5 episodes. The `--record` flag will
 save the animations as `.mp4` videos in the training directory.
 
 ### Analyzing
-Upon visualizing the trained preator's behavior, we can further investigate the
+We can further investigate the learned
 behaviors using the `analyze` command along with an analysis script.
 
 Analysis scripts implement a `run` command which takes the environment and
 the training agent as input arguments. At this point, the researcher can define any
 script to further investigate the agents' behavior. In this
-example, we will craft a script that records how often a predator visits each grid square and how
-often it attacks from each grid square. This file is
+example, we will craft a script that records how
+often a predator attacks from each grid square. This file is
 [movement_map.py](movement_map.py).
 
 ```python
@@ -197,7 +196,6 @@ We can run it with
 admiral analyze ~/admiral_results/PredatorPrey-2020-08-25_09-30/ movement_map.py
 ```
 
-![position frequency](/.images/position_freq.png)
 ![attack frequency](/.images/attack_freq.png)
 
 The heatmap figures indicate that the predator spends most of its time attacking
