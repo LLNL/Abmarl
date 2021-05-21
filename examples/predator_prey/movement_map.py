@@ -1,13 +1,19 @@
 
-
 def run(env, agent):
     import numpy as np
     import seaborn as sns
     import matplotlib.pyplot as plt
 
+    # Try to unwrap the environment to get the simulation manager.
+    # TODO: Should unwrap only go down to the simulation manager?
+    try:
+        env = env.env
+    except:
+        pass
+
     # Create a grid
-    grid = np.zeros((env.region, env.region))
-    attack = np.zeros((env.region, env.region))
+    grid = np.zeros((env.unwrapped.region, env.unwrapped.region))
+    attack = np.zeros((env.unwrapped.region, env.unwrapped.region))
 
     # Run the trained policy
     policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
@@ -15,7 +21,7 @@ def run(env, agent):
         print('Episode: {}'.format(episode))
         obs = env.reset()
         done = {agent: False for agent in obs}
-        pox, poy = env.alive_agents['predator0'].position
+        pox, poy = env.agents['predator0'].position
         grid[pox, poy] += 1
         while True:
             joint_action = {}
@@ -25,9 +31,9 @@ def run(env, agent):
                 action = agent.compute_action(agent_obs, policy_id=policy_id)
                 joint_action[agent_id] = action
             obs, _, done, _ = env.step(joint_action)
-            pox, poy = env.alive_agents['predator0'].position
+            pox, poy = env.agents['predator0'].position
             grid[pox, poy] += 1
-            if joint_action['predator0'] == env.Actions.ATTACK.value: # This is the attack action
+            if joint_action['predator0']['attack'] == 1: # This is the attack action
                 attack[pox, poy] += 1
             if done['__all__']:
                 break

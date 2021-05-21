@@ -216,6 +216,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
         This should only be called if the agent has chosen to move or stay still.
         """
+        action = np.rint(action)
         if all(action == [0, 0]):
             return self.ActionStatus.NO_MOVE
         elif 0 <= agent.position[0] + action[0] < self.region and \
@@ -449,14 +450,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
             })
             prey_action_space_builder = lambda agent: Dict({
                 'harvest': Discrete(2),
-                'move': Box(-agent.move, agent.move, (2,), np.int)
+                'move': Box(-agent.move-0.5, agent.move+0.5, (2,))
             })
         else:
             obs_space_builder = lambda agent: Dict({
                 other_agent.id: Box(-config['region']+1, config['region']-1, (3,), np.int)
                 for other_agent in config['agents'] if other_agent.id != agent.id
             })
-            prey_action_space_builder = lambda agent: Box(-agent.move, agent.move, (2,), np.int)
+            prey_action_space_builder = lambda agent: Box(-agent.move-0.5, agent.move+0.5, (2,))
 
         for agent in config['agents']:
             if type(agent) is Prey:
@@ -466,7 +467,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
                 agent.observation_space = obs_space_builder(agent)
                 agent.action_space = Dict({
                     'attack': Discrete(2),
-                    'move': Box(-agent.move, agent.move, (2,), np.int),
+                    'move': Box(-agent.move-0.5, agent.move+0.5, (2,)),
                 })
         config['agents'] = {agent.id: agent for agent in config['agents']}
 
