@@ -3,17 +3,18 @@
 # --- Setup the environment --- #
 # ----------------------------- #
 
-import env_class
+import env_class, env_agents
+from admiral.managers import SimulationManager
+from admiral.external import MultiAgentWrapper
+from ray.tune.registry import register_env
 env_config = {
     # Fill in environment_configuration
 }
-env, agents= env_class.build(env_config)
 
-from admiral.envs.wrappers import MultiAgentWrapper
-from ray.tune.registry import register_env
+env_creator = lambda env_config: MultiAgentWrapper(SimulationManager(env_class(env_config)))
+env = env_creator(env_config)
 env_name = "EnvironmentName"
-register_env(env_name, lambda env_config: MultiAgentWrapper.wrap(env))
-
+register_env(env_name, env_creator)
 
 # -------------------------- #
 # --- Setup the policies --- #
@@ -27,6 +28,7 @@ class CustomHeuristicPolicy(HeuristicPolicy):
         # return [some_action for _ in obs_batch], [], {}
         return [0 for _ in obs_batch], [], {}
 
+agents = env.agents
 policies = {
     'policy_0_name': (None, agents[0].observation_space, agents[0].action_space, {}),
     'policy_1_name': (None, agents[1].observation_space, agents[1].action_space, {}),
@@ -40,7 +42,7 @@ def policy_mapping_fn(agent_id):
 # --- Setup the algorithm --- #
 # --------------------------- #
 
-# Full list of supported algorithms here: https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
+# Full list of supported algorithms here: https://docs.ray.io/en/releases-1.2.0/rllib-algorithms.html#rllib-algorithms
 algo_name = 'PG'
 
 
@@ -48,11 +50,11 @@ algo_name = 'PG'
 # --- Parameters --- #
 # ------------------ #
 
-# List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
+# List of common ray_tune parameters here: https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters
 params = {
     'experiment': {
         'title': '{}'.format('The-title-of-this-experiment'),
-        'env_creator': lambda config=None: env,
+        'env_creator': env_creator,
     },
     'ray_tune': {
         'run_or_experiment': algo_name,

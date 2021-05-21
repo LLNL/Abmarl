@@ -43,14 +43,13 @@ Install each package as needed.
 
 To train:
 1. Install tensorflow or pytorch
-1. Install ray rllib v0.8.5: `pip install ray[rllib]==0.8.5`
+1. Install ray rllib v1.2.0: `pip install ray==1.2.0`
 1. Install Admiral: `pip install .` or `pip install -e .`
 
 To visualize:
 1. Install matplotlib: `pip install matplotlib`
 
 To run Predator-Prey example:
-1. Install python-box: `pip install python-box`
 1. Install seaborn: `pip install seaborn`
 
 
