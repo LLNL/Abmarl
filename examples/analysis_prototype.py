@@ -6,6 +6,8 @@ def run(env, agent):
     can use the unwrapped property to get the Simulation Manager.
     """
 
+    env = env.unwrapped
+
     # Run the simulation with actions chosen from the trained policies
     policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
     # for episode in range(num_episodes):
