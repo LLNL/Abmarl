@@ -41,13 +41,3 @@ class SimulationManager(ABC):
     
     def render(self, **kwargs):
         self.env.render(**kwargs)
-
-    @property
-    def unwrapped(self):
-        """
-        Fall through all the wrappers and obtain the original, completely unwrapped environment.
-        """
-        try:
-            return self.env.unwrapped
-        except:
-            return self.env

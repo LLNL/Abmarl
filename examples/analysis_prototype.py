@@ -2,7 +2,8 @@
 def run(env, agent):
     """
     Analyze the behavior of your trained policies using the environment and agent from your RL
-    experiment.
+    experiment. The environment is likely wrapped by the MultiAgentWrapper; you
+    can use the unwrapped property to get the Simulation Manager.
     """
 
     # Run the simulation with actions chosen from the trained policies
