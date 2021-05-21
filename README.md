@@ -177,9 +177,8 @@ implemented.
 
 ## Contact
 
-Edward Rusu, rusu1@llnl.gov
-
-Ruben Glatt, glatt1@llnl.gov
+* Edward Rusu, rusu1@llnl.gov
+* Ruben Glatt, glatt1@llnl.gov
 
 ## Release
 
