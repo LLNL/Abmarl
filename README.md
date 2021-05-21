@@ -2,9 +2,12 @@
 
 Admiral is a package for developing agent based simulations and training them
 with multiagent reinforcement learning. We provide an intuitive command line
-interface for training, viewing, and analyzing agent behavior. We support
-several environment interfaces, including gym.Env and MultiAgentEnv, and provide
-useful wrappers for integrating simulations with the RL stack.
+interface for training, visualizing, and analyzing agent behavior. We define an
+[Agent Based Simulation interface](/admiral/envs/agent_based_simulation.py) and
+[Simulation Managers](/admiral/mangers/), which control which agents interact
+with the environment at each step. We support integration with several popular
+environment interfaces, including [gym.Env](/admiral/external/gym_env_wrapper.py) and
+[MultiAgentEnv](/admiral/external/rllib_multiagent_wrapper.py).
 
 Admiral is a layer in the Reinforcement Learning stack that sits on top of RLlib.
 We leverage RLlib's framework for training agents and extend it to more easily
@@ -62,43 +65,58 @@ to train, visualize, and analyze agent behavior. Full examples can be found
 
 ### Creating a configuration script
 
+This example demonstrates a simple corridor environment with multiple agents and
+can be found [here](/examples/multi_corridor_example.py).
+
 ```python
-""" This example demonstrates training a single agent environment."""
+from admiral.envs.corridor import MultiCorridor
+from admiral.managers import TurnBasedManager
+from admiral.external import MultiAgentWrapper
 
-from admiral.envs.flight import Flight_v0 as Flight
+env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
 
-env_name = 'Flight-v0'
-env_config = {
-    'birds': 4,
-}
-env = Flight.build(env_config)
+env_name = "MultiCorridor"
 from ray.tune.registry import register_env
-register_env(env_name, lambda env_config: Flight.build(env_config))
+register_env(env_name, lambda env_config: env)
 
-algo_name = 'PPO'
+agents = env.unwrapped.agents
+policies = {
+    'corridor': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
+}
+def policy_mapping_fn(agent_id):
+    return 'corridor'
 
+# Experiment parameters
 params = {
     'experiment': {
-        'title': '{}'.format('Flight-single-agent'),
+        'title': f'{env_name}',
+        'env_creator': lambda config=None: env,
     },
     'ray_tune': {
-        'run_or_experiment': algo_name,
+        'run_or_experiment': 'PG',
         'checkpoint_freq': 50,
+        'checkpoint_at_end': True,
         'stop': {
             'episodes_total': 20_000,
         },
+        'verbose': 2,
         'config': {
             # --- Environment ---
             'env': env_name,
-            'env_config': env_config,
+            'horizon': 200,
+            'env_config': {},
+            # --- Multiagent ---
+            'multiagent': {
+                'policies': policies,
+                'policy_mapping_fn': policy_mapping_fn,
+            },
             # --- Parallelism ---
-            # Number of workers per experiment: int
             "num_workers": 7,
-            # Number of environments that each worker starts: int
-            "num_envs_per_worker": 4,
+            "num_envs_per_worker": 1,
         },
     }
 }
+
 ```
 
 **Warning**: This example has `num_workers` set to 7 because we are on a computer
@@ -109,33 +127,34 @@ with 8 CPU's. You may need to adjust this for your computer to be `<cpu count> -
 #### Training
 
 With the configuration scipt complete, we can utilize the command line interface
-to train our predator. We simply type
+to train our agents. We simply type
 
 ```
-admiral train flight_training.py
+admiral train multi_corridor_example.py
 ```
-where `flight_training.py` is the name of our script. This will launch
+where `multi_corridor_example.py` is the name of our script. This will launch
 Admiral, which will process the script and launch RLlib according to the
-specified parameters. This particular example should take about 10 minutes to
-train. You can view the performance in real time in tensorboard with
+specified parameters. This particular example should take 1-10 minutes to
+train, depending on your compute capabilities. You can view the performance in real time in tensorboard with
 ```
 tensorboard --logdir ~/admiral_results
 ```
 
 #### Visualizing
-The birds have made some progress in learning to fly without crashing into each
-other or the region boundaries. We can vizualize the birds' learned behavior with
-the `visualize` command, which takes as argument the output directory
-from the training session stored in `~/admiral_results`. For example, the command
+We can vizualize the agents' learned behavior with the `visualize` command, which
+takes as argument the output directory from the training session stored in `~/admiral_results`. For example, the command
 
 ```
-admiral visualize ~/admiral_results/Flight-single-agent-2020-08-25_09-30/ -n 5 --record
+admiral visualize ~/admiral_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
 ```
 
 will load the training session (notice that the directory name is the experiment
 name from the configuration script appended with a timestamp) and display an animation
 of 5 episodes. The `--record` flag will save the animations as `.mp4` videos in
 the training directory.
+
+Visualizing the trained behavior, we can see that all the agents learn to move
+to the right, which is the desired behavior.
 
 #### Analyzing
 
@@ -159,6 +178,7 @@ implemented.
 ## Contact
 
 Edward Rusu, rusu1@llnl.gov
+
 Ruben Glatt, glatt1@llnl.gov
 
 ## Release
