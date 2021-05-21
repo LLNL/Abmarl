@@ -74,7 +74,7 @@ def test_builder():
         'resources': Box(-1, env.resources.max_value, (19,19), np.float),
     })
     assert agents['prey0'].action_space == Dict({
-        'move': Box(low=-1, high=1, shape=(2,), dtype=np.int),
+        'move': Box(low=-1.5, high=1.5, shape=(2,)),
         'harvest': Discrete(2)
     })
     assert agents['predator0'].id == 'predator0'
@@ -86,7 +86,7 @@ def test_builder():
         'resources': Box(-1, env.resources.max_value, (19,19), np.float),
     })
     assert agents['predator0'].action_space == Dict({
-        'move': Box(low=-1, high=1, shape=(2,), dtype=np.int),
+        'move': Box(low=-1.5, high=1.5, shape=(2,)),
         'attack': Discrete(2)
     })
 
@@ -219,24 +219,24 @@ def test_builder_agents():
     })
 
     assert agents['prey0'].action_space == Dict({
-        'move': Box(-2, 2, (2,), np.int),
+        'move': Box(-2.5, 2.5, (2,)),
         'harvest': Discrete(2),
     })
     assert agents['predator1'].action_space == Dict({
         'attack': Discrete(2),
-        'move': Box(-1, 1, (2,), np.int),
+        'move': Box(-1.5, 1.5, (2,)),
     })
     assert agents['prey2'].action_space == Dict({
-        'move': Box(-3, 3, (2,), np.int),
+        'move': Box(-3.5, 3.5, (2,)),
         'harvest': Discrete(2),
     })
     assert agents['predator3'].action_space == Dict({
         'attack': Discrete(2),
-        'move': Box(-2, 2, (2,), np.int),
+        'move': Box(-2.5, 2.5, (2,)),
     })
     assert agents['predator4'].action_space == Dict({
         'attack': Discrete(2),
-        'move': Box(-1, 1, (2,), np.int),
+        'move': Box(-1.5, 1.5, (2,)),
     })
 
 def test_reset_grid_obs():
