@@ -8,22 +8,21 @@ from admiral.managers import AllStepManager
 
 def test_init():
     env = Corridor()
-    wrapped_env = AllStepManager(env)
-    assert wrapped_env.env == env
-    assert wrapped_env.unwrapped == env
-    assert wrapped_env.agents == env.agents
+    sim = AllStepManager(env)
+    assert sim.env == env
+    assert sim.agents == env.agents
 
 def test_reset_and_step():
     np.random.seed(24)
-    env = AllStepManager(Corridor())
+    sim = AllStepManager(Corridor())
 
-    obs = env.reset()
-    assert env.unwrapped.corridor[4].id == 'agent3'
-    assert env.unwrapped.corridor[5].id == 'agent4'
-    assert env.unwrapped.corridor[6].id == 'agent2'
-    assert env.unwrapped.corridor[7].id == 'agent1'
-    assert env.unwrapped.corridor[8].id == 'agent0'
-    assert env.done_agents == set()
+    obs = sim.reset()
+    assert sim.env.corridor[4].id == 'agent3'
+    assert sim.env.corridor[5].id == 'agent4'
+    assert sim.env.corridor[6].id == 'agent2'
+    assert sim.env.corridor[7].id == 'agent1'
+    assert sim.env.corridor[8].id == 'agent0'
+    assert sim.done_agents == set()
     assert obs['agent0'] == {'left': [True], 'position': [8], 'right': [False]}
     assert obs['agent1'] == {'left': [True], 'position': [7], 'right': [True]}
     assert obs['agent2'] == {'left': [True], 'position': [6], 'right': [True]}
@@ -31,7 +30,7 @@ def test_reset_and_step():
     assert obs['agent4'] == {'left': [True], 'position': [5], 'right': [True]}
     
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent0': Corridor.Actions.RIGHT,
         'agent1': Corridor.Actions.RIGHT,
         'agent2': Corridor.Actions.RIGHT,
@@ -58,7 +57,7 @@ def test_reset_and_step():
 
     
     with pytest.raises(AssertionError):
-        env.step({
+        sim.step({
             'agent0': Corridor.Actions.RIGHT,
             'agent1': Corridor.Actions.STAY,
             'agent2': Corridor.Actions.LEFT,
@@ -66,7 +65,7 @@ def test_reset_and_step():
             'agent4': Corridor.Actions.LEFT,
         })
     
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent1': Corridor.Actions.STAY,
         'agent2': Corridor.Actions.LEFT,
         'agent3': Corridor.Actions.STAY,
@@ -91,7 +90,7 @@ def test_reset_and_step():
     assert done['__all__'] == False
 
     
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent1': Corridor.Actions.RIGHT,
         'agent2': Corridor.Actions.RIGHT,
         'agent3': Corridor.Actions.RIGHT,
@@ -114,14 +113,14 @@ def test_reset_and_step():
 
     
     with pytest.raises(AssertionError):
-        env.step({
+        sim.step({
             'agent1': Corridor.Actions.STAY,
             'agent2': Corridor.Actions.STAY,
             'agent3': Corridor.Actions.LEFT,
             'agent4': Corridor.Actions.RIGHT,
         })
     
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent2': Corridor.Actions.STAY,
         'agent3': Corridor.Actions.LEFT,
         'agent4': Corridor.Actions.RIGHT,
@@ -142,7 +141,7 @@ def test_reset_and_step():
     assert done['__all__'] == False
 
     
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent2': Corridor.Actions.RIGHT,
         'agent3': Corridor.Actions.RIGHT,
         'agent4': Corridor.Actions.RIGHT,
@@ -161,13 +160,13 @@ def test_reset_and_step():
         
     
     with pytest.raises(AssertionError):
-        env.step({
+        sim.step({
             'agent2': Corridor.Actions.STAY,
             'agent3': Corridor.Actions.RIGHT,
             'agent4': Corridor.Actions.RIGHT,
         })
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent3': Corridor.Actions.RIGHT,
         'agent4': Corridor.Actions.RIGHT,
     })
@@ -184,7 +183,7 @@ def test_reset_and_step():
     assert done['__all__'] == False
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent3': Corridor.Actions.RIGHT,
         'agent4': Corridor.Actions.RIGHT,
     })
@@ -199,12 +198,12 @@ def test_reset_and_step():
 
     
     with pytest.raises(AssertionError):
-        env.step({
+        sim.step({
             'agent3': Corridor.Actions.RIGHT,
             'agent4': Corridor.Actions.STAY,
         })
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent3': Corridor.Actions.RIGHT,
     })
     
@@ -216,7 +215,7 @@ def test_reset_and_step():
     assert done == {'agent3': False, '__all__': False}
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent3': Corridor.Actions.RIGHT,
     })
     
@@ -225,7 +224,7 @@ def test_reset_and_step():
     assert done == {'agent3': False, '__all__': False}
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'agent3': Corridor.Actions.RIGHT,
     })
     

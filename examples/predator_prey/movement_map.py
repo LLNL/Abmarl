@@ -4,24 +4,19 @@ def run(env, agent):
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    # Try to unwrap the environment to get the simulation manager.
-    # TODO: Should unwrap only go down to the simulation manager?
-    try:
-        env = env.env
-    except:
-        pass
+    sim = env.unwrapped
 
     # Create a grid
-    grid = np.zeros((env.unwrapped.region, env.unwrapped.region))
-    attack = np.zeros((env.unwrapped.region, env.unwrapped.region))
+    grid = np.zeros((sim.env.region, sim.env.region))
+    attack = np.zeros((sim.env.region, sim.env.region))
 
     # Run the trained policy
     policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
     for episode in range(100): # Run 100 trajectories
         print('Episode: {}'.format(episode))
-        obs = env.reset()
+        obs = sim.reset()
         done = {agent: False for agent in obs}
-        pox, poy = env.agents['predator0'].position
+        pox, poy = sim.agents['predator0'].position
         grid[pox, poy] += 1
         while True:
             joint_action = {}
@@ -30,8 +25,8 @@ def run(env, agent):
                 policy_id = policy_agent_mapping(agent_id)
                 action = agent.compute_action(agent_obs, policy_id=policy_id)
                 joint_action[agent_id] = action
-            obs, _, done, _ = env.step(joint_action)
-            pox, poy = env.agents['predator0'].position
+            obs, _, done, _ = sim.step(joint_action)
+            pox, poy = sim.agents['predator0'].position
             grid[pox, poy] += 1
             if joint_action['predator0']['attack'] == 1: # This is the attack action
                 attack[pox, poy] += 1
@@ -47,4 +42,3 @@ def run(env, agent):
     ax = sns.heatmap(np.flipud(np.transpose(attack)), linewidth=0.5)
 
     plt.show()
-
