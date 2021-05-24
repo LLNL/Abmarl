@@ -21,8 +21,7 @@ env = MultiAgentWrapper(AllStepManager(PredatorPreyEnv.build(env_config)))
 agents = env.unwrapped.agents
 register_env(env_name, lambda env_config: env)
 
-# Set up heuristic policies
-from admiral.pols import RandomAction, HeuristicPolicy
+# Define policies
 
 policies = {
     'predator': (None, agents['predator0'].observation_space, agents['predator0'].action_space, {}),
