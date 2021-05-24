@@ -46,7 +46,7 @@ Install each package as needed.
 
 To train:
 1. Install tensorflow or pytorch
-1. Install ray rllib v1.2.0: `pip install ray==1.2.0`
+1. Install ray rllib v1.2.0: `pip install ray[rllib]==1.2.0`
 1. Install Admiral: `pip install .` or `pip install -e .`
 
 To visualize:
