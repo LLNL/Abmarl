@@ -390,7 +390,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
                 config['rewards'] = rewards
 
         # --- resources --- #
-        from admiral.envs.modules import GridResources
+        from .grid_resources import GridResources
         if 'resources' not in env_config:
             env_config['resources'] = {}
         env_config['resources']['region'] = config['region']

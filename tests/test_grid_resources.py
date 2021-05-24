@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from admiral.envs.modules import GridResources
+from admiral.envs.examples.predator_prey.grid_resources import GridResources
 
 def test_builder():
     env = GridResources.build()

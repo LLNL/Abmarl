@@ -5,7 +5,7 @@ import pytest
 
 from admiral.envs.examples.predator_prey import PredatorPreyEnv, PredatorPreyEnvDistanceObs, PredatorPreyEnvGridObs
 from admiral.envs.examples.predator_prey import Predator, Prey
-from admiral.envs.modules import GridResources
+from admiral.envs.examples.predator_prey.grid_resources import GridResources
 
 def test_build_fails():
     with pytest.raises(TypeError): # Abstract class error
