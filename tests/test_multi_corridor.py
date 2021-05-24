@@ -3,7 +3,7 @@ from gym.spaces import Box, MultiBinary, Discrete, Dict
 import numpy as np
 
 from admiral.envs import Agent
-from admiral.envs.corridor import MultiCorridor as Corridor
+from admiral.envs.examples.corridor import MultiCorridor as Corridor
 
 
 def test_corridor_attributes():

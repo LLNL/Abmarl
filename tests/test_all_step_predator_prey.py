@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
+from admiral.envs.examples.predator_prey import PredatorPreyEnv, Predator, Prey
 from admiral.managers import AllStepManager
 
 def test_turn_based_predator_prey_distance():

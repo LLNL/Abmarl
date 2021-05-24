@@ -1,6 +1,6 @@
 
 # Setup the environment
-from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
+from admiral.envs.examples.predator_prey import PredatorPreyEnv, Predator, Prey
 from admiral.managers import TurnBasedManager, AllStepManager
 
 region = 6

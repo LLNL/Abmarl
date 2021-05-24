@@ -3,8 +3,8 @@ from gym.spaces import Dict, Discrete, Box
 import numpy as np
 import pytest
 
-from admiral.envs.predator_prey import PredatorPreyEnv, PredatorPreyEnvDistanceObs, PredatorPreyEnvGridObs
-from admiral.envs.predator_prey import Predator, Prey
+from admiral.envs.examples.predator_prey import PredatorPreyEnv, PredatorPreyEnvDistanceObs, PredatorPreyEnvGridObs
+from admiral.envs.examples.predator_prey import Predator, Prey
 from admiral.envs.modules import GridResources
 
 def test_build_fails():

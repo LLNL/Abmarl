@@ -18,7 +18,7 @@ To begin, we'll import the Predator-Prey simulation environment, wrap
 it with our MultiAgentWrapper, and register it with RLlib.
 
 ```python
-from admiral.envs.predator_prey import PredatorPrey
+from admiral.envs.examples.predator_prey import PredatorPreyEnv, Predator, Prey
 from admiral.managers import AllStepManager
 from admiral.envs.wrappers import MultiAgentWrapper
 from ray.tune.registry import register_env

@@ -69,7 +69,7 @@ This example demonstrates a simple corridor environment with multiple agents and
 can be found [here](/examples/multi_corridor_example.py).
 
 ```python
-from admiral.envs.corridor import MultiCorridor
+from admiral.envs.examples.corridor import MultiCorridor
 from admiral.managers import TurnBasedManager
 from admiral.external import MultiAgentWrapper
 

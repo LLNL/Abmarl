@@ -3,7 +3,7 @@ from gym.spaces import Box, MultiBinary, Discrete, Dict
 import numpy as np
 import pytest
 
-from admiral.envs.corridor import MultiCorridor as Corridor
+from admiral.envs.examples.corridor import MultiCorridor as Corridor
 from admiral.managers import TurnBasedManager
 
 def test_init():

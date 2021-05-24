@@ -1,5 +1,5 @@
 
-from admiral.envs.corridor import MultiCorridor
+from admiral.envs.examples.corridor import MultiCorridor
 from admiral.managers import TurnBasedManager, AllStepManager
 from admiral.external import MultiAgentWrapper
 

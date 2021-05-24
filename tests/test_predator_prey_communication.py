@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
+from admiral.envs.examples.predator_prey import PredatorPreyEnv, Predator, Prey
 from admiral.envs.wrappers import CommunicationHandshakeWrapper
 
 def test_communication():
