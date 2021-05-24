@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2020, Lawrence Livermore National Security, LLC
+Copyright (c) 2021, Lawrence Livermore National Security, LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 Code call to Ray in Admiral imported from
 https://github.com/ray-project/ray
 
-Copyright 2019, The Ray Team
+Copyright 2021, The Ray Team
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
