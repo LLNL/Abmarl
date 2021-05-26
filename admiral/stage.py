@@ -50,7 +50,7 @@ def _finish():
 
 def run_analysis(full_trained_directory, full_subscript, parameters):
     """Analyze MARL policies from a saved policy through an analysis script"""
-    env, agent = _start(full_trained_directory, parameters.checkpoint)
+    env, agent = _start(full_trained_directory, parameters.checkpoint, parameters.seed)
 
     # Load the analysis module and run it
     analysis_mod = adu.custom_import_module(full_subscript)

@@ -7,6 +7,7 @@ def create_parser(subparsers):
         help='Path to subscript to run.')
     analyze_parser.add_argument('-c','--checkpoint', type=int, \
         help='Specify which checkpoint to load. Default is the last timestep in the directory.')
+    analyze_parser.add_argument('--seed', type=int, help='Seed for reproducibility.')
     return analyze_parser
 
 def run(full_trained_directory, full_subscript, parameters):
