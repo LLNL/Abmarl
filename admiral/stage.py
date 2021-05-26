@@ -4,6 +4,7 @@ import os
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import numpy as np
 import ray
 import ray.rllib
 from ray.rllib.env import MultiAgentEnv
@@ -59,6 +60,10 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
 def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
     env, agent = _start(full_trained_directory, parameters.checkpoint)
+
+    np.random.seed = parameters.seed
+    for agent_i in agent.unwrapped.agents.values():
+        agent_i.seed = parameters.seed
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):
