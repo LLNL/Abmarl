@@ -4,7 +4,6 @@ import os
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import numpy as np
 import ray
 import ray.rllib
 from ray.rllib.env import MultiAgentEnv
