@@ -11,7 +11,7 @@ from ray.tune.registry import get_trainable_cls
 
 from admiral.tools import utils as adu
 
-def _start(full_trained_directory, requested_checkpoint):
+def _start(full_trained_directory, requested_checkpoint, seed=None):
     """The elements that are common to both analyze and visualize."""
     # Load the experiment as a module
     # First, we must find the .py file in the directory
@@ -22,6 +22,7 @@ def _start(full_trained_directory, requested_checkpoint):
     # Modify the number of workers in the configuration
     experiment_mod.params['ray_tune']['config']['num_workers'] = 1
     experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
+    experiment_mod.params['ray_tune']['config']['seed'] = seed
 
     checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(full_trained_directory, requested_checkpoint)
     print(checkpoint_dir)
@@ -48,7 +49,7 @@ def _finish():
 
 def run_analysis(full_trained_directory, full_subscript, parameters):
     """Analyze MARL policies from a saved policy through an analysis script"""
-    env, agent = _start(full_trained_directory, parameters.checkpoint)
+    env, agent = _start(full_trained_directory, parameters.checkpoint, parameters.seed)
 
     # Load the analysis module and run it
     analysis_mod = adu.custom_import_module(full_subscript)
@@ -58,7 +59,7 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
 
 def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
-    env, agent = _start(full_trained_directory, parameters.checkpoint)
+    env, agent = _start(full_trained_directory, parameters.checkpoint, seed=parameters.seed)
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):

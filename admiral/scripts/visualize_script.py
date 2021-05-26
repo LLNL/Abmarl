@@ -13,6 +13,7 @@ def create_parser(subparsers):
         'to delay between each frame in the animation.', default=200)
     visualize_parser.add_argument('--no-explore', action='store_false', help='Turn off' + \
         'exploration in the action policy.')
+    visualize_parser.add_argument('--seed', type=int, help='Seed for reproducibility.')
     return visualize_parser
 
 def run(full_trained_directory, parameters):
