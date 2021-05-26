@@ -161,8 +161,8 @@ to the right, which is the desired behavior.
 See the [Predator-Prey example](examples/predator_prey), which provides a great use case
 for analyzing agent behaviors.
 
-## Running on LC
-See the [lc-magpie example](examples/lc-magpie/), which provides a walkthrough
+## Running at scale with HPC
+See the [magpie example](examples/magpie/), which provides a walkthrough
 for launching a training experiment on multiple compute nodes.
 
 ## Continued Support
