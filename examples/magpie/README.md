@@ -1,14 +1,14 @@
-# Running on LC with magpie
+# Running with magpie
 
-The prospect of applying Reinforcement Learning algorithms to the lab's HPC
-simulations codes is very attractive. As a first step, we demonstrate that
+The prospect of applying Reinforcement Learning algorithms in HPC
+environments is very attractive. As a first step, we demonstrate that
 admiral can be used with [magpie](https://github.com/LLNL/magpie) to create batch
 jobs for running on multiple compute nodes.
 
 
-## Installing Admiral on LC
+## Installing Admiral on HPC systems
 
-Here we'll use conda to install on LC:
+Here we'll use conda to install on an HPC system:
 1. Create the conda virtual environment: `conda create --name admiral`
 1. Activate it: `conda activate admiral`
 1. Install pip installer: `conda install --name admiral pip`
@@ -17,12 +17,12 @@ Here we'll use conda to install on LC:
 # Usage
 
 We demonstrate running the [Predator-Prey example](/examples/predator_prey/predator_prey_training.py)
-on LC using Mapgie.
+using Mapgie.
 
 ## make-runnable mode
 
 Admiral's command line interface provides the `make-runnable`
-mode that converts the configuration module into a runnable script and saves it
+subcommand that converts the configuration script into a runnable script and saves it
 to the same directory.
 
 ```

@@ -88,7 +88,7 @@ def run(full_config_path, parameters):
         try:
             ray_init_line = _process_magpie_sbatch(config_items_needed, full_runnable_config_path)
         except FileNotFoundError as e:
-            print('Could not find magpie. Are you running on an LC system?')
+            print('Could not find magpie. Is it installed on your HPC system?')
 
     # Open the runnable file and write parts to enable runnable
     with open(full_runnable_config_path, 'a') as file_writer:
