@@ -13,7 +13,7 @@ Welcome to Admiral's documentation!
    overview
    highlights
    install
-   tutorials
+   tutorials/tutorials
    api
 
 
