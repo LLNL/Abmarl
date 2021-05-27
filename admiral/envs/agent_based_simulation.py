@@ -127,31 +127,8 @@ class Agent(ObservingAgent, ActingAgent):
 class AgentBasedSimulation(ABC):
     """
     AgentBasedSimulation defines the interface that agent-based simulations will
-    implement. The interface defines the following API:
-        agents: dict
-            A dictionary that maps the Agent's id to Agent object. An Agent object can hold
-            any property, but it must include an id, the action space, and the
-            observation space. A multi-agent environment is expected to have
-            multiple entries in the dictionary, whereas a single-agent environment
-            should only have a single entry in the dictionary.
-        reset()
-            Reset the simulation environment to a start state, which may be randomly
-            generated.
-        step(action: dict)
-            Step the environment forward one discrete time-step. The action is a dictionary that
-            contains the action of each agent in this time-step.
-        render
-            Render the enviroment for visualization.
-        get_obs(agent_id) -> obj
-            Get the observation of the respective agent.
-        get_reward(agent_id) -> double
-            Get the reward for the respective agent.
-        get_done(agent_id) -> bool
-            Get the done status of the respective agent.
-        get_all_done() -> bool
-            Get the done status for all the agents and/or the environment.
-        get_info(agent_id) -> dict
-            Get additional information that can be used for analysis or debugging.
+    implement.
+    
     Under this design model the observations, rewards, and done conditions of the
     agents is treated as part of the environments internal state instead of as
     output from reset and step. Thus, it is the environments responsibility to manage
@@ -161,8 +138,17 @@ class AgentBasedSimulation(ABC):
     the single-agent environment as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
     """
+
     @property
     def agents(self):
+        """
+        A dictionary that maps the Agent's id to Agent object. An Agent object can hold
+        any property, but it must include an id, the action space, and the
+        observation space. A multi-agent environment is expected to have
+        multiple entries in the dictionary, whereas a single-agent environment
+        should only have a single entry in the dictionary.
+        """
+
         return self._agents
 
     @agents.setter
@@ -186,7 +172,8 @@ class AgentBasedSimulation(ABC):
     @abstractmethod
     def reset(self, **kwargs):
         """
-        Reset the simulation environment.
+        Reset the simulation environment to a start state, which may be randomly
+        generated.
         """
         pass
 
