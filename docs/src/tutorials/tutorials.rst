@@ -1,7 +1,7 @@
 .. Admiral documentation tutorials.
 
-Tutorials
-=========
+Full Tutorials
+==============
 
 Admiral has some tutorials that demonstrate how to train, visualize, and analyze MARL policies.
 
