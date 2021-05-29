@@ -11,3 +11,4 @@ Admiral has some tutorials that demonstrate how to train, visualize, and analyze
 
    multi_corridor
    predator_prey
+   magpie
