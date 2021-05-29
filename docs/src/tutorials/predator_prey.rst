@@ -3,22 +3,32 @@
 PredatorPrey
 ============
 
-# Predator Prey Example
-
 Predator-Prey is a multiagent environment usefuly for exploring competitve behaviors between groups
 of agents. We will train both predator and prey behavior using MARL.
 
-## Installation
-
+NOTE: This tutorial requires seaborn...
 In addition the listed dependencies in the [main README](/README.md), the Predator-Prey
 environment requires seaborn:
 1. Install seaborn: `pip install seaborn`
+
+Creating the Environment
+------------------------
+
+Some documentation on creating the Mapp environment.
+
+
+Experiment Configuration
+------------------------
 
 ## Creating a configuration script
 
 We start with a Python configuration script that defines the simulation
 environment and training agents. This example's scipt is
 [predator_prey_training.py](predator_prey_training.py).
+
+Setting up the Environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 To begin, we'll import the Predator-Prey simulation environment, wrap
 it with our MultiAgentWrapper, and register it with RLlib.
 
@@ -45,6 +55,9 @@ agents = env.unwrapped.agents
 register_env(env_name, lambda env_config: env)
 ```
 
+Setting up the Policies
+~~~~~~~~~~~~~~~~~~~~~~~
+
 Next, we assign agents to policies. This is done
 through a policy mapping function that maps the agents' ids to their
 respective policy ids. This experiment has two policies, one that is shared by
@@ -61,6 +74,9 @@ def policy_mapping_fn(agent_id):
     else:
         return 'predator'
 ```
+
+The parameters
+~~~~~~~~~~~~~~
 
 The last thing to do now is to specifiy which
 learning algorithm we will use and to wrap all the settings together into a
@@ -104,9 +120,12 @@ params = {
 **Warning**: This example has `num_workers` set to 7 because we are on a computer
 with 8 CPU's. You may need to adjust this for your computer to be `<cpu count> - 1`.
 
-## Using the command line 
 
-### Training
+Using the command line
+----------------------
+
+Training
+~~~~~~~~
 
 With the [configuration scipt complete](predator_prey_training.py),
 we can utilize the command line interface to train our predator. We simply type
@@ -123,7 +142,8 @@ tensorboard --logdir ~/admiral_results
 We can find the rewards associated with the policies on the second page of tensorboard.
 
 
-### Visualizing
+Visualizing
+~~~~~~~~~~~
 Having successfully trained predators to attack prey, we can vizualize the agents'
 learned behavior with the `visualize` command,
 which takes as argument the output directory from the training session stored
@@ -138,7 +158,8 @@ directory name is the experiment name from the configuration script appended wit
 timestamp) and display an animation of 5 episodes. The `--record` flag will
 save the animations as `.mp4` videos in the training directory.
 
-### Analyzing
+Analyzing
+~~~~~~~~~
 We can further investigate the learned
 behaviors using the `analyze` command along with an analysis script.
 
