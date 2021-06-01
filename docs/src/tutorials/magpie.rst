@@ -1,5 +1,7 @@
 .. Admiral documentation Magpie tutorial.
 
+.. _tutorial_magpie:
+
 Magpie
 ======
 

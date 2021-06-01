@@ -1,5 +1,7 @@
 .. Admiral documentation PredatorPrey tutorial.
 
+.. _tutorial_predator_prey:
+
 PredatorPrey
 ============
 

@@ -1,5 +1,7 @@
 .. Admiral documentation MultiCorridor tutorial.
 
+.. _tutorial_multi_corridor:
+
 MultiCorridor
 =============
 
