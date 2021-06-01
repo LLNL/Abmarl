@@ -27,6 +27,16 @@ Creating Agents and Environments
 Using Agent, AgentBasedSimulation, and Managers to construct a simulation ready
 for training in Admiral.
 
+.. _abs:
+
+Agent Based Simulation
+``````````````````````
+
+.. _sim-man:
+
+Simulation Managers
+```````````````````
+
 Training with an Experiment Configuration
 -----------------------------------------
 We must define a configuration script that specifies the environment and agent
@@ -129,5 +139,13 @@ for analyzing agent behaviors.
 ## Running at scale with HPC
 See the [magpie example](examples/magpie/), which provides a walkthrough
 for launching a training experiment on multiple compute nodes.
+
+.. _external:
+
+External Integration
+--------------------
+
+Some text about how we integrate with gym and marl envs.
+
 
 
