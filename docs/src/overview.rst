@@ -7,7 +7,7 @@ A reinforcement learning experiment contains two main components: (1) a simulati
 environment and (2) a trainer, which contain policies that map observations
 to actions. These policies may be hard-coded by the researcher or trained
 by the RL algorithm. In Admiral, these two components are specified in a single
-Python configuration script. The components can be defined in-script or imported
+Python configuration file. The components can be defined in-file or imported
 as modules.
 
 Once these components are set up, they are passed as parameters to RLlib's
@@ -31,21 +31,27 @@ Admiral provides three interfaces for setting up an agent-based simulation envir
 Agent
 `````
 
-First, we have :ref:`Agents <>`. An agent is an object with an observation and
+.. ATTENTION::
+   TODO: The link for Agent API is not very good because it is an organizational
+   class that inherits from Observing and Acting Agent. We should come up with a
+   better link/structure of the API.
+
+First, we have :ref:`Agents <api_agent>`. An agent is an object with an observation and
 action space. Many practitioners may be accustomed to gym.Env's interface, which
 defines the observation and action space for the *environment*. However, in heterogeneous
 multi-agent settings, each *agent* can have different spaces; thus we assign these
 spaces to the agents and not the environment.
 
-An agent can be created like so
+An agent can be created like so:
+
 .. code-block:: python
 
    from gym.spaces import Discrete, Box
    from admiral.envs import Agent
    agent = Agent(
-        id='agent0',
-        observation_space=Box(-1, 1, (2,)),
-        action_space=Discrete(3)
+       id='agent0',
+       observation_space=Box(-1, 1, (2,)),
+       action_space=Discrete(3)
    )
 
 At this level, the Agent is basically a dataclass. We have left it open for our
@@ -55,31 +61,39 @@ users to extend its features as they see fit.
 
 Agent Based Simulation
 ``````````````````````
-Next, we define an :ref:`Agent Based Simulation <>`, or ABS for short, with the ususal `reset` and `step`
+Next, we define an :ref:`Agent Based Simulation <api_abs>`, or ABS for short, with the
+ususal ``reset`` and ``step``
 functions that we are used to seeing in RL environments. These functions, however, do
 not return anything; the state information must be obtained from the getters:
-`get_obs`, `get_reward`, `get_done`, `get_all_done`, and `get_info`. The getters
+``get_obs``, ``get_reward``, ``get_done``, ``get_all_done``, and ``get_info``. The getters
 take an agent's id as input and return the respective information from the simulation's
 state. The ABS also contains a dictionary of agents that "live" in the environment.
 
 An Agent Based Simulation can be created and used like so:
+
 .. code-block:: python
-    from admiral.envs import Agent, AgentBasedSimulation
 
-    class MySim(AgentBasedSimulation):
-        def __init__(self, agents=None, **kwargs):
-            self.agents = agents
-            ... # Implement the ABS interface
+   from admiral.envs import Agent, AgentBasedSimulation   
+   class MySim(AgentBasedSimulation):
+       def __init__(self, agents=None, **kwargs):
+           self.agents = agents
+           ... # Implement the ABS interface
 
-    agents = {f'agent{i}': Agent(id=f'agent{i}', ...) for i in range(10)} # Create a dictionary of agents
-    env = MySim(agents=agents) # Create the ABS environment with the agents
-    env.reset()
-    obs = {agent.id: env.get_obs(agent.id) for agent in agents.values()} # Get the observations
-    env.step({agent.id: agent.action_space.sample() for agent in agents.values()}) # Take some random actions
-    print(env.get_reward('agent3')) # See the reward for agent3.
+   # Create a dictionary of agents
+   agents = {f'agent{i}': Agent(id=f'agent{i}', ...) for i in range(10)}
+   # Create the ABS environment with the agents
+   env = MySim(agents=agents)
+   env.reset()
+   # Get the observations
+   obs = {agent.id: env.get_obs(agent.id) for agent in agents.values()}
+   # Take some random actions
+   env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+   # See the reward for agent3
+   print(env.get_reward('agent3'))
 
 .. IMPORTANT::
-   Your implementation of AgentBasedSimulation should call `finalize` at the end of its `__init__`.
+   Your implementation of AgentBasedSimulation should call ``finalize`` at the
+   end of its ``__init__``.
    Finalize ensures that all agents are configured and ready to be used for training.
 
 .. _sim-man:
@@ -89,29 +103,35 @@ Simulation Managers
 
 The Agent Based Simulation interface does not specify an ordering for agents' interactions
 with the environment. This is left open to give our users maximal flexibility. However,
-in order to interace with RLlib's learning library, we provide `Simulation Managers <>`
-which specify the output from `reset` and `step` as RLlib expects it. Specifically,
+in order to interace with RLlib's learning library, we provide :ref:`Simulation Managers <api_sim>`
+which specify the output from ``reset`` and ``step`` as RLlib expects it. Specifically,
 1. Agents that appear in the output dictionary (from reset or step) will provide
 actions at the next step, and
 2. Agents that are done on this step will not provide actions on the next step.
 
-Simulation managers are open-ended requiring only `reset` and `step` with output
-described above. For convenience, we have provided two managers: `Turn Based <>`,
-which implements turn-based games; and `All Step <>`, which has every non-done
+Simulation managers are open-ended requiring only ``reset`` and ``step`` with output
+described above. For convenience, we have provided two managers: :ref:`Turn Based <api_turn_based>`,
+which implements turn-based games; and :ref:`All Step <api_all_step>`, which has every non-done
 agent provide actions at each step.
 
 Simluation Managers "wrap" environments, and they can be used like so:
+
 .. code-block:: python
+
    from admiral.managers import AllStepManager
    from admiral.envs import AgentBasedSimulation, Agent
    class MySim(AgentBasedSimulation):
-        ... # Define some simulation environment
-   env = MySim(agents=...) # Instatiate the environment
-   sim = AllStepManager(env) # Wrap the environment with the simulation manager.
-   obs = sim.reset() # Get the observations for all agents
+       ... # Define some simulation environment
+
+   # Instatiate the environment
+   env = MySim(agents=...)
+   # Wrap the environment with the simulation manager
+   sim = AllStepManager(env)
+   # Get the observations for all agents
+   obs = sim.reset()
+   # Get simulation state for all non-done agents, regardless of which agents
+   # actually contribute an action.
    obs, rewards, dones, infos = sim.step({'agent0': 4, 'agent2': [-1, 1]})
-   # Get simulation state for all non-done agents, regardless of which agents actually
-   # contributed an action.
 
 
 Training with an Experiment Configuration
