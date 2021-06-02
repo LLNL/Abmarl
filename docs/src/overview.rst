@@ -236,7 +236,21 @@ simple corridor environment with multiple agents.
    This example has ``num_workers`` set to 7 for a computer with 8 CPU's.
    You may need to adjust this for your computer to be `<cpu count> - 1`.
 
+Experiment Parameters
+`````````````````````
+The strucutre of the parameters dictionary is very imporant. It *must* have an
+`experiment` key which contains both the `title` of the experiment and the `env_creator`
+function. This function should receive a config and, if appropriate, pass it to
+the simulation constructor. In the example configuration above, we just retrun the
+already-configured simulation. Without the title and environment creator, Admiral
+may not behave as expected.
 
+The experiment parameters also contains information that will be passed directly
+to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
+`list of common configuration parameters <https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters>`_.
+
+Command Line
+````````````
 With the configuration file complete, we can utilize the command line interface
 to train our agents. We simply type ``admiral train multi_corridor_example.py``,
 where `multi_corridor_example.py` is the name of our configuration file. This will launch
