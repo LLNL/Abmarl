@@ -1,20 +1,13 @@
 
+# Admiral
 
-### Creating a configuration script
+## Documentation
 
-
-
-### Using the command line 
-
-#### Training
+[Admiral Users Manual](https://abmarl.readthedocs.io/en/latest/) [![Documentation Status](https://readthedocs.org/projects/pydv/badge/?version=latest)](https://pydv.readthedocs.io/en/latest/?badge=latest)
 
 
-#### Visualizing
+## Continued Support
 
-#### Analyzing
-
-Continued Support
------------------
 Admiral was funded as an ISCP project through Computing's Idea Day call. What you
 see here is a minimal viable product (MVP), with enhancements planned in future
 ISCP projects. However, this project is meant to be primarily *community driven*.
@@ -23,11 +16,11 @@ you think would be useful to the greater RL community. In addition, please conta
 me or fill out a "new issue" if you encounter any bugs or want features to be
 implemented.
 
-Contact
--------
+## Contact
+
 * Edward Rusu, rusu1@llnl.gov
 * Ruben Glatt, glatt1@llnl.gov
 
-Release
--------
+## Release
+
 LLNL-CODE-815883
