@@ -105,9 +105,17 @@ An Agent Based Simulation can be created and used like so:
    print(env.get_reward('agent3'))
 
 .. IMPORTANT::
-   Your implementation of AgentBasedSimulation should call ``finalize`` at the
-   end of its ``__init__``.
-   Finalize ensures that all agents are configured and ready to be used for training.
+   Implementations of AgentBasedSimulation should call ``finalize`` at the
+   end of its ``__init__``. Finalize ensures that all agents are configured and
+   ready to be used for training.
+
+.. NOTE::
+   Instead of treating agents as dataclasses, we could have included the relevant
+   information in the Agent Based Simulation with various dictionaries. For example,
+   we could have ``action_spaces`` and ``observation_spaces`` that
+   maps agents' ids to their action spaces and observation spaces, respectively.
+   In Admiral, we favor the dataclass approach and use it throughout the package
+   and documentation.
 
 .. _sim-man:
 
