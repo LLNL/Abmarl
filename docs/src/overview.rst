@@ -3,26 +3,35 @@
 Design
 ======
 
-.. ATTENTION::
-   TODO: Include another figure under this paragraph that shows the multi-agent
-   environment cycle.
+A reinforcement learning experiment in Admiral contains two interacting components:
+a Simulation and a Trainer.
 
-A reinforcement learning experiment contains two main components: (1) a simulation
-environment and (2) a trainer, which contain policies that map observations
-to actions. These policies may be hard-coded by the researcher or trained
-by the RL algorithm. In Admiral, these two components are specified in a single
-Python configuration file. The components can be defined in-file or imported
-as modules.
+The Simulation contains agent(s) who can observe the state (or a substate) of the
+Simulation and whose actions affect the state of the simulation. The simulation is
+discrete in time, and at each time step agents can provide actions. The simulation
+also produces rewards for each agent that the Trainer can use to train optimal behaviors.
+The Agent-Simulation interaction produces state-action-reward tuples (SARs), which
+can be collected in *rollout fragments* and used to optimize agent behaviors. 
 
-Once these components are set up, they are passed as parameters to RLlib's
-tune command, which will launch the RLlib application and begin the training
+The Trainer contains policies that map agents' observations to actions. Policies
+are one-to-many with agents, meaning that there can be multiple agents using
+the same policy. Policies may be heuristic (i.e. coded by the researcher) or trainable
+by the RL algorithm.
+
+In Admiral, the Simulation and Trainer are specified in a single Python configuration
+file. Once these components are set up, they are passed as parameters to
+RLlib's tune command, which will launch the RLlib application and begin the training
 process. The training process will save checkpoints to an output directory,
-from which you can visualize and analyze results. The following diagram
+from which the user can visualize and analyze results. The following diagram
 demonstrates this workflow.
 
-.. image:: .images/workflow.png
-  :width: 800
-  :alt: Admiral Workflow
+.. figure:: .images/workflow.png
+   :width: 100 %
+   :alt: Admiral usage workflow
+
+   Admiral's usage workflow. An experiment configuration is used to train agents'
+   behaviors. The policies and environment are saved to an output directory. Behaviors can then
+   be analyzed or visualized from the output directory.
 
 
 Creating Agents and Environments
@@ -43,7 +52,7 @@ Agent
 First, we have :ref:`Agents <api_agent>`. An agent is an object with an observation and
 action space. Many practitioners may be accustomed to gym.Env's interface, which
 defines the observation and action space for the *environment*. However, in heterogeneous
-multi-agent settings, each *agent* can have different spaces; thus we assign these
+multiagent settings, each *agent* can have different spaces; thus we assign these
 spaces to the agents and not the environment.
 
 An agent can be created like so:
@@ -81,7 +90,7 @@ An Agent Based Simulation can be created and used like so:
    class MySim(AgentBasedSimulation):
        def __init__(self, agents=None, **kwargs):
            self.agents = agents
-           ... # Implement the ABS interface
+        ... # Implement the ABS interface
 
    # Create a dictionary of agents
    agents = {f'agent{i}': Agent(id=f'agent{i}', ...) for i in range(10)}
@@ -107,10 +116,10 @@ Simulation Managers
 
 The Agent Based Simulation interface does not specify an ordering for agents' interactions
 with the environment. This is left open to give our users maximal flexibility. However,
-in order to interace with RLlib's learning library, we provide :ref:`Simulation Managers <api_sim>`
-which specify the output from ``reset`` and ``step`` as RLlib expects it. Specifically,
-1. Agents that appear in the output dictionary (from reset or step) will provide
-actions at the next step, and
+in order to interace with RLlib's learning library, we provide a :ref:`Simulation Manager <api_sim>`
+which specifies the output from ``reset`` and ``step`` as RLlib expects it. Specifically,
+
+1. Agents that appear in the output dictionary will provide actions at the next step.
 2. Agents that are done on this step will not provide actions on the next step.
 
 Simulation managers are open-ended requiring only ``reset`` and ``step`` with output
@@ -143,29 +152,31 @@ Simluation Managers "wrap" environments, and they can be used like so:
 External Integration
 ````````````````````
 
-In order to train agents in a Simulation Manager in RLlib, we must wrap the simulation
+In order to train agents in a Simulation Manager using RLlib, we must wrap the simulation
 with either a :ref:`GymWrapper <api_gym_wrapper>` for single-agent simulations
 (i.e. only a single entry in the `agents` dict) or a
-:ref`MultiAgentWrapper <api_ma_wrapper>` for multiagent simulations.
+:ref:`MultiAgentWrapper <api_ma_wrapper>` for multiagent simulations.
 
 
 
 Training with an Experiment Configuration
 -----------------------------------------
 In order to run experiments, we must define a configuration file that
-specifies the environment and trainer parameters. Here is the configuration file
+specifies Simulation and Trainer parameters. Here is the configuration file
 from the :ref:`Corridor tutorial<tutorial_multi_corridor>` that demonstrates a
-simple corridor environment with multiple agents.
+simple corridor environment with multiple agents.   
 
 .. code-block:: python
 
-   # Import the AgentBasedSimulation MultiCorridor, the appropriate simulation
-   # manager, and the multi-agent wrapper needed to connect to RLlib's trainers
+   # Import the MultiCorridor ABS, a simulation manager, and the multiagent
+   # wrapper needed to connect to RLlib's trainers
    from admiral.envs.corridor import MultiCorridor
    from admiral.managers import TurnBasedManager
    from admiral.external import MultiAgentWrapper
    
-   # Create and wrap the environment.
+   # Create and wrap the environment
+   # NOTE: The agents in `MultiCorridor` are all homogeneous, so this simulation
+   # just creates and stores the agents itself.
    env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
    
    # Register the environment with RLlib
@@ -173,7 +184,7 @@ simple corridor environment with multiple agents.
    from ray.tune.registry import register_env
    register_env(env_name, lambda env_config: env)
    
-   # Set up the agents' policy. In this experiment, all agents are homogeneous,
+   # Set up the policies. In this experiment, all agents are homogeneous,
    # so we just use a single shared policy.
    ref_agent = env.unwrapped.agents['agent0']
    policies = {
@@ -214,7 +225,7 @@ simple corridor environment with multiple agents.
    }
    
 .. NOTE::
-   This example has ``num_workers`` set to 7 for a computer with 7 CPU's.
+   This example has ``num_workers`` set to 7 for a computer with 8 CPU's.
    You may need to adjust this for your computer to be `<cpu count> - 1`.
 
 
@@ -229,7 +240,7 @@ in real time in tensorboard with ``tensorboard --logdir ~/admiral_results``.
 
 Visualizing
 -----------
-We can vizualize the agents' learned behavior with the ``visualize`` command, which
+We can visualize the agents' learned behavior with the ``visualize`` command, which
 takes as argument the output directory from the training session stored in
 ``~/admiral_results``. For example, the command
 
@@ -239,7 +250,7 @@ takes as argument the output directory from the training session stored in
 
 will load the experiment (notice that the directory name is the experiment
 name from the configuration file appended with a timestamp) and display an animation
-of 5 episodes. The ``--record`` flag will save the animations as ``.mp4`` videos in
+of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
 the training directory.
 
 
@@ -274,7 +285,7 @@ Running at scale with HPC
 -------------------------
 
 Admiral also supports some functionality for training at scale. See the
-`magpie tutorial <tutorial_magpie>`, which provides a walkthrough
+:ref:`magpie tutorial <tutorial_magpie>`, which provides a walkthrough
 for launching a training experiment on multiple compute nodes with slurm.
 
 
