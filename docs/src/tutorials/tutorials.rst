@@ -3,10 +3,10 @@
 Full Tutorials
 ==============
 
-Admiral has some tutorials that demonstrate how to train, visualize, and analyze MARL policies.
+We provide tutorials that demonstrate how to train, visualize, and analyze MARL policies.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    multi_corridor

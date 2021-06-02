@@ -5,10 +5,244 @@
 MultiCorridor
 =============
 
-Creating the multi-corridor environment
+MultiCorridor is derived from RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
+wherein agents must learn to move to the right to reach the end of the corridor.
+Our implementation provides the ability to instantiate multiple agents in the environment
+and restricts agents from occupying the same square. Every agent is homogeneous:
+they all have the same action space, observation space, and objective function.
 
-A brief description that indicates how we created the multicorridor env as an ABS
+.. image:: /.images/multicorridor.*
+   :width: 80 %
+   :alt: Animation of agents moving back and forth in a corridor until they reach the end.
 
-Trainign with the mmulti corridor environment
+.. ATTENTION::
+   TODO: Is it safe to have this .gif here when we go to pdf?
+
+Creating the MultiCorridor Simulation
+-------------------------------------
+
+The Agents in the Simulation
+````````````````````````````
+It's helpful to start by thinking about what we want the agents to learn and what
+information they will need in order to learn it. In this tutorial, we want to
+train agents that can reach the end of a one-dimensional corridor without bumping
+into each other. Therefore, agents should be able to move left, move right, and
+stay still. In order to move to the end of the corridor without bumping into each
+other, they will need to see their own position and if the squares near them are
+occupied. Finally, we need to decide how to reward the agents. There are many ways
+we can do this, and we should at least capture the following:
+
+* The agent should be rewarded for reaching the end of the corridor.
+* The agent should be penalized for bumping into other agents.
+* The agent should be penalized for taking too long.
+
+Since all our agents are homogeneous, we can just create them in the Agent Based
+Simulation itself, like so:
+
+.. code-block:: python
+
+   from enum import IntEnum
+
+   from gym.spaces import Box, Discrete, MultiBinary
+   import numpy as np
+
+   from admiral.envs import Agent, AgentBasedSimulation
+
+   class MultiCorridor(AgentBasedSimulation):
+
+       class Actions(IntEnum): # The tree actions each agent can take
+           LEFT = 0
+           STAY = 1
+           RIGHT = 2
+
+       def __init__(self, end=10, num_agents=5):
+           self.end = end
+           agents = {}
+           for i in range(num_agents):
+               agents[f'agent{i}'] = Agent(
+                   id=f'agent{i}',
+                   action_space=Discrete(3), # Move left, stay still, or move right
+                   observation_space={
+                       'position': Box(0, self.end-1, (1,), np.int), # Observe your own position
+                       'left': MultiBinary(1), # Observe if the left square is occupied
+                       'right': MultiBinary(1) # Observe if the right square is occupied
+                   }
+               )
+           self.agents = agents
+           
+           self.finalize()
+
+Here, notice how the agents `observation_space` is a `dict` rather than a
+`gym.space.Dict`. That's okay because our `Agent` class can convert a dict
+of gym spaces into a `Dict`. This happens when ``finalize`` is called at the
+end of our ``__init__``.
+
+
+Resetting the Simulation
+````````````````````````
+
+At the beginning of each episode, we want the agents to be randomly positioned
+throughout the corridor without occupying the same squares. We must give each agent
+a position attribute at reset. We will also create a data structure that captures
+which agent is in which cell so that we don't have to do a search for nearby agents
+but can directly index the space. Finally, we must track the agents' rewards.
+
+.. code-block:: python
+
+   def reset(self, **kwargs):
+       location_sample = np.random.choice(self.end-1, len(self.agents), False)
+       # Track the squares themselves
+       self.corridor = np.empty(self.end, dtype=object)
+       # Track the position of the agents
+       for i, agent in enumerate(self.agents.values()):
+           agent.position = location_sample[i]
+           self.corridor[location_sample[i]] = agent
+       
+       # Track the agents' rewards over multiple steps.
+       self.reward = {agent_id: 0 for agent_id in self.agents}
+
+
+Stepping the Simulation
+```````````````````````
+
+Simulation stepping is driven by the agents' actions because there are no other
+activities happening in this environment. Thus, the MultiCorridor Simulation only
+concerns itself with processing the agents' actions at each step. For each agent,
+we'll capture the following cases:
+
+* An agent attempts to move to a space that is unoccupied.
+* An agent attempts to move to a space that is already occupied.
+* An agent attempts to move to the right-most space (the end) of the corridor.
+
+.. code-block:: python
+
+   def step(self, action_dict, **kwargs):
+       for agent_id, action in action_dict.items():
+           agent = self.agents[agent_id]
+           if action == self.Actions.LEFT:
+               if agent.position != 0 and self.corridor[agent.position-1] is None:
+                   # Good move, no extra penalty
+                   self.corridor[agent.position] = None
+                   agent.position -= 1
+                   self.corridor[agent.position] = agent
+                   self.reward[agent_id] -= 1 # Entropy penalty
+               elif agent.position == 0: # Tried to move left from left-most square
+                   # Bad move, only acting agent is involved and should be penalized.
+                   self.reward[agent_id] -= 5 # Bad move
+               else: # There was another agent to the left of me that I bumped into
+                   # Bad move involving two agents. Both are penalized
+                   self.reward[agent_id] -= 5 # Penalty for offending agent
+                   # Penalty for offended agent 
+                   self.reward[self.corridor[agent.position-1].id] -= 2
+           elif action == self.Actions.RIGHT:
+               if self.corridor[agent.position + 1] is None:
+                   # Good move, but is the agent done?
+                   self.corridor[agent.position] = None
+                   agent.position += 1
+                   if agent.position == self.end-1:
+                       # Agent has reached the end of the corridor!
+                       self.reward[agent_id] += self.end ** 2
+                   else:
+                   # Good move, no extra penalty
+                       self.corridor[agent.position] = agent
+                       self.reward[agent_id] -= 1 # Entropy penalty
+               else: # There was another agent to the right of me that I bumped into
+                   # Bad move involving two agents. Both are penalized
+                   self.reward[agent_id] -= 5 # Penalty for offending agent
+                   # Penalty for offended agent
+                   self.reward[self.corridor[agent.position+1].id] -= 2 
+           elif action == self.Actions.STAY:
+               self.reward[agent_id] -= 1 # Entropy penalty
+
+.. ATTENTION::
+   Our reward schema reveals a training
+   dynamic that is not present in single-agent simulations: an agent's reward
+   does not entirely depend on its own interaction with the environment but can
+   be affected by other agents' interactions with the environment. In this case, agents
+   are slightly penalized for being "bumped into" when other agents attempt to move
+   onto their square. This is discussed in MARL literature and captured in the way
+   we have designed our Simulation Managers. In Admiral, we favor capturing the rewards
+   as part of the simulation's state and only "flushing" them once they rewards are
+   asked for in ``get_reward``.
+
+.. NOTE::
+   We have not needed to consider the order in which the simulation processes actions.
+   Our simulation simply provides the capabilities to process *any* agent's action,
+   and we can use `Simulation Managers` to impose an order. This shows the flexibility
+   of our design. In this tutorial, we use the `TurnBasedManager`, but we can use
+   any `SimulationManager`.
+
+Querying Simulation State
+`````````````````````````
+
+The trainer needs to see how agents' actions impact the simulation's state. They do
+so via getters, which we define below.
+
+.. code-block:: python
+
+   def get_obs(self, agent_id, **kwargs):
+       agent_position = self.agents[agent_id].position
+       if agent_position == 0 or self.corridor[agent_position-1] is None:
+           left = False
+       else:
+           left = True
+       if agent_position == self.end-1 or self.corridor[agent_position+1] is None:
+           right = False
+       else:
+           right = True
+       return {
+           'position': [agent_position],
+           'left': [left],
+           'right': [right],
+       }
+   
+   def get_done(self, agent_id, **kwargs):
+       return self.agents[agent_id].position == self.end - 1
+   
+   def get_all_done(self, **kwargs):
+       for agent in self.agents.values():
+           if agent.position != self.end - 1:
+               return False
+       return True
+   
+   def get_reward(self, agent_id, **kwargs):
+       agent_reward = self.reward[agent_id]
+       self.reward[agent_id] = 0
+       return agent_reward
+   
+   def get_info(self, agent_id, **kwargs):
+       return {}
+
+Rendering for Visualization
+```````````````````````````
+Finally, it's often useful to be able to visualize a simulation as it steps through
+an episode. We can do this via the render funciton.
+
+.. code-block:: python
+
+   def render(self, *args, fig=None, **kwargs):
+       draw_now = fig is None
+       if draw_now:
+           from matplotlib import pyplot as plt
+           fig = plt.gcf()
+   
+       fig.clear()
+       ax = fig.gca()
+       ax.set(xlim=(-0.5, self.end + 0.5), ylim=(-0.5, 0.5))
+       ax.set_xticks(np.arange(-0.5, self.end + 0.5, 1.))
+       ax.scatter(np.array(
+           [agent.position for agent in self.agents.values()]),
+           np.zeros(len(self.agents)),
+           marker='s', s=200, c='g'
+       )
+   
+       if draw_now:
+           plt.plot()
+           plt.pause(1e-17)
+
+
+
+Training the MultiCorridor Simulation
+-------------------------------------
 
 Here's how we train with this environment!
