@@ -48,7 +48,7 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2000,
+            'episodes_total': 1,
         },
         'verbose': 2,
         'config': {
@@ -64,7 +64,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 7,
+            "num_workers": 1,
             # Number of environments that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             # 'simple_optimizer': True,
