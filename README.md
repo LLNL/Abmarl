@@ -3,7 +3,9 @@
 
 ## Documentation
 
-[Admiral Users Manual](https://abmarl.readthedocs.io/en/latest/) [![Documentation Status](https://readthedocs.org/projects/pydv/badge/?version=latest)](https://pydv.readthedocs.io/en/latest/?badge=latest)
+[Admiral Users Manual](https://abmarl.readthedocs.io/en/latest/) [![Documentation Status](https://readthedocs.org/projects/abmarl/badge/?version=latest)](https://abmarl.readthedocs.io/en/latest/?badge=latest)
+
+
 
 
 ## Continued Support
