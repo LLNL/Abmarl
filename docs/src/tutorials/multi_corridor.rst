@@ -7,7 +7,7 @@ MultiCorridor
 
 MultiCorridor is derived from RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
 wherein agents must learn to move to the right to reach the end of the corridor.
-Our implementation provides the ability to instantiate multiple agents in the environment
+Our implementation provides the ability to instantiate multiple agents in the simulation
 and restricts agents from occupying the same square. Every agent is homogeneous:
 they all have the same action space, observation space, and objective function.
 
@@ -106,7 +106,7 @@ Stepping the Simulation
 ```````````````````````
 
 Simulation stepping is driven by the agents' actions because there are no other
-activities happening in this environment. Thus, the MultiCorridor Simulation only
+activities happening in this simulation. Thus, the MultiCorridor Simulation only
 concerns itself with processing the agents' actions at each step. For each agent,
 we'll capture the following cases:
 
@@ -245,4 +245,114 @@ an episode. We can do this via the render funciton.
 Training the MultiCorridor Simulation
 -------------------------------------
 
-Here's how we train with this environment!
+Now that we have created the simulation and agents, we can create a configuration
+file for training.
+
+Simulation Setup
+````````````````
+
+We'll start by setting up the simulation we have just built.
+Then we'll choose a Simulation Manager. Admiral comes with two built-In
+managers--TurnBasedManager, where only a single agent take a turn per step, and
+AllStepManager, where all non-done agent take a turn per step. For this experiment,
+we'll use the TurnBasedManager. Then, we'll wrap the simulation with our `MultiAgentWrapper`,
+which enables us to connect with RLlib. Finally, we'll register the simulation
+with RLlib.
+
+.. code-block:: python
+
+   # MultiCorridor is the simulation we created above
+   from admiral.envs.corridor import MultiCorridor
+   from admiral.managers import TurnBasedManager
+   # MultiAgentWrapper needed to connect with RLlib
+   from admiral.external import MultiAgentWrapper
+
+   # Create an instance of the simulation and register it
+   env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
+   env_name = "MultiCorridor"
+   from ray.tune.registry import register_env
+   register_env(env_name, lambda env_config: env)
+
+Policy Setup
+````````````
+
+Now we want to create the policies and policy mapping function in our multiagent
+experiment. Each agent in our simulation is homogeneous: they all have the same
+observation space, action space, and objective function. Thus, we can create a
+single policy and map all agents to that policy.
+
+.. code-block:: python
+
+   ref_agent = env.unwrapped.agentsp['agent0']
+   policies = {
+       'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
+   }
+   def policy_mapping_fn(agent_id):
+       return 'corridor'
+
+Experiment Parameters
+`````````````````````
+
+Having setup the simulation and policies, we can now bundle all that information
+into a parameters dictionary that will be read by Admrial and used to launch RLlib.
+
+.. code-block:: python
+
+   params = {
+       'experiment': {
+           'title': f'{env_name}',
+           'env_creator': lambda config=None: env,
+       },
+       'ray_tune': {
+           'run_or_experiment': 'PG',
+           'checkpoint_freq': 50,
+           'checkpoint_at_end': True,
+           'stop': {
+               'episodes_total': 20_000,
+           },
+           'verbose': 2,
+           'config': {
+               # --- Environment ---
+               'env': env_name,
+               'horizon': 200,
+               'env_config': {},
+               # --- Multiagent ---
+               'multiagent': {
+                   'policies': policies,
+                   'policy_mapping_fn': policy_mapping_fn,
+               },
+               # "lr": 0.0001,
+               # --- Parallelism ---
+               # Number of workers per experiment: int
+               "num_workers": 7,
+               # Number of environments that each worker starts: int
+               "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
+           },
+       }
+   }
+
+Command Line interface
+``````````````````````
+With the configuration file complete, we can utilize the command line interface
+to train our agents. We simply type ``admiral train multi_corridor_example.py``,
+where `multi_corridor_example.py` is the name of our configuration file. This will launch
+Admiral, which will process the file and launch RLlib according to the
+specified parameters. This particular example should take 1-10 minutes to
+train, depending on your compute capabilities. You can view the performance
+in real time in tensorboard with ``tensorboard --logdir ~/admiral_results``.
+
+
+Visualizing
+-----------
+We can visualize the agents' learned behavior with the ``visualize`` command, which
+takes as argument the output directory from the training session stored in
+``~/admiral_results``. For example, the command
+
+.. code-block::
+
+   admiral visualize ~/admiral_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
+
+will load the experiment (notice that the directory name is the experiment
+name from the configuration file appended with a timestamp) and display an animation
+of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
+the training directory.
