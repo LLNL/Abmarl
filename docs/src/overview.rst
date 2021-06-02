@@ -271,7 +271,7 @@ takes as argument the output directory from the training session stored in
    admiral visualize ~/admiral_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
 
 will load the experiment (notice that the directory name is the experiment
-name from the configuration file appended with a timestamp) and display an animation
+title from the configuration file appended with a timestamp) and display an animation
 of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
 the training directory.
 

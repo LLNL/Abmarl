@@ -6,7 +6,7 @@ MultiCorridor
 =============
 
 MultiCorridor is derived from RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
-wherein agents must learn to move to the right to reach the end of the corridor.
+wherein agents must learn to move to the right in a one-dimensonal corridor to reach the end.
 Our implementation provides the ability to instantiate multiple agents in the simulation
 and restricts agents from occupying the same square. Every agent is homogeneous:
 they all have the same action space, observation space, and objective function.
@@ -36,7 +36,7 @@ we can do this, and we should at least capture the following:
 * The agent should be penalized for bumping into other agents.
 * The agent should be penalized for taking too long.
 
-Since all our agents are homogeneous, we can just create them in the Agent Based
+Since all our agents are homogeneous, we can create them in the Agent Based
 Simulation itself, like so:
 
 .. code-block:: python
@@ -50,7 +50,7 @@ Simulation itself, like so:
 
    class MultiCorridor(AgentBasedSimulation):
 
-       class Actions(IntEnum): # The tree actions each agent can take
+       class Actions(IntEnum): # The three actions each agent can take
            LEFT = 0
            STAY = 1
            RIGHT = 2
@@ -72,10 +72,9 @@ Simulation itself, like so:
            
            self.finalize()
 
-Here, notice how the agents `observation_space` is a `dict` rather than a
-`gym.space.Dict`. That's okay because our `Agent` class can convert a dict
-of gym spaces into a `Dict`. This happens when ``finalize`` is called at the
-end of our ``__init__``.
+Here, notice how the agents' `observation_space` is a `dict` rather than a
+`gym.space.Dict`. That's okay because our `Agent` class can convert a `dict of gym spaces`
+into a `Dict` when ``finalize`` is called at the end of ``__init__``.
 
 
 Resetting the Simulation
@@ -105,10 +104,9 @@ but can directly index the space. Finally, we must track the agents' rewards.
 Stepping the Simulation
 ```````````````````````
 
-Simulation stepping is driven by the agents' actions because there are no other
-activities happening in this simulation. Thus, the MultiCorridor Simulation only
-concerns itself with processing the agents' actions at each step. For each agent,
-we'll capture the following cases:
+The simulation is driven by the agents' actions because there are no other
+dynamics. Thus, the MultiCorridor Simulation only concerns itself with processing
+the agents' actions at each step. For each agent, we'll capture the following cases:
 
 * An agent attempts to move to a space that is unoccupied.
 * An agent attempts to move to a space that is already occupied.
@@ -160,7 +158,8 @@ we'll capture the following cases:
    does not entirely depend on its own interaction with the environment but can
    be affected by other agents' interactions with the environment. In this case, agents
    are slightly penalized for being "bumped into" when other agents attempt to move
-   onto their square. This is discussed in MARL literature and captured in the way
+   onto their square, even though the "offended" agent did not directly cause the
+   collision. This is discussed in MARL literature and captured in the way
    we have designed our Simulation Managers. In Admiral, we favor capturing the rewards
    as part of the simulation's state and only "flushing" them once they rewards are
    asked for in ``get_reward``.
@@ -169,7 +168,7 @@ we'll capture the following cases:
    We have not needed to consider the order in which the simulation processes actions.
    Our simulation simply provides the capabilities to process *any* agent's action,
    and we can use `Simulation Managers` to impose an order. This shows the flexibility
-   of our design. In this tutorial, we use the `TurnBasedManager`, but we can use
+   of our design. In this tutorial, we will use the `TurnBasedManager`, but we can use
    any `SimulationManager`.
 
 Querying Simulation State
@@ -253,9 +252,9 @@ Simulation Setup
 
 We'll start by setting up the simulation we have just built.
 Then we'll choose a Simulation Manager. Admiral comes with two built-In
-managers--TurnBasedManager, where only a single agent take a turn per step, and
-AllStepManager, where all non-done agent take a turn per step. For this experiment,
-we'll use the TurnBasedManager. Then, we'll wrap the simulation with our `MultiAgentWrapper`,
+managers: `TurnBasedManager`, where only a single agent takes a turn per step, and
+`AllStepManager`, where all non-done agents take a turn per step. For this experiment,
+we'll use the `TurnBasedManager`. Then, we'll wrap the simulation with our `MultiAgentWrapper`,
 which enables us to connect with RLlib. Finally, we'll register the simulation
 with RLlib.
 
@@ -276,14 +275,14 @@ with RLlib.
 Policy Setup
 ````````````
 
-Now we want to create the policies and policy mapping function in our multiagent
+Now we want to create the policies and the policy mapping function in our multiagent
 experiment. Each agent in our simulation is homogeneous: they all have the same
 observation space, action space, and objective function. Thus, we can create a
 single policy and map all agents to that policy.
 
 .. code-block:: python
 
-   ref_agent = env.unwrapped.agentsp['agent0']
+   ref_agent = env.unwrapped.agents['agent0']
    policies = {
        'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
    }
@@ -321,7 +320,6 @@ into a parameters dictionary that will be read by Admrial and used to launch RLl
                    'policies': policies,
                    'policy_mapping_fn': policy_mapping_fn,
                },
-               # "lr": 0.0001,
                # --- Parallelism ---
                # Number of workers per experiment: int
                "num_workers": 7,
@@ -342,8 +340,8 @@ train, depending on your compute capabilities. You can view the performance
 in real time in tensorboard with ``tensorboard --logdir ~/admiral_results``.
 
 
-Visualizing
------------
+Visualizing the Trained Behaviors
+`````````````````````````````````
 We can visualize the agents' learned behavior with the ``visualize`` command, which
 takes as argument the output directory from the training session stored in
 ``~/admiral_results``. For example, the command
@@ -353,6 +351,32 @@ takes as argument the output directory from the training session stored in
    admiral visualize ~/admiral_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
 
 will load the experiment (notice that the directory name is the experiment
-name from the configuration file appended with a timestamp) and display an animation
+title from the configuration file appended with a timestamp) and display an animation
 of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
 the training directory.
+
+
+
+Extra Challenges
+----------------
+Having successfully trained a MARL experiment, we can further explore the agents'
+behaviors and the training process. Some ideas are:
+
+* We could enhance the MultiCorridor Simulation so that the "target" cell is a 
+  different location in each episode.
+* We could introduce heterogeneous agents with the ability to "jump over" other
+  agents. With heterogeneous agents, we can nontrivially train multiple policies.
+* We could study how the agents' behaviors differ if they are trained using the `AllStepManager`.
+* We could create our own Simulation Manager so that if an agent causes a collision,
+  it skips its next turn.
+* We could do a parameter search over both simulation and algorithm parameters
+  to study how the parameters affect the learned behaviors.
+* We could analyze how often agents collide with one another and where those collisions
+  most commonly occur.
+* And much, much more!
+
+As we attempt these extra challenges, we will experience one of Admiral's strongest
+features: the ease with which we can modify our experiment
+file and launch another training job, going through the pipeline from
+experiment setup to behavior visualization and analysis!
+
