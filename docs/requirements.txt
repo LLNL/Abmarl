@@ -1,2 +1,2 @@
 gym
-ray[rllib]
+ray[rllib]==1.2.0
