@@ -25,5 +25,8 @@ jobs:
         pip install sphinx
         pip install sphinx-rtd-theme
         pip install -r docs/requirements.txt
+    - name: Install Admiral
+      run: |
+        pip install .
     - name: Build docs
       run: cd docs/ ; make html
