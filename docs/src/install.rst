@@ -1,5 +1,7 @@
 .. Admiral documentation installation instructions.
 
+.. _installation:
+
 Installation
 ============
 
