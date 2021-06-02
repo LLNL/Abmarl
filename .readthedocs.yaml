@@ -12,9 +12,8 @@ version: 2
 python:
   version: 3.7
   install:
-    - packages:
-      - path: .
-      - method: pip
+    - method: pip
+      path: .
   #   - requirements: docs/requirements.txt
   #   - method: pip
   #     path: .
