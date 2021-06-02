@@ -13,6 +13,7 @@ python:
   version: 3.7
   install:
     - requirements: docs/requirements.txt
+    # Below will install admiral to the RTD virtual environment so that the API build works.
     - method: pip
       path: .
 
@@ -21,4 +22,3 @@ sphinx:
   builder: html
   configuration: docs/src/conf.py
   # fail_on_warning: true
-
