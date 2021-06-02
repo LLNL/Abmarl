@@ -4,9 +4,9 @@ name: Sphinx docs build
 
 on:
   push:
-    branches: [ main, admiral-107-sphinx-docs ]
+    branches: [ main, admial-113-ci-test-docs-build ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, admiral-107-sphinx-docs ]
 
 jobs:
   docs-build:
