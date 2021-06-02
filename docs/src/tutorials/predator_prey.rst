@@ -48,7 +48,7 @@ the prey as follows:
 In order to accomodate this, we will create two types of Agents, one for Predators
 and one for Prey. Notice that all agents can move around and view a subset of the
 grid, so we'll capture this in a parent class and encode the distinction in the
-agents' respective classes.
+agents' respective child classes.
 
 .. code-block:: python
 
@@ -99,8 +99,9 @@ agents' respective classes.
 The PredatorPrey Simulation
 ```````````````````````````
 The PredatorPrey Simulation needs much detailed explanation, which we believe will
-distract from this tutorial. Suffice it to say that we have created an environment
-that captures our desired features. 
+distract from this tutorial. Suffice it to say that we have created a simulation
+that works with the above agents and captures our desired features. This simulation
+can be found in full `in our repo <https://github.com/LLNL/Admiral/blob/main/admiral/envs/predator_prey/predator_prey.py>`_.
 
 Training the Predator Prey Simulation
 -------------------------------------
@@ -156,7 +157,6 @@ single `params` dictionary. Below is the full configuration file:
    register_env(env_name, lambda env_config: env)
    
    # Set up policies
-   
    policies = {
        'predator': (None, agents['predator0'].observation_space, agents['predator0'].action_space, {}),
        'prey': (None, agents['prey0'].observation_space, agents['prey0'].action_space, {})
@@ -209,7 +209,7 @@ Using the Command Line
 Training
 ''''''''
 With the configuration scipt complete, we can utilize the command line interface
-to train our predator. We simply type ``admiral train predator_prey_training.py`,
+to train our predator. We simply type ``admiral train predator_prey_training.py``,
 where `predator_prey_training.py` is our configuration file. This will launch Admiral,
 which will process the script and launch RLlib according to the
 specified parameters. This particular example should take about 10 minutes to
@@ -237,11 +237,9 @@ save the animations as `.mp4` videos in the training directory.
 
 Analyzing
 '''''''''
-We can further investigate the learned
-behaviors using the `analyze` command along with an analysis script.
-
-Analysis scripts implement a `run` command which takes the Simulation and
-the Trainer as input arguments. We can define any
+We can further investigate the learned behaviors using the `analyze` command along
+with an analysis script. Analysis scripts implement a `run` command which takes
+the Simulation and the Trainer as input arguments. We can define any
 script to further investigate the agents' behavior. In this
 example, we will craft a script that records how
 often a predator attacks from each grid square.
@@ -307,3 +305,12 @@ prey from the center of the map and rarely ventures to the corners.
    Creating the analysis script required some in-depth knowledge about
    the inner workings of the PredatorPrey Simulation. This will likely be needed
    when analyzing most simulation you work with.
+
+
+Extra Challenges
+----------------
+Having successfully trained the predators to attack prey experiment, we can further
+explore the agents' behaviors and the training process. For example, you may have
+noticed that the prey agents didn't seem to learn anything. We may need to improve
+our reward schema for the prey or modify the way agents interact in the simulation.
+This is left open to exploration.
