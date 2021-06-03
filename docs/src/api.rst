@@ -3,13 +3,28 @@
 Admiral API Specification
 =========================
 
-A "doxygenated" API description of Admiral.
+
+Admiral Environments
+--------------------
 
 .. _api_agent:
+
+.. autoclass:: admiral.envs.PrincipleAgent
+	:members:
+	:undoc-members:
+
+.. autoclass:: admiral.envs.ObservingAgent
+	:members:
+	:undoc-members:
+
+.. autoclass:: admiral.envs.ActingAgent
+	:members:
+	:undoc-members:
 
 .. autoclass:: admiral.envs.Agent
 	:members:
 	:undoc-members:
+	:show-inheritance:
 
 .. _api_abs:
 
@@ -18,6 +33,10 @@ A "doxygenated" API description of Admiral.
 	:undoc-members:
 
 .. _api_sim:
+
+
+Admiral Simulation Managers
+---------------------------
 
 .. autoclass:: admiral.managers.SimulationManager
 	:members:
@@ -36,6 +55,10 @@ A "doxygenated" API description of Admiral.
 	:undoc-members:
 
 .. _api_gym_wrapper:
+
+
+Admiral External Integration
+----------------------------
 
 .. autoclass:: admiral.external.GymWrapper
 	:members:

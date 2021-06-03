@@ -5,14 +5,7 @@ from admiral.tools import gym_utils as gu
 
 class PrincipleAgent:
     """
-    Principle Agent class for agents that live in an environment. All agents require
-    a string id.
-
-    id (str):
-        The agent's id.
-
-    seed (int):
-        Seed this agent's rng. Default value is None.
+    Principle Agent class for agents in a simulation.
     """
     def __init__(self, id=None, seed=None, **kwargs):
         self.id = id
@@ -29,6 +22,7 @@ class PrincipleAgent:
 
     @property
     def seed(self):
+        """Seed for random number generation."""
         return self._seed
 
     @seed.setter
@@ -39,7 +33,7 @@ class PrincipleAgent:
     @property
     def configured(self):
         """
-        Determine if the agent has been successfully configured.
+        All agents must have an id.
         """
         return self.id is not None
 
@@ -52,8 +46,10 @@ class PrincipleAgent:
 
 class ActingAgent(PrincipleAgent):
     """
-    ActingAgents are Agents that are expected to produce actions and therefore
-    should have an action space in order to be successfully configured.
+    ActingAgents can act in the simulation.
+
+    The Trainer will produce actions for the agents and send them to the SimulationManager,
+    which will process those actions in its step function.
     """
     def __init__(self, action_space=None, **kwargs):
         super().__init__(**kwargs)
@@ -71,6 +67,9 @@ class ActingAgent(PrincipleAgent):
 
     @property
     def configured(self):
+        """
+        Acting agents must have an action space.
+        """
         return super().configured and gu.check_space(self.action_space, strict=True)
 
     def finalize(self, **kwargs):
@@ -86,8 +85,10 @@ class ActingAgent(PrincipleAgent):
 
 class ObservingAgent(PrincipleAgent):
     """
-    ObservingAgents are Agents that are expected to receive observations and therefore
-    should have an observation space in order to be successfully configured.
+    ObservingAgents can observe the state of the simulation.
+    
+    The agent's observation must be *in* its observation space. The SimulationManager
+    will send the observation to the Trainer, which will use it to produce actions.
     """
     def __init__(self, observation_space=None, **kwargs):
         super().__init__(**kwargs)
@@ -105,6 +106,9 @@ class ObservingAgent(PrincipleAgent):
 
     @property
     def configured(self):
+        """
+        Observing agents must have an observation space.
+        """
         return super().configured and gu.check_space(self.observation_space, strict=True)
 
     def finalize(self, **kwargs):
@@ -120,7 +124,7 @@ class ObservingAgent(PrincipleAgent):
 
 class Agent(ObservingAgent, ActingAgent):
     """
-    An Agent can observe and act.
+    An Agent that can both observe and act.
     """
     pass
 
