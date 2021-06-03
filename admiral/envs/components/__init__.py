@@ -1,2 +1,1 @@
-
 from .agent import ComponentAgent

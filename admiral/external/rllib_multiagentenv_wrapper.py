@@ -1,5 +1,7 @@
 
 from ray.rllib import MultiAgentEnv
+
+
 class MultiAgentWrapper(MultiAgentEnv):
     """
     Use this wrapper to activate multi-agent features on environments that do not directly inherit
@@ -8,7 +10,7 @@ class MultiAgentWrapper(MultiAgentEnv):
     Environment must implement the following interface:
         reset -> observations: dict
         step(action: dict) -> observations: dict, rewards: dict, dones:dict, and infos:dict
-    
+
     For rendering, the environment must implement the render function:
         render(fig: Matplotlib Artist)
     """
@@ -30,7 +32,7 @@ class MultiAgentWrapper(MultiAgentEnv):
         """
         If you want to vizualize agents in the environment, then your environment will need to
         implement the render function.
-        """ 
+        """
         return self.env.render(*args, **kwargs)
 
     @property
@@ -40,5 +42,5 @@ class MultiAgentWrapper(MultiAgentEnv):
         """
         try:
             return self.env.unwrapped
-        except:
+        except AttributeError: # TODO: Confirm that this is really attribute error
             return self.env

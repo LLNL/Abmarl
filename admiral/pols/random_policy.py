@@ -1,5 +1,6 @@
-
 from . import HeuristicPolicy
+
+
 class RandomAction(HeuristicPolicy):
     """A policy to take random actions."""
     def __init__(self, observation_space, action_space, config={}):

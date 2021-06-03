@@ -1,10 +1,10 @@
-
 from gym.spaces import Space, Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
+
 
 def check_space(space, strict=False):
     """
     Ensure that the space is a gym Space, including all nested spaces.
-    
+
     strict (bool), default False:
         If strict is True, then the recursion rule is that every subspace must be
         a gym space. If strict is False, then the recursion rule is that every subspace
@@ -26,6 +26,7 @@ def check_space(space, strict=False):
     else:
         return False
 
+
 def make_dict(space):
     """
     Convert a hierarchical space into a gym space by recursively moving through
@@ -38,5 +39,5 @@ def make_dict(space):
             space[key] = make_dict(subspace)
         else:
             assert isinstance(subspace, Space), "Cannot convert this to a Dict."
-    
+
     return Dict(space) if type(space) is dict else space

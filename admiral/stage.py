@@ -1,6 +1,4 @@
-
 import os
-
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -10,6 +8,7 @@ from ray.rllib.env import MultiAgentEnv
 from ray.tune.registry import get_trainable_cls
 
 from admiral.tools import utils as adu
+
 
 def _start(full_trained_directory, requested_checkpoint):
     """The elements that are common to both analyze and visualize."""
@@ -23,7 +22,9 @@ def _start(full_trained_directory, requested_checkpoint):
     experiment_mod.params['ray_tune']['config']['num_workers'] = 1
     experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
 
-    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(full_trained_directory, requested_checkpoint)
+    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(
+        full_trained_directory, requested_checkpoint
+    )
     print(checkpoint_dir)
 
     # Setup ray
@@ -33,18 +34,22 @@ def _start(full_trained_directory, requested_checkpoint):
     alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
     agent = alg(
         env=experiment_mod.params['ray_tune']['config']['env'],
-        config=experiment_mod.params['ray_tune']['config']    
+        config=experiment_mod.params['ray_tune']['config']
     )
     agent.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
 
     # Get the environment
-    env = experiment_mod.params['experiment']['env_creator'](experiment_mod.params['ray_tune']['config']['env_config'])
+    env = experiment_mod.params['experiment']['env_creator'](
+        experiment_mod.params['ray_tune']['config']['env_config']
+    )
 
     return env, agent
+
 
 def _finish():
     """Finish off the evaluation run."""
     ray.shutdown()
+
 
 def run_analysis(full_trained_directory, full_subscript, parameters):
     """Analyze MARL policies from a saved policy through an analysis script"""
@@ -55,6 +60,7 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
     analysis_mod.run(env, agent)
 
     _finish()
+
 
 def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
@@ -68,20 +74,21 @@ def run_visualize(full_trained_directory, parameters):
         for agent_id, agent_obs in obs.items():
             if done[agent_id]: continue # Don't get actions for done agents
             policy_id = policy_agent_mapping(agent_id)
-            action = agent.compute_action(agent_obs, policy_id=policy_id, \
-                explore=parameters.no_explore)
+            action = agent.compute_action(
+                agent_obs, policy_id=policy_id, explore=parameters.no_explore
+            )
             joint_action[agent_id] = action
         return joint_action
-    
+
     def _single_get_action(obs, agent=None, **kwargs):
         return agent.compute_action(obs, explore=parameters.no_explore)
 
     def _multi_get_done(done):
         return done['__all__']
-    
+
     def _single_get_done(done):
         return done
-    
+
     policy_agent_mapping = None
     if isinstance(env, MultiAgentEnv):
         policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
@@ -109,7 +116,9 @@ def run_visualize(full_trained_directory, parameters):
             nonlocal obs, done
             env.render(fig=fig)
             plt.pause(1e-16)
-            action = _get_action(obs, done=done, env=env, agent=agent, policy_agent_mapping=policy_agent_mapping)
+            action = _get_action(
+                obs, done=done, env=env, agent=agent, policy_agent_mapping=policy_agent_mapping
+            )
             obs, _, done, _ = env.step(action)
             if _get_done(done):
                 nonlocal all_done
@@ -118,8 +127,10 @@ def run_visualize(full_trained_directory, parameters):
                 plt.pause(1e-16)
                 plt.close(fig)
 
-        anim = FuncAnimation(fig, animate, frames=gen_frame_until_done, repeat=False, \
-            interval=parameters.frame_delay)
+        anim = FuncAnimation(
+            fig, animate, frames=gen_frame_until_done, repeat=False,
+            interval=parameters.frame_delay
+        )
         if parameters.record:
             anim.save(os.path.join(full_trained_directory, 'Episode_{}.mp4'.format(episode)))
         plt.show(block=False)

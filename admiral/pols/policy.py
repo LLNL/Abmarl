@@ -1,7 +1,7 @@
-
 from abc import ABC, abstractmethod
 
 import numpy as np
+
 
 class Policy(ABC):
     """
@@ -12,7 +12,7 @@ class Policy(ABC):
     def __init__(self, q_table):
         """Store a q_table, which maps (state, action) to a value."""
         self.q_table = q_table
-    
+
     @abstractmethod
     def act(self, state, *args, **kwargs):
         """Choose an action given a state."""
@@ -22,13 +22,14 @@ class Policy(ABC):
     def probability(self, state, action):
         """Calculate the probability of choosing this action given this state."""
         pass
-    
+
     def reset(self):
         """
-        Some policies behave differently at the beginning of an episode or as an episode progresses.
-        The reset function allows them to reset their parameters accordingly.
+        Some policies behave differently at the beginning of an episode or as an episode
+        progresses. The reset function allows them to reset their parameters accordingly.
         """
         pass
+
 
 class GreedyPolicy(Policy):
     """
@@ -36,9 +37,10 @@ class GreedyPolicy(Policy):
     """
     def act(self, state):
         return np.argmax(self.q_table[state])
-    
+
     def probability(self, state, action):
         return 1 if action == np.argmax(self.q_table[state]) else 0
+
 
 class EpsilonSoftPolicy(GreedyPolicy):
     """
@@ -50,18 +52,19 @@ class EpsilonSoftPolicy(GreedyPolicy):
         super().__init__(*args)
         assert 0 <= epsilon <= 1.0
         self.epsilon = epsilon
-    
+
     def act(self, state):
         if np.random.uniform(0, 1) < self.epsilon:
             return np.random.randint(0, self.q_table[state].size)
         else:
             return super().act(state)
-    
+
     def probability(self, state, action):
         if action == np.argmax(self.q_table[state]): # Optimal action
             return 1 - self.epsilon + self.epsilon / self.q_table[state].size
         else: # Nonoptimal action
             return self.epsilon / self.q_table[state].size
+
 
 class RandomFirstActionPolicy(GreedyPolicy):
     """
@@ -71,7 +74,7 @@ class RandomFirstActionPolicy(GreedyPolicy):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+
     def reset(self):
         """
         Set take_random_action to True so that the policy takes a random action at the beginning
@@ -86,10 +89,9 @@ class RandomFirstActionPolicy(GreedyPolicy):
             action = super().act(state)
         self.take_random_action = False
         return action
-    
+
     def probability(self, state, action):
         if self.take_random_action:
             return 1. / self.q_table[state].size
         else:
             return super().probability(state, action)
-        

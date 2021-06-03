@@ -2,13 +2,13 @@
 from gym.spaces import Discrete
 import numpy as np
 
-from admiral.envs.wrappers import RavelDiscreteWrapper
 from admiral.managers import SimulationManager
 from admiral.external import GymWrapper
 from admiral.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
 from admiral.tools import numpy_utils as npu
 
 from .generate_episode import generate_episode
+
 
 def exploring_starts(env, iteration=10_000, gamma=0.9, horizon=200):
     """
@@ -42,14 +42,16 @@ def exploring_starts(env, iteration=10_000, gamma=0.9, horizon=200):
         for i in reversed(range(len(states))):
             state, action, reward = states[i], actions[i], rewards[i]
             G = gamma * G + reward
-            if not (npu.array_in_array(state, states[:i]) and npu.array_in_array(action, actions[:i])):
+            if not (npu.array_in_array(state, states[:i]) and
+                    npu.array_in_array(action, actions[:i])):
                 if (state, action) not in state_action_returns:
                     state_action_returns[(state, action)] = [G]
                 else:
                     state_action_returns[(state, action)].append(G)
                 q_table[state, action] = np.mean(state_action_returns[(state, action)])
-    
+
     return env, q_table, policy
+
 
 def epsilon_soft(env, iteration=10_000, gamma=0.9, epsilon=0.1, horizon=200):
     """
@@ -84,14 +86,16 @@ def epsilon_soft(env, iteration=10_000, gamma=0.9, epsilon=0.1, horizon=200):
         for i in reversed(range(len(states))):
             state, action, reward = states[i], actions[i], rewards[i]
             G = gamma * G + reward
-            if not (npu.array_in_array(state, states[:i]) and npu.array_in_array(action, actions[:i])):
+            if not (npu.array_in_array(state, states[:i]) and
+                    npu.array_in_array(action, actions[:i])):
                 if (state, action) not in state_action_returns:
                     state_action_returns[(state, action)] = [G]
                 else:
                     state_action_returns[(state, action)].append(G)
                 q_table[state, action] = np.mean(state_action_returns[(state, action)])
-    
+
     return env, q_table, policy
+
 
 def off_policy(env, iteration=10_000, gamma=0.9, horizon=200):
     """
@@ -125,12 +129,10 @@ def off_policy(env, iteration=10_000, gamma=0.9, horizon=200):
             state, action, reward = states[i], actions[i], rewards[i]
             G = gamma * G + reward
             c_table[state, action] += W
-            q_table[state, action] = q_table[state, action] + W/(c_table[state,action]) * (G - q_table[state, action])
+            q_table[state, action] = q_table[state, action] + W/(c_table[state, action]) * \
+                (G - q_table[state, action])
             if action != policy.act(state): # Nonoptimal action
                 break
             W /= behavior_policy.probability(state, action)
-    
+
     return env, q_table, policy
-            
-
-

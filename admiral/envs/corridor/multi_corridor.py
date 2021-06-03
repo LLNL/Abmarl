@@ -1,10 +1,10 @@
-
-from itertools import cycle
+from enum import IntEnum
 
 from gym.spaces import Dict, Box, Discrete, MultiBinary
 import numpy as np
 
 from admiral.envs import AgentBasedSimulation, Agent
+
 
 class MultiCorridor(AgentBasedSimulation):
     """
@@ -17,12 +17,11 @@ class MultiCorridor(AgentBasedSimulation):
     The agent can observe its own position. It can also see if the two squares
     near it are occupied.
     """
-    from enum import IntEnum
     class Actions(IntEnum):
         LEFT = 0
         STAY = 1
         RIGHT = 2
-    
+
     def __init__(self, end=10, num_agents=5):
         self.end = end
         agents = {}
@@ -37,7 +36,7 @@ class MultiCorridor(AgentBasedSimulation):
                 })
             )
         self.agents = agents
-        
+
         self.finalize()
 
     def reset(self, **kwargs):
@@ -49,7 +48,7 @@ class MultiCorridor(AgentBasedSimulation):
         for i, agent in enumerate(self.agents.values()):
             agent.position = location_sample[i]
             self.corridor[location_sample[i]] = agent
-        
+
         # Track the agents' rewards over multiple steps.
         self.reward = {agent_id: 0 for agent_id in self.agents}
 
@@ -75,7 +74,7 @@ class MultiCorridor(AgentBasedSimulation):
                 else: # There was another agent to the left of me that I bumped into
                     # Bad move involving two agents. Both are penalized
                     self.reward[agent_id] -= 5 # Penalty for offending agent
-                    self.reward[self.corridor[agent.position-1].id] -= 2 # Penalty for offended agent 
+                    self.reward[self.corridor[agent.position-1].id] -= 2 # Penalty for offended
             elif action == self.Actions.RIGHT:
                 if self.corridor[agent.position + 1] is None:
                     # Good move, but is the agent done?
@@ -85,13 +84,13 @@ class MultiCorridor(AgentBasedSimulation):
                         # Agent has reached the end of the corridor!
                         self.reward[agent_id] += self.end ** 2
                     else:
-                    # Good move, no extra penalty
+                        # Good move, no extra penalty
                         self.corridor[agent.position] = agent
                         self.reward[agent_id] -= 1 # Entropy penalty
                 else: # There was another agent to the right of me that I bumped into
                     # Bad move involving two agents. Both are penalized
                     self.reward[agent_id] -= 5 # Penalty for offending agent
-                    self.reward[self.corridor[agent.position+1].id] -= 2 # Penalty for offended agent
+                    self.reward[self.corridor[agent.position+1].id] -= 2 # Penalty for offended
             elif action == self.Actions.STAY:
                 self.reward[agent_id] -= 1 # Entropy penalty
 
@@ -116,11 +115,11 @@ class MultiCorridor(AgentBasedSimulation):
             np.zeros(len(self.agents)),
             marker='s', s=200, c='g'
         )
-    
+
         if draw_now:
             plt.plot()
             plt.pause(1e-17)
-    
+
     def get_obs(self, agent_id, **kwargs):
         """
         Agents observe their own position and if the squares to the left and right
@@ -155,7 +154,7 @@ class MultiCorridor(AgentBasedSimulation):
             if agent.position != self.end - 1:
                 return False
         return True
-    
+
     def get_reward(self, agent_id, **kwargs):
         """
         The agent's reward is tracked throughout the simulation and returned here.

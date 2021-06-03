@@ -6,6 +6,7 @@ from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Box, Dict, Tuple
 
 from .sar_wrapper import SARWrapper
 
+
 def _ravel_helper(space, point):
     if isinstance(space, Discrete):
         return point, space.n
@@ -15,7 +16,8 @@ def _ravel_helper(space, point):
         return np.ravel_multi_index(point, [2] * space.n), 2 ** space.n
     if isinstance(space, Box):
         space_helper = (space.high + 1 - space.low).flatten()
-        return np.ravel_multi_index((point - space.low).flatten(), space_helper), np.prod(space_helper)
+        return np.ravel_multi_index((point - space.low).flatten(), space_helper), \
+            np.prod(space_helper)
     elif isinstance(space, Dict):
         discretized_values = []
         space_dims = []
@@ -33,6 +35,7 @@ def _ravel_helper(space, point):
             space_dims.append(space_dim)
         return _ravel_helper(MultiDiscrete(space_dims), discretized_values)
 
+
 def _nested_dim_helper(space):
     if isinstance(space, Discrete):
         return [space.n]
@@ -49,22 +52,27 @@ def _nested_dim_helper(space):
     else:
         raise TypeError
 
+
 def _nested_dim(space):
     """
     Return the total number of dimensions in the entire (nested) space.
     """
     if isinstance(space, Dict):
-        return [*itertools.chain.from_iterable([_nested_dim_helper(s) for s in space.spaces.values()])]
+        return [
+            *itertools.chain.from_iterable([_nested_dim_helper(s) for s in space.spaces.values()])
+        ]
     elif isinstance(space, Tuple):
         return [*itertools.chain.from_iterable([_nested_dim_helper(s) for s in space.spaces])]
     else:
         return _nested_dim_helper(space)
+
 
 def ravel(space, point):
     """
     Ravel point in space to a single discrete value.
     """
     return _ravel_helper(space, point)[0]
+
 
 def unravel(space, point):
     """
@@ -94,12 +102,14 @@ def unravel(space, point):
             output.append(unravel(value, unravelled_point[i]))
         return tuple(output)
 
+
 def ravel_space(space):
     """
     Convert the space into a Discrete space.
     """
     dims = _nested_dim_helper(space)
     return Discrete(dims[0])
+
 
 def _isbounded(space):
     """
@@ -113,11 +123,13 @@ def _isbounded(space):
         not (space.high == np.iinfo(space.dtype).min).any() and \
         not (space.high == np.iinfo(space.dtype).max).any()
 
+
 def check_space(space):
     """
     Ensure that the space is of type that can be ravelled to discrete value.
     """
-    if isinstance(space, Discrete) or isinstance(space, MultiDiscrete) or isinstance(space, MultiBinary):
+    if isinstance(space, Discrete) or isinstance(space, MultiDiscrete) or \
+            isinstance(space, MultiBinary):
         return True
     elif isinstance(space, Box) and np.issubdtype(space, np.int) and _isbounded(space):
         return True
@@ -127,6 +139,7 @@ def check_space(space):
         return all([check_space(sub_space) for sub_space in space.spaces])
     else:
         return False
+
 
 class RavelDiscreteWrapper(SARWrapper):
     """
@@ -139,8 +152,10 @@ class RavelDiscreteWrapper(SARWrapper):
     def __init__(self, env):
         super().__init__(env)
         for agent_id, wrapped_agent in self.agents.items():
-            assert check_space(wrapped_agent.observation_space), agent_id + " observation must be discretizable."
-            assert check_space(wrapped_agent.action_space), agent_id + " action must be discretizable."
+            assert check_space(wrapped_agent.observation_space), \
+                f"{agent_id}: observation must be discretizable."
+            assert check_space(wrapped_agent.action_space), \
+                f"{agent_id} action must be discretizable."
             self.agents[agent_id].observation_space = ravel_space(wrapped_agent.observation_space)
             self.agents[agent_id].action_space = ravel_space(wrapped_agent.action_space)
 
@@ -149,10 +164,9 @@ class RavelDiscreteWrapper(SARWrapper):
 
     def unwrap_observation(self, from_agent, observation):
         return unravel(from_agent.observation_space, observation)
-    
+
     def wrap_action(self, from_agent, action):
         return unravel(from_agent.action_space, action)
-    
+
     def unwrap_action(self, from_agent, action):
         return ravel(from_agent.action_space, action)
-

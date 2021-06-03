@@ -1,4 +1,3 @@
-
 import copy
 
 from gym.spaces import Dict, Box
@@ -7,16 +6,19 @@ import numpy as np
 
 from admiral.envs import PrincipleAgent
 
+
 class World:
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer."
         self.region = region
         self.agents = agents if agents is not None else {}
 
+
 class ContinuousWorld(World):
     def reset(self, **kwargs):
         for agent in self.agents.values():
             agent.position = np.random.uniform(0, self.region, 2)
+
 
 class GridWorld(World):
     def reset(self, **kwargs):
@@ -33,10 +35,16 @@ class GridWorld(World):
             agents_x = [agent.position[1] + 0.5 for agent in self.agents.values()]
             agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values()]
         else:
-            agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
-            agents_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+            agents_x = [
+                agent.position[1] + 0.5 for agent in self.agents.values()
+                if render_condition[agent.id]
+            ]
+            agents_y = [
+                self.region - 0.5 - agent.position[0] for agent in self.agents.values()
+                if render_condition[agent.id]
+            ]
 
-        ax.scatter(agents_x, agents_y, marker='o', s=200,  edgecolor='black', facecolor='gray')
+        ax.scatter(agents_x, agents_y, marker='o', s=200, edgecolor='black', facecolor='gray')
 
         if draw_now:
             plt.plot()
@@ -44,23 +52,28 @@ class GridWorld(World):
 
         return ax
 
+
 class Movement:
     def __init__(self, region=None, agents=None, **kwargs):
         assert type(region) is int, "Region must be an integer."
         self.region = region
         self.agents = agents if agents is not None else {}
 
+
 class GridMovement(Movement):
     def process_move(self, agent, direction, **kwargs):
         if 0 <= agent.position[0] + direction[0] < self.region and \
-           0 <= agent.position[1] + direction[1] < self.region: # Still inside the boundary, good move
-            agent.position += direction 
+                0 <= agent.position[1] + direction[1] < self.region:
+            # Still inside the boundary, good move
+            agent.position += direction
             return True
         else:
             return False
 
+
 class Resources:
-    def __init__(self, region=None, agents=None, coverage=0.75, min_value=0.1, max_value=1.0, regrow_rate=0.04, **kwargs):
+    def __init__(self, region=None, agents=None, coverage=0.75, min_value=0.1, max_value=1.0,
+                 regrow_rate=0.04, **kwargs):
         assert type(region) is int, "Region must be an integer."
         self.agents = agents if agents is not None else {}
         self.region = region
@@ -69,8 +82,9 @@ class Resources:
         self.regrow_rate = regrow_rate
         self.coverage = coverage
 
+
 class GridResources(Resources):
-    def reset(self, **kwargs):        
+    def reset(self, **kwargs):
         coverage_filter = np.zeros((self.region, self.region))
         coverage_filter[np.random.uniform(0, 1, (self.region, self.region)) < self.coverage] = 1.
         self.resources = np.multiply(
@@ -115,8 +129,10 @@ class GridResources(Resources):
 
         return ax
 
+
 class DeathLifeAgent(PrincipleAgent):
     count = 0
+
     def __init__(self, death=None, life=None, **kwargs):
         super().__init__(**kwargs)
         self.death = death
@@ -134,6 +150,7 @@ class DeathLifeAgent(PrincipleAgent):
     @property
     def configured(self):
         return super().configured and self.death is not None and self.life is not None
+
 
 class LifeAndDeath:
     def __init__(self, agents=None, **kwargs):
@@ -166,6 +183,7 @@ class LifeAndDeath:
         for agent in self.agents.values():
             print(f'{agent.id}: {agent.health}, {agent.is_alive}')
 
+
 class CompositeEnv:
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "Agents must be a dict."
@@ -187,7 +205,9 @@ class CompositeEnv:
             agent = self.agents[agent_id]
             if agent.is_alive:
                 if 'harvest' in action:
-                    amount_harvested = self.resources.process_harvest(tuple(agent.position), action['harvest'])
+                    amount_harvested = self.resources.process_harvest(
+                        tuple(agent.position), action['harvest']
+                    )
                     agent.health += amount_harvested
                 if 'move' in action:
                     good_move = self.movement.process_move(agent, action['move'])
@@ -206,6 +226,7 @@ class CompositeEnv:
         plt.pause(1e-6)
 
         self.life_and_death.render(**kwargs)
+
 
 # --- Use case --- #
 region = 10

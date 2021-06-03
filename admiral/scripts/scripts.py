@@ -22,6 +22,7 @@ Example usage for converting to runnable script:
     admiral make-runnable my_experiment.py --some-args
 """
 
+
 def cli():
     parser = argparse.ArgumentParser(
         prog='admiral',
@@ -30,6 +31,8 @@ def cli():
         epilog=EXAMPLE_USAGE
     )
     subparsers = parser.add_subparsers(dest='command')
+
+    # TODO: Why do I not need to use the objects?
     train_parser = train.create_parser(subparsers)
     analyze_parser = analyze.create_parser(subparsers)
     visualize_parser = visualize.create_parser(subparsers)
@@ -48,4 +51,3 @@ def cli():
         runnable.run(path_config, parameters)
     else:
         parser.print_help()
-        

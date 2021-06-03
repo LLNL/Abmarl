@@ -7,6 +7,7 @@ from admiral.envs.components.agent import AttackingAgent, GridMovementAgent, Har
     SpeedAngleAgent, AcceleratingAgent, VelocityAgent, \
     CollisionAgent, BroadcastingAgent
 
+
 class Actor(ABC):
     """
     Base actor class provides the interface required of all actors. Setup the agents'
@@ -18,7 +19,7 @@ class Actor(ABC):
         instance (Agent):
             An Agent class. This is used in the isinstance check to determine if
             the agent will receive the action channel.
-        
+
         space_func (function):
             A function that takes the agent as input and outputs the action space.
     """
@@ -30,7 +31,7 @@ class Actor(ABC):
 
     def _get_action_from_dict(self, action_dict, **kwargs):
         """
-        The action dict passed to an AgentBasedSimulation will be keyed off the 
+        The action dict passed to an AgentBasedSimulation will be keyed off the
         agent id's. This action dict, however, is just the specific agent's actions,
         which is a dictionary keyed off the action channels. This function extracts
         that action if available, otherwise returning the Actor's null_value.
@@ -46,6 +47,7 @@ class Actor(ABC):
     @abstractproperty
     def null_value(self): pass
 
+
 # ----------------- #
 # --- Attacking --- #
 # ----------------- #
@@ -58,12 +60,12 @@ class AttackActor(Actor):
 
     agents (dict of Agents):
         The dictionary of agents.
-    
+
     attack_norm (int):
         Norm used to measure the distance between agents. For example, you might
         use a norm of 1 or np.inf in a Gird space, while 2 might be used in a Continuous
         space. Default is np.inf.
-    
+
     team_attack_matrix (np.ndarray):
         A matrix that indicates which teams can attack which other team using the
         value at the index, like so:
@@ -71,7 +73,7 @@ class AttackActor(Actor):
         0 indicates it cannot attack, 1 indicates that it can.
         Default None, meaning that any team can attack any other team, and no team
         can attack itself.
-    
+
     number_of_teams (int):
         Specify the number of teams in the simulation for building the team_attack_matrix
         if that is not specified here.
@@ -89,11 +91,11 @@ class AttackActor(Actor):
             # by and can attack agents from any other team, including "team 0"
             # agents.
             self.team_attack_matrix = -np.diag(np.ones(number_of_teams+1)) + 1
-            self.team_attack_matrix[0,0] = 1
+            self.team_attack_matrix[0, 0] = 1
         else:
             self.team_attack_matrix = team_attack_matrix
         self.attack_norm = attack_norm
-    
+
     def process_action(self, attacking_agent, action_dict, **kwargs):
         """
         If the agent has chosen to attack, then determine which agent got attacked.
@@ -110,7 +112,8 @@ class AttackActor(Actor):
                 elif not attacked_agent.is_alive:
                     # Cannot attack a dead agent
                     continue
-                elif np.linalg.norm(attacking_agent.position - attacked_agent.position, self.attack_norm) > attacking_agent.attack_range:
+                elif np.linalg.norm(attacking_agent.position - attacked_agent.position,
+                                    self.attack_norm) > attacking_agent.attack_range:
                     # Agent is too far away
                     continue
                 elif not self.team_attack_matrix[attacking_agent.team, attacked_agent.team]:
@@ -122,15 +125,14 @@ class AttackActor(Actor):
                 else:
                     # The agent was successfully attacked!
                     return attacked_agent
-    
+
     @property
     def channel(self):
         return 'attack'
-    
+
     @property
     def null_value(self):
         return False
-
 
 
 # --------------------- #
@@ -154,7 +156,7 @@ class BroadcastActor(Actor):
             **kwargs
         )
         self.broadcast_state = broadcast_state
-    
+
     def process_action(self, agent, action_dict, **kwargs):
         """
         Determine the agents new broadcasting state based on its action.
@@ -164,15 +166,14 @@ class BroadcastActor(Actor):
         """
         broadcasting = self._get_action_from_dict(action_dict)
         self.broadcast_state.modify_broadcast(agent, broadcasting)
-        
+
     @property
     def channel(self):
         return 'broadcast'
-    
+
     @property
     def null_value(self):
         return False
-
 
 
 # ----------------------------- #
@@ -201,7 +202,7 @@ class GridMovementActor(Actor):
     def process_action(self, agent, action_dict, **kwargs):
         """
         Determine the agent's new position based on its move action.
-        
+
         return (np.array):
             How much the agent has moved in row and column. This can be different
             from the desired move if the position update was invalid.
@@ -210,14 +211,15 @@ class GridMovementActor(Actor):
         position_before = agent.position
         self.position_state.modify_position(agent, move, **kwargs)
         return agent.position - position_before
-    
+
     @property
     def channel(self):
         return 'move'
-    
+
     @property
     def null_value(self):
         return np.zeros(2)
+
 
 class SpeedAngleMovementActor:
     """
@@ -226,7 +228,7 @@ class SpeedAngleMovementActor:
 
     position (ContinuousPositionState):
         The position state handler. Needed to modify agent positions.
-    
+
     speed_angle (SpeedAngleState):
         The speed and angle state handler.
 
@@ -240,9 +242,13 @@ class SpeedAngleMovementActor:
 
         for agent in agents.values():
             if isinstance(agent, SpeedAngleAgent):
-                agent.action_space['accelerate'] = Box(-agent.max_acceleration, agent.max_acceleration, (1,))
-                agent.action_space['bank'] = Box(-agent.max_banking_angle_change, agent.max_banking_angle_change, (1,))
-    
+                agent.action_space['accelerate'] = Box(
+                    -agent.max_acceleration, agent.max_acceleration, (1,)
+                )
+                agent.action_space['bank'] = Box(
+                    -agent.max_banking_angle_change, agent.max_banking_angle_change, (1,)
+                )
+
     def process_move(self, agent, acceleration, angle, **kwargs):
         """
         Update the agent's speed by applying the acceleration and the agent's banking
@@ -251,11 +257,11 @@ class SpeedAngleMovementActor:
 
         agent (SpeedAngleAgent):
             Agent that is attempting to move.
-        
+
         acceleration (np.array):
             A one-element float array that changes the agent's speed. New speed
             must be within the agent's min and max speed.
-        
+
         angle (np.array):
             A one-element float array that changes the agent's banking angle. New
             banking angle must be within the agent's min and max banking angles.
@@ -266,13 +272,14 @@ class SpeedAngleMovementActor:
         if isinstance(agent, SpeedAngleAgent):
             self.speed_angle_state.modify_speed(agent, acceleration[0])
             self.speed_angle_state.modify_banking_angle(agent, angle[0])
-            
+
             x_position = agent.speed*np.cos(np.deg2rad(agent.ground_angle))
             y_position = agent.speed*np.sin(np.deg2rad(agent.ground_angle))
-            
+
             position_before = agent.position
             self.position_state.modify_position(agent, np.array([x_position, y_position]))
             return agent.position - position_before
+
 
 class AccelerationMovementActor(Actor):
     """
@@ -281,10 +288,10 @@ class AccelerationMovementActor(Actor):
 
     position_state (ContinuousPositionState):
         The position state handler. Needed to modify agent positions.
-    
+
     velocity_state (VelocityState):
         The velocity state handler. Needed to modify agent velocities.
-    
+
     agents (dict):
         The dictionary of agents.
     """
@@ -296,12 +303,12 @@ class AccelerationMovementActor(Actor):
         )
         self.position_state = position_state
         self.velocity_state = velocity_state
-    
+
     def process_action(self, agent, action_dict, **kwargs):
         """
         Update the agent's velocity by applying the acceleration. Then use the
         updated velocity to determine the agent's next position.
-        
+
         return (np.array):
             Return the change in position.
         """
@@ -310,15 +317,14 @@ class AccelerationMovementActor(Actor):
         position_before = agent.position
         self.position_state.modify_position(agent, agent.velocity, **kwargs)
         return agent.position - position_before
-        
+
     @property
     def channel(self):
         return 'accelerate'
-    
+
     @property
     def null_value(self):
         return np.zeros(2)
-                
 
 
 # -------------------------------- #
@@ -347,7 +353,7 @@ class GridResourcesActor(Actor):
     def process_action(self, agent, action_dict, **kwargs):
         """
         Harvest some amount of resources at the agent's position.
-        
+
         return (float):
             Return the amount of resources that was actually harvested. This can
             be less than the desired amount if the cell does not have enough resources.
@@ -357,17 +363,14 @@ class GridResourcesActor(Actor):
         resource_before = self.resource_state.resources[location]
         self.resource_state.modify_resources(location, -amount)
         return resource_before - self.resource_state.resources[location]
-    
+
     @property
     def channel(self):
         return 'harvest'
-    
+
     @property
     def null_value(self):
         return 0
-
-
-
 
 
 # --------------------------------------------- #
@@ -381,10 +384,10 @@ class ContinuousCollisionActor:
 
     position_state (PositionState):
         The PositionState handler.
-    
+
     velocity_state (VelocityState):
         The VelocityState handler.
-    
+
     agents (dict):
         The dictionary of agents.
     """
@@ -399,10 +402,12 @@ class ContinuousCollisionActor:
         """
         checked_agents = set()
         for agent1 in self.agents.values():
-            if not (isinstance(agent1, CollisionAgent) and isinstance(agent1, VelocityAgent)): continue
+            if not (isinstance(agent1, CollisionAgent) and isinstance(agent1, VelocityAgent)):
+                continue
             checked_agents.add(agent1.id)
             for agent2 in self.agents.values():
-                if not (isinstance(agent1, VelocityAgent) and isinstance(agent2, CollisionAgent)): continue
+                if not (isinstance(agent1, VelocityAgent) and isinstance(agent2, CollisionAgent)):
+                    continue
                 if agent1.id == agent2.id: continue # Cannot collide with yourself
                 if agent2.id in checked_agents: continue # Already checked this agent
                 dist = np.linalg.norm(agent1.position - agent2.position)
@@ -419,13 +424,13 @@ class ContinuousCollisionActor:
 
         agent1 (CollisionAgent):
             One of the colliding agents.
-        
+
         agent2 (CollisionAgent):
             The other colliding agent.
-        
+
         dist (float):
             The collision distance threshold.
-        
+
         combined_size (float):
             The combined size of the two agents
         """
@@ -440,7 +445,7 @@ class ContinuousCollisionActor:
 
         agent1 (CollisionAgent):
             One of the colliding agents.
-        
+
         agent2 (CollisionAgent):
             The other colliding agent.
         """

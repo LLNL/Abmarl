@@ -1,5 +1,5 @@
-
 from abc import ABC, abstractmethod
+
 
 class SimulationManager(ABC):
     """
@@ -23,14 +23,14 @@ class SimulationManager(ABC):
             "SimulationManager can only interface with AgentBasedSimulation."
         self.env = env
         self.agents = env.agents
-    
+
     @abstractmethod
     def reset(self, **kwargs):
         """
         Reset the environment and return an observation.
         """
         pass
-    
+
     @abstractmethod
     def step(self, action_dict, **kwargs):
         """
@@ -38,6 +38,6 @@ class SimulationManager(ABC):
         observation, reward, done, and info.
         """
         pass
-    
+
     def render(self, **kwargs):
         self.env.render(**kwargs)

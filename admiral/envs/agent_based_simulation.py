@@ -1,8 +1,7 @@
-
 from abc import ABC, abstractmethod
 
-from gym.spaces import Space
 from admiral.tools import gym_utils as gu
+
 
 class PrincipleAgent:
     """
@@ -18,20 +17,20 @@ class PrincipleAgent:
     def __init__(self, id=None, seed=None, **kwargs):
         self.id = id
         self.seed = seed
-    
+
     @property
     def id(self):
         return self._id
-    
+
     @id.setter
     def id(self, value):
         assert type(value) is str, "id must be a string."
         self._id = value
-    
+
     @property
     def seed(self):
         return self._seed
-    
+
     @seed.setter
     def seed(self, value):
         assert value is None or type(value) is int, "Seed must be an integer."
@@ -43,12 +42,13 @@ class PrincipleAgent:
         Determine if the agent has been successfully configured.
         """
         return self.id is not None
-    
+
     def finalize(self, **kwargs):
         pass
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
+
 
 class ActingAgent(PrincipleAgent):
     """
@@ -58,21 +58,21 @@ class ActingAgent(PrincipleAgent):
     def __init__(self, action_space=None, **kwargs):
         super().__init__(**kwargs)
         self.action_space = action_space
-    
+
     @property
     def action_space(self):
         return self._action_space
-    
+
     @action_space.setter
     def action_space(self, value):
         assert value is None or gu.check_space(value), \
             "The action space must be None, a gym Space, or a dict of gym Spaces."
         self._action_space = {} if value is None else value
-    
+
     @property
     def configured(self):
         return super().configured and gu.check_space(self.action_space, strict=True)
-            
+
     def finalize(self, **kwargs):
         """
         Wrap all the action spaces with a Dict if applicable and seed it if the agent was
@@ -82,6 +82,7 @@ class ActingAgent(PrincipleAgent):
         if type(self.action_space) is dict:
             self.action_space = gu.make_dict(self.action_space)
         self.action_space.seed(self.seed)
+
 
 class ObservingAgent(PrincipleAgent):
     """
@@ -95,13 +96,13 @@ class ObservingAgent(PrincipleAgent):
     @property
     def observation_space(self):
         return self._observation_space
-    
+
     @observation_space.setter
     def observation_space(self, value):
         assert value is None or gu.check_space(value), \
             "The observation space must be None, a gym Space, or a dict of gym Spaces."
         self._observation_space = {} if value is None else value
-    
+
     @property
     def configured(self):
         return super().configured and gu.check_space(self.observation_space, strict=True)
@@ -116,6 +117,7 @@ class ObservingAgent(PrincipleAgent):
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
+
 class Agent(ObservingAgent, ActingAgent):
     """
     An Agent can observe and act.
@@ -123,17 +125,16 @@ class Agent(ObservingAgent, ActingAgent):
     pass
 
 
-
 class AgentBasedSimulation(ABC):
     """
     AgentBasedSimulation defines the interface that agent-based simulations will
     implement.
-    
+
     Under this design model the observations, rewards, and done conditions of the
     agents is treated as part of the environments internal state instead of as
     output from reset and step. Thus, it is the environments responsibility to manage
     rewards and dones as part of its state (e.g. via self.rewards dictionary).
-    
+
     This interface supports both single- and multi-agent environments by treating
     the single-agent environment as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
@@ -155,8 +156,10 @@ class AgentBasedSimulation(ABC):
     def agents(self, value_agents):
         assert type(value_agents) is dict, "Agents must be a dictionary."
         for agent_id, agent in value_agents.items():
-            assert isinstance(agent, PrincipleAgent), "Values of agents dictionary must be of type Agent."
-            assert agent_id == agent.id, "Keys of the dictionary must be the same as the Agent's id."
+            assert isinstance(agent, PrincipleAgent), \
+                "Values of agents dictionary must be of type Agent."
+            assert agent_id == agent.id, \
+                "Keys of the dictionary must be the same as the Agent's id."
         self._agents = value_agents
 
     def finalize(self):
@@ -168,7 +171,7 @@ class AgentBasedSimulation(ABC):
         for agent in self.agents.values():
             agent.finalize()
             assert agent.configured
-    
+
     @abstractmethod
     def reset(self, **kwargs):
         """
@@ -191,35 +194,35 @@ class AgentBasedSimulation(ABC):
         Render the environment for vizualization.
         """
         pass
-    
+
     @abstractmethod
     def get_obs(self, agent_id, **kwargs):
         """
         Return the agent's observation.
         """
         pass
-    
+
     @abstractmethod
     def get_reward(self, agent_id, **kwargs):
         """
         Return the agent's reward.
         """
         pass
-    
+
     @abstractmethod
     def get_done(self, agent_id, **kwargs):
         """
         Return the agent's done status.
         """
         pass
-    
+
     @abstractmethod
     def get_all_done(self, **kwargs):
         """
         Return the environment's done status.
         """
         pass
-    
+
     @abstractmethod
     def get_info(self, agent_id, **kwargs):
         """

@@ -1,5 +1,5 @@
-
 from admiral.envs import AgentBasedSimulation
+
 
 class Wrapper(AgentBasedSimulation):
     """
@@ -16,28 +16,28 @@ class Wrapper(AgentBasedSimulation):
 
         import copy
         self.agents = copy.deepcopy(env.agents)
-    
+
     def reset(self, **kwargs):
         self.env.reset(**kwargs)
-    
+
     def step(self, action, **kwargs):
         self.env.step(action, **kwargs)
-    
+
     def render(self, **kwargs):
         self.env.render(**kwargs)
-    
+
     def get_obs(self, agent_id, **kwargs):
         return self.env.get_obs(agent_id, **kwargs)
-    
+
     def get_reward(self, agent_id, **kwargs):
         return self.env.get_reward(agent_id, **kwargs)
-    
+
     def get_done(self, agent_id, **kwargs):
         return self.env.get_done(agent_id, **kwargs)
-    
+
     def get_all_done(self, **kwargs):
         return self.env.get_all_done(**kwargs)
-    
+
     def get_info(self, agent_id, **kwargs):
         return self.env.get_info(agent_id, **kwargs)
 
@@ -48,5 +48,5 @@ class Wrapper(AgentBasedSimulation):
         """
         try:
             return self.env.unwrapped
-        except:
+        except AttributeError: # TODO: test to confirm that this is indeed an AttributeError
             return self.env
