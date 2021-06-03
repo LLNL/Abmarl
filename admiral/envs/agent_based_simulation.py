@@ -86,7 +86,7 @@ class ActingAgent(PrincipleAgent):
 class ObservingAgent(PrincipleAgent):
     """
     ObservingAgents can observe the state of the simulation.
-    
+
     The agent's observation must be *in* its observation space. The SimulationManager
     will send the observation to the Trainer, which will use it to produce actions.
     """
