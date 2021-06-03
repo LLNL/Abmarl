@@ -121,7 +121,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [True]}
     assert env.get_reward('agent1') == -1
-    assert env.get_done('agent1') is False
+    assert not env.get_done('agent1')
 
     env.step({'agent2': Corridor.Actions.RIGHT})
     assert env.corridor[6] is None
@@ -131,7 +131,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent2') == -1
-    assert env.get_done('agent2') is False
+    assert not env.get_done('agent2')
 
     env.step({'agent3': Corridor.Actions.RIGHT})
     assert env.corridor[4].id == 'agent3'
@@ -141,7 +141,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent3') == -5
-    assert env.get_done('agent3') is False
+    assert not env.get_done('agent3')
 
     env.step({'agent4': Corridor.Actions.RIGHT})
     assert env.corridor[5] is None
@@ -151,7 +151,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [False]}
     assert env.get_obs('agent4') == {'left': [False], 'position': [6], 'right': [True]}
     assert env.get_reward('agent4') == -3
-    assert env.get_done('agent4') is False
+    assert not env.get_done('agent4')
 
     env.step({'agent1': Corridor.Actions.STAY})
     assert env.corridor[8].id == 'agent1'
@@ -160,7 +160,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [False]}
     assert env.get_obs('agent4') == {'left': [False], 'position': [6], 'right': [True]}
     assert env.get_reward('agent1') == -1
-    assert env.get_done('agent1') is False
+    assert not env.get_done('agent1')
 
     env.step({'agent2': Corridor.Actions.LEFT})
     assert env.corridor[7].id == 'agent2'
@@ -170,7 +170,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [False]}
     assert env.get_obs('agent4') == {'left': [False], 'position': [6], 'right': [True]}
     assert env.get_reward('agent2') == -5
-    assert env.get_done('agent2') is False
+    assert not env.get_done('agent2')
 
     env.step({'agent3': Corridor.Actions.STAY})
     assert env.corridor[4].id == 'agent3'
@@ -179,7 +179,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [False]}
     assert env.get_obs('agent4') == {'left': [False], 'position': [6], 'right': [True]}
     assert env.get_reward('agent3') == -1
-    assert env.get_done('agent3') is False
+    assert not env.get_done('agent3')
 
     env.step({'agent4': Corridor.Actions.LEFT})
     assert env.corridor[5].id == 'agent4'
@@ -188,7 +188,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent4') == -3
-    assert env.get_done('agent4') is False
+    assert not env.get_done('agent4')
 
     env.step({'agent1': Corridor.Actions.RIGHT})
     assert env.corridor[9] is None
@@ -206,7 +206,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent2') == -1
-    assert env.get_done('agent2') is False
+    assert not env.get_done('agent2')
 
     env.step({'agent3': Corridor.Actions.RIGHT})
     assert env.corridor[4].id == 'agent3'
@@ -215,7 +215,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent3') == -5
-    assert env.get_done('agent3') is False
+    assert not env.get_done('agent3')
 
     env.step({'agent4': Corridor.Actions.LEFT})
     assert env.corridor[4].id == 'agent3'
@@ -224,7 +224,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent4') == -7
-    assert env.get_done('agent4') is False
+    assert not env.get_done('agent4')
 
     env.step({'agent2': Corridor.Actions.STAY})
     assert env.corridor[8].id == 'agent2'
@@ -232,7 +232,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [4], 'right': [True]}
     assert env.get_obs('agent4') == {'left': [True], 'position': [5], 'right': [False]}
     assert env.get_reward('agent2') == -1
-    assert env.get_done('agent2') is False
+    assert not env.get_done('agent2')
 
     env.step({'agent3': Corridor.Actions.LEFT})
     assert env.corridor[4] is None
@@ -241,7 +241,7 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [3], 'right': [False]}
     assert env.get_obs('agent4') == {'left': [False], 'position': [5], 'right': [False]}
     assert env.get_reward('agent3') == -3
-    assert env.get_done('agent3') is False
+    assert not env.get_done('agent3')
 
     env.step({'agent4': Corridor.Actions.RIGHT})
     assert env.corridor[5] is None
@@ -250,9 +250,9 @@ def test_corridor_step():
     assert env.get_obs('agent3') == {'left': [False], 'position': [3], 'right': [False]}
     assert env.get_obs('agent4') == {'left': [False], 'position': [6], 'right': [False]}
     assert env.get_reward('agent4') == -1
-    assert env.get_done('agent4') is False
+    assert not env.get_done('agent4')
 
-    assert env.get_all_done() is False
+    assert not env.get_all_done()
     env.step({'agent2': Corridor.Actions.RIGHT})
     env.step({'agent4': Corridor.Actions.RIGHT})
     env.step({'agent4': Corridor.Actions.RIGHT})

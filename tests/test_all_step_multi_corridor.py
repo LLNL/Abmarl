@@ -49,11 +49,11 @@ def test_reset_and_step():
     assert reward['agent3'] == -5
     assert reward['agent4'] == -3
     assert done['agent0']
-    assert done['agent1'] is False
-    assert done['agent2'] is False
-    assert done['agent3'] is False
-    assert done['agent4'] is False
-    assert done['__all__'] is False
+    assert not done['agent1']
+    assert not done['agent2']
+    assert not done['agent3']
+    assert not done['agent4']
+    assert not done['__all__']
 
 
     with pytest.raises(AssertionError):
@@ -83,11 +83,11 @@ def test_reset_and_step():
     assert reward['agent3'] == -1
     assert reward['agent4'] == -3
     assert 'agent0' not in done
-    assert done['agent1'] is False
-    assert done['agent2'] is False
-    assert done['agent3'] is False
-    assert done['agent4'] is False
-    assert done['__all__'] is False
+    assert not done['agent1']
+    assert not done['agent2']
+    assert not done['agent3']
+    assert not done['agent4']
+    assert not done['__all__']
 
 
     obs, reward, done, _ = sim.step({
@@ -106,10 +106,10 @@ def test_reset_and_step():
     assert reward['agent3'] == -7
     assert reward['agent4'] == -7
     assert done['agent1']
-    assert done['agent2'] is False
-    assert done['agent3'] is False
-    assert done['agent4'] is False
-    assert done['__all__'] is False
+    assert not done['agent2']
+    assert not done['agent3']
+    assert not done['agent4']
+    assert not done['__all__']
 
 
     with pytest.raises(AssertionError):
@@ -135,10 +135,10 @@ def test_reset_and_step():
     assert reward['agent3'] == -1
     assert reward['agent4'] == -1
     assert 'agent1' not in done
-    assert done['agent2'] is False
-    assert done['agent3'] is False
-    assert done['agent4'] is False
-    assert done['__all__'] is False
+    assert not done['agent2']
+    assert not done['agent3']
+    assert not done['agent4']
+    assert not done['__all__']
 
 
     obs, reward, done, _ = sim.step({
@@ -154,9 +154,9 @@ def test_reset_and_step():
     assert reward['agent3'] == -1
     assert reward['agent4'] == -1
     assert done['agent2']
-    assert done['agent3'] is False
-    assert done['agent4'] is False
-    assert done['__all__'] is False
+    assert not done['agent3']
+    assert not done['agent4']
+    assert not done['__all__']
 
 
     with pytest.raises(AssertionError):
@@ -178,9 +178,9 @@ def test_reset_and_step():
     assert reward['agent3'] == -1
     assert reward['agent4'] == -1
     assert 'agent2' not in done
-    assert done['agent3'] is False
-    assert done['agent4'] is False
-    assert done['__all__'] is False
+    assert not done['agent3']
+    assert not done['agent4']
+    assert not done['__all__']
 
 
     obs, reward, done, _ = sim.step({
@@ -192,9 +192,9 @@ def test_reset_and_step():
     assert obs['agent4'] == {'left': [False], 'position': [9], 'right': [False]}
     assert reward['agent3'] == -1
     assert reward['agent4'] == 100
-    assert done['agent3'] is False
+    assert not done['agent3']
     assert done['agent4']
-    assert done['__all__'] is False
+    assert not done['__all__']
 
 
     with pytest.raises(AssertionError):
