@@ -1,8 +1,8 @@
-
 from gym.spaces import Discrete, Dict
 import pytest
 
 from admiral.tools import gym_utils as gu
+
 
 def test_check_space():
     space = {
@@ -52,6 +52,7 @@ def test_check_space():
     }
     assert not gu.check_space(space)
 
+
 def test_make_dict():
     space = {
         1: Discrete(1),
@@ -76,7 +77,7 @@ def test_make_dict():
     }
 
     space = gu.make_dict(space)
-    
+
     assert space == Dict({
         1: Discrete(1),
         2: Dict({
@@ -98,6 +99,7 @@ def test_make_dict():
             })
         })
     })
+
 
 def test_make_dict_fail():
     space = {

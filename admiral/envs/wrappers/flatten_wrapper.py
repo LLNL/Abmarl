@@ -1,10 +1,10 @@
-
 import copy
 
 from gym.spaces import Box, Discrete, Tuple, Dict, MultiDiscrete, MultiBinary
 import numpy as np
 
 from .sar_wrapper import SARWrapper
+
 
 def flatdim(space):
     """Return the number of dimensions a flattened equivalent of this space
@@ -27,6 +27,7 @@ def flatdim(space):
         return int(np.prod(space.shape))
     else:
         raise TypeError
+
 
 def flatten(space, x):
     """Flatten a data point from a space.
@@ -54,6 +55,7 @@ def flatten(space, x):
         return np.asarray(x, dtype=np.int).flatten()
     else:
         raise TypeError('space must be instance of gym.spaces')
+
 
 def unflatten(space, x):
     """Unflatten a data point from a space.
@@ -87,13 +89,13 @@ def unflatten(space, x):
         ]
         from collections import OrderedDict
         return OrderedDict(list_unflattened)
-        # return {key: unflatten(s, flattened) for flattened, (key, s) in zip(list_flattened, space.spaces.items())}
     elif isinstance(space, MultiBinary):
         return np.asarray(x, dtype=np.int).reshape(space.shape)
     elif isinstance(space, MultiDiscrete):
         return np.asarray(x, dtype=np.int).reshape(space.shape)
     else:
         raise TypeError
+
 
 def flatten_space(space):
     """Flatten a space into a single Box.
@@ -166,6 +168,7 @@ def flatten_space(space):
         )
     raise TypeError
 
+
 class FlattenWrapper(SARWrapper):
     """
     Flattens all agents' action and observation spaces into continuous Boxes.
@@ -174,19 +177,22 @@ class FlattenWrapper(SARWrapper):
         super().__init__(env)
         for agent_id, wrapped_agent in self.env.agents.items(): # Wrap the agents' spaces
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
-            self.agents[agent_id].observation_space = flatten_space(wrapped_agent.observation_space)
+            self.agents[agent_id].observation_space = flatten_space(
+                wrapped_agent.observation_space
+            )
 
     def wrap_observation(self, from_agent, observation):
         return flatten(from_agent.observation_space, observation)
 
     def unwrap_observation(self, from_agent, observation):
         return unflatten(from_agent.observation_space, observation)
-    
+
     def wrap_action(self, from_agent, action):
         return unflatten(from_agent.action_space, action)
-    
+
     def unwrap_action(self, from_agent, action):
         return flatten(from_agent.action_space, action)
+
 
 class FlattenActionWrapper(SARWrapper):
     """
@@ -195,12 +201,12 @@ class FlattenActionWrapper(SARWrapper):
     def __init__(self, env):
         super().__init__(env)
         self.agents = copy.deepcopy(self.env.agents)
-        for agent_id, wrapped_agent in self.env.agents.items(): # Wrap the action spaces of the agents
+        for agent_id, wrapped_agent in self.env.agents.items():
+            # Wrap the action spaces of the agents
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
-    
+
     def wrap_action(self, from_agent, action):
         return unflatten(from_agent.action_space, action)
-    
+
     def unwrap_action(self, from_agent, action):
         return flatten(from_agent.action_space, action)
-

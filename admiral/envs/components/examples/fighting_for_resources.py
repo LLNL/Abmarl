@@ -4,15 +4,21 @@ import numpy as np
 import seaborn as sns
 
 from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
-from admiral.envs.components.observer import PositionObserver, GridResourceObserver, HealthObserver, LifeObserver
+from admiral.envs.components.observer import PositionObserver, GridResourceObserver, \
+    HealthObserver, LifeObserver
 from admiral.envs.components.actor import GridMovementActor, GridResourcesActor, AttackActor
 from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
+from admiral.envs.components.agent import PositionObservingAgent, ResourceObservingAgent, \
+    HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class FightForResourcesAgent(PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent):
-    pass
+
+class FightForResourcesAgent(
+    PositionObservingAgent, ResourceObservingAgent, HealthObservingAgent, LifeObservingAgent,
+    GridMovementAgent, HarvestingAgent, AttackingAgent
+): pass
+
 
 class FightForResourcesEnv(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -38,12 +44,12 @@ class FightForResourcesEnv(AgentBasedSimulation):
         self.done = DeadDone(**kwargs)
 
         self.finalize()
-    
+
     def reset(self, **kwargs):
         self.position_state.reset(**kwargs)
         self.life_state.reset(**kwargs)
         self.resource_state.reset(**kwargs)
-    
+
     def step(self, action_dict, **kwargs):
         # Process harvesting
         for agent_id, action in action_dict.items():
@@ -51,7 +57,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
             harvested_amount = self.resource_actor.process_action(agent, action, **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
-        
+
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
@@ -69,7 +75,7 @@ class FightForResourcesEnv(AgentBasedSimulation):
 
         # Regrow the resources
         self.resource_state.regrow()
-    
+
     def render(self, fig=None, **kwargs):
         fig.clear()
 
@@ -84,13 +90,18 @@ class FightForResourcesEnv(AgentBasedSimulation):
         ax.set_yticks(np.arange(0, self.position_state.region, 1))
         ax.grid()
 
-        agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
-        agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+        agents_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]
+        ]
+        agents_y = [
+            self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values()
+            if render_condition[agent.id]
+        ]
         mscatter(agents_x, agents_y, ax=ax, m='o', s=200, edgecolor='black', facecolor='gray')
 
         plt.plot()
         plt.pause(1e-6)
-    
+
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
@@ -99,22 +110,24 @@ class FightForResourcesEnv(AgentBasedSimulation):
             **self.health_observer.get_obs(agent, **kwargs),
             **self.life_observer.get_obs(agent, **kwargs),
         }
-    
+
     def get_reward(self, agent_id, **kwargs):
         pass
 
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(self.agents[agent_id])
-    
+
     def get_all_done(self, **kwargs):
         return self.done.get_all_done(**kwargs)
-    
+
     def get_info(self, **kwargs):
         return {}
 
+
 if __name__ == '__main__':
     agents = {f'agent{i}': FightForResourcesAgent(
-        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0, resource_view=3
+        id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0,
+        resource_view=3
     ) for i in range(6)}
     env = FightForResourcesEnv(
         region=10,
@@ -126,7 +139,10 @@ if __name__ == '__main__':
     env.render(fig=fig)
 
     for _ in range(50):
-        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
+        action_dict = {
+            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            if agent.is_alive
+        }
         env.step(action_dict)
         env.render(fig=fig)
         print({agent_id: env.get_done(agent_id) for agent_id in env.agents})

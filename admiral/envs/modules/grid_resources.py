@@ -1,5 +1,5 @@
-
 import numpy as np
+
 
 class GridResources:
     """
@@ -8,7 +8,7 @@ class GridResources:
     replenish over time. The grid is covered up to some coverage percentage, and
     the initial value of the resources on each cell are random between the minimum
     and maximum values.
-        
+
         max_value: double
             The maximum value that a resource can reach. Default 1.0
         min_value: double
@@ -51,7 +51,7 @@ class GridResources:
         self.resources[location] = max([0., self.resources[location] - amount])
 
         return actual_amount_harvested
-    
+
     def regrow(self, **kwargs):
         """
         Process the regrowth, which is done according to the revival rate.

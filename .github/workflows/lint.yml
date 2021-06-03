@@ -1,0 +1,34 @@
+# This workflow will lint the code.
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Lint
+
+on:
+  push:
+    branches: [ main, admiral-107-sphinx-docs ]
+  pull_request:
+    branches: [ main, admiral-107-sphinx-docs ]
+
+jobs:
+  lint:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install flake8
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+    - name: Lint with flake8
+      run: |
+        # Lint source directory
+        flake8 admiral/ --count  --max-line-length 100 --indent-size 4 --doctests --per-file-ignores="__init__.py:F401 admiral/envs/wrappers/communication_wrapper.py,admiral/envs/components/wrappers/observer_wrapper.py,admiral/algs/monte_carlo.py:W504" --ignore="E261,E701,E731,E226"
+        # Lint examples directory
+        flake8 examples/ --count  --max-line-length 100 --indent-size 4 --doctests --per-file-ignores="examples/config_prototype.py:F401,E401" --ignore="E261,E701,E731,E226,E402"
+        # Lint the tests directory
+        flake8 tests/ --count  --max-line-length 100 --indent-size 4 --doctests --per-file-ignores="tests/test_predator_prey.py:E128" --ignore="E261,E701,E731,E226,E231,E202,E241,E203,E303,E201"

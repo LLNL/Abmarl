@@ -1,5 +1,5 @@
-
 from admiral.tools import utils as adu
+
 
 def run(full_config_path):
     """Train MARL policies using the config_file."""
@@ -13,7 +13,11 @@ def run(full_config_path):
     import shutil
     import time
     home = os.path.expanduser("~")
-    output_dir = os.path.join(home, 'admiral_results/{}_{}'.format(title, time.strftime('%Y-%m-%d_%H-%M')))
+    output_dir = os.path.join(
+        home, 'admiral_results/{}_{}'.format(
+            title, time.strftime('%Y-%m-%d_%H-%M')
+        )
+    )
     experiment_mod.params['ray_tune']['local_dir'] = output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -23,5 +27,5 @@ def run(full_config_path):
     import ray
     from ray import tune
     ray.init()
-    ray.tune.run(**experiment_mod.params['ray_tune'])
+    tune.run(**experiment_mod.params['ray_tune'])
     ray.shutdown()

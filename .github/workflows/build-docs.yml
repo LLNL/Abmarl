@@ -6,7 +6,7 @@ on:
   push:
     branches: [ main, admiral-107-sphinx-docs ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, admiral-107-sphinx-docs ]
 
 jobs:
   docs-build:

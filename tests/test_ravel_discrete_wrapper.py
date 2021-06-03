@@ -1,5 +1,3 @@
-
-from admiral.envs import AgentBasedSimulation
 from admiral.envs.wrappers.ravel_discrete_wrapper import ravel, unravel
 from admiral.envs.wrappers import RavelDiscreteWrapper
 from admiral.envs import Agent
@@ -7,6 +5,8 @@ from admiral.envs import Agent
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np
 import pytest
+from .helpers import FillInHelper, MultiAgentGymSpacesEnv
+
 
 def test_ravel():
     my_space = Dict({
@@ -27,9 +27,9 @@ def test_ravel():
         'f': Discrete(6),
     })
     point = {
-        'a': [3, 1], 
-        'b': [0, 1, 1, 0], 
-        'c': np.array([[0, 7, 5],[1, 3, 1]]), 
+        'a': [3, 1],
+        'b': [0, 1, 1, 0],
+        'c': np.array([[0, 7, 5],[1, 3, 1]]),
         'd': {1: 2, 2: np.array([1, 3])},
         'e': ([1,0,4], [1, 1], {'my_dict': 5}),
         'f': 1
@@ -48,57 +48,72 @@ def test_ravel():
     np.testing.assert_array_equal(unravelled_point['e'][2], point['e'][2])
     assert unravelled_point['f'] == point['f']
 
-from .helpers import FillInHelper, MultiAgentGymSpacesEnv
 
 # Observations that we don't support
 class FloatObservation(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3))}
+        self.agents = {'agent0': Agent(
+            id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3)
+        )}
+
 
 class UnboundedBelowObservation(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
-            np.array([0, 13, -3, -np.inf]),
-            np.array([0, 20, 0, 0]),
-            dtype=np.int
-        ),
-        action_space=Discrete(3)
+        self.agents = {'agent0': Agent(
+            id='agent0', observation_space=Box(
+                np.array([0, 13, -3, -np.inf]),
+                np.array([0, 20, 0, 0]),
+                dtype=np.int
+            ),
+            action_space=Discrete(3)
         )}
+
 
 class UnboundedAboveObservation(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
-            np.array([0, 12, 20, 0]),
-            np.array([np.inf, 20, 24, np.inf]),
-            dtype=np.int
-        ),
-        action_space=Discrete(2)
+        self.agents = {'agent0': Agent(
+            id='agent0', observation_space=Box(
+                np.array([0, 12, 20, 0]),
+                np.array([np.inf, 20, 24, np.inf]),
+                dtype=np.int
+            ),
+            action_space=Discrete(2)
         )}
+
 
 # Actions that we don't support
 class FloatAction(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3))}
+        self.agents = {'agent0': Agent(
+            id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3)
+        )}
+
 
 class UnboundedBelowAction(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
-            np.array([0, 13, -3, -np.inf]),
-            np.array([0, 20, 0, 0]),
-            dtype=np.int
-        ),
-        action_space=Discrete(3)
+        self.agents = {'agent0': Agent(
+            id='agent0',
+            observation_space=Box(
+                np.array([0, 13, -3, -np.inf]),
+                np.array([0, 20, 0, 0]),
+                dtype=np.int
+            ),
+            action_space=Discrete(3)
         )}
+
 
 class UnboundedAboveAction(FillInHelper):
     def __init__(self):
-        self.agents = {'agent0': Agent(id='agent0', observation_space=Box(
-            np.array([0, 12, 20, 0]),
-            np.array([np.inf, 20, 24, np.inf]),
-            dtype=np.int
-        ), 
-        action_space=Discrete(2)
+        self.agents = {'agent0': Agent(
+            id='agent0',
+            observation_space=Box(
+                np.array([0, 12, 20, 0]),
+                np.array([np.inf, 20, 24, np.inf]),
+                dtype=np.int
+            ),
+            action_space=Discrete(2)
         )}
+
 
 def test_exceptions():
     with pytest.raises(AssertionError):
@@ -113,6 +128,7 @@ def test_exceptions():
         RavelDiscreteWrapper(UnboundedBelowAction())
     with pytest.raises(AssertionError):
         RavelDiscreteWrapper(UnboundedAboveAction())
+
 
 def test_ravel_wrapper():
     env = MultiAgentGymSpacesEnv()
@@ -129,14 +145,38 @@ def test_ravel_wrapper():
     assert env.get_obs('agent2') == 2
     assert env.get_obs('agent3') == 47
 
-    action_0 = {'agent0': ({'first': 2, 'second': [-1, 2]}, [0, 1, 1]), 'agent1': [3, 2, 0], 'agent2': {'alpha': [1, 1, 0]}, 'agent3': (2, np.array([0, 6]), 1)}
-    action_0_wrapped = {agent_id: env.unwrap_action(env.env.agents[agent_id], action) for agent_id, action in action_0.items()}
+    action_0 = {
+        'agent0': ({'first': 2, 'second': [-1, 2]}, [0, 1, 1]),
+        'agent1': [3, 2, 0],
+        'agent2': {'alpha': [1, 1, 0]},
+        'agent3': (2, np.array([0, 6]), 1)
+    }
+    action_0_wrapped = {
+        agent_id: env.unwrap_action(env.env.agents[agent_id], action)
+        for agent_id, action in action_0.items()
+    }
 
-    action_1 = {'agent0': ({'first': 0, 'second': [3, 3]}, [1, 1, 1]), 'agent1': [1, 5, 1], 'agent2': {'alpha': [1, 0, 0]}, 'agent3': (1, np.array([9, 4]), 0)}
-    action_1_wrapped = {agent_id: env.unwrap_action(env.env.agents[agent_id], action) for agent_id, action in action_1.items()}
+    action_1 = {
+        'agent0': ({'first': 0, 'second': [3, 3]}, [1, 1, 1]),
+        'agent1': [1, 5, 1],
+        'agent2': {'alpha': [1, 0, 0]},
+        'agent3': (1, np.array([9, 4]), 0)
+    }
+    action_1_wrapped = {
+        agent_id: env.unwrap_action(env.env.agents[agent_id], action)
+        for agent_id, action in action_1.items()
+    }
 
-    action_2 = {'agent0': ({'first': 1, 'second': [1, 0]}, [0, 0, 1]), 'agent1': [2, 0, 1], 'agent2': {'alpha': [0, 0, 0]}, 'agent3': (0, np.array([7, 7]), 0)}
-    action_2_wrapped = {agent_id: env.unwrap_action(env.env.agents[agent_id], action) for agent_id, action in action_2.items()}
+    action_2 = {
+        'agent0': ({'first': 1, 'second': [1, 0]}, [0, 0, 1]),
+        'agent1': [2, 0, 1],
+        'agent2': {'alpha': [0, 0, 0]},
+        'agent3': (0, np.array([7, 7]), 0)
+    }
+    action_2_wrapped = {
+        agent_id: env.unwrap_action(env.env.agents[agent_id], action)
+        for agent_id, action in action_2.items()
+    }
 
     env.step(action_0_wrapped)
     assert env.get_obs('agent0') == 1
@@ -155,7 +195,9 @@ def test_ravel_wrapper():
     assert env.get_done('agent3') == 'Done from agent3'
 
     assert env.get_info('agent0')[0]['first'] == action_0['agent0'][0]['first']
-    np.testing.assert_array_equal(env.get_info('agent0')[0]['second'], action_0['agent0'][0]['second'])
+    np.testing.assert_array_equal(
+        env.get_info('agent0')[0]['second'], action_0['agent0'][0]['second']
+    )
     np.testing.assert_array_equal(env.get_info('agent0')[1], action_0['agent0'][1])
     np.testing.assert_array_equal(env.get_info('agent1'), action_0['agent1'])
     np.testing.assert_array_equal(env.get_info('agent2')['alpha'], action_0['agent2']['alpha'])
@@ -165,7 +207,9 @@ def test_ravel_wrapper():
 
     env.step(action_1_wrapped)
     assert env.get_info('agent0')[0]['first'] == action_1['agent0'][0]['first']
-    np.testing.assert_array_equal(env.get_info('agent0')[0]['second'], action_1['agent0'][0]['second'])
+    np.testing.assert_array_equal(
+        env.get_info('agent0')[0]['second'], action_1['agent0'][0]['second']
+    )
     np.testing.assert_array_equal(env.get_info('agent0')[1], action_1['agent0'][1])
     np.testing.assert_array_equal(env.get_info('agent1'), action_1['agent1'])
     np.testing.assert_array_equal(env.get_info('agent2')['alpha'], action_1['agent2']['alpha'])
@@ -175,7 +219,9 @@ def test_ravel_wrapper():
 
     env.step(action_2_wrapped)
     assert env.get_info('agent0')[0]['first'] == action_2['agent0'][0]['first']
-    np.testing.assert_array_equal(env.get_info('agent0')[0]['second'], action_2['agent0'][0]['second'])
+    np.testing.assert_array_equal(
+        env.get_info('agent0')[0]['second'], action_2['agent0'][0]['second']
+    )
     np.testing.assert_array_equal(env.get_info('agent0')[1], action_2['agent0'][1])
     np.testing.assert_array_equal(env.get_info('agent1'), action_2['agent1'])
     np.testing.assert_array_equal(env.get_info('agent2')['alpha'], action_2['agent2']['alpha'])
