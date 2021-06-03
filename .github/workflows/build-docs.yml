@@ -4,9 +4,9 @@ name: Sphinx docs build
 
 on:
   push:
-    branches: [ main, admiral-107-sphinx-docs, admiral-112-google-style-and-linter-flake8 ]
+    branches: [ main, admiral-107-sphinx-docs ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, admiral-107-sphinx-docs ]
 
 jobs:
   docs-build:
