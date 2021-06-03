@@ -88,13 +88,16 @@ class Observer(ABC):
             return {}
 
     @abstractmethod
-    def get_obs(self, agent, **kwargs): pass
+    def get_obs(self, agent, **kwargs):
+        pass
 
     @abstractproperty
-    def channel(self): pass
+    def channel(self):
+        pass
 
     @abstractproperty
-    def null_value(self): pass
+    def null_value(self):
+        pass
 
 
 # --------------------- #

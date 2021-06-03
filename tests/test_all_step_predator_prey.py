@@ -1,9 +1,9 @@
-
 import numpy as np
 import pytest
 
 from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
 from admiral.managers import AllStepManager
+
 
 def test_turn_based_predator_prey_distance():
     np.random.seed(24)
@@ -17,7 +17,7 @@ def test_turn_based_predator_prey_distance():
     }
     env = PredatorPreyEnv.build(env_config)
     env = AllStepManager(env)
-    
+
     # Little hackish here because I have to explicitly set their values
     obs = env.reset()
     env.agents['predator0'].position = np.array([2, 3])
@@ -494,7 +494,8 @@ def test_turn_based_predator_prey_distance():
         'prey1': True,
         'prey2': True,
         '__all__': True}
-        
+
+
 def test_turn_based_predator_prey_grid():
     np.random.seed(24)
     predators = [Predator(id=f'predator{i}', attack=1, view=0) for i in range(2)]
@@ -507,7 +508,7 @@ def test_turn_based_predator_prey_grid():
     }
     env = PredatorPreyEnv.build(env_config)
     env = AllStepManager(env)
-    
+
     # Little hackish here because I have to explicitly set their values
     obs = env.reset()
     env.agents['predator0'].position = np.array([2, 3])
@@ -520,7 +521,7 @@ def test_turn_based_predator_prey_grid():
     env.agents['prey5'].position = np.array([3, 1])
     env.agents['prey6'].position = np.array([2, 1])
     obs = {agent_id: env.env.get_obs(agent_id) for agent_id in env.agents}
-    
+
     assert 'predator0' in obs
     assert 'predator0' in obs
     assert 'prey0' in obs
@@ -590,7 +591,7 @@ def test_turn_based_predator_prey_grid():
             'prey5': {'move': np.array([1, 1]), 'harvest': 0},
             'prey6': {'move': np.array([0, 0]), 'harvest': 0},
         })
-        
+
     obs, reward, done, info = env.step({
         'predator0': {'attack': 1, 'move': np.array([0, 0])},
         'predator1': {'attack': 0, 'move': np.array([1, 0])},
@@ -640,7 +641,7 @@ def test_turn_based_predator_prey_grid():
             'prey5': {'move': np.array([1, 1]), 'harvest': 0},
             'prey6': {'move': np.array([0, 0]), 'harvest': 0},
         })
-        
+
     obs, reward, done, info = env.step({
         'predator0': {'attack': 1, 'move': np.array([0, 0])},
         'predator1': {'attack': 1, 'move': np.array([0, 0])},
@@ -685,7 +686,7 @@ def test_turn_based_predator_prey_grid():
             'prey5': {'move': np.array([1, 1]), 'harvest': 0},
             'prey6': {'move': np.array([0, 0]), 'harvest': 0},
         })
-        
+
     obs, reward, done, info = env.step({
         'predator0': {'attack': 1, 'move': np.array([0, 0])},
         'predator1': {'attack': 1, 'move': np.array([0, 0])},

@@ -1,7 +1,7 @@
-
 import numpy as np
 
 from admiral.envs.modules import GridResources
+
 
 def test_builder():
     env = GridResources.build()
@@ -10,6 +10,7 @@ def test_builder():
     assert env.min_value == 0.1
     assert env.revive_rate == 0.04
     assert env.coverage == 0.75
+
 
 def test_builder_custom():
     env = GridResources.build({
@@ -25,11 +26,13 @@ def test_builder_custom():
     assert env.revive_rate == 0.5
     assert env.coverage == 0.4
 
+
 def test_reset():
     np.random.seed(24)
     env = GridResources.build({'region': 5})
     env.reset()
     assert ((env.resources <= env.max_value) & (env.resources >= 0.)).all()
+
 
 def test_harvest_and_regrow():
     np.random.seed(24)

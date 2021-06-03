@@ -106,14 +106,29 @@ def test_agent_based_simulation_agents():
         def __init__(self, agents):
             self.agents = agents
 
-        def reset(self, **kwargs): pass
-        def step(self, action, **kwargs): pass
-        def render(self, **kwargs): pass
-        def get_obs(self, agent_id, **kwargs): pass
-        def get_reward(self, agent_id, **kwargs): pass
-        def get_done(self, agent_id, **kwargs): pass
-        def get_all_done(self, **kwargs): pass
-        def get_info(self, agent_id, **kwargs): pass
+        def reset(self, **kwargs):
+            pass
+
+        def step(self, action, **kwargs):
+            pass
+
+        def render(self, **kwargs):
+            pass
+
+        def get_obs(self, agent_id, **kwargs):
+            pass
+
+        def get_reward(self, agent_id, **kwargs):
+            pass
+
+        def get_done(self, agent_id, **kwargs):
+            pass
+
+        def get_all_done(self, **kwargs):
+            pass
+
+        def get_info(self, agent_id, **kwargs):
+            pass
 
     agents_single_object = PrincipleAgent(id='just_a_simple_agent')
     agents_list = [PrincipleAgent(id=f'{i}') for i in range(3)]

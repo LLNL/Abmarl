@@ -46,7 +46,7 @@ def policy_mapping_fn(agent_id):
 # --- Setup the algorithm --- #
 # --------------------------- #
 
-# Full list of supported algorithms here: 
+# Full list of supported algorithms here:
 # https://docs.ray.io/en/releases-1.2.0/rllib-algorithms.html#rllib-algorithms
 algo_name = 'PG'
 
@@ -55,7 +55,7 @@ algo_name = 'PG'
 # --- Parameters --- #
 # ------------------ #
 
-# List of common ray_tune parameters here: 
+# List of common ray_tune parameters here:
 # https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters
 params = {
     'experiment': {

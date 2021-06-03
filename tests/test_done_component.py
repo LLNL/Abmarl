@@ -1,9 +1,9 @@
-
 import numpy as np
 
 from admiral.envs.components.agent import ComponentAgent as Agent
 from admiral.envs.components.state import LifeState, ContinuousPositionState
 from admiral.envs.components.done import DeadDone, TeamDeadDone, TooCloseDone
+
 
 def test_dead_done_condition():
     agents = {
@@ -38,6 +38,7 @@ def test_dead_done_condition():
     assert done.get_done(agents['agent3'])
     assert done.get_all_done()
 
+
 def test_team_dead_done_condition():
     agents = {
         'agent0': Agent(id='agent0', team=1),
@@ -65,19 +66,20 @@ def test_team_dead_done_condition():
     assert not done.get_done(agents['agent1'])
     assert not done.get_done(agents['agent2'])
     assert not done.get_done(agents['agent3'])
-    assert     done.get_done(agents['agent4'])
-    assert     done.get_done(agents['agent5'])
+    assert done.get_done(agents['agent4'])
+    assert done.get_done(agents['agent5'])
     assert not done.get_all_done()
 
     agents['agent1'].is_alive = False
     agents['agent3'].is_alive = False
     assert not done.get_done(agents['agent0'])
-    assert     done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent1'])
     assert not done.get_done(agents['agent2'])
-    assert     done.get_done(agents['agent3'])
-    assert     done.get_done(agents['agent4'])
-    assert     done.get_done(agents['agent5'])
-    assert     done.get_all_done()
+    assert done.get_done(agents['agent3'])
+    assert done.get_done(agents['agent4'])
+    assert done.get_done(agents['agent5'])
+    assert done.get_all_done()
+
 
 def test_too_close_done_with_continuous():
     agents = {
