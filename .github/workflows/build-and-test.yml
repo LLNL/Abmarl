@@ -5,7 +5,7 @@ name: Build and Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, admiral-112-google-style-and-linter-flake8 ]
   pull_request:
     branches: [ main ]
 
