@@ -32,7 +32,7 @@ def cli():
     )
     subparsers = parser.add_subparsers(dest='command')
 
-    # TODO: Why do I not need to use the objects?
+    # TODO: Why do I not need to use the objects? Remove scripts from extend exclude
     train_parser = train.create_parser(subparsers)
     analyze_parser = analyze.create_parser(subparsers)
     visualize_parser = visualize.create_parser(subparsers)
