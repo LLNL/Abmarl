@@ -25,7 +25,7 @@ class SimulationManager(ABC):
     def reset(self, **kwargs):
         """
         Reset the simulation.
-        
+
         Returns:
             The first obersvation of the agent(s).
         """
@@ -39,7 +39,7 @@ class SimulationManager(ABC):
         Args:
             action_dict:
                 Dictionary mapping agent(s) to their actions in this time step.
-        
+
         Returns:
             The observations, rewards, done status, and info for the agent(s) whose
             actions we expect to receive next.
