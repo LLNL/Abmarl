@@ -48,7 +48,7 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2000,
+            'episodes_total': 20_000,
         },
         'verbose': 2,
         'config': {
@@ -78,11 +78,15 @@ if __name__ == "__main__":
     import os
     import time
     home = os.path.expanduser("~")
-    output_dir = os.path.join(home, 'admiral_results/{}_{}'.format(params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')))
+    output_dir = os.path.join(
+        home, 'admiral_results/{}_{}'.format(
+            params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
+        )
+    )
     params['ray_tune']['local_dir'] = output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
+
     # Copy this configuration file to the output directory
     import shutil
     shutil.copy(os.path.join(os.getcwd(), __file__), output_dir)
