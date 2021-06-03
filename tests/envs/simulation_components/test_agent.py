@@ -1,8 +1,8 @@
-
 import numpy as np
 import pytest
 
 from admiral.envs.components import ComponentAgent
+
 
 def test_component_agent_defaults():
     agent = ComponentAgent(id='agent')
@@ -15,6 +15,7 @@ def test_component_agent_defaults():
     assert agent.is_alive
     assert agent.configured
 
+
 def test_component_agent_initial_position():
     with pytest.raises(AssertionError):
         ComponentAgent(id='agent', initial_position=[2, 4])
@@ -24,6 +25,7 @@ def test_component_agent_initial_position():
         ComponentAgent(id='agent', initial_position=np.array(['2', '4']))
     agent = ComponentAgent(id='agent', initial_position=np.array([2, 4]))
     np.testing.assert_array_equal(agent.initial_position, np.array([2, 4]))
+
 
 def test_component_agent_min_max_health():
     with pytest.raises(AssertionError):
@@ -42,6 +44,7 @@ def test_component_agent_min_max_health():
     with pytest.raises(AttributeError):
         agent.max_health = 10
 
+
 def test_component_agent_initial_health():
     with pytest.raises(AssertionError):
         ComponentAgent(id='agent', min_max_health=np.array([0, 10]), initial_health='3')
@@ -51,6 +54,7 @@ def test_component_agent_initial_health():
         ComponentAgent(id='agent', initial_health=-2)
     agent = ComponentAgent(id='agent', initial_health=0.78)
     assert agent.initial_health == 0.78
+
 
 def test_component_agent_team():
     with pytest.raises(AssertionError):

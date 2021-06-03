@@ -22,11 +22,13 @@ register_env(env_name, env_creator)
 
 from admiral.pols import HeuristicPolicy
 
+
 class CustomHeuristicPolicy(HeuristicPolicy):
     """A custom heuristic policy for you the design"""
     def compute_actions(self, obs_batch, *args, **kwargs):
         # return [some_action for _ in obs_batch], [], {}
         return [0 for _ in obs_batch], [], {}
+
 
 agents = env.agents
 policies = {
@@ -34,6 +36,8 @@ policies = {
     'policy_1_name': (None, agents[1].observation_space, agents[1].action_space, {}),
     'policy_2_name': (None, agents[2].observation_space, agents[2].action_space, {})
 }
+
+
 def policy_mapping_fn(agent_id):
     pass # Map the agent id to the policy you want that agent to train.
 
@@ -42,7 +46,8 @@ def policy_mapping_fn(agent_id):
 # --- Setup the algorithm --- #
 # --------------------------- #
 
-# Full list of supported algorithms here: https://docs.ray.io/en/releases-1.2.0/rllib-algorithms.html#rllib-algorithms
+# Full list of supported algorithms here: 
+# https://docs.ray.io/en/releases-1.2.0/rllib-algorithms.html#rllib-algorithms
 algo_name = 'PG'
 
 
@@ -50,7 +55,8 @@ algo_name = 'PG'
 # --- Parameters --- #
 # ------------------ #
 
-# List of common ray_tune parameters here: https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters
+# List of common ray_tune parameters here: 
+# https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters
 params = {
     'experiment': {
         'title': '{}'.format('The-title-of-this-experiment'),

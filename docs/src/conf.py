@@ -12,6 +12,7 @@
 # sys.path.insert(0, os.path.abspath('../..'))
 # import admiral
 
+from sphinx.builders.html import StandaloneHTMLBuilder
 
 # -- Project information -----------------------------------------------------
 
@@ -29,9 +30,9 @@ release = '0.1.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-	'sphinx.ext.autodoc',
-	'sphinx.ext.napoleon',
-	'sphinx_rtd_theme',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx_rtd_theme',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -55,7 +56,6 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-from sphinx.builders.html import StandaloneHTMLBuilder
 StandaloneHTMLBuilder.supported_image_types = [
     'image/svg+xml',
     'image/gif',
