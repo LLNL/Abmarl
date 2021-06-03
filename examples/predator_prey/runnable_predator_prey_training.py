@@ -1,7 +1,7 @@
 
 # Setup the environment
 from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
-from admiral.managers import TurnBasedManager, AllStepManager
+from admiral.managers import AllStepManager
 
 region = 6
 predators = [Predator(id=f'predator{i}', attack=1) for i in range(2)]
@@ -22,17 +22,18 @@ agents = env.unwrapped.agents
 register_env(env_name, lambda env_config: env)
 
 # Set up heuristic policies
-from admiral.pols import RandomAction, HeuristicPolicy
-
 policies = {
     'predator': (None, agents['predator0'].observation_space, agents['predator0'].action_space, {}),
     'prey': (None, agents['prey0'].observation_space, agents['prey0'].action_space, {})
 }
+
+
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('prey'):
         return 'prey'
     else:
         return 'predator'
+
 
 # Algorithm
 algo_name = 'PG'
@@ -72,6 +73,7 @@ params = {
         },
     }
 }
+
 
 if __name__ == "__main__":
     # Create output directory and save to params
