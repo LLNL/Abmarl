@@ -35,7 +35,7 @@ between other predators and prey. We will reward the predators as follows:
 * The predator should be penalized for taking too long.
 
 Concurrently, we will train prey agents to harvest resources while attempting to
-avoid predators. To learn this, prey agetns must be able to see a subset off the
+avoid predators. To learn this, prey agents must be able to see a subset off the
 grid around them, both the resources available and any other agents. We will reward
 the prey as follows:
 
@@ -207,7 +207,7 @@ Using the Command Line
 
 Training
 ''''''''
-With the configuration scipt complete, we can utilize the command line interface
+With the configuration script complete, we can utilize the command line interface
 to train our predator. We simply type ``admiral train predator_prey_training.py``,
 where `predator_prey_training.py` is our configuration file. This will launch Admiral,
 which will process the script and launch RLlib according to the

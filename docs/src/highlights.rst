@@ -24,12 +24,12 @@ observation and action spaces.
    location. The green box shows the orange agent’s observation of the map,
    and the matrix below it shows the actual observation. Each agent can choose
    to move or to "attack" another agent in one of the nearby squares. The policy is just a simple
-   2-layer MLP, each layer having 64 units. We don’t apply any kind of specialized architecture to
-   encourage collaboration or competition. Each agent is simple: they do not have a model
-   of the simulation; they do not have a global view of the environment; their
+   2-layer MLP, each layer having 64 units. We don’t apply any kind of specialized
+   architecture that encourages collaboration or competition. Each agent is simple: they do not
+   have a model of the simulation; they do not have a global view of the environment; their
    actions are only local in both space and in agent interaction (they can only
    interact with one agent at a time). Yet, we will see efficient and complex
-   strategies emerege, collaboration and competition from the common or conflicting
+   strategies emerge, collaboration and competition from the common or conflicting
    interest among agents.
 
 
@@ -94,7 +94,7 @@ which is near it and does not have any information distinguishing one "deserted"
 area of the map from another. Recall, however, that it observes the edges
 of the map, and it uses this information to learn an effecive exploration strategy.
 In the video below, we can see that the forager learns to explore the map by moving
-along its edges in a clockwise-direction, occasionally making random moves towards
+along its edges in a clockwise direction, occasionally making random moves towards
 the middle of the map.
 
 .. figure:: .images/single_agent_explore.*
@@ -120,7 +120,7 @@ learned behaviors.
 
 Cover and explore
 '''''''''''''''''
-Our reward schema implicity encourages the foragers to collaborate because we give
+Our reward schema implicitly encourages the foragers to collaborate because we give
 a small penalty to each one for taking too long. Thus, the faster they
 can collect all the resources, the less they are penalized. Furthermore, because each
 agent trains the same policy, there is no incentive for competitive behavior. An
@@ -177,8 +177,8 @@ behavior. In the following experiments, we explore competitive emergence by intr
 hunters into the simulation. Like foragers, hunters can move up to one square away
 and observe other agents and map edges up to three squares away. Hunters, however,
 are more effective killers and can attack a forager up to two squares away. They are
-rewarded for successful kills and penalized for bad moves and taking too long, exactly
-the same way as foragers.
+rewarded for successful kills, they are and penalized for bad moves and for taking
+too long, exactly the same way as foragers.
 
 However, the hunters and foragers have completely different objectives:
 a forager tries to clear the map of all *resources*, but a hunter tries to clear
@@ -186,7 +186,7 @@ the map of all *foragers*. Therefore, we set up two policies. All the hunters
 will train the same policy, and all the foragers will train the same policy, and
 these policies will be distinct. 
 
-The leanred behaviors among the two groups in this mixed collaborate-competitive
+The learned behaviors among the two groups in this mixed collaborate-competitive
 simulation are tightly integrated, with multiple strategies appearing at the same
 time within a simulation. Therefore, in contrast to above, we will not show video
 clips that capture a single strategy; instead, we will show video clips that

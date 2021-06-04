@@ -233,7 +233,7 @@ simple corridor environment with multiple agents.
 
 Experiment Parameters
 `````````````````````
-The strucutre of the parameters dictionary is very imporant. It *must* have an
+The strucutre of the parameters dictionary is very important. It *must* have an
 `experiment` key which contains both the `title` of the experiment and the `env_creator`
 function. This function should receive a config and, if appropriate, pass it to
 the simulation constructor. In the example configuration above, we just retrun the
@@ -289,7 +289,7 @@ following function:
 .. ATTENTION::
    Is it possible to add the subscript to the API?
 
-Anaylsis can then be performed using the command line interface:
+Analysis can then be performed using the command line interface:
 
 .. code-block::
 

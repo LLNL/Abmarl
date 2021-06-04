@@ -292,7 +292,7 @@ Experiment Parameters
 `````````````````````
 
 Having setup the simulation and policies, we can now bundle all that information
-into a parameters dictionary that will be read by Admrial and used to launch RLlib.
+into a parameters dictionary that will be read by Admiral and used to launch RLlib.
 
 .. code-block:: python
 

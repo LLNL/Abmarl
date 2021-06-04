@@ -3,7 +3,7 @@
 Welcome to Admiral's documentation!
 ===================================
 
-Admiral is a package for developing agent based simulations and training them
+Admiral is a package for developing agent-based simulations and training them
 with multiagent reinforcement learning. We provide an intuitive command line
 interface for training, visualizing, and analyzing agent behavior. We define an
 :ref:`Agent Based Simulation Interface <abs>` and :ref:`Simulation Managers <sim-man>`,
