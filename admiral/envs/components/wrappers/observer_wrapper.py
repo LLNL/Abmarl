@@ -43,9 +43,8 @@ class PositionRestrictedObservationWrapper:
     agents (dict):
         Dictionary of agents.
     """
-    def __init__(
-            self, observers, obs_filter=obs_filter_step, obs_norm=np.inf, agents=None, **kwargs
-    ):
+    def __init__(self, observers, obs_filter=obs_filter_step, obs_norm=np.inf, agents=None,
+                 **kwargs):
         assert type(observers) is list, "observers must be in a list."
         self.observers = observers
         self._channel_observer_map = {observer.channel: observer for observer in self.observers}
