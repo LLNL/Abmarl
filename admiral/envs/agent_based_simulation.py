@@ -131,8 +131,7 @@ class Agent(ObservingAgent, ActingAgent):
 
 class AgentBasedSimulation(ABC):
     """
-    AgentBasedSimulation defines the interface that agent-based simulations will
-    implement.
+    AgentBasedSimulation interface.
 
     Under this design model the observations, rewards, and done conditions of the
     agents is treated as part of the environments internal state instead of as
@@ -147,9 +146,8 @@ class AgentBasedSimulation(ABC):
     @property
     def agents(self):
         """
-        A dictionary that maps the Agent's id to Agent object. An Agent object can hold
-        any property, but it must include an id, the action space, and the
-        observation space. A multi-agent environment is expected to have
+        A dict that maps the Agent's id to the Agent object. An Agent must be an
+        instance of PrincipleAgent. A multi-agent environment is expected to have
         multiple entries in the dictionary, whereas a single-agent environment
         should only have a single entry in the dictionary.
         """
@@ -158,12 +156,12 @@ class AgentBasedSimulation(ABC):
 
     @agents.setter
     def agents(self, value_agents):
-        assert type(value_agents) is dict, "Agents must be a dictionary."
+        assert type(value_agents) is dict, "Agents must be a dict."
         for agent_id, agent in value_agents.items():
             assert isinstance(agent, PrincipleAgent), \
-                "Values of agents dictionary must be of type Agent."
+                "Values of agents dict must be instance of PrincipleAgent."
             assert agent_id == agent.id, \
-                "Keys of the dictionary must be the same as the Agent's id."
+                "Keys of agents dict must be the same as the Agent's id."
         self._agents = value_agents
 
     def finalize(self):
