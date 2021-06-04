@@ -48,5 +48,5 @@ class Wrapper(AgentBasedSimulation):
         """
         try:
             return self.env.unwrapped
-        except AttributeError: # TODO: test to confirm that this is indeed an AttributeError
+        except AttributeError:
             return self.env

@@ -17,9 +17,6 @@ grid hunting the prey agents.
    Animation of predator and prey agents in a two-dimensional grid.
 
 .. ATTENTION::
-   TODO: Is it safe to have this .gif here when we go to pdf?
-
-.. ATTENTION::
    This tutorial requires seaborn for visualizing the resources. This can be easily
    added to your virtual environment with ``pip install seaborn``.
 

@@ -39,5 +39,5 @@ class MultiAgentWrapper(MultiAgentEnv):
         """
         try:
             return self.env.unwrapped
-        except AttributeError: # TODO: Confirm that this is really attribute error
+        except AttributeError:
             return self.env

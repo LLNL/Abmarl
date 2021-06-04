@@ -44,11 +44,6 @@ Admiral provides three interfaces for setting up an agent-based simulation envir
 Agent
 `````
 
-.. ATTENTION::
-   TODO: The link for Agent API is not very good because it is an organizational
-   class that inherits from Observing and Acting Agent. We should come up with a
-   better link/structure of the API.
-
 First, we have :ref:`Agents <api_agent>`. An agent is an object with an observation and
 action space. Many practitioners may be accustomed to gym.Env's interface, which
 defines the observation and action space for the *environment*. However, in heterogeneous

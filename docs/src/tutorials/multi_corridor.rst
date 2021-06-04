@@ -17,9 +17,6 @@ they all have the same action space, observation space, and objective function.
 
    Animation of agents moving left and right in a corridor until they reach the end.
 
-.. ATTENTION::
-   TODO: Is it safe to have this .gif here when we go to pdf?
-
 Creating the MultiCorridor Simulation
 -------------------------------------
 

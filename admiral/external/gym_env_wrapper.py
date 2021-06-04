@@ -48,5 +48,5 @@ class GymWrapper(GymEnv):
         """
         try:
             return self.env.unwrapped
-        except AttributeError: # TODO: confirm that this is really an attribute error
+        except AttributeError:
             return self.env
