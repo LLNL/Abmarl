@@ -68,10 +68,10 @@ def test_life_state():
         state.apply_entropy(agents['agent2'])
         state.apply_entropy(agents['agent3'])
 
-    assert agents['agent0'].is_alive is False
-    assert agents['agent1'].is_alive is False
-    assert agents['agent2'].is_alive is False
-    assert agents['agent3'].is_alive is False
+    assert not agents['agent0'].is_alive
+    assert not agents['agent1'].is_alive
+    assert not agents['agent2'].is_alive
+    assert not agents['agent3'].is_alive
 
     state.reset()
     assert agents['agent0'].min_health == 0.0

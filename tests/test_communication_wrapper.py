@@ -52,9 +52,9 @@ def test_communication_wrapper_reset():
     env = CommunicationHandshakeWrapper(CommsEnv())
     env.reset()
     for values in env.message_buffer.values():
-        assert all([True if val is False else False for val in values.values()])
+        assert all([True if not val else False for val in values.values()])
     for values in env.received_message.values():
-        assert all([True if val is False else False for val in values.values()])
+        assert all([True if not val else False for val in values.values()])
 
     for agent_id in env.agents:
         assert 'env_obs' in env.get_obs(agent_id)

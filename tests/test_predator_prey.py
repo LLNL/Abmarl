@@ -425,7 +425,7 @@ def test_step_grid_obs():
         [0., 0., 0., 0., 0.]
     ]))
     assert env.get_reward('predator0') == -10
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     np.testing.assert_array_equal(env.get_obs('prey1')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -438,7 +438,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.]
     ]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
     np.testing.assert_array_equal(env.get_obs('prey2')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -453,8 +453,8 @@ def test_step_grid_obs():
         [-1., -1., -1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]
     ]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     action = {
         'predator0': {'move': np.array([-1, 0]), 'attack': 0},
@@ -469,7 +469,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.],
         [ 0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     np.testing.assert_array_equal(env.get_obs('prey1')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -481,7 +481,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.],
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0., -1.]]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
     np.testing.assert_array_equal(env.get_obs('prey2')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -495,8 +495,8 @@ def test_step_grid_obs():
         [-1., -1., -1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
         [-1., -1., -1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('prey2') == -10
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     action = {
         'predator0': {'move': np.array([0,0]), 'attack': 0},
@@ -511,7 +511,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.],
         [ 0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('predator0') == 0
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     np.testing.assert_array_equal(env.get_obs('prey1')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -523,7 +523,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
     np.testing.assert_array_equal(env.get_obs('prey2')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -537,8 +537,8 @@ def test_step_grid_obs():
         [-1., -1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
         [-1., -1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     action = {
         'predator0': {'move': np.array([0, 1]), 'attack': 0},
@@ -553,7 +553,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  1.,  0.],
         [ 0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     np.testing.assert_array_equal(env.get_obs('prey1')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -565,7 +565,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
         [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
     np.testing.assert_array_equal(env.get_obs('prey2')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -579,8 +579,8 @@ def test_step_grid_obs():
         [-1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
         [-1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     action = {
         'predator0': {'move': np.zeros(2), 'attack': 1},
@@ -595,7 +595,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.],
         [ 0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('predator0') == 100
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     np.testing.assert_array_equal(env.get_obs('prey1')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -621,8 +621,8 @@ def test_step_grid_obs():
         [-1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],
         [-1., -1.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     action = {
         'predator0': {'move': np.zeros(2), 'attack': 1},
@@ -636,7 +636,7 @@ def test_step_grid_obs():
         [ 0.,  0.,  0.,  0.,  0.],
         [ 0.,  0.,  0.,  0.,  0.]]))
     assert env.get_reward('predator0') == 100
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     np.testing.assert_array_equal(env.get_obs('prey2')['agents'], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -689,18 +689,18 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('predator0')['prey1'], np.array([ 0, 0, 0]))
     np.testing.assert_array_equal(env.get_obs('predator0')['prey2'], np.array([-1, -1, 1]))
     assert env.get_reward('predator0') == -10
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
 
     np.testing.assert_array_equal(env.get_obs('prey1')['predator0'], np.array([ 2, -4, 2]))
     np.testing.assert_array_equal(env.get_obs('prey1')['prey2'], np.array([0, 0, 0]))
     assert env.get_reward('prey1') == -10
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
 
     np.testing.assert_array_equal(env.get_obs('prey2')['predator0'], np.array([ 1, 1, 2]))
     np.testing.assert_array_equal(env.get_obs('prey2')['prey1'], np.array([-1, 5, 1]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     action = {
@@ -713,18 +713,18 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('predator0')['prey1'], np.array([ 0, 0, 0]))
     np.testing.assert_array_equal(env.get_obs('predator0')['prey2'], np.array([0, 0, 1]))
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
 
     np.testing.assert_array_equal(env.get_obs('prey1')['predator0'], np.array([ 1, -3, 2]))
     np.testing.assert_array_equal(env.get_obs('prey1')['prey2'], np.array([1, -3, 1]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
 
     np.testing.assert_array_equal(env.get_obs('prey2')['predator0'], np.array([ 0, 0, 2]))
     np.testing.assert_array_equal(env.get_obs('prey2')['prey1'], np.array([-1, 3, 1]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     action = {
@@ -737,18 +737,18 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('predator0')['prey1'], np.array([-1, 2, 1]))
     np.testing.assert_array_equal(env.get_obs('predator0')['prey2'], np.array([0, 1, 1]))
     assert env.get_reward('predator0') == 0
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
 
     np.testing.assert_array_equal(env.get_obs('prey1')['predator0'], np.array([ 1, -2, 2]))
     np.testing.assert_array_equal(env.get_obs('prey1')['prey2'], np.array([1, -1, 1]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
 
     np.testing.assert_array_equal(env.get_obs('prey2')['predator0'], np.array([ 0, -1, 2]))
     np.testing.assert_array_equal(env.get_obs('prey2')['prey1'], np.array([-1, 1, 1]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     action = {
@@ -761,18 +761,18 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('predator0')['prey1'], np.array([-1, 0, 1]))
     np.testing.assert_array_equal(env.get_obs('predator0')['prey2'], np.array([-1, 0, 1]))
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
 
     np.testing.assert_array_equal(env.get_obs('prey1')['predator0'], np.array([ 1, 0, 2]))
     np.testing.assert_array_equal(env.get_obs('prey1')['prey2'], np.array([0, 0, 1]))
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') is False
+    assert not env.get_done('prey1')
 
     np.testing.assert_array_equal(env.get_obs('prey2')['predator0'], np.array([1, 0, 2]))
     np.testing.assert_array_equal(env.get_obs('prey2')['prey1'], np.array([0,0,1]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     action = {
@@ -785,7 +785,7 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('predator0')['prey1'], np.array([0, 0, 0]))
     np.testing.assert_array_equal(env.get_obs('predator0')['prey2'], np.array([-1, -1, 1]))
     assert env.get_reward('predator0') == 100
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
 
     np.testing.assert_array_equal(env.get_obs('prey1')['predator0'], np.array([ 1, 0, 2]))
     np.testing.assert_array_equal(env.get_obs('prey1')['prey2'], np.array([0, -1, 1]))
@@ -795,8 +795,8 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('prey2')['predator0'], np.array([1, 1, 2]))
     np.testing.assert_array_equal(env.get_obs('prey2')['prey1'], np.array([0,0,0]))
     assert env.get_reward('prey2') == -1
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     action = {
@@ -808,7 +808,7 @@ def test_step_distance_obs():
     np.testing.assert_array_equal(env.get_obs('predator0')['prey1'], np.array([0, 0, 0]))
     np.testing.assert_array_equal(env.get_obs('predator0')['prey2'], np.array([0, 0, 0]))
     assert env.get_reward('predator0') == 100
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
 
     np.testing.assert_array_equal(env.get_obs('prey2')['predator0'], np.array([1, 1, 2]))
     np.testing.assert_array_equal(env.get_obs('prey2')['prey1'], np.array([0,0,0]))
@@ -846,11 +846,11 @@ def test_attack_distances():
     assert env.get_reward('prey0') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.EATEN]
     assert env.get_reward('prey1') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.NO_MOVE]
     assert env.get_reward('prey2') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.NO_MOVE]
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     assert env.get_done('prey0')
-    assert env.get_done('prey1') is False
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey1')
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     del action_dict['prey0']
     env.step(action_dict)
@@ -858,10 +858,10 @@ def test_attack_distances():
         env.reward_map['predator'][PredatorPreyEnv.ActionStatus.BAD_ATTACK]
     assert env.get_reward('prey1') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.NO_MOVE]
     assert env.get_reward('prey2') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.NO_MOVE]
-    assert env.get_done('predator0') is False
-    assert env.get_done('prey1') is False
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('predator0')
+    assert not env.get_done('prey1')
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     env.agents['predator0'].attack = 1
@@ -871,19 +871,19 @@ def test_attack_distances():
         env.reward_map['predator'][PredatorPreyEnv.ActionStatus.GOOD_ATTACK]
     assert env.get_reward('prey1') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.EATEN]
     assert env.get_reward('prey2') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.NO_MOVE]
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     assert env.get_done('prey1')
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
     del action_dict['prey1']
     env.step(action_dict)
     assert env.get_reward('predator0') == \
         env.reward_map['predator'][PredatorPreyEnv.ActionStatus.BAD_ATTACK]
     assert env.get_reward('prey2') == env.reward_map['prey'][PredatorPreyEnv.ActionStatus.NO_MOVE]
-    assert env.get_done('predator0') is False
-    assert env.get_done('prey2') is False
-    assert env.get_all_done() is False
+    assert not env.get_done('predator0')
+    assert not env.get_done('prey2')
+    assert not env.get_all_done()
 
 
     env.agents['predator0'].attack = 2
@@ -892,7 +892,7 @@ def test_attack_distances():
         env.reward_map['predator'][PredatorPreyEnv.ActionStatus.GOOD_ATTACK]
     assert env.get_reward('prey2') == \
         env.reward_map['prey'][PredatorPreyEnv.ActionStatus.EATEN]
-    assert env.get_done('predator0') is False
+    assert not env.get_done('predator0')
     assert env.get_done('prey2')
     assert env.get_all_done()
 

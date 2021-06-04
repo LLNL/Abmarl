@@ -16,19 +16,19 @@ def test_dead_done_condition():
     done = DeadDone(agents=agents)
     state.reset()
 
-    assert done.get_done(agents['agent0']) is False
-    assert done.get_done(agents['agent1']) is False
-    assert done.get_done(agents['agent2']) is False
-    assert done.get_done(agents['agent3']) is False
-    assert done.get_all_done() is False
+    assert not done.get_done(agents['agent0'])
+    assert not done.get_done(agents['agent1'])
+    assert not done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_all_done()
 
     agents['agent0'].is_alive = False
     agents['agent1'].is_alive = False
     assert done.get_done(agents['agent0'])
     assert done.get_done(agents['agent1'])
-    assert done.get_done(agents['agent2']) is False
-    assert done.get_done(agents['agent3']) is False
-    assert done.get_all_done() is False
+    assert not done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_all_done()
 
     agents['agent2'].is_alive = False
     agents['agent3'].is_alive = False

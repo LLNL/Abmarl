@@ -103,7 +103,7 @@ def test_random_first_action_policy_act():
 
     policy.reset()
     policy.act(1)
-    assert policy.take_random_action is False
+    assert not policy.take_random_action
     action = policy.act(2)
     assert action == np.argmax(policy.q_table[2])
 

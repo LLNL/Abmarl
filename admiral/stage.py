@@ -135,7 +135,7 @@ def run_visualize(full_trained_directory, parameters):
         if parameters.record:
             anim.save(os.path.join(full_trained_directory, 'Episode_{}.mp4'.format(episode)))
         plt.show(block=False)
-        while all_done is False:
+        while not all_done:
             plt.pause(1)
 
     _finish()
