@@ -5,9 +5,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ main, admiral-107-sphinx-docs ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, admiral-107-sphinx-docs ]
+    branches: [ main ]
 
 jobs:
   build:
