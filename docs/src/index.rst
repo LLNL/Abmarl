@@ -19,7 +19,7 @@ for pre-existing projects to prototype RL as a potential solution.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Site Map
+   :caption: Contents
 
    overview
    highlights
