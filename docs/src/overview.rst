@@ -99,7 +99,7 @@ An Agent Based Simulation can be created and used like so:
    # See the reward for agent3
    print(env.get_reward('agent3'))
 
-.. IMPORTANT::
+.. WARNING::
    Implementations of AgentBasedSimulation should call ``finalize`` at the
    end of its ``__init__``. Finalize ensures that all agents are configured and
    ready to be used for training.
