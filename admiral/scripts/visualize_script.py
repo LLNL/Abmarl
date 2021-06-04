@@ -22,6 +22,7 @@ def create_parser(subparsers):
     visualize_parser.add_argument(
         '--no-explore', action='store_false', help='Turn off exploration in the action policy.'
     )
+    visualize_parser.add_argument('--seed', type=int, help='Seed for reproducibility.')
     return visualize_parser
 
 

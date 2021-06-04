@@ -10,6 +10,7 @@ def create_parser(subparsers):
         '-c', '--checkpoint', type=int,
         help='Specify which checkpoint to load. Default is the last timestep in the directory.'
     )
+    analyze_parser.add_argument('--seed', type=int, help='Seed for reproducibility.')
     return analyze_parser
 
 
