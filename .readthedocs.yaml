@@ -4,11 +4,11 @@
 
 version: 2
 
-# Optionally build your docs in additional formats such as PDF
+# Build docs in pdf format as well
 formats:
   - pdf
 
-# Optionally set the version of Python and requirements required to build your docs
+# Set the version of Python and requirements
 python:
   version: 3.7
   install:
@@ -21,4 +21,3 @@ python:
 sphinx:
   builder: html
   configuration: docs/src/conf.py
-  # fail_on_warning: true
