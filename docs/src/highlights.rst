@@ -60,7 +60,7 @@ clips showing how the agent behaves when it can see resources.
 
 .. figure:: .images/single_agent_exploit.gif
    :width: 100 %
-   :alt: Video showing the foragers behavior when it observes resources.
+   :alt: Video showing the forager's behavior when it observes resources.
 
    The forager learns an effective foraging strategy, moving towards and foraging
    the nearest resources that it observes.
@@ -78,18 +78,75 @@ the middle of the map.
 
 .. figure:: .images/single_agent_explore.gif
    :width: 100 %
-   :alt: Video showing the foragers behavior when it does not observe resources.
+   :alt: Video showing the forager's behavior when it does not observe resources.
 
    The forager learns an effective exploration policy: it moves along the edge
    of the map in a clockwise direction.
 
+.. IMPORTANT::
+   We do not use any kind of heuristic or mixed policy. The exporation is behavior
+   that *emerges* entirely from reinforcement learning.
+
 Multiple Agents Foraging
 ````````````````````````
 Having experimented with what a single forager can learn, we turn our attention
-to the behaviors learned by multiple foragers.....
+to the behaviors learned by multiple foragers interacting in the map at the same
+time. Each forager is homogeneous with each other as described above: they can
+all move up to one square away, observe up to three squares away, and are rewarded
+the same way. The observations include other foragers in addition to the resources
+and map edges. All agents train a single policy. Below is a brief analysis of the
+learned behaviors.
 
+Cover and explore
+'''''''''''''''''
+Our reward schema implicity encourages the agents to collaborate because we give
+a small penalty to each agent for taking too long. Thus, the faster the agents
+can collect all the resources, the less they are penalized. Furthermore, because each
+agent trains the same policy, there is no incentive for competitive behavior. An
+agent can afford to say, "I don't need to get the resource first. As long as one
+of us gets it quickly, then we all benefit". Therefore, the foragers learn to spread
+out to *cover* the space.
 
-Highlight: Agents learn to spread out to effectively cover to map.
+In the video clips below, we see that the foragers avoid being within observation
+distance of one another. Typically, when two foragers get too close, they repel
+each other, each moving in opposite directions, ensuring that the space is *covered*.
+Furthermore, notice the dance-like exploration policy that these foragers learn.
+Similar to the single-agent case above, the foragers learn to *explore* along the
+edges of the map in a clockwise direction. However, they're not as efficient as
+the single agent because they "repel" each other.
+
+.. figure:: .images/multi_agent_spread.gif
+   :width: 100 %
+   :alt: Video showing how the foragers spread out.
+
+   The foragers cover the map by spreading out and explore it by traveling in a
+   clockwise direction.
+
+.. IMPORTANT::
+   We do not directly incentivize agents to keep their distance. No part of the
+   reward schema directly deals with the agents' distances from each other. These
+   learned behaviors are *emergent*.
+
+Breaking the pattern
+''''''''''''''''''''
+When a forager observes a resource, it breaks its "cover and explore" behavior and
+moves directly for the resource. Even multiple foragers move towards the same resource.
+They have no reason to coordinate who will get it because, as we stated above,
+there is no incentive for competition, so no need to negotiate. If another forager
+gets there first, everyone benefits. The foragers learn to prioritize collecting
+the resources over keeping their distance from each other.
+
+.. figure:: .images/multi_agent_forage.gif
+   :width: 100 %
+   :alt: Video showing how the foragers move towards resources.
+
+   The foragers move towards resources to forage, even when there are other foragers
+   nearby.
+
+.. Tip::
+   We should expect to see a mixture of these "behavioral regimes" occuring at
+   the same time within a simulation because while some agents are "covering and
+   exploring", others are moving towards resources.
 
 Introducing Hunters
 ```````````````````
