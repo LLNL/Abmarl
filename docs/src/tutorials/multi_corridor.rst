@@ -5,7 +5,7 @@
 MultiCorridor
 =============
 
-MultiCorridor is derived from RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
+MultiCorridor extends RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
 wherein agents must learn to move to the right in a one-dimensonal corridor to reach the end.
 Our implementation provides the ability to instantiate multiple agents in the simulation
 and restricts agents from occupying the same square. Every agent is homogeneous:
