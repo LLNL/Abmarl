@@ -4,14 +4,6 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Path setup --------------------------------------------------------------
-
-# Need to add admiral root to the system path so that we can autodoc the modules.
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('../..'))
-# import admiral
-
 from sphinx.builders.html import StandaloneHTMLBuilder
 
 # -- Project information -----------------------------------------------------
@@ -56,6 +48,12 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
+# This allows us to dynamically pick between gif and png images based on the build.
+# For example, when we have something like:
+# .. image:: that_directory/this_image.*
+# Then the build will look for the image in that_directory in the following
+# order. Because html supports gif, it will grab the gif image before the png,
+# whereas because pdf does not support gif, it will grab the png.
 StandaloneHTMLBuilder.supported_image_types = [
     'image/svg+xml',
     'image/gif',
