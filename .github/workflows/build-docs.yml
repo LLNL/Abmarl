@@ -22,11 +22,9 @@ jobs:
     - name: Install documentation dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install sphinx
-        pip install sphinx-rtd-theme
+        pip install sphinx sphinx-rtd-theme
         pip install -r docs/requirements.txt
     - name: Install Admiral
-      run: |
-        pip install .
+      run: pip install .
     - name: Build docs
       run: cd docs/ ; make html
