@@ -1,4 +1,3 @@
-
 def mscatter(x, y, ax=None, m=None, **kw):
     """
     Scatter plot with markers m assigned to each element.

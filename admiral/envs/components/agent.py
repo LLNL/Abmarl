@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from admiral.envs import PrincipleAgent, ActingAgent, ObservingAgent

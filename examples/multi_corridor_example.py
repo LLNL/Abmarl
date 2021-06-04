@@ -1,4 +1,3 @@
-
 from admiral.envs.corridor import MultiCorridor
 from admiral.managers import TurnBasedManager
 from admiral.external import MultiAgentWrapper
