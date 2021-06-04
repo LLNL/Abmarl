@@ -45,7 +45,8 @@ class SimulationManager(ABC):
             actions we expect to receive next.
 
             Note: We do not necessarily return anything for the agent whose actions
-            we just received in this time-step.
+            we just received in this time-step. This behavior is defined by each
+            Manager.
         """
         pass
 
