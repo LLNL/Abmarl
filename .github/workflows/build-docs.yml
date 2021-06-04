@@ -26,5 +26,7 @@ jobs:
         pip install -r docs/requirements.txt
     - name: Install Admiral
       run: pip install .
-    - name: Build docs
+    - name: Build docs html
       run: cd docs/ ; make html
+    - name: Build docs pdf
+      run: cd docs/ ; make latexpdf
