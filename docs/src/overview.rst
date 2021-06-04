@@ -286,9 +286,6 @@ following function:
        # Do whatever you want with the environment and the trained policies.
        ...
 
-.. ATTENTION::
-   Is it possible to add the subscript to the API?
-
 Analysis can then be performed using the command line interface:
 
 .. code-block::
