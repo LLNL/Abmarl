@@ -1,8 +1,8 @@
 # Minimal makefile for Sphinx documentation
 #
 
-# You can set these variables from the command line, and also
-# from the environment for the first two.
+# -W and --keep-going will treat warning like errors and capture all warnings.
+# -n will raise warning about missing references in the docs.
 SPHINXOPTS    ?= -W --keep-going -n
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = src
