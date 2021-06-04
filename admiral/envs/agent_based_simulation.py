@@ -1,37 +1,30 @@
-
 from abc import ABC, abstractmethod
 
-from gym.spaces import Space
 from admiral.tools import gym_utils as gu
+
 
 class PrincipleAgent:
     """
-    Principle Agent class for agents that live in an environment. All agents require
-    a string id.
-
-    id (str):
-        The agent's id.
-
-    seed (int):
-        Seed this agent's rng. Default value is None.
+    Principle Agent class for agents in a simulation.
     """
     def __init__(self, id=None, seed=None, **kwargs):
         self.id = id
         self.seed = seed
-    
+
     @property
     def id(self):
         return self._id
-    
+
     @id.setter
     def id(self, value):
         assert type(value) is str, "id must be a string."
         self._id = value
-    
+
     @property
     def seed(self):
+        """Seed for random number generation."""
         return self._seed
-    
+
     @seed.setter
     def seed(self, value):
         assert value is None or type(value) is int, "Seed must be an integer."
@@ -40,39 +33,45 @@ class PrincipleAgent:
     @property
     def configured(self):
         """
-        Determine if the agent has been successfully configured.
+        All agents must have an id.
         """
         return self.id is not None
-    
+
     def finalize(self, **kwargs):
         pass
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__ if isinstance(other, self.__class__) else False
 
+
 class ActingAgent(PrincipleAgent):
     """
-    ActingAgents are Agents that are expected to produce actions and therefore
-    should have an action space in order to be successfully configured.
+    ActingAgents can act in the simulation.
+
+    The Trainer will produce actions for the agents and send them to the SimulationManager,
+    which will process those actions in its step function.
     """
     def __init__(self, action_space=None, **kwargs):
         super().__init__(**kwargs)
         self.action_space = action_space
-    
+
     @property
     def action_space(self):
         return self._action_space
-    
+
     @action_space.setter
     def action_space(self, value):
         assert value is None or gu.check_space(value), \
             "The action space must be None, a gym Space, or a dict of gym Spaces."
         self._action_space = {} if value is None else value
-    
+
     @property
     def configured(self):
+        """
+        Acting agents must have an action space.
+        """
         return super().configured and gu.check_space(self.action_space, strict=True)
-            
+
     def finalize(self, **kwargs):
         """
         Wrap all the action spaces with a Dict if applicable and seed it if the agent was
@@ -83,10 +82,13 @@ class ActingAgent(PrincipleAgent):
             self.action_space = gu.make_dict(self.action_space)
         self.action_space.seed(self.seed)
 
+
 class ObservingAgent(PrincipleAgent):
     """
-    ObservingAgents are Agents that are expected to receive observations and therefore
-    should have an observation space in order to be successfully configured.
+    ObservingAgents can observe the state of the simulation.
+
+    The agent's observation must be *in* its observation space. The SimulationManager
+    will send the observation to the Trainer, which will use it to produce actions.
     """
     def __init__(self, observation_space=None, **kwargs):
         super().__init__(**kwargs)
@@ -95,15 +97,18 @@ class ObservingAgent(PrincipleAgent):
     @property
     def observation_space(self):
         return self._observation_space
-    
+
     @observation_space.setter
     def observation_space(self, value):
         assert value is None or gu.check_space(value), \
             "The observation space must be None, a gym Space, or a dict of gym Spaces."
         self._observation_space = {} if value is None else value
-    
+
     @property
     def configured(self):
+        """
+        Observing agents must have an observation space.
+        """
         return super().configured and gu.check_space(self.observation_space, strict=True)
 
     def finalize(self, **kwargs):
@@ -116,61 +121,47 @@ class ObservingAgent(PrincipleAgent):
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
+
 class Agent(ObservingAgent, ActingAgent):
     """
-    An Agent can observe and act.
+    An Agent that can both observe and act.
     """
     pass
 
 
-
 class AgentBasedSimulation(ABC):
     """
-    AgentBasedSimulation defines the interface that agent-based simulations will
-    implement. The interface defines the following API:
-        agents: dict
-            A dictionary that maps the Agent's id to Agent object. An Agent object can hold
-            any property, but it must include an id, the action space, and the
-            observation space. A multi-agent environment is expected to have
-            multiple entries in the dictionary, whereas a single-agent environment
-            should only have a single entry in the dictionary.
-        reset()
-            Reset the simulation environment to a start state, which may be randomly
-            generated.
-        step(action: dict)
-            Step the environment forward one discrete time-step. The action is a dictionary that
-            contains the action of each agent in this time-step.
-        render
-            Render the enviroment for visualization.
-        get_obs(agent_id) -> obj
-            Get the observation of the respective agent.
-        get_reward(agent_id) -> double
-            Get the reward for the respective agent.
-        get_done(agent_id) -> bool
-            Get the done status of the respective agent.
-        get_all_done() -> bool
-            Get the done status for all the agents and/or the environment.
-        get_info(agent_id) -> dict
-            Get additional information that can be used for analysis or debugging.
+    AgentBasedSimulation interface.
+
     Under this design model the observations, rewards, and done conditions of the
     agents is treated as part of the environments internal state instead of as
     output from reset and step. Thus, it is the environments responsibility to manage
     rewards and dones as part of its state (e.g. via self.rewards dictionary).
-    
+
     This interface supports both single- and multi-agent environments by treating
     the single-agent environment as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
     """
+
     @property
     def agents(self):
+        """
+        A dict that maps the Agent's id to the Agent object. An Agent must be an
+        instance of PrincipleAgent. A multi-agent environment is expected to have
+        multiple entries in the dictionary, whereas a single-agent environment
+        should only have a single entry in the dictionary.
+        """
+
         return self._agents
 
     @agents.setter
     def agents(self, value_agents):
-        assert type(value_agents) is dict, "Agents must be a dictionary."
+        assert type(value_agents) is dict, "Agents must be a dict."
         for agent_id, agent in value_agents.items():
-            assert isinstance(agent, PrincipleAgent), "Values of agents dictionary must be of type Agent."
-            assert agent_id == agent.id, "Keys of the dictionary must be the same as the Agent's id."
+            assert isinstance(agent, PrincipleAgent), \
+                "Values of agents dict must be instance of PrincipleAgent."
+            assert agent_id == agent.id, \
+                "Keys of agents dict must be the same as the Agent's id."
         self._agents = value_agents
 
     def finalize(self):
@@ -182,11 +173,12 @@ class AgentBasedSimulation(ABC):
         for agent in self.agents.values():
             agent.finalize()
             assert agent.configured
-    
+
     @abstractmethod
     def reset(self, **kwargs):
         """
-        Reset the simulation environment.
+        Reset the simulation environment to a start state, which may be randomly
+        generated.
         """
         pass
 
@@ -204,35 +196,35 @@ class AgentBasedSimulation(ABC):
         Render the environment for vizualization.
         """
         pass
-    
+
     @abstractmethod
     def get_obs(self, agent_id, **kwargs):
         """
         Return the agent's observation.
         """
         pass
-    
+
     @abstractmethod
     def get_reward(self, agent_id, **kwargs):
         """
         Return the agent's reward.
         """
         pass
-    
+
     @abstractmethod
     def get_done(self, agent_id, **kwargs):
         """
         Return the agent's done status.
         """
         pass
-    
+
     @abstractmethod
     def get_all_done(self, **kwargs):
         """
         Return the environment's done status.
         """
         pass
-    
+
     @abstractmethod
     def get_info(self, agent_id, **kwargs):
         """

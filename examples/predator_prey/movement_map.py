@@ -1,4 +1,3 @@
-
 def run(env, agent):
     import numpy as np
     import seaborn as sns
@@ -32,13 +31,13 @@ def run(env, agent):
                 attack[pox, poy] += 1
             if done['__all__']:
                 break
-    
+
     plt.figure(1)
     plt.title("Position concentration")
-    ax = sns.heatmap(np.flipud(np.transpose(grid)), linewidth=0.5)
+    sns.heatmap(np.flipud(np.transpose(grid)), linewidth=0.5)
 
     plt.figure(2)
     plt.title("Attack action frequency")
-    ax = sns.heatmap(np.flipud(np.transpose(attack)), linewidth=0.5)
+    sns.heatmap(np.flipud(np.transpose(attack)), linewidth=0.5)
 
     plt.show()

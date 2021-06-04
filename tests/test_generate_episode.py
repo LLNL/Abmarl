@@ -1,24 +1,26 @@
-
 from admiral.algs.generate_episode import generate_episode
+
 
 class Env:
     def reset(self):
         self.count = 0
         return self.count
-    
+
     def step(self, action):
         self.count = action
         done = True if abs(self.count) > 100 else False
         return self.count, action, done, {}
 
+
 class Policy:
     def reset(self):
         self.first_guess = True
-    
+
     def act(self, obs):
         action = obs + 1 if self.first_guess else -2 * obs
         self.first_guess = False
         return action
+
 
 def test_generate_episode():
     states, actions, rewards = generate_episode(Env(), Policy())

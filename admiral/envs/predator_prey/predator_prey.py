@@ -1,11 +1,12 @@
-
 from abc import ABC, abstractmethod
+from enum import IntEnum
 
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
 from admiral.envs import PrincipleAgent
 from admiral.envs import AgentBasedSimulation
+
 
 class PredatorPreyAgent(PrincipleAgent, ABC):
     """
@@ -37,6 +38,7 @@ class PredatorPreyAgent(PrincipleAgent, ABC):
         else:
             return False
 
+
 class Prey(PredatorPreyAgent):
     """
     In addition to the shared parameters, Prey must have the following property:
@@ -57,13 +59,14 @@ class Prey(PredatorPreyAgent):
             return True
         else:
             return False
-    
+
     @property
     def value(self):
         """
         The enumerated value of this agent is 1.
         """
         return 1
+
 
 class Predator(PredatorPreyAgent):
     """
@@ -87,13 +90,14 @@ class Predator(PredatorPreyAgent):
             return True
         else:
             return False
-    
+
     @property
     def value(self):
         """
         The enumerated value of this agent is 1.
         """
         return 2
+
 
 class PredatorPreyEnv(AgentBasedSimulation):
     """
@@ -105,7 +109,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
     it has smart config checking for the environment and will create agents that are configured to
     work with the environment.
     """
-    from enum import IntEnum
+
     class ObservationMode(IntEnum):
         GRID = 0
         DISTANCE = 1
@@ -141,7 +145,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         # appear in other agents' observations and they don't have observations
         # of their own, except for the one step in which they died.
         self.cemetery = set()
-        
+
         # Track the agents' rewards over multiple steps.
         self.rewards = {agent_id: 0 for agent_id in self.agents}
 
@@ -172,13 +176,13 @@ class PredatorPreyEnv(AgentBasedSimulation):
             else:
                 action_status = self._process_move_action(predator, action['move'])
             self.rewards[predator_id] = self.reward_map['predator'][action_status]
-        
+
         # The prey are processed differently for Grid and Distance modes because
         # grid mode supports resources on the grid.
 
     def get_reward(self, agent_id, **kwargs):
         return self.rewards[agent_id]
-    
+
     def get_done(self, agent_id, **kwargs):
         """
         Agent is done if it is not alive or in the morgue.
@@ -187,7 +191,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
             return True
         else:
             return False
-    
+
     def get_all_done(self, **kwargs):
         """
         If there are no prey left, the environment is done.
@@ -198,14 +202,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
             if type(agent) == Prey and agent.id not in self.cemetery:
                 return False
         return True
-    
+
     def get_info(self, agent_id, **kwargs):
         """
         Just return an empty dictionary becuase this environment does not track
         any info.
         """
         return {}
-    
+
     def _process_move_action(self, agent, action):
         """
         The environment will attempt to move the agent according to its action.
@@ -220,14 +224,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
         if all(action == [0, 0]):
             return self.ActionStatus.NO_MOVE
         elif 0 <= agent.position[0] + action[0] < self.region and \
-           0 <= agent.position[1] + action[1] < self.region: # Still inside the boundary, good move
-            # agent.position += action
+                0 <= agent.position[1] + action[1] < self.region:
+            # Still inside the boundary, good move
             agent.position[0] += action[0]
             agent.position[1] += action[1]
             return self.ActionStatus.GOOD_MOVE
         else:
             return self.ActionStatus.BAD_MOVE
-    
+
     def _process_attack_action(self, predator):
         """
         The environment will process the predator's attack action. If that attack
@@ -241,12 +245,13 @@ class PredatorPreyEnv(AgentBasedSimulation):
             if type(prey) == Predator: continue # Not a prey
             if prey.id in self.cemetery: continue # Ignore already dead agents
             if abs(predator.position[0] - prey.position[0]) <= predator.attack \
-                    and abs(predator.position[1] - prey.position[1]) <= predator.attack: # Good attack, prey is eaten:
+                    and abs(predator.position[1] - prey.position[1]) <= predator.attack:
+                # Good attack, prey is eaten:
                 self.cemetery.add(prey.id)
                 self.rewards[prey.id] += self.reward_map['prey'][self.ActionStatus.EATEN]
                 return self.ActionStatus.GOOD_ATTACK
         return self.ActionStatus.BAD_ATTACK
-    
+
     def _process_harvest_action(self, prey):
         """
         The environment will process the prey's harvest action by calling the resources
@@ -278,14 +283,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
             The maximum number of steps per episode.
             Must be >= 1.
             Default 200.
-        
+
         observation_mode: ObservationMode enum
             Either GRID or DISTANCE. In GRID, the agents see a grid of values around them as
             large as their view. In DISTANCE, the agents see the distance between themselves and
             other agents that they can see. Note: communication only works with
             DISTANCE observation mode.
             Default GRID.
-        
+
         rewards: dict
             A dictionary that maps the various action status to a reward per each
             agent type. Any agent type that you create must have mappings for all
@@ -318,12 +323,11 @@ class PredatorPreyEnv(AgentBasedSimulation):
                     Predator(id='predator3', view=2, move=2, attack=1),
                     Predator(id='predator4', view=0, attack=3)
                 ]
-        
+
         Returns:
         --------
         Configured instance of PredatorPreyEnv with configured PredatorPreyAgents.
         """
-        import warnings
         config = {  # default config
             'region': 10,
             'max_steps': 200,
@@ -343,7 +347,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
         # Assign this here because we must use the right size of the region.
         config['agents'] = [
-            Prey(    id='prey0',     view=config['region']-1, move=1, harvest_amount=0.1),
+            Prey(id='prey0', view=config['region']-1, move=1, harvest_amount=0.1),
             Predator(id='predator0', view=config['region']-1, move=1, attack=0)
         ]
         # Assign this here so that we can coordinate rewards with region size.
@@ -380,7 +384,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
                 raise TypeError("observation_mode must be either GRID or DISTANCE.")
             else:
                 config['observation_mode'] = observation_mode
-        
+
         # --- rewards --- #
         if 'rewards' in env_config:
             rewards = env_config['rewards']
@@ -400,9 +404,11 @@ class PredatorPreyEnv(AgentBasedSimulation):
         if 'agents' in env_config:
             agents = env_config['agents']
             if type(agents) is not list:
-                raise TypeError("agents must be a list of PredatorPreyAgent objects. " + \
-                    "Each element in the list is an agent's configuration. See " + \
-                    "PredatorPreyAgent docstring for more information.")
+                raise TypeError(
+                    "agents must be a list of PredatorPreyAgent objects. "
+                    "Each element in the list is an agent's configuration. See "
+                    "PredatorPreyAgent docstring for more information."
+                )
             else:
                 for agent in agents:
                     if not isinstance(agent, PredatorPreyAgent):
@@ -410,43 +416,49 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
                     if agent.view is None:
                         agent.view = config['region'] - 1
-                    elif type(agent.view) is not int or \
-                        agent.view < 0 or \
-                        agent.view > config['region'] -1:
-                        raise TypeError(agent['id'] + " must have a view that is an integer " + \
-                            "between 0 and " + str(config['region'] - 1))
-                    
+                    elif type(agent.view) is not int or agent.view < 0 or \
+                            agent.view > config['region'] - 1:
+                        raise TypeError(
+                            f"{agent['id']} must have a view that is an integer "
+                            f"between 0 and {config['region'] - 1}"
+                        )
+
                     if agent.move is None:
                         agent.move = 1
-                    elif type(agent.move) is not int or \
-                        agent.move < 0 or \
-                        agent.move > config['region'] - 1:
-                        raise TypeError(agent['id'] + " must have a move that is an integer " + \
-                            "between 0 and " + str(config['region'] - 1))
-                    
+                    elif type(agent.move) is not int or agent.move < 0 or \
+                            agent.move > config['region'] - 1:
+                        raise TypeError(
+                            f"{agent['id']} must have a move that is an integer "
+                            f"between 0 and {config['region'] - 1}"
+                        )
+
                     if type(agent) is Predator:
                         if agent.attack is None:
                             agent.attack = 0
-                        elif type(agent.attack) is not int or \
-                            agent.attack < 0 or \
-                            agent.attack > config['region']:
-                            raise TypeError(agent['id'] + " must have an attack that is an integer " + \
-                                "between 0 and " + str(config['region']))
-                    
+                        elif type(agent.attack) is not int or agent.attack < 0 or \
+                                agent.attack > config['region']:
+                            raise TypeError(
+                                f"{agent['id']} must have an attack that is an integer "
+                                f"between 0 and {config['region']}"
+                            )
+
                     if type(agent) is Prey:
                         if agent.harvest_amount is None:
                             agent.harvest_amount = 0.4
-                        elif type(agent.harvest_amount) is not float or \
-                            agent.harvest_amount < 0:
-                            raise TypeError(agent['id'] + " must have a harvest amount that is a float " + \
-                                "greater than 0.")
+                        elif type(agent.harvest_amount) is not float or agent.harvest_amount < 0:
+                            raise TypeError(
+                                f"{agent['id']} must have a harvest amount that is a float "
+                                "greater than 0."
+                            )
 
                 config['agents'] = agents
 
         if config['observation_mode'] == cls.ObservationMode.GRID:
             obs_space_builder = lambda agent: Dict({
                 'agents': Box(-1, 2, (2*agent.view+1, 2*agent.view+1), np.int),
-                'resources': Box(-1., config['resources'].max_value, (2*agent.view+1, 2*agent.view+1), np.float)
+                'resources': Box(
+                    -1., config['resources'].max_value, (2*agent.view+1, 2*agent.view+1), np.float
+                )
             })
             prey_action_space_builder = lambda agent: Dict({
                 'harvest': Discrete(2),
@@ -476,6 +488,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
         else:
             return PredatorPreyEnvDistanceObs(config)
 
+
 class PredatorPreyEnvGridObs(PredatorPreyEnv):
     """
     PredatorPreyEnv where observations are of the grid and the items/agents on
@@ -484,11 +497,11 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
     def __init__(self, config):
         super().__init__(config)
         self.resources = config['resources']
-    
+
     def reset(self, **kwargs):
         super().reset(**kwargs)
         self.resources.reset(**kwargs)
-    
+
     def step(self, joint_actions, **kwargs):
         super().step(joint_actions, **kwargs)
 
@@ -502,7 +515,7 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
             else:
                 action_status = self._process_move_action(prey, action['move'])
             self.rewards[prey_id] = self.reward_map['prey'][action_status]
-        
+
         # Now process the other pieces of the environment
         self.resources.regrow()
 
@@ -522,14 +535,26 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
         fig.clear()
         ax = self.resources.render(fig=fig)
 
-        prey_x = [agent.position[1] + 0.5 for agent in self.agents.values() if type(agent) == Prey and agent.id not in self.cemetery]
-        prey_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values() if type(agent) == Prey and agent.id not in self.cemetery]
-        ax.scatter(prey_x, prey_y, marker='s', s=200,  edgecolor='black', facecolor='gray')
+        prey_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values()
+            if type(agent) == Prey and agent.id not in self.cemetery
+        ]
+        prey_y = [
+            self.region - 0.5 - agent.position[0] for agent in self.agents.values()
+            if type(agent) == Prey and agent.id not in self.cemetery
+        ]
+        ax.scatter(prey_x, prey_y, marker='s', s=200, edgecolor='black', facecolor='gray')
 
-        predator_x = [agent.position[1] + 0.5 for agent in self.agents.values() if type(agent) == Predator and agent.id not in self.cemetery]
-        predator_y = [self.region - 0.5 - agent.position[0] for agent in self.agents.values() if type(agent) == Predator and agent.id not in self.cemetery]
+        predator_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values()
+            if type(agent) == Predator and agent.id not in self.cemetery
+        ]
+        predator_y = [
+            self.region - 0.5 - agent.position[0] for agent in self.agents.values()
+            if type(agent) == Predator and agent.id not in self.cemetery
+        ]
         ax.scatter(predator_x, predator_y, s=200, marker='o', edgecolor='black', facecolor='gray')
-    
+
         if draw_now:
             plt.plot()
             plt.pause(1e-17)
@@ -546,7 +571,7 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
             'agents': self._observe_other_agents(my_id, **kwargs),
             'resources': self._observe_resources(my_id, **kwargs),
         }
-    
+
     def _observe_other_agents(self, my_id, **kwargs):
         """
         These cells are filled with the value of the agent's type, including -1
@@ -566,7 +591,7 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
         if my_agent.view - my_agent.position[1] >= 0: # Left end
             signal[:, 0:my_agent.view - my_agent.position[1]] = -1
         if self.region - my_agent.position[0] - my_agent.view - 1 < 0: # Bottom end
-            signal[self.region - my_agent.position[0] - my_agent.view - 1:,:] = -1
+            signal[self.region - my_agent.position[0] - my_agent.view - 1:, :] = -1
         if self.region - my_agent.position[1] - my_agent.view - 1 < 0: # Right end
             signal[:, self.region - my_agent.position[1] - my_agent.view - 1:] = -1
 
@@ -575,7 +600,8 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
             if other_id == my_id or other_id in self.cemetery: continue
             r_diff = other_agent.position[0] - my_agent.position[0]
             c_diff = other_agent.position[1] - my_agent.position[1]
-            if -my_agent.view <= r_diff <= my_agent.view and -my_agent.view <= c_diff <= my_agent.view:
+            if -my_agent.view <= r_diff <= my_agent.view and \
+                    -my_agent.view <= c_diff <= my_agent.view:
                 r_diff += my_agent.view
                 c_diff += my_agent.view
                 if signal[r_diff, c_diff] != 0: # Already another agent here
@@ -583,9 +609,9 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
                         signal[r_diff, c_diff] = other_agent.value
                 else:
                     signal[r_diff, c_diff] = other_agent.value
-        
+
         return signal
-    
+
     def _observe_resources(self, agent_id, **kwargs):
         """
         These cells are filled with the values of the resources surrounding the
@@ -597,14 +623,17 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
         # Derived by considering each square in the resources as an "agent" and
         # then applied the agent diff logic from above. The resulting for-loop
         # can be written in the below vectorized form.
-        (r,c) = agent.position
+        (r, c) = agent.position
         r_lower = max([0, r-agent.view])
         r_upper = min([self.region-1, r+agent.view])+1
         c_lower = max([0, c-agent.view])
         c_upper = min([self.region-1, c+agent.view])+1
-        signal[(r_lower+agent.view-r):(r_upper+agent.view-r),(c_lower+agent.view-c):(c_upper+agent.view-c)] = \
-            self.resources.resources[r_lower:r_upper, c_lower:c_upper]
+        signal[
+            (r_lower+agent.view-r):(r_upper+agent.view-r),
+            (c_lower+agent.view-c):(c_upper+agent.view-c)
+        ] = self.resources.resources[r_lower:r_upper, c_lower:c_upper]
         return signal
+
 
 class PredatorPreyEnvDistanceObs(PredatorPreyEnv):
     """
@@ -640,14 +669,26 @@ class PredatorPreyEnvDistanceObs(PredatorPreyEnv):
         ax.set_yticks(np.arange(-0.5, self.region - 0.5, 1.))
         ax.grid(linewidth=5)
 
-        prey_x = [agent.position[1] for agent in self.agents.values() if type(agent) == Prey and agent.id not in self.cemetery]
-        prey_y = [self.region - 1 - agent.position[0] for agent in self.agents.values() if type(agent) == Prey and agent.id not in self.cemetery]
+        prey_x = [
+            agent.position[1] for agent in self.agents.values()
+            if type(agent) == Prey and agent.id not in self.cemetery
+        ]
+        prey_y = [
+            self.region - 1 - agent.position[0] for agent in self.agents.values()
+            if type(agent) == Prey and agent.id not in self.cemetery
+        ]
         ax.scatter(prey_x, prey_y, marker='s', s=200, edgecolor='black', facecolor='gray')
 
-        predator_x = [agent.position[1] for agent in self.agents.values() if type(agent) == Predator and agent.id not in self.cemetery]
-        predator_y = [self.region - 1 - agent.position[0] for agent in self.agents.values() if type(agent) == Predator and agent.id not in self.cemetery]
+        predator_x = [
+            agent.position[1] for agent in self.agents.values()
+            if type(agent) == Predator and agent.id not in self.cemetery
+        ]
+        predator_y = [
+            self.region - 1 - agent.position[0] for agent in self.agents.values()
+            if type(agent) == Predator and agent.id not in self.cemetery
+        ]
         ax.scatter(predator_x, predator_y, s=200, marker='o', edgecolor='black', facecolor='gray')
-    
+
         if draw_now:
             plt.plot()
             plt.pause(1e-17)
@@ -670,16 +711,19 @@ class PredatorPreyEnvDistanceObs(PredatorPreyEnv):
         for other_id in self.agents:
             if my_id == other_id: continue
             my_obs[other_id] = np.zeros(3, dtype=np.int)
-        for other_id, other_agent in self.agents.items(): # Fill values for agents that are still alive
+        # Fill values for agents that are still alive
+        for other_id, other_agent in self.agents.items():
             if other_id == my_id or other_id in self.cemetery: continue
             r_diff = other_agent.position[0] - my_agent.position[0]
             c_diff = other_agent.position[1] - my_agent.position[1]
-            if -my_agent.view <= c_diff <= my_agent.view and -my_agent.view <= r_diff <= my_agent.view:
+            if -my_agent.view <= c_diff <= my_agent.view and \
+                    -my_agent.view <= r_diff <= my_agent.view:
                 my_obs[other_id] = np.array((r_diff, c_diff, other_agent.value))
-        
+
         # --- Get the observations from other agents --- #
         for sending_agent_id, message in fusion_matrix.items():
-            if sending_agent_id not in self.cemetery and message: # Only receive messages from alive agents
+            # Only receive messages from alive agents
+            if sending_agent_id not in self.cemetery and message:
                 for spied_agent_id, distance_type in self.get_obs(sending_agent_id).items():
                     # Don't receive a message about yourself or other agents
                     # that you already see
@@ -695,5 +739,5 @@ class PredatorPreyEnvDistanceObs(PredatorPreyEnv):
                 c_diff = sending_agent.position[1] - my_agent.position[1]
                 r_diff = sending_agent.position[0] - my_agent.position[0]
                 my_obs[sending_agent_id] = np.array([r_diff, c_diff, sending_agent.value])
-        
+
         return my_obs

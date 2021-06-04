@@ -1,7 +1,7 @@
-
 from .wrapper import Wrapper
 
 from gym.spaces import Discrete, Dict
+
 
 class CommunicationHandshakeWrapper(Wrapper):
     """
@@ -52,10 +52,14 @@ class CommunicationHandshakeWrapper(Wrapper):
         self.message_buffer = {}
         self.received_message = {}
         for my_id in self.agents:
-            self.message_buffer[my_id] = {other_id: False for other_id in self.agents if other_id != my_id}
-            self.received_message[my_id] = {other_id: False for other_id in self.agents if other_id != my_id}
+            self.message_buffer[my_id] = {
+                other_id: False for other_id in self.agents if other_id != my_id
+            }
+            self.received_message[my_id] = {
+                other_id: False for other_id in self.agents if other_id != my_id
+            }
         self.env.reset(**kwargs)
-    
+
     def step(self, action_dict, **kwargs):
         """
         First, we process the receive actions, which will be used to determine
@@ -66,22 +70,27 @@ class CommunicationHandshakeWrapper(Wrapper):
         # Process receive actions
         for receiving_agent, action in action_dict.items():
             self.received_message[receiving_agent] = {
-                sending_agent: True if self.message_buffer[receiving_agent][sending_agent] and action['receive'][sending_agent] else False
+                sending_agent: True if self.message_buffer[receiving_agent][sending_agent] and
+                action['receive'][sending_agent] else False
                 for sending_agent in self.received_message[receiving_agent]
             }
         # Reset the message buffer
         for my_id in self.agents:
-            self.message_buffer[my_id] = {other_id: False for other_id in self.agents if other_id != my_id}
+            self.message_buffer[my_id] = {
+                other_id: False for other_id in self.agents if other_id != my_id
+            }
 
         # Wrapped environment takes a step
-        env_only_action = {agent_id: action_dict[agent_id]['env_action'] for agent_id in action_dict}
+        env_only_action = {
+            agent_id: action_dict[agent_id]['env_action'] for agent_id in action_dict
+        }
         self.env.step(env_only_action, **kwargs)
 
         # Process send actions
         for sending_agent, action in action_dict.items():
             for receiving_agent, message in action['send'].items():
                 self.message_buffer[receiving_agent][sending_agent] = message
-    
+
     def get_obs(self, agent_id, **kwargs):
         """
         The (fused) observation from the wrapped environment is keyed on 'env_obs'

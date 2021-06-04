@@ -1,0 +1,30 @@
+# This workflow will install sphinx and other dependencies to build the docs.
+
+name: Sphinx docs build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  docs-build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install documentation dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install sphinx sphinx-rtd-theme
+        pip install -r docs/requirements.txt
+    - name: Install Admiral
+      run: pip install .
+    - name: Build docs html
+      run: cd docs/ ; make html

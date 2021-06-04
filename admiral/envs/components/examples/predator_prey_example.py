@@ -1,4 +1,3 @@
-
 from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
@@ -7,15 +6,22 @@ from admiral.envs.components.state import GridPositionState, LifeState, GridReso
 from admiral.envs.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
 from admiral.envs.components.actor import GridMovementActor, AttackActor, GridResourcesActor
 from admiral.envs.components.done import TeamDeadDone
-from admiral.envs.components.agent import AgentObservingAgent, PositionObservingAgent, ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
+from admiral.envs.components.agent import AgentObservingAgent, PositionObservingAgent, \
+    ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
-class PreyAgent(GridMovementAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent, PositionObservingAgent):
-    pass
 
-class PredatorAgent(GridMovementAgent, AgentObservingAgent, AttackingAgent, PositionObservingAgent):
-    pass
+class PreyAgent(
+    GridMovementAgent, AgentObservingAgent, HarvestingAgent, ResourceObservingAgent,
+    PositionObservingAgent
+): pass
+
+
+class PredatorAgent(
+    GridMovementAgent, AgentObservingAgent, AttackingAgent, PositionObservingAgent
+): pass
+
 
 class PredatorPreyEnvGridBased(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -27,7 +33,9 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         self.resource_state = GridResourceState(**kwargs)
 
         # Observer components
-        self.position_observer = GridPositionTeamBasedObserver(position_state=self.position_state, **kwargs)
+        self.position_observer = GridPositionTeamBasedObserver(
+            position_state=self.position_state, **kwargs
+        )
         self.resource_observer = GridResourceObserver(resource_state=self.resource_state, **kwargs)
 
         # Actor components
@@ -39,7 +47,7 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         self.done = TeamDeadDone(**kwargs)
 
         self.finalize()
-    
+
     def reset(self, **kwargs):
         self.position_state.reset(**kwargs)
         self.resource_state.reset(**kwargs)
@@ -52,7 +60,7 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
             harvested_amount = self.resource_actor.process_action(agent, action, **kwargs)
             if harvested_amount is not None:
                 self.life_state.modify_health(agent, harvested_amount)
-        
+
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
@@ -71,7 +79,7 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
 
         # Regrow the resources
         self.resource_state.regrow()
-    
+
     def render(self, fig=None, **kwargs):
         fig.clear()
 
@@ -87,36 +95,51 @@ class PredatorPreyEnvGridBased(AgentBasedSimulation):
         ax.set_yticks(np.arange(0, self.position_state.region, 1))
         ax.grid()
 
-        agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
-        agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+        agents_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]
+        ]
+        agents_y = [
+            self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values()
+            if render_condition[agent.id]
+        ]
         shape = [shape_dict[agent_id] for agent_id in shape_dict if render_condition[agent_id]]
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
 
         plt.plot()
         plt.pause(1e-6)
-    
+
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
             **self.position_observer.get_obs(agent),
             **self.resource_observer.get_obs(agent),
         }
-    
+
     def get_reward(self, agent_id, **kwargs):
         pass
 
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(self.agents[agent_id])
-    
+
     def get_all_done(self, **kwargs):
         return self.done.get_all_done(**kwargs)
-    
+
     def get_info(self, *args, **kwargs):
         return {}
 
+
 if __name__ == '__main__':
-    prey =      {f'prey{i}':     PreyAgent(    id=f'prey{i}',     agent_view=5, team=1, move_range=1, max_harvest=0.5, resource_view=5) for i in range(7)}
-    predators = {f'predator{i}': PredatorAgent(id=f'predator{i}', agent_view=2, team=2, move_range=1, attack_range=1, attack_strength=0.24) for i in range(2)}
+    prey = {
+        f'prey{i}': PreyAgent(
+            id=f'prey{i}', agent_view=5, team=1, move_range=1, max_harvest=0.5, resource_view=5
+        ) for i in range(7)
+    }
+    predators = {
+        f'predator{i}': PredatorAgent(
+            id=f'predator{i}', agent_view=2, team=2, move_range=1, attack_range=1,
+            attack_strength=0.24
+        ) for i in range(2)
+    }
     agents = {**prey, **predators}
     region = 10
     env = PredatorPreyEnvGridBased(
@@ -131,7 +154,10 @@ if __name__ == '__main__':
     env.render(fig=fig)
 
     for _ in range(50):
-        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive}
+        action_dict = {
+            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            if agent.is_alive
+        }
         env.step(action_dict)
         env.render(fig=fig)
         print(env.get_all_done())

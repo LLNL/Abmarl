@@ -1,4 +1,3 @@
-
 # This probably shouldn't go in algs, but we'll move it later after we've figured out the
 # architecture a bit more.
 

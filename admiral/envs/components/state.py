@@ -1,10 +1,10 @@
-
 from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, \
-    CollisionAgent, BroadcastingAgent
+from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, CollisionAgent, \
+    BroadcastingAgent
+
 
 # --------------------- #
 # --- Communication --- #
@@ -19,7 +19,7 @@ class BroadcastState:
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
-    
+
     def reset(self, **kwargs):
         """
         Reset the broadcasting state of all applicable agents.
@@ -27,20 +27,19 @@ class BroadcastState:
         for agent in self.agents.values():
             if isinstance(agent, BroadcastingAgent):
                 agent.broadcasting = False
-        
+
     def set_broadcast(self, agent, _broadcast):
         """
         Set the broadcasting state of the agent.
         """
         if isinstance(agent, BroadcastingAgent):
             agent.broadcasting = _broadcast
-        
+
     def modify_broadcast(self, agent, value):
         """
         Set the broadcasting state of the agent.
         """
         self.set_broadcast(agent, value)
-
 
 
 # ----------------------- #
@@ -58,7 +57,7 @@ class LifeState:
 
     agents (dict):
         Dictionary of agents.
-    
+
     entropy (float):
         The amount of health that is depleted from an agent whenever apply_entropy
         is called.
@@ -67,7 +66,7 @@ class LifeState:
         assert type(agents) is dict, "Agents must be a dict"
         self.agents = agents
         self.entropy = entropy
-    
+
     def reset(self, **kwargs):
         """
         Reset the health and life state of all applicable agents.
@@ -78,7 +77,7 @@ class LifeState:
             else:
                 agent.health = np.random.uniform(agent.min_health, agent.max_health)
             agent.is_alive = True
-    
+
     def set_health(self, agent, _health):
         """
         Set the health of an agent to a specific value, bounded by the agent's
@@ -92,7 +91,7 @@ class LifeState:
             agent.health = agent.max_health
         else:
             agent.health = _health
-    
+
     def modify_health(self, agent, value):
         """
         Add some value to the health of the agent.
@@ -106,7 +105,6 @@ class LifeState:
         self.modify_health(agent, -self.entropy, **kwargs)
 
 
-
 # ----------------------------- #
 # --- Position and Movement --- #
 # ----------------------------- #
@@ -117,7 +115,7 @@ class PositionState(ABC):
 
     region (int):
         The size of the environment.
-    
+
     agents (dict):
         The dictionary of agents.
     """
@@ -141,7 +139,7 @@ class PositionState(ABC):
                 agent.position = agent.initial_position
             else:
                 self.random_reset(agent)
-    
+
     @abstractmethod
     def random_reset(self, agent, **kwargs):
         """
@@ -157,12 +155,13 @@ class PositionState(ABC):
         Set the position of the agents. Child classes implement.
         """
         pass
-    
+
     def modify_position(self, agent, value, **kwargs):
         """
         Add some value to the position of the agent.
         """
         self.set_position(agent, agent.position + value)
+
 
 class GridPositionState(PositionState):
     """
@@ -183,6 +182,7 @@ class GridPositionState(PositionState):
         Set the agents' random positions as integers within the region.
         """
         agent.position = np.random.randint(0, self.region, 2)
+
 
 class ContinuousPositionState(PositionState):
     """
@@ -212,7 +212,8 @@ class ContinuousPositionState(PositionState):
                     if other.id != agent.id and \
                        isinstance(other, CollisionAgent) and \
                        other.position is not None and \
-                       np.linalg.norm(other.position - potential_position) < (other.size + agent.size):
+                       np.linalg.norm(other.position - potential_position) < \
+                                     (other.size + agent.size):
                         collision = True
                         break
                 if not collision:
@@ -222,13 +223,14 @@ class ContinuousPositionState(PositionState):
         else:
             agent.position = np.random.uniform(0, self.region, 2)
 
+
 class SpeedAngleState:
     """
     Manages the agents' speed, banking angles, and ground angles.
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
-    
+
     def reset(self, **kwargs):
         """
         Reset the agents' speeds and ground angles.
@@ -245,14 +247,16 @@ class SpeedAngleState:
                 if agent.initial_banking_angle is not None:
                     agent.banking_angle = agent.initial_banking_angle
                 else:
-                    agent.banking_angle = np.random.uniform(-agent.max_banking_angle, agent.max_banking_angle)
+                    agent.banking_angle = np.random.uniform(
+                        -agent.max_banking_angle, agent.max_banking_angle
+                    )
 
                 # Reset agent ground angle
                 if agent.initial_ground_angle is not None:
                     agent.ground_angle = agent.initial_ground_angle
                 else:
                     agent.ground_angle = np.random.uniform(0, 360)
-    
+
     def set_speed(self, agent, _speed, **kwargs):
         """
         Set the agent's speed if it is between its min and max speed.
@@ -260,14 +264,14 @@ class SpeedAngleState:
         if isinstance(agent, SpeedAngleAgent):
             if agent.min_speed <= _speed <= agent.max_speed:
                 agent.speed = _speed
-    
+
     def modify_speed(self, agent, value, **kwargs):
         """
         Modify the agent's speed.
         """
         if isinstance(agent, SpeedAngleAgent):
             self.set_speed(agent, agent.speed + value)
-    
+
     def set_banking_angle(self, agent, _banking_angle, **kwargs):
         """
         Set the agent's banking angle if it is between its min and max angle.
@@ -276,7 +280,7 @@ class SpeedAngleState:
             if abs(_banking_angle) <= agent.max_banking_angle:
                 agent.banking_angle = _banking_angle
                 self.modify_ground_angle(agent, agent.banking_angle)
-    
+
     def modify_banking_angle(self, agent, value, **kwargs):
         """
         Modify the agent's banking angle.
@@ -291,13 +295,14 @@ class SpeedAngleState:
         """
         if isinstance(agent, SpeedAngleAgent):
             agent.ground_angle = _ground_angle % 360
-    
+
     def modify_ground_angle(self, agent, value, **kwargs):
         """
         Modify the agent's ground angle.
         """
         if isinstance(agent, SpeedAngleAgent):
             self.set_ground_angle(agent, agent.ground_angle + value)
+
 
 class VelocityState:
     """
@@ -306,7 +311,7 @@ class VelocityState:
     def __init__(self, agents=None, friction=0.05, **kwargs):
         self.agents = agents
         self.friction = friction
-    
+
     def reset(self, **kwargs):
         """
         Reset the agents' velocities.
@@ -318,7 +323,7 @@ class VelocityState:
                     agent.velocity = agent.initial_velocity
                 else:
                     agent.velocity = np.random.uniform(-agent.max_speed, agent.max_speed, (2,))
-    
+
     def set_velocity(self, agent, _velocity, **kwargs):
         """
         Set the agent's velocity if it is within its max speed.
@@ -329,14 +334,14 @@ class VelocityState:
                 agent.velocity = _velocity
             else:
                 agent.velocity = _velocity / vel_norm * agent.max_speed
-    
+
     def modify_velocity(self, agent, value, **kwargs):
         """
         Modify the agent's velocity.
         """
         if isinstance(agent, VelocityAgent):
             self.set_velocity(agent, agent.velocity + value, **kwargs)
-    
+
     def apply_friction(self, agent, **kwargs):
         """
         Apply friction to the agent's movement, decreasing its speed by a small amount.
@@ -350,7 +355,6 @@ class VelocityState:
                 agent.velocity *= new_speed / old_speed
 
 
-
 # -------------------------------- #
 # --- Resources and Harvesting --- #
 # -------------------------------- #
@@ -359,7 +363,7 @@ class GridResourceState:
     """
     Resources exist in the cells of the grid. The grid is populated with resources
     between the min and max value on some coverage of the region at reset time.
-    If original resources is specified, then reset will set the resources back 
+    If original resources is specified, then reset will set the resources back
     to that original value. This component supports resource depletion: if a resource falls below
     the minimum value, it will not regrow. Agents can harvest resources from the cell they occupy.
     Agents can observe the resources in a grid-like observation surrounding their positions.
@@ -381,13 +385,13 @@ class GridResourceState:
         The minimum value a resource can have before it cannot grow back. This is
         different from the absolute minimum value, 0, which indicates that there
         are no resources in the cell.
-    
+
     max_value (float):
         The maximum value a resource can have.
 
     regrow_rate (float):
         The rate at which resources regrow.
-    
+
     initial_resources (np.array):
         Instead of specifying the above resource-related parameters, we can provide
         an initial state of the resources. At reset time, the resources will be
@@ -396,7 +400,7 @@ class GridResourceState:
         region.
     """
     def __init__(self, agents=None, region=None, coverage=0.75, min_value=0.1, max_value=1.0,
-            regrow_rate=0.04, initial_resources=None, **kwargs):        
+                 regrow_rate=0.04, initial_resources=None, **kwargs):
         self.initial_resources = initial_resources
         if self.initial_resources is None:
             assert type(region) is int, "Region must be an integer."
@@ -422,12 +426,14 @@ class GridResourceState:
             self.resources = self.initial_resources
         else:
             coverage_filter = np.zeros((self.region, self.region))
-            coverage_filter[np.random.uniform(0, 1, (self.region, self.region)) < self.coverage] = 1.
+            coverage_filter[
+                np.random.uniform(0, 1, (self.region, self.region)) < self.coverage
+            ] = 1.
             self.resources = np.multiply(
                 np.random.uniform(self.min_value, self.max_value, (self.region, self.region)),
                 coverage_filter
             )
-    
+
     def set_resources(self, location, value, **kwargs):
         """
         Set the resource at a certain location to a value, bounded between 0 and
@@ -440,7 +446,7 @@ class GridResourceState:
             self.resources[location] = self.max_value
         else:
             self.resources[location] = value
-    
+
     def modify_resources(self, location, value, **kwargs):
         """
         Add some value to the resource at a certain location.

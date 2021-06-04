@@ -1,6 +1,5 @@
-
-from abc import ABC, abstractmethod
 from .wrapper import Wrapper
+
 
 class SARWrapper(Wrapper):
     """
@@ -33,7 +32,7 @@ class SARWrapper(Wrapper):
 
     def get_obs(self, agent_id, **kwargs):
         return self.wrap_observation(self.env.agents[agent_id], self.env.get_obs(agent_id))
-            
+
     def get_reward(self, agent_id, **kwargs):
         return self.wrap_reward(self.env.get_reward(agent_id))
 
@@ -45,15 +44,15 @@ class SARWrapper(Wrapper):
 
     def unwrap_observation(self, from_agent, observation):
         return observation
-    
+
     def wrap_action(self, from_agent, action):
         return action
-    
+
     def unwrap_action(self, from_agent, action):
         return action
-    
+
     def wrap_reward(self, reward):
         return reward
-    
+
     def unwrap_reward(self, reward):
         return reward

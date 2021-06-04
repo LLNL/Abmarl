@@ -1,7 +1,7 @@
-
 from abc import ABC, abstractmethod
 
 from ray.rllib.policy.policy import Policy
+
 
 class HeuristicPolicy(Policy, ABC):
     """Abstract class for policies that do not learn."""

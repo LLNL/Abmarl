@@ -1,15 +1,24 @@
-
-from gym.spaces import Box, Dict, MultiBinary
 import numpy as np
 
-from admiral.envs.components.examples.predator_prey_example import PredatorPreyEnvGridBased, PreyAgent, PredatorAgent
+from admiral.envs.components.examples.predator_prey_example import PredatorPreyEnvGridBased, \
+    PreyAgent, PredatorAgent
 from admiral.managers import AllStepManager
+
 
 def test_all_step_grid_based_predator_prey():
     agents = {
-        'prey0': PreyAgent(id='prey0', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=1, move_range=1, max_harvest=0.5, resource_view=4),
-        'prey1': PreyAgent(id='prey1', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5, team=1, move_range=1, max_harvest=0.5, resource_view=4),
-        'predator0': PredatorAgent(id='predator0', initial_position=np.array([0, 0]), agent_view=2, initial_health=0.5, team=2, move_range=1, attack_range=1, attack_strength=2.0)
+        'prey0': PreyAgent(
+            id='prey0', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5,
+            team=1, move_range=1, max_harvest=0.5, resource_view=4
+        ),
+        'prey1': PreyAgent(
+            id='prey1', initial_position=np.array([2, 2]), agent_view=4, initial_health=0.5,
+            team=1, move_range=1, max_harvest=0.5, resource_view=4
+        ),
+        'predator0': PredatorAgent(
+            id='predator0', initial_position=np.array([0, 0]), agent_view=2, initial_health=0.5,
+            team=2, move_range=1, attack_range=1, attack_strength=2.0
+        )
     }
     initial_resources = np.array([
         [0.43, 0.  , 0.  , 0.37, 0.32],
@@ -152,7 +161,7 @@ def test_all_step_grid_based_predator_prey():
         [-1.,   -1.,   -1.,   -1.  , -1.  , -1.  , -1.  , -1.  , -1.,  ]
     ]))
     assert not done['prey0']
-    
+
     np.testing.assert_array_equal(obs['prey1']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],

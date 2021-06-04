@@ -1,44 +1,43 @@
-
 from ray.rllib import MultiAgentEnv
+
+
 class MultiAgentWrapper(MultiAgentEnv):
     """
-    Use this wrapper to activate multi-agent features on environments that do not directly inherit
-    from ray.rllib.MultiAgentEnv.
+    Enable connection between SimulationManager and RLlib Trainer.
 
-    Environment must implement the following interface:
-        reset -> observations: dict
-        step(action: dict) -> observations: dict, rewards: dict, dones:dict, and infos:dict
-    
-    For rendering, the environment must implement the render function:
-        render(fig: Matplotlib Artist)
+    Wraps a SimulationManager and forwards all calls to the manager. This class
+    is boilerplate and needed because RLlib checks that the simulation is an instance
+    of MultiAgentEnv.
+
+    Attributes:
+        env: The SimulationManager.
     """
     def __init__(self, env):
-        """
-        env is an object of the environment class you want to wrap.
-        """
         from admiral.managers import SimulationManager
         assert isinstance(env, SimulationManager)
         self.env = env
 
     def reset(self):
+        """See SimulationManager."""
         return self.env.reset()
 
     def step(self, actions):
+        """See SimulationManager."""
         return self.env.step(actions)
 
     def render(self, *args, **kwargs):
-        """
-        If you want to vizualize agents in the environment, then your environment will need to
-        implement the render function.
-        """ 
+        """See SimulationManager."""
         return self.env.render(*args, **kwargs)
 
     @property
     def unwrapped(self):
         """
-        Fall through all the wrappers and obtain the original, completely unwrapped environment.
+        Fall through all the wrappers to the SimulationManager.
+
+        Returns:
+            The wrapped SimulationManager.
         """
         try:
             return self.env.unwrapped
-        except:
+        except AttributeError:
             return self.env

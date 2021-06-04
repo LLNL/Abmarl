@@ -22,6 +22,7 @@ Example usage for converting to runnable script:
     admiral make-runnable my_experiment.py --some-args
 """
 
+
 def cli():
     parser = argparse.ArgumentParser(
         prog='admiral',
@@ -30,10 +31,11 @@ def cli():
         epilog=EXAMPLE_USAGE
     )
     subparsers = parser.add_subparsers(dest='command')
-    train_parser = train.create_parser(subparsers)
-    analyze_parser = analyze.create_parser(subparsers)
-    visualize_parser = visualize.create_parser(subparsers)
-    runnable_parser = runnable.create_parser(subparsers)
+
+    train.create_parser(subparsers)
+    analyze.create_parser(subparsers)
+    visualize.create_parser(subparsers)
+    runnable.create_parser(subparsers)
     parameters = parser.parse_args()
     path_config = os.path.join(os.getcwd(), parameters.configuration)
 
@@ -48,4 +50,3 @@ def cli():
         runnable.run(path_config, parameters)
     else:
         parser.print_help()
-        

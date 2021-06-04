@@ -1,8 +1,8 @@
-
 import numpy as np
 
 from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
 from admiral.envs.wrappers import CommunicationHandshakeWrapper
+
 
 def test_communication():
     np.random.seed(24)
@@ -12,7 +12,9 @@ def test_communication():
         Prey(id='prey1', view=4),
         Prey(id='prey2', view=5)
     ]
-    env = PredatorPreyEnv.build({'agents': agents, 'observation_mode': PredatorPreyEnv.ObservationMode.DISTANCE})
+    env = PredatorPreyEnv.build(
+        {'agents': agents, 'observation_mode': PredatorPreyEnv.ObservationMode.DISTANCE}
+    )
     env = CommunicationHandshakeWrapper(env)
 
 
@@ -22,27 +24,51 @@ def test_communication():
     env.env.agents['predator0'].position = np.array([2, 3])
     env.env.agents['predator1'].position = np.array([0, 7])
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([-1, 1, 1]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([-1, 1, 1])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': False, 'prey1': False, 'prey2': False}
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([2, -4, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([1, -6, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([1, -3, 1]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([2, -4, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([1, -6, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([1, -3, 1])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': False, 'prey1': False, 'prey2': False}
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([1, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 3, 1]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([1, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 3, 1])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
 
-    np.testing.assert_array_equal(env.get_obs('prey2')['env_obs']['predator0'], np.array([1, -1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey2')['env_obs']['predator1'], np.array([-1, 3, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey2')['env_obs']['prey1'], np.array([0, -3, 1]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey2')['env_obs']['predator0'], np.array([1, -1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey2')['env_obs']['predator1'], np.array([-1, 3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey2')['env_obs']['prey1'], np.array([0, -3, 1])
+    )
     assert env.get_obs('prey2')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey1': False}
 
@@ -71,39 +97,63 @@ def test_communication():
     }
     env.step(action1)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == 100
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([2, -4, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -6, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([2, -4, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -6, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': False, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == 0
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([2, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([2, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': True}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
-        
-    np.testing.assert_array_equal(env.get_obs('prey2')['env_obs']['predator0'], np.array([1, -1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey2')['env_obs']['predator1'], np.array([-1, 3, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey2')['env_obs']['prey1'], np.array([-1, -3, 1]))
+    assert not env.get_done('prey1')
+
+    np.testing.assert_array_equal(
+        env.get_obs('prey2')['env_obs']['predator0'], np.array([1, -1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey2')['env_obs']['predator1'], np.array([-1, 3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey2')['env_obs']['prey1'], np.array([-1, -3, 1])
+    )
     assert env.get_obs('prey2')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey1': False}
     assert env.get_reward('prey2') == -100
-    assert env.get_done('prey2') == True
+    assert env.get_done('prey2')
 
-    assert env.get_all_done() == False
+    assert not env.get_all_done()
 
 
     action2 = {
@@ -125,29 +175,47 @@ def test_communication():
     }
     env.step(action2)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([0, -3, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -6, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([0, -3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -6, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': False, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([0, 3, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([0, 3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
 
     action3 = {
@@ -169,29 +237,47 @@ def test_communication():
     }
     env.step(action3)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-1, -3, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -5, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-1, -3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -5, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': False, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-1, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-1, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
 
     action4 = {
@@ -213,29 +299,47 @@ def test_communication():
     }
     env.step(action4)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == -10
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-2, -2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -4, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-2, -2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -4, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': False, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 4, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 4, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
 
     action5 = {
@@ -257,29 +361,47 @@ def test_communication():
     }
     env.step(action5)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([3, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([2, -2, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([3, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([2, -2, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == 0
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-3, -2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([-1, -4, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-3, -2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([-1, -4, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([1, 4, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([1, 4, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -10
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
     action6 = {
         'predator0': {
@@ -300,29 +422,47 @@ def test_communication():
     }
     env.step(action6)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([3, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([2, -1, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([3, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([2, -1, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-3, -2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([-1, -3, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-3, -2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([-1, -3, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([1, 3, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([1, 3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
 
     action7 = {
@@ -344,29 +484,47 @@ def test_communication():
     }
     env.step(action7)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([3, 3, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([2, 0, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([3, 3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([2, 0, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-3, -3, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([-1, -3, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-3, -3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([-1, -3, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 0, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([1, 3, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-2, 0, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([1, 3, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
 
     action8 = {
@@ -388,29 +546,47 @@ def test_communication():
     }
     env.step(action8)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([1, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([1, 1, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([1, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([1, 1, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == -1
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-1, -2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -1, 1]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-1, -2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([0, -1, 1])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == -1
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-1, -1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-1, -1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -1
-    assert env.get_done('prey1') == False
+    assert not env.get_done('prey1')
 
 
     action9 = {
@@ -432,28 +608,46 @@ def test_communication():
     }
     env.step(action9)
 
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['predator1'], np.array([1, 2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['predator1'], np.array([1, 2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator0')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator0')['message_buffer'] == \
         {'predator1': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator0') == 100
-    assert env.get_done('predator0') == False
+    assert not env.get_done('predator0')
 
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['predator0'], np.array([-1, -2, 2]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey1'], np.array([0, 0, 0]))
-    np.testing.assert_array_equal(env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['predator0'], np.array([-1, -2, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey1'], np.array([0, 0, 0])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('predator1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('predator1')['message_buffer'] == \
         {'predator0': True, 'prey1': False, 'prey2': False}
     assert env.get_reward('predator1') == 0
-    assert env.get_done('predator1') == False
+    assert not env.get_done('predator1')
 
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator0'], np.array([-1, -1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 1, 2]))
-    np.testing.assert_array_equal(env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0]))
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator0'], np.array([-1, -1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['predator1'], np.array([0, 1, 2])
+    )
+    np.testing.assert_array_equal(
+        env.get_obs('prey1')['env_obs']['prey2'], np.array([0, 0, 0])
+    )
     assert env.get_obs('prey1')['message_buffer'] == \
         {'predator0': False, 'predator1': False, 'prey2': False}
     assert env.get_reward('prey1') == -100
-    assert env.get_done('prey1') == True
+    assert env.get_done('prey1')
 
-    assert env.get_all_done() == True
+    assert env.get_all_done()

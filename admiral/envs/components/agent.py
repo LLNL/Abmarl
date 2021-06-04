@@ -1,8 +1,7 @@
-
-from gym.spaces import Dict
 import numpy as np
 
 from admiral.envs import PrincipleAgent, ActingAgent, ObservingAgent
+
 
 # ------------------ #
 # --- Base Agent --- #
@@ -31,21 +30,23 @@ class ComponentAgent(PrincipleAgent):
         The agent's team. Teams are indexed starting from 1, with team 0 reserved
         for agents that are not on a team (None).
     """
-    def __init__(self, initial_position=None, min_health=0.0, max_health=1.0, initial_health=None, \
+    def __init__(self, initial_position=None, min_health=0.0, max_health=1.0, initial_health=None,
                  team=None, **kwargs):
         super().__init__(**kwargs)
         self.initial_position = initial_position
-        assert type(min_health) in [float, int] and type(max_health) in [float, int], "Min and max health must be numerical."
-        assert min_health <= max_health, "The min health must be less than or equal to the max_health."
+        assert type(min_health) in [float, int] and type(max_health) in [float, int], \
+            "Min and max health must be numerical."
+        assert min_health <= max_health, \
+            "The min health must be less than or equal to the max_health."
         self._min_max_health = np.array([min_health, max_health])
         self.initial_health = initial_health
         self.is_alive = True
         self.team = team
-    
+
     @property
     def initial_position(self):
         return self._initial_position
-    
+
     @initial_position.setter
     def initial_position(self, value):
         if value is not None:
@@ -53,39 +54,41 @@ class ComponentAgent(PrincipleAgent):
             assert value.shape == (2,), "Initial position must be a 2-dimensional array."
             assert value.dtype in [np.int, np.float], "Initial position must be numerical."
         self._initial_position = value
-    
+
     @property
     def min_health(self):
         return self._min_max_health[0]
-    
+
     @property
     def max_health(self):
         return self._min_max_health[1]
-    
+
     @property
     def initial_health(self):
         return self._initial_health
-    
+
     @initial_health.setter
     def initial_health(self, value):
         if value is not None:
             assert type(value) in [float, int], "Initial health must be a float."
-            assert self.min_health <= value <= self.max_health, "Initial health must be between the min and max health."
+            assert self.min_health <= value <= self.max_health, \
+                "Initial health must be between the min and max health."
         self._initial_health = value
-    
+
     @property
     def team(self):
         return self._team
-    
+
     @team.setter
     def team(self, value):
         if value is not None:
             assert type(value) is int, "Team must be an int."
-            assert value != 0, "Team 0 is reserved for agents who do not have a team. Use a team number greater than 0."
+            assert value != 0, "Team 0 is reserved for agents who do not have a team. " + \
+                "Use a team number greater than 0."
             self._team = value
         else:
             self._team = 0
-        
+
     @property
     def configured(self):
         """
@@ -95,7 +98,6 @@ class ComponentAgent(PrincipleAgent):
             self._min_max_health is not None and \
             self.is_alive is not None and \
             self.team is not None
-
 
 
 # ----------------- #
@@ -109,7 +111,7 @@ class AttackingAgent(ActingAgent, ComponentAgent):
     attack_range (int):
         The effective range of the attack. Can be used to determine if an attack
         is successful based on distance between agents.
-    
+
     attack_strength (float):
         How effective the agent's attack is. This is applicable in situations where
         the agents' health is affected by attacks.
@@ -125,15 +127,15 @@ class AttackingAgent(ActingAgent, ComponentAgent):
         assert attack_strength is not None, "attack_strength must be a nonnegative number"
         self.attack_strength = attack_strength
         self.attack_accuracy = attack_accuracy
-    
+
     @property
     def configured(self):
         """
         The agent is successfully configured if the attack range and strength is
         specified.
         """
-        return super().configured and self.attack_range is not None and self.attack_strength is not None
-
+        return super().configured and self.attack_range is not None and \
+            self.attack_strength is not None
 
 
 # --------------------- #
@@ -152,7 +154,7 @@ class BroadcastingAgent(ActingAgent, ComponentAgent):
         super().__init__(**kwargs)
         self.broadcast_range = broadcast_range
         self.broadcasting = False
-    
+
     @property
     def configured(self):
         """
@@ -160,8 +162,8 @@ class BroadcastingAgent(ActingAgent, ComponentAgent):
         """
         return super().configured and self.broadcast_range is not None
 
-class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
 
+class BroadcastObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
 # ----------------------- #
@@ -192,7 +194,7 @@ class AgentObservingAgent(ObservingAgent, ComponentAgent):
         super().__init__(**kwargs)
         assert agent_view is not None, "agent_view must be nonnegative integer"
         self.agent_view = agent_view
-    
+
     @property
     def configured(self):
         """
@@ -201,12 +203,13 @@ class AgentObservingAgent(ObservingAgent, ComponentAgent):
         return super().configured and self.agent_view is not None
 
 
-
 # ----------------------------- #
 # --- Position and Movement --- #
 # ----------------------------- #
 
+
 class PositionObservingAgent(ObservingAgent, ComponentAgent): pass
+
 
 class GridMovementAgent(ActingAgent, ComponentAgent):
     """
@@ -219,7 +222,7 @@ class GridMovementAgent(ActingAgent, ComponentAgent):
         super().__init__(**kwargs)
         assert move_range is not None, "move_range must be an integer"
         self.move_range = move_range
-    
+
     @property
     def configured(self):
         """
@@ -227,30 +230,31 @@ class GridMovementAgent(ActingAgent, ComponentAgent):
         """
         return super().configured and self.move_range is not None
 
+
 class SpeedAngleAgent(ComponentAgent):
     """
     Agents have a speed and a banking angle which are used to determine how the
     agent moves around a continuous field.
-    
+
     min_speed (float):
         The minimum speed this agent can travel.
-    
+
     max_speed (float):
         The maximum speed this agent can travel.
-    
+
     max_banking_angle (float):
         The maximum banking angle the agent can endure.
 
     initial_speed (float):
         The agent's initial speed.
-    
+
     initial_banking_angle (float):
         The agent's initial banking angle.
-    
+
     initial_ground_angle (float):
         The agent's initial ground angle.
     """
-    def __init__(self, min_speed=0.25, max_speed=1.0, max_banking_angle=45, initial_speed=None, \
+    def __init__(self, min_speed=0.25, max_speed=1.0, max_banking_angle=45, initial_speed=None,
                  initial_banking_angle=None, initial_ground_angle=None, **kwargs):
         super().__init__(**kwargs)
         self.min_speed = min_speed
@@ -262,16 +266,17 @@ class SpeedAngleAgent(ComponentAgent):
         self.initial_banking_angle = initial_banking_angle
         self.initial_ground_angle = initial_ground_angle
         self.banking_angle = None # Should be set by the state handler
-    
+
     @property
     def configured(self):
-        return super().configured and self.min_speed is not None and self.max_speed is not None and \
-            self.max_banking_angle is not None
+        return super().configured and self.min_speed is not None and self.max_speed is not None \
+            and self.max_banking_angle is not None
+
 
 class SpeedAngleActingAgent(ActingAgent, ComponentAgent):
     """
     Agents can change their speed and banking angles.
-    
+
     max_acceleration (float):
         The maximum amount by which an agent can change its speed in a single time
         step.
@@ -284,13 +289,15 @@ class SpeedAngleActingAgent(ActingAgent, ComponentAgent):
         super().__init__(**kwargs)
         self.max_acceleration = max_acceleration
         self.max_banking_angle_change = max_banking_angle_change
-    
+
     @property
     def configured(self):
         return super().configured and self.max_acceleration is not None and \
             self.max_banking_angle_change is not None
 
+
 class SpeedAngleObservingAgent(ObservingAgent, ComponentAgent): pass
+
 
 class VelocityAgent(ComponentAgent):
     """
@@ -302,7 +309,7 @@ class VelocityAgent(ComponentAgent):
 
     max_speed (float):
         The maximum speed the agent can travel.
-    
+
     max_acceleration (float):
         The maximum amount by which an agent can change its velocity in a single
         time step.
@@ -311,15 +318,16 @@ class VelocityAgent(ComponentAgent):
         super().__init__(**kwargs)
         self.initial_velocity = initial_velocity
         self.max_speed = max_speed
-    
+
     @property
     def configured(self):
         return super().configured and self.max_speed is not None
 
+
 class AcceleratingAgent(ActingAgent, ComponentAgent):
     """
     Agents can accelerate to modify their velocities.
-    
+
     max_acceleration (float):
         The maximum amount by which an agent can change its velocity in a single
         time step.
@@ -327,12 +335,14 @@ class AcceleratingAgent(ActingAgent, ComponentAgent):
     def __init__(self, max_acceleration=None, **kwargs):
         super().__init__(**kwargs)
         self.max_acceleration = max_acceleration
-    
+
     @property
     def configured(self):
         return super().configured and self.max_acceleration is not None
 
+
 class VelocityObservingAgent(ObservingAgent, ComponentAgent): pass
+
 
 class CollisionAgent(PrincipleAgent):
     """
@@ -341,7 +351,7 @@ class CollisionAgent(PrincipleAgent):
     size (float):
         The size of the agent.
         Default 1.
-    
+
     mass (float):
         The mass of the agent.
         Default 1.
@@ -350,10 +360,11 @@ class CollisionAgent(PrincipleAgent):
         super().__init__(**kwargs)
         self.size = size
         self.mass = mass
-    
+
     @property
     def configured(self):
         return super().configured and self.size is not None and self.mass is not None
+
 
 # -------------------------------- #
 # --- Resources and Harvesting --- #
@@ -371,13 +382,14 @@ class HarvestingAgent(ActingAgent, ComponentAgent):
         super().__init__(**kwargs)
         assert max_harvest is not None, "max_harvest must be nonnegative number"
         self.max_harvest = max_harvest
-    
+
     @property
     def configured(self):
         """
         Agents are configured if max_harvest is set.
         """
         return super().configured and self.max_harvest is not None
+
 
 class ResourceObservingAgent(ObservingAgent, ComponentAgent):
     """
@@ -397,7 +409,6 @@ class ResourceObservingAgent(ObservingAgent, ComponentAgent):
         Agents are configured if the resource_view parameter is set.
         """
         return super().configured and self.resource_view is not None
-
 
 
 # ------------ #

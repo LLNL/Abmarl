@@ -1,5 +1,5 @@
-
 from gym import Env as GymEnv
+
 
 class GymWrapper(GymEnv):
     """
@@ -15,14 +15,14 @@ class GymWrapper(GymEnv):
         self.agent_id, agent = next(iter(env.agents.items()))
         self.observation_space = agent.observation_space
         self.action_space = agent.action_space
-    
+
     def reset(self, **kwargs):
         """
         Return the observation from the single agent.
         """
         obs = self.env.reset(**kwargs)
         return obs[self.agent_id]
-    
+
     def step(self, action, **kwargs):
         """
         Wrap the action by storing it in a dict that maps the agent's id to the
@@ -34,13 +34,13 @@ class GymWrapper(GymEnv):
             reward[self.agent_id], \
             done[self.agent_id], \
             info[self.agent_id]
-    
+
     def render(self, **kwargs):
         """
         Forward render calls to the composed environment.
         """
         self.env.render(**kwargs)
-    
+
     @property
     def unwrapped(self):
         """
@@ -48,6 +48,5 @@ class GymWrapper(GymEnv):
         """
         try:
             return self.env.unwrapped
-        except:
+        except AttributeError:
             return self.env
-

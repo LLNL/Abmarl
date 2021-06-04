@@ -1,4 +1,3 @@
-
 import pytest
 
 from admiral.managers import AllStepManager
@@ -6,14 +5,17 @@ from admiral.external import GymWrapper
 
 from .helpers import MultiAgentEnv
 
+
 def test_gym_init_multi_agent_error():
     with pytest.raises(AssertionError):
-        wrapped_env = GymWrapper(MultiAgentEnv(3))
+        GymWrapper(MultiAgentEnv(3))
+
 
 def test_gym_init():
     env = AllStepManager(MultiAgentEnv(1))
     wrapped_env = GymWrapper(env)
     assert wrapped_env.env == env
+
 
 def test_gym_reset_and_step():
     env = GymWrapper(AllStepManager(MultiAgentEnv(1)))

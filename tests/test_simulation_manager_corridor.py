@@ -1,8 +1,8 @@
-
 import numpy as np
 
 from admiral.managers import TurnBasedManager, AllStepManager
 from admiral.envs.corridor import MultiCorridor as Corridor
+
 
 def test_managers_are_same_for_single_agent():
     turn_based_env = TurnBasedManager(Corridor(num_agents=1))

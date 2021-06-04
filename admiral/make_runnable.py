@@ -1,5 +1,5 @@
-
-from admiral.tools import utils as adu
+import os
+import shutil
 
 main_if_block_begin = """
 if __name__ == "__main__":
@@ -7,11 +7,15 @@ if __name__ == "__main__":
     import os
     import time
     home = os.path.expanduser("~")
-    output_dir = os.path.join(home, 'admiral_results/{}_{}'.format(params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')))
+    output_dir = os.path.join(
+        home, 'admiral_results/{}_{}'.format(
+            params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
+        )
+    )
     params['ray_tune']['local_dir'] = output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
+
     # Copy this configuration file to the output directory
     import shutil
     shutil.copy(os.path.join(os.getcwd(), __file__), output_dir)
@@ -26,10 +30,13 @@ main_if_block_end = """
     ray.shutdown()
 """
 
+
 def _process_magpie_sbatch(config, full_runnable_config_path):
-    with open('/usr/tce/packages/magpie/magpie2/submission-scripts/script-sbatch-srun/magpie.sbatch-srun-ray','r') as file_reader:
+    with open(
+        '/usr/tce/packages/magpie/magpie2/submission-scripts/script-sbatch-srun/'
+        'magpie.sbatch-srun-ray', 'r'
+    ) as file_reader:
         magpie_script = file_reader.readlines()
-    import os, shutil
     for ndx, line in enumerate(magpie_script):
         if line.startswith("#SBATCH --nodes"):
             magpie_script[ndx] = "#SBATCH --nodes={}\n".format(config['nodes'])
@@ -51,9 +58,14 @@ def _process_magpie_sbatch(config, full_runnable_config_path):
             magpie_script[ndx] = 'export RAY_JOB="script"\n'
         elif line.startswith('# export RAY_SCRIPT_PATH'):
             magpie_script[ndx] = 'export RAY_SCRIPT_PATH="{}"\n'.format(full_runnable_config_path)
-    with open(os.path.join(os.path.dirname(full_runnable_config_path), config['title'] + '_magpie.sbatch-srun-ray'), 'w') as file_writer:
+    with open(
+        os.path.join(
+            os.path.dirname(full_runnable_config_path),
+            f"{config['title']}_magpie.sbatch-srun-ray"), 'w'
+    ) as file_writer:
         file_writer.writelines(magpie_script)
     return "    ray.init(address=os.environ['MAGPIE_RAY_ADDRESS'])"
+
 
 def run(full_config_path, parameters):
     """Convert a configuration file to a runnable script, outputting additional
@@ -61,12 +73,11 @@ def run(full_config_path, parameters):
     # Copy the configuration script
     import os
     import shutil
-    full_runnable_config_path= os.path.join(
+    full_runnable_config_path = os.path.join(
         os.path.dirname(full_config_path),
         'runnable_' + os.path.basename(full_config_path)
     )
     shutil.copy(full_config_path, full_runnable_config_path)
-    
 
     ray_init_line = "    ray.init()"
     if parameters.magpie:
@@ -83,11 +94,11 @@ def run(full_config_path, parameters):
                     title = line.split(':')[1].strip().strip(',')
                     exec("config_items_needed['title'] = {}".format(title))
                     break
-                    # I'm not worried about executing here becuase the entire module will be executed
-                    # when the script is run.
+                    # I'm not worried about executing here becuase the entire module will be
+                    # executed when the script is run.
         try:
             ray_init_line = _process_magpie_sbatch(config_items_needed, full_runnable_config_path)
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             print('Could not find magpie. Is it installed on your HPC system?')
 
     # Open the runnable file and write parts to enable runnable

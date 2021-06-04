@@ -1,15 +1,16 @@
-
-from gym.spaces import Box
-
 import numpy as np
 
 from admiral.envs.components.state import GridPositionState, LifeState
-from admiral.envs.components.observer import PositionObserver, GridPositionBasedObserver, GridPositionTeamBasedObserver, RelativePositionObserver
-from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, ComponentAgent
+from admiral.envs.components.observer import GridPositionBasedObserver, \
+    GridPositionTeamBasedObserver, RelativePositionObserver
+from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, \
+    ComponentAgent
+
 
 class PositionTestAgent(PositionObservingAgent, AgentObservingAgent): pass
 class PositionTeamTestAgent(PositionObservingAgent, AgentObservingAgent): pass
 class PositionTeamNoViewTestAgent(ComponentAgent): pass
+
 
 def test_grid_position_observer():
     agents = {
@@ -19,7 +20,7 @@ def test_grid_position_observer():
         'agent3': PositionTestAgent(id='agent3', initial_position=np.array([1, 4]), agent_view=4),
         'agent4': ComponentAgent(id='agent4', initial_position=np.array([1, 4])),
     }
-    
+
     state = GridPositionState(agents=agents, region=5)
     life = LifeState(agents=agents)
     observer = GridPositionBasedObserver(position_state=state, agents=agents)
@@ -60,23 +61,42 @@ def test_grid_position_observer():
     ]))
     assert observer.get_obs(agents['agent4']) == {}
 
+
 def test_grid_team_position_observer():
     agents = {
-        'agent0': PositionTeamTestAgent      (id='agent0', team=1, initial_position=np.array([0, 0]), agent_view=1),
-        'agent1': PositionTeamNoViewTestAgent(id='agent1', team=1, initial_position=np.array([0, 0])),
-        'agent2': PositionTeamTestAgent      (id='agent2', team=1, initial_position=np.array([2, 2]), agent_view=2),
-        'agent3': PositionTeamTestAgent      (id='agent3', team=2, initial_position=np.array([3, 2]), agent_view=3),
-        'agent4': PositionTeamTestAgent      (id='agent4', team=2, initial_position=np.array([1, 4]), agent_view=4),
-        'agent5': PositionTeamNoViewTestAgent(id='agent5', team=2, initial_position=np.array([1, 4])),
-        'agent6': PositionTeamNoViewTestAgent(id='agent6', team=2, initial_position=np.array([1, 4])),
-        'agent7': PositionTeamTestAgent      (id='agent7', team=3, initial_position=np.array([1, 4]), agent_view=2),
+        'agent0': PositionTeamTestAgent(
+            id='agent0', team=1, initial_position=np.array([0, 0]), agent_view=1
+        ),
+        'agent1': PositionTeamNoViewTestAgent(
+            id='agent1', team=1, initial_position=np.array([0, 0])
+        ),
+        'agent2': PositionTeamTestAgent(
+            id='agent2', team=1, initial_position=np.array([2, 2]), agent_view=2
+        ),
+        'agent3': PositionTeamTestAgent(
+            id='agent3', team=2, initial_position=np.array([3, 2]), agent_view=3
+        ),
+        'agent4': PositionTeamTestAgent(
+            id='agent4', team=2, initial_position=np.array([1, 4]), agent_view=4
+        ),
+        'agent5': PositionTeamNoViewTestAgent(
+            id='agent5', team=2, initial_position=np.array([1, 4])
+        ),
+        'agent6': PositionTeamNoViewTestAgent(
+            id='agent6', team=2, initial_position=np.array([1, 4])
+        ),
+        'agent7': PositionTeamTestAgent(
+            id='agent7', team=3, initial_position=np.array([1, 4]), agent_view=2
+        ),
     }
     for agent in agents.values():
         agent.position = agent.initial_position
-    
+
     state = GridPositionState(agents=agents, region=5)
     life = LifeState(agents=agents)
-    observer = GridPositionTeamBasedObserver(position_state=state, number_of_teams=3, agents=agents)
+    observer = GridPositionTeamBasedObserver(
+        position_state=state, number_of_teams=3, agents=agents
+    )
     state.reset()
     life.reset()
 
@@ -202,6 +222,7 @@ def test_grid_team_position_observer():
         [ 0.,  0.,  0., -1., -1.],
     ]))
 
+
 def test_relative_position_observer():
     agents = {
         'agent0': PositionTestAgent(id='agent0', initial_position=np.array([0, 0]), agent_view=1),
@@ -210,7 +231,7 @@ def test_relative_position_observer():
         'agent3': PositionTestAgent(id='agent3', initial_position=np.array([1, 4]), agent_view=4),
         'agent4': ComponentAgent(id='agent4', initial_position=np.array([1, 4])),
     }
-    
+
     state = GridPositionState(agents=agents, region=5)
     observer = RelativePositionObserver(position_state=state, agents=agents)
     state.reset()

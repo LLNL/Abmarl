@@ -1,3 +1,6 @@
+import fnmatch
+import os
+
 
 def custom_import_module(full_config_path):
     """
@@ -6,7 +9,7 @@ def custom_import_module(full_config_path):
 
     Parameters:
         full_config_path: Full path to the python file.
-    
+
     Returns: The python file as a module
     """
     import importlib.util
@@ -14,6 +17,7 @@ def custom_import_module(full_config_path):
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
 
 def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired):
     """
@@ -28,8 +32,11 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
             if checkpoint_desired == int(checkpoint.split('/')[-1].split('_')[-1]):
                 return checkpoint, checkpoint_desired
         import warnings
-        warnings.warn('Could not find checkpoint_{}. Attempting to load the last checkpoint.'.format(checkpoint_desired))
-    
+        warnings.warn(
+            f'Could not find checkpoint_{checkpoint_desired}. Attempting to load the last '
+            'checkpoint.'
+        )
+
     # Load the last checkpoint
     max_checkpoint = None
     max_checkpoint_value = 0
@@ -38,11 +45,12 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
         if checkpoint_value > max_checkpoint_value:
             max_checkpoint_value = checkpoint_value
             max_checkpoint = checkpoint
-    
+
     if max_checkpoint is None:
         raise FileNotFoundError("Did not find a checkpoint file in the given directory.")
-    
+
     return max_checkpoint, max_checkpoint_value
+
 
 def find_dirs_in_dir(pattern, path):
     """
@@ -50,7 +58,6 @@ def find_dirs_in_dir(pattern, path):
 
     Return: list of paths that match
     """
-    import os, fnmatch
     result = []
     for root, dirs, files in os.walk(path):
         for name in dirs:

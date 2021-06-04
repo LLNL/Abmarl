@@ -1,7 +1,7 @@
-
 from itertools import cycle
 
 from .simulation_manager import SimulationManager
+
 
 class TurnBasedManager(SimulationManager):
     """
@@ -13,7 +13,7 @@ class TurnBasedManager(SimulationManager):
     def __init__(self, env):
         super().__init__(env)
         self.agent_order = cycle(self.env.agents)
-    
+
     def reset(self, **kwargs):
         """
         Reset the environment and return the observation of the first agent.
@@ -23,7 +23,7 @@ class TurnBasedManager(SimulationManager):
         self.env.reset(**kwargs)
         next_agent = next(self.agent_order)
         return {next_agent: self.env.get_obs(next_agent)}
-    
+
     def step(self, action_dict, **kwargs):
         """
         Assert that the incoming action does not come from an agent who is recorded
@@ -34,7 +34,8 @@ class TurnBasedManager(SimulationManager):
         wrapper returns all done.
         """
         agent_id = next(iter(action_dict))
-        assert agent_id not in self.done_agents, "Received an action for an agent that is already done."
+        assert agent_id not in self.done_agents, \
+            "Received an action for an agent that is already done."
         self.env.step(action_dict, **kwargs)
 
         obs, rewards, dones, infos = {}, {}, {'__all__': self.env.get_all_done()}, {}

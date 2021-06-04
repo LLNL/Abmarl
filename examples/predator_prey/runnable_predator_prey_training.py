@@ -1,7 +1,6 @@
-
 # Setup the environment
 from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
-from admiral.managers import TurnBasedManager, AllStepManager
+from admiral.managers import AllStepManager
 
 region = 6
 predators = [Predator(id=f'predator{i}', attack=1) for i in range(2)]
@@ -22,17 +21,18 @@ agents = env.unwrapped.agents
 register_env(env_name, lambda env_config: env)
 
 # Set up heuristic policies
-from admiral.pols import RandomAction, HeuristicPolicy
-
 policies = {
     'predator': (None, agents['predator0'].observation_space, agents['predator0'].action_space, {}),
     'prey': (None, agents['prey0'].observation_space, agents['prey0'].action_space, {})
 }
+
+
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('prey'):
         return 'prey'
     else:
         return 'predator'
+
 
 # Algorithm
 algo_name = 'PG'
@@ -48,7 +48,7 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2000,
+            'episodes_total': 20_000,
         },
         'verbose': 2,
         'config': {
@@ -73,16 +73,21 @@ params = {
     }
 }
 
+
 if __name__ == "__main__":
     # Create output directory and save to params
     import os
     import time
     home = os.path.expanduser("~")
-    output_dir = os.path.join(home, 'admiral_results/{}_{}'.format(params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')))
+    output_dir = os.path.join(
+        home, 'admiral_results/{}_{}'.format(
+            params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
+        )
+    )
     params['ray_tune']['local_dir'] = output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    
+
     # Copy this configuration file to the output directory
     import shutil
     shutil.copy(os.path.join(os.getcwd(), __file__), output_dir)

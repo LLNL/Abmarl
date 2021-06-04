@@ -1,4 +1,3 @@
-
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -6,11 +5,14 @@ from admiral.envs.components.state import ContinuousPositionState, SpeedAngleSta
 from admiral.envs.components.actor import SpeedAngleMovementActor
 from admiral.envs.components.observer import SpeedObserver, AngleObserver
 from admiral.envs.components.done import TooCloseDone
-from admiral.envs.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, SpeedAngleObservingAgent, SpeedAngleObservingAgent
+from admiral.envs.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, \
+    SpeedAngleObservingAgent
 from admiral.envs import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
+
 class BirdAgent(SpeedAngleAgent, SpeedAngleActingAgent, SpeedAngleObservingAgent): pass
+
 
 class Flight(AgentBasedSimulation):
     def __init__(self, **kwargs):
@@ -21,7 +23,9 @@ class Flight(AgentBasedSimulation):
         self.speed_angle_state = SpeedAngleState(**kwargs)
 
         # Actor
-        self.move_actor = SpeedAngleMovementActor(position_state=self.position_state, speed_angle_state=self.speed_angle_state, **kwargs)
+        self.move_actor = SpeedAngleMovementActor(
+            position_state=self.position_state, speed_angle_state=self.speed_angle_state, **kwargs
+        )
 
         # Observer
         self.speed_observer = SpeedObserver(**kwargs)
@@ -35,11 +39,14 @@ class Flight(AgentBasedSimulation):
     def reset(self, **kwargs):
         self.position_state.reset(**kwargs)
         self.speed_angle_state.reset(**kwargs)
-    
+
     def step(self, action_dict, **kwargs):
         for agent, action in action_dict.items():
-            self.move_actor.process_move(self.agents[agent], action.get('accelerate', np.zeros(1)), action.get('bank', np.zeros(1)), **kwargs)
-        
+            self.move_actor.process_move(
+                self.agents[agent], action.get('accelerate', np.zeros(1)),
+                action.get('bank', np.zeros(1)), **kwargs
+            )
+
     def render(self, fig=None, **kwargs):
         fig.clear()
 
@@ -77,14 +84,15 @@ class Flight(AgentBasedSimulation):
     def get_info(self, agent_id, **kwargs):
         pass
 
+
 if __name__ == "__main__":
     agents = {
         f'bird{i}': BirdAgent(
-                id=f'bird{i}', min_speed=0.5, max_speed=1.0, max_acceleration=0.1, \
-                max_banking_angle=90, max_banking_angle_change=90, \
-                initial_banking_angle=30
-            ) for i in range(24)
-        }
+            id=f'bird{i}', min_speed=0.5, max_speed=1.0, max_acceleration=0.1,
+            max_banking_angle=90, max_banking_angle_change=90,
+            initial_banking_angle=30
+        ) for i in range(24)
+    }
 
     env = Flight(
         region=20,

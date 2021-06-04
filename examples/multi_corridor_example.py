@@ -1,22 +1,22 @@
-
 from admiral.envs.corridor import MultiCorridor
-from admiral.managers import TurnBasedManager, AllStepManager
+from admiral.managers import TurnBasedManager
 from admiral.external import MultiAgentWrapper
 
-env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
+env = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
 
 env_name = "MultiCorridor"
 from ray.tune.registry import register_env
 register_env(env_name, lambda env_config: env)
 
-
-from ray.rllib.examples.policy.random_policy import RandomPolicy
 agents = env.unwrapped.agents
 policies = {
     'corridor': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
 }
+
+
 def policy_mapping_fn(agent_id):
     return 'corridor'
+
 
 # Experiment parameters
 params = {

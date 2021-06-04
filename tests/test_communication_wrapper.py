@@ -1,10 +1,10 @@
-
 from gym.spaces import Discrete
 import numpy as np
 
 from admiral.envs.wrappers import CommunicationHandshakeWrapper
 
 from .helpers import MultiAgentGymSpacesEnv
+
 
 class CommsEnv(MultiAgentGymSpacesEnv):
     def get_obs(self, my_id, fusion_matrix={}):
@@ -28,7 +28,8 @@ class CommsEnv(MultiAgentGymSpacesEnv):
                 my_obs[0:-1] += [agent_3_obs['first'], agent_3_obs['second']][:]
 
         return my_obs
-        
+
+
 def test_communication_wrapper_init():
     env = CommsEnv()
     wrapped_env = CommunicationHandshakeWrapper(env)
@@ -46,17 +47,21 @@ def test_communication_wrapper_init():
             assert agent.action_space['receive'][other_agent] == Discrete(2)
             assert agent.observation_space['message_buffer'][other_agent] == Discrete(2)
 
+
 def test_communication_wrapper_reset():
     env = CommunicationHandshakeWrapper(CommsEnv())
     env.reset()
     for values in env.message_buffer.values():
-        assert all([True if val == False else False for val in values.values()])
+        assert all([True if not val else False for val in values.values()])
     for values in env.received_message.values():
-        assert all([True if val == False else False for val in values.values()])
+        assert all([True if not val else False for val in values.values()])
 
     for agent_id in env.agents:
         assert 'env_obs' in env.get_obs(agent_id)
-    assert env.message_buffer == {agent_id: env.get_obs(agent_id)['message_buffer'] for agent_id in env.agents}
+    assert env.message_buffer == {
+        agent_id: env.get_obs(agent_id)['message_buffer'] for agent_id in env.agents
+    }
+
 
 def test_communication_wrapper_step():
     env = CommunicationHandshakeWrapper(CommsEnv())
@@ -89,13 +94,21 @@ def test_communication_wrapper_step():
         agent_info = env.get_info(agent_id)
         assert 'send' not in agent_info and 'receive' not in agent_info
     assert env.get_obs('agent0')['env_obs'] == [0, 0, 0, 1]
-    assert env.get_obs('agent0')['message_buffer'] == {'agent1': True, 'agent2': True, 'agent3': False}
+    assert env.get_obs('agent0')['message_buffer'] == {
+        'agent1': True, 'agent2': True, 'agent3': False
+    }
     assert env.get_obs('agent1')['env_obs'] == 0
-    assert env.get_obs('agent1')['message_buffer'] == {'agent0': True, 'agent2': True, 'agent3': False}
+    assert env.get_obs('agent1')['message_buffer'] == {
+        'agent0': True, 'agent2': True, 'agent3': False
+    }
     assert env.get_obs('agent2')['env_obs'] == [1, 0]
-    assert env.get_obs('agent2')['message_buffer'] == {'agent0': True, 'agent1': False, 'agent3': True}
+    assert env.get_obs('agent2')['message_buffer'] == {
+        'agent0': True, 'agent1': False, 'agent3': True
+    }
     assert env.get_obs('agent3')['env_obs'] == {'first': 1, 'second': [3, 1]}
-    assert env.get_obs('agent3')['message_buffer'] == {'agent0': True, 'agent1': False, 'agent2': False}
+    assert env.get_obs('agent3')['message_buffer'] == {
+        'agent0': True, 'agent1': False, 'agent2': False
+    }
 
     action_1 = {
         'agent0': {
@@ -121,13 +134,21 @@ def test_communication_wrapper_step():
     }
     env.step(action_1)
     assert env.get_obs('agent0')['env_obs'] == [0, 0, 0, 1]
-    assert env.get_obs('agent0')['message_buffer'] == {'agent1': True, 'agent2': True, 'agent3': False}
+    assert env.get_obs('agent0')['message_buffer'] == {
+        'agent1': True, 'agent2': True, 'agent3': False
+    }
     assert env.get_obs('agent1')['env_obs'] == 0
-    assert env.get_obs('agent1')['message_buffer'] == {'agent0': False, 'agent2': True, 'agent3': True}
+    assert env.get_obs('agent1')['message_buffer'] == {
+        'agent0': False, 'agent2': True, 'agent3': True
+    }
     assert env.get_obs('agent2')['env_obs'] == [1, 0]
-    assert env.get_obs('agent2')['message_buffer'] == {'agent0': False, 'agent1': False, 'agent3': True}
+    assert env.get_obs('agent2')['message_buffer'] == {
+        'agent0': False, 'agent1': False, 'agent3': True
+    }
     assert env.get_obs('agent3')['env_obs'] == {'first': 1, 'second': [3, 1]}
-    assert env.get_obs('agent3')['message_buffer'] == {'agent0': False, 'agent1': True, 'agent2': False}
+    assert env.get_obs('agent3')['message_buffer'] == {
+        'agent0': False, 'agent1': True, 'agent2': False
+    }
 
     action_2 = {
         'agent0': {
@@ -153,10 +174,18 @@ def test_communication_wrapper_step():
     }
     env.step(action_2)
     assert env.get_obs('agent0')['env_obs'] == [0, 0, 1, 0, 0, 1]
-    assert env.get_obs('agent0')['message_buffer'] == {'agent1': True, 'agent2': True, 'agent3': False}
+    assert env.get_obs('agent0')['message_buffer'] == {
+        'agent1': True, 'agent2': True, 'agent3': False
+    }
     assert env.get_obs('agent1')['env_obs'] == 0
-    assert env.get_obs('agent1')['message_buffer'] == {'agent0': True, 'agent2': True, 'agent3': False}
+    assert env.get_obs('agent1')['message_buffer'] == {
+        'agent0': True, 'agent2': True, 'agent3': False
+    }
     assert env.get_obs('agent2')['env_obs'] == [1, 0]
-    assert env.get_obs('agent2')['message_buffer'] == {'agent0': True, 'agent1': False, 'agent3': True}
+    assert env.get_obs('agent2')['message_buffer'] == {
+        'agent0': True, 'agent1': False, 'agent3': True
+    }
     assert env.get_obs('agent3')['env_obs'] == {'first': 0, 'second': [3, 1]}
-    assert env.get_obs('agent3')['message_buffer'] == {'agent0': True, 'agent1': False, 'agent2': False}
+    assert env.get_obs('agent3')['message_buffer'] == {
+        'agent0': True, 'agent1': False, 'agent2': False
+    }
