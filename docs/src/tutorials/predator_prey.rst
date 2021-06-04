@@ -10,9 +10,11 @@ between groups of agents. Resources "grow" in a two-dimensional grid. Prey agent
 move around the grid harvesting resources, and predator agents move around the
 grid hunting the prey agents.
    
-.. image:: /.images/predatorprey.*
+.. figure:: /.images/predatorprey.*
    :width: 80 %
    :alt: Animation of predator and prey agents in a two-dimensional grid.
+
+   Animation of predator and prey agents in a two-dimensional grid.
 
 .. ATTENTION::
    TODO: Is it safe to have this .gif here when we go to pdf?

@@ -11,9 +11,11 @@ Our implementation provides the ability to instantiate multiple agents in the si
 and restricts agents from occupying the same square. Every agent is homogeneous:
 they all have the same action space, observation space, and objective function.
 
-.. image:: /.images/multicorridor.*
+.. figure:: /.images/multicorridor.*
    :width: 80 %
-   :alt: Animation of agents moving back and forth in a corridor until they reach the end.
+   :alt: Animation of agents moving left and right in a corridor until they reach the end.
+
+   Animation of agents moving left and right in a corridor until they reach the end.
 
 .. ATTENTION::
    TODO: Is it safe to have this .gif here when we go to pdf?
