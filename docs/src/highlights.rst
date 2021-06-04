@@ -30,10 +30,10 @@ Single Agent Foraging
 We start by considering a single foraging agent whose objective is to move around
 the map collecting resources. The resources are technically agents themselves,
 although they don't do anything and don't learn anything. The single foraging agent
-can see up to 3 squares away and can move up to 1 square away. The agent is rewarded
-for every resource it collects and given a small penalty for attempting to move
-off the map and an even smaller "entropy" penalty every time-step to encourage
-it to act quickly. At the beginning of every episode, the agent and resources spawn
+can see up to three squares away, move up to one square away, and forage resources up
+to one square away. The agent is rewarded for every resource it collects and given a small penalty
+for attempting to move off the map and an even smaller "entropy" penalty every time-step to
+encourage it to act quickly. At the beginning of every episode, the agent and resources spawn
 at random locations in the map. Below is a video showing a typical full episode
 of the learned behavior and a brief analysis.
 
@@ -150,9 +150,76 @@ the resources over keeping their distance from each other.
 
 Introducing Hunters
 ```````````````````
+So far, we have seen intelligent behaviors emerge in both single- and multi-agent
+scnearios. In the multiagent scenario, we even saw the emergence of collaborative
+behavior. In the following experiments, we explore competitive emergence by introducing
+hunters into the simulation. Like foragers, hunters can move up to one square away
+and observe other agents and map edges up to three squares away. Hunters, however,
+are more effective killers and can kill a forager up to two squares away. They are
+rewarded for successful kills and penalized for bad moves and taking too long exactly
+the same way as foragers.
 
+While these agents may seem (almost) homogeneous, their resulting behaviors should
+be very different. A forager who observes another forager should not be alarmed
+and, as we saw above, can be repelled in order to "cover and explore"; but a hunter
+who observes a forger should not be repelled but attracted. Therefore, because
+we expect their behaviors to be different, we'll set up two policies. All the hunters
+will train the same policy, and all the foragers will train the same policy, and
+these policies will be distinct.
 
-Hunters effectively hunt agents.
-Highlight some of the behaviors I put in the slides.
+The leanred behaviors among the two groups in this mixed collaborate-competitive
+simulation are tightly integrated, with multiple behavior patterns happening at
+once within a simulation. Therefore, in contrast to above, we will not show video
+clips that capture a single behavior type; instead, we will show video clips that
+capture many interesting behaviors and attempt to describe them in detail.
 
+First Scenario
+''''''''''''''
 
+.. image:: .images/teams_scenario_1.gif
+   :width: 100 %
+   :alt: Video showing the first scenario with hunters and foragers.
+
+Two of the foragers spawn next to hunters and are killed immediately. Afterwards,
+two of the hunters do not observe any foragers for some time. They seem to have
+learned the *cover* behavior by spreading out, but they don't seem to have
+learned an effecient *explore* behavior since they mostly occupy the same region
+of the map for the duration of the experiment.
+
+The three foragers that remain at the bottom of the map. These foragers
+work together to collect all nearby resources. Just as they finish the resource cluster,
+a hunter moves within range and begins to chase them towards the bottom of the
+map. When they hit the edge, they split in two directions. The hunter kills
+one of them and then waits for one step, unsure about which forager to persue next.
+After one step, we see that it decides to persue the forager to the right.
+
+Meanwhile, the forager to the left continues to run away, straight into the path
+of another hunter but also another resource. The forager could get away by running
+to the right, but it decides to collect the resource at the cost of its own life.
+
+The last remaining forager has escaped the hunter and has conveniently found another
+cluster of resources, which it collects. A few frames later, it encounters the
+same hunter, and this time it is chased all the way across the map. It manages
+to evade the hunter and collect one final resource before encountering yet another
+hunter. At the end, we see both hunters chasing the forager to the top of the map,
+boxing it in and killing it.
+
+Second scenario
+'''''''''''''''
+
+.. image:: .images/teams_scenario_2.gif
+   :width: 100 %
+   :alt: Video showing the second scenario with hunters and foragers.
+
+None of the foragers are under threat at the beginning of this scenario. They clear
+a cluster of resources before one of them wanders into the path of a hunter. The
+hunter gives chase, and the forager actually leads the hunter back to the group.
+This works to its benefit, however, as the hunter is repeatedlyconfused by the
+foragers exercising the *splitting* strategy. Meanwhile the second hunter has spotted
+a forager and gives chase. The two hunters together are able to split up the pack
+of foragers and systematically hunt them down. The last forager is chased into the
+corner and killed.
+
+.. NOTE::
+   Humorously, the first forager that was spotted is the one who manages to stay
+   alive the longest.
