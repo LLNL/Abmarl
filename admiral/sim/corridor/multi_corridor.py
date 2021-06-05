@@ -3,12 +3,12 @@ from enum import IntEnum
 from gym.spaces import Dict, Box, Discrete, MultiBinary
 import numpy as np
 
-from admiral.envs import AgentBasedSimulation, Agent
+from admiral.sim import AgentBasedSimulation, Agent
 
 
 class MultiCorridor(AgentBasedSimulation):
     """
-    MultiCorridor Environment used for testing. Multiple agents spawn along
+    MultiCorridor simulation used for testing. Multiple agents spawn along
     a corridor and can choose to move left, right, or stay still. The agents
     must learn to move to the right until they reach the end position. The agent
     cannot move to spaces that area already occupied by other agents. An agent
@@ -96,10 +96,10 @@ class MultiCorridor(AgentBasedSimulation):
 
     def render(self, *args, fig=None, **kwargs):
         """
-        Visualize the state of the environment. If a figure is received, then we
+        Visualize the state of the simulation. If a figure is received, then we
         will draw but not actually plot because we assume the caller will do the
         work (e.g. with an Animation object). If there is no figure received, then
-        we will draw and plot the environment.
+        we will draw and plot the simulation.
         """
         draw_now = fig is None
         if draw_now:
@@ -148,7 +148,7 @@ class MultiCorridor(AgentBasedSimulation):
 
     def get_all_done(self, **kwargs):
         """
-        Environment is done when all agents have reached the end of the corridor.
+        Simulation is done when all agents have reached the end of the corridor.
         """
         for agent in self.agents.values():
             if agent.position != self.end - 1:
@@ -165,7 +165,7 @@ class MultiCorridor(AgentBasedSimulation):
 
     def get_info(self, agent_id, **kwargs):
         """
-        Just return an empty dictionary becuase this environment does not track
+        Just return an empty dictionary becuase this simulation does not track
         any info.
         """
         return {}

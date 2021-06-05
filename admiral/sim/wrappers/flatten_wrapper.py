@@ -173,9 +173,9 @@ class FlattenWrapper(SARWrapper):
     """
     Flattens all agents' action and observation spaces into continuous Boxes.
     """
-    def __init__(self, env):
-        super().__init__(env)
-        for agent_id, wrapped_agent in self.env.agents.items(): # Wrap the agents' spaces
+    def __init__(self, sim):
+        super().__init__(sim)
+        for agent_id, wrapped_agent in self.sim.agents.items(): # Wrap the agents' spaces
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
             self.agents[agent_id].observation_space = flatten_space(
                 wrapped_agent.observation_space
@@ -198,10 +198,10 @@ class FlattenActionWrapper(SARWrapper):
     """
     Flattens all agents' action spaces into continuous Boxes.
     """
-    def __init__(self, env):
-        super().__init__(env)
-        self.agents = copy.deepcopy(self.env.agents)
-        for agent_id, wrapped_agent in self.env.agents.items():
+    def __init__(self, sim):
+        super().__init__(sim)
+        self.agents = copy.deepcopy(self.sim.agents)
+        for agent_id, wrapped_agent in self.sim.agents.items():
             # Wrap the action spaces of the agents
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
 

@@ -26,7 +26,7 @@ observation and action spaces.
    to move or to "attack" another agent in one of the nearby squares. The policy is just a simple
    2-layer MLP, each layer having 64 units. We don’t apply any kind of specialized
    architecture that encourages collaboration or competition. Each agent is simple: they do not
-   have a model of the simulation; they do not have a global view of the environment; their
+   have a model of the simulation; they do not have a global view of the simulation; their
    actions are only local in both space and in agent interaction (they can only
    interact with one agent at a time). Yet, we will see efficient and complex
    strategies emerge, collaboration and competition from the common or conflicting

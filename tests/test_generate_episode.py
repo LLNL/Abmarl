@@ -1,7 +1,7 @@
 from admiral.algs.generate_episode import generate_episode
 
 
-class Env:
+class Sim:
     def reset(self):
         self.count = 0
         return self.count
@@ -23,7 +23,7 @@ class Policy:
 
 
 def test_generate_episode():
-    states, actions, rewards = generate_episode(Env(), Policy())
+    states, actions, rewards = generate_episode(Sim(), Policy())
     assert states == [0, 1, -2, 4, -8, 16, -32, 64]
     assert actions == [1, -2, 4, -8, 16, -32, 64, -128]
     assert rewards == [1, -2, 4, -8, 16, -32, 64, -128]

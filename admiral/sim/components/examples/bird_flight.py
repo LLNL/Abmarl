@@ -1,13 +1,13 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import ContinuousPositionState, SpeedAngleState
-from admiral.envs.components.actor import SpeedAngleMovementActor
-from admiral.envs.components.observer import SpeedObserver, AngleObserver
-from admiral.envs.components.done import TooCloseDone
-from admiral.envs.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, \
+from admiral.sim.components.state import ContinuousPositionState, SpeedAngleState
+from admiral.sim.components.actor import SpeedAngleMovementActor
+from admiral.sim.components.observer import SpeedObserver, AngleObserver
+from admiral.sim.components.done import TooCloseDone
+from admiral.sim.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, \
     SpeedAngleObservingAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -94,22 +94,22 @@ if __name__ == "__main__":
         ) for i in range(24)
     }
 
-    env = Flight(
+    sim = Flight(
         region=20,
         agents=agents,
         collision_distance=1.0,
     )
     fig = plt.figure()
-    env.reset()
-    env.render(fig=fig)
+    sim.reset()
+    sim.render(fig=fig)
 
-    print(env.get_obs('bird0'))
+    print(sim.get_obs('bird0'))
 
     for i in range(50):
-        env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
-        env.render(fig=fig)
+        sim.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+        sim.render(fig=fig)
         for agent in agents:
-            print(agent, ': ', env.get_done(agent))
+            print(agent, ': ', sim.get_done(agent))
         print('\n')
 
-    print(env.get_all_done())
+    print(sim.get_all_done())

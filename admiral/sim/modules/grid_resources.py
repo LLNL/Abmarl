@@ -4,7 +4,7 @@ import numpy as np
 class GridResources:
     """
     GridResources provides resources that exist on the grid and can be consumed
-    by agents in the environemnt via their "harvest" action. The resources will
+    by agents in the simulation via their "harvest" action. The resources will
     replenish over time. The grid is covered up to some coverage percentage, and
     the initial value of the resources on each cell are random between the minimum
     and maximum values.
@@ -77,7 +77,7 @@ class GridResources:
         return ax
 
     @classmethod
-    def build(cls, env_config={}):
+    def build(cls, sim_config={}):
         config = {
             'region': 10,
             'max_value': 1.,
@@ -86,5 +86,5 @@ class GridResources:
             'coverage': 0.75
         }
         for key, value in config.items():
-            config[key] = env_config.get(key, value)
+            config[key] = sim_config.get(key, value)
         return cls(config)

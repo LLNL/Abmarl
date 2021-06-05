@@ -2,13 +2,13 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.state import GridPositionState, LifeState, GridResourceState
-from admiral.envs.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
-from admiral.envs.components.actor import GridMovementActor, AttackActor, GridResourcesActor
-from admiral.envs.components.done import TeamDeadDone
-from admiral.envs.components.agent import AgentObservingAgent, PositionObservingAgent, \
+from admiral.sim.components.state import GridPositionState, LifeState, GridResourceState
+from admiral.sim.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
+from admiral.sim.components.actor import GridMovementActor, AttackActor, GridResourcesActor
+from admiral.sim.components.done import TeamDeadDone
+from admiral.sim.components.agent import AgentObservingAgent, PositionObservingAgent, \
     ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -23,7 +23,7 @@ class PredatorAgent(
 ): pass
 
 
-class PredatorPreyEnvGridBased(AgentBasedSimulation):
+class PredatorPreySimGridBased(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -142,22 +142,22 @@ if __name__ == '__main__':
     }
     agents = {**prey, **predators}
     region = 10
-    env = PredatorPreyEnvGridBased(
+    sim = PredatorPreySimGridBased(
         region=region,
         agents=agents,
         number_of_teams=2,
         entropy=0.05
     )
-    env.reset()
-    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    sim.reset()
+    print({agent_id: sim.get_obs(agent_id) for agent_id in sim.agents})
     fig = plt.gcf()
-    env.render(fig=fig)
+    sim.render(fig=fig)
 
     for _ in range(50):
         action_dict = {
-            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            agent.id: agent.action_space.sample() for agent in sim.agents.values()
             if agent.is_alive
         }
-        env.step(action_dict)
-        env.render(fig=fig)
-        print(env.get_all_done())
+        sim.step(action_dict)
+        sim.render(fig=fig)
+        print(sim.get_all_done())

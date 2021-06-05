@@ -1,12 +1,12 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import GridPositionState, LifeState
-from admiral.envs.components.observer import GridPositionTeamBasedObserver
-from admiral.envs.components.actor import GridMovementActor
-from admiral.envs.components.agent import PositionObservingAgent, AgentObservingAgent, \
+from admiral.sim.components.state import GridPositionState, LifeState
+from admiral.sim.components.observer import GridPositionTeamBasedObserver
+from admiral.sim.components.actor import GridMovementActor
+from admiral.sim.components.agent import PositionObservingAgent, AgentObservingAgent, \
     GridMovementAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -111,78 +111,78 @@ if __name__ == '__main__':
             id='agent5', team=3, agent_view=1, move_range=0, initial_position=np.array([4, 4])
         ),
     }
-    env = SimpleGridObservations(
+    sim = SimpleGridObservations(
         region=5,
         agents=agents,
         number_of_teams=3
     )
-    obs = env.reset()
+    obs = sim.reset()
     fig = plt.gcf()
-    env.render(fig=fig)
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([-1, 0])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([-1, 0])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([0, 1])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([0, 1])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([0, 1])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([0, 1])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([1, 0])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([1, 0])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([1, 0])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([1, 0])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([0, -1])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([0, -1])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([0, -1])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([0, -1])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])
     print(obs['agent0']['position'][:, :, 3])
     print()
 
-    obs = env.step({'agent0': {'move': np.array([-1, 0])}})
-    env.render(fig=fig)
+    obs = sim.step({'agent0': {'move': np.array([-1, 0])}})
+    sim.render(fig=fig)
     print(obs['agent0']['position'][:, :, 0])
     print(obs['agent0']['position'][:, :, 1])
     print(obs['agent0']['position'][:, :, 2])

@@ -4,14 +4,14 @@ from enum import IntEnum
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
-from admiral.envs import PrincipleAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import PrincipleAgent
+from admiral.sim import AgentBasedSimulation
 
 
 class PredatorPreyAgent(PrincipleAgent, ABC):
     """
     In addition to their own agent-type-specific parameters, every Agent in the
-    Predator Prey environment will have the following parameters:
+    Predator Prey simulation will have the following parameters:
 
     move: int
         The maximum movement range. 0 means the agent can only stay, 1 means the agent
@@ -99,15 +99,15 @@ class Predator(PredatorPreyAgent):
         return 2
 
 
-class PredatorPreyEnv(AgentBasedSimulation):
+class PredatorPreySimulation(AgentBasedSimulation):
     """
     Each agent observes other agents around its own location. Both predators and
     prey agents can move around. Predators' goal is to approach prey and attack
     it. Preys' goal is to stay alive for as long as possible.
 
-    Note: we recommend that you use the class build function to instantiate the environment because
-    it has smart config checking for the environment and will create agents that are configured to
-    work with the environment.
+    Note: we recommend that you use the class build function to instantiate the simulation because
+    it has smart config checking for the simulation and will create agents that are configured to
+    work with the simulation.
     """
 
     class ObservationMode(IntEnum):
@@ -141,7 +141,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
             agent.position = np.random.randint(0, self.region, 2)
 
         # Holding for all agents that have died. Agents
-        # in the cememtery are effectively removed from the environment. They don't
+        # in the cememtery are effectively removed from the simulation. They don't
         # appear in other agents' observations and they don't have observations
         # of their own, except for the one step in which they died.
         self.cemetery = set()
@@ -151,7 +151,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
     def step(self, joint_actions, **kwargs):
         """
-        The environment will update its state with the joint actions from all
+        The simulation will update its state with the joint actions from all
         the agents. All agents can choose to move up to the amount of squares
         enabled in their move configuration. In addition, predators can choose
         to ATTACK.
@@ -194,7 +194,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
     def get_all_done(self, **kwargs):
         """
-        If there are no prey left, the environment is done.
+        If there are no prey left, the simulation is done.
         """
         if self.step_count >= self.max_steps:
             return True
@@ -205,14 +205,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
     def get_info(self, agent_id, **kwargs):
         """
-        Just return an empty dictionary becuase this environment does not track
+        Just return an empty dictionary becuase this simulation does not track
         any info.
         """
         return {}
 
     def _process_move_action(self, agent, action):
         """
-        The environment will attempt to move the agent according to its action.
+        The simulation will attempt to move the agent according to its action.
         If that move is successful, the agent will move and we will return GOOD_MOVE.
         If that move is unsuccessful, the agent will not move and we will return
         BAD_MOVE. Moves can be unsuccessful if the agent moves against a wall.
@@ -234,7 +234,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
     def _process_attack_action(self, predator):
         """
-        The environment will process the predator's attack action. If that attack
+        The simulation will process the predator's attack action. If that attack
         is successful, the prey will be added to the morgue and we will return
         GOOD_ATTACK. If the attack is unsuccessful, then we will return BAD_ATTACK.
 
@@ -254,7 +254,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
     def _process_harvest_action(self, prey):
         """
-        The environment will process the prey's harvest action by calling the resources
+        The simulation will process the prey's harvest action by calling the resources
         harvest api. If the amount harvested is the same as the amount attempted
         to harvest, then it was a good harvest. Otherwise, the agent over-harvested,
         or harvested a resource that wasn't ready yet, and so it was a bad harvest.
@@ -269,7 +269,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
             return self.ActionStatus.BAD_HARVEST
 
     @classmethod
-    def build(cls, env_config={}):
+    def build(cls, sim_config={}):
         """
         Parameters
         ----------
@@ -326,7 +326,7 @@ class PredatorPreyEnv(AgentBasedSimulation):
 
         Returns:
         --------
-        Configured instance of PredatorPreyEnv with configured PredatorPreyAgents.
+        Configured instance of PredatorPreySimulation with configured PredatorPreyAgents.
         """
         config = {  # default config
             'region': 10,
@@ -338,8 +338,8 @@ class PredatorPreyEnv(AgentBasedSimulation):
         }
 
         # --- region --- #
-        if 'region' in env_config:
-            region = env_config['region']
+        if 'region' in sim_config:
+            region = sim_config['region']
             if type(region) is not int or region < 2:
                 raise TypeError("region must be an integer greater than 2.")
             else:
@@ -370,39 +370,39 @@ class PredatorPreyEnv(AgentBasedSimulation):
         }
 
         # --- max_steps --- #
-        if 'max_steps' in env_config:
-            max_steps = env_config['max_steps']
+        if 'max_steps' in sim_config:
+            max_steps = sim_config['max_steps']
             if type(max_steps) is not int or max_steps < 1:
                 raise TypeError("max_steps must be an integer at least 1.")
             else:
                 config['max_steps'] = max_steps
 
         # --- observation_mode --- #
-        if 'observation_mode' in env_config:
-            observation_mode = env_config['observation_mode']
+        if 'observation_mode' in sim_config:
+            observation_mode = sim_config['observation_mode']
             if observation_mode not in cls.ObservationMode:
                 raise TypeError("observation_mode must be either GRID or DISTANCE.")
             else:
                 config['observation_mode'] = observation_mode
 
         # --- rewards --- #
-        if 'rewards' in env_config:
-            rewards = env_config['rewards']
+        if 'rewards' in sim_config:
+            rewards = sim_config['rewards']
             if type(rewards) is not dict:
                 raise TypeError("rewards must be a dict (see docstring).")
             else:
                 config['rewards'] = rewards
 
         # --- resources --- #
-        from admiral.envs.modules import GridResources
-        if 'resources' not in env_config:
-            env_config['resources'] = {}
-        env_config['resources']['region'] = config['region']
-        config['resources'] = GridResources.build(env_config['resources'])
+        from admiral.sim.modules import GridResources
+        if 'resources' not in sim_config:
+            sim_config['resources'] = {}
+        sim_config['resources']['region'] = config['region']
+        config['resources'] = GridResources.build(sim_config['resources'])
 
         # --- agents --- #
-        if 'agents' in env_config:
-            agents = env_config['agents']
+        if 'agents' in sim_config:
+            agents = sim_config['agents']
             if type(agents) is not list:
                 raise TypeError(
                     "agents must be a list of PredatorPreyAgent objects. "
@@ -484,14 +484,14 @@ class PredatorPreyEnv(AgentBasedSimulation):
         config['agents'] = {agent.id: agent for agent in config['agents']}
 
         if config['observation_mode'] == cls.ObservationMode.GRID:
-            return PredatorPreyEnvGridObs(config)
+            return PredatorPreySimGridObs(config)
         else:
-            return PredatorPreyEnvDistanceObs(config)
+            return PredatorPreySimDistanceObs(config)
 
 
-class PredatorPreyEnvGridObs(PredatorPreyEnv):
+class PredatorPreySimGridObs(PredatorPreySimulation):
     """
-    PredatorPreyEnv where observations are of the grid and the items/agents on
+    PredatorPreySimulation where observations are of the grid and the items/agents on
     that grid up to the view.
     """
     def __init__(self, config):
@@ -516,15 +516,15 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
                 action_status = self._process_move_action(prey, action['move'])
             self.rewards[prey_id] = self.reward_map['prey'][action_status]
 
-        # Now process the other pieces of the environment
+        # Now process the other pieces of the simulation
         self.resources.regrow()
 
     def render(self, *args, fig=None, **kwargs):
         """
-        Visualize the state of the environment. If a figure is received, then we
+        Visualize the state of the simulation. If a figure is received, then we
         will draw but not actually plot because we assume the caller will do the
         work (e.g. with an Animation object). If there is no figure received, then
-        we will draw and plot the environment. Call the resources render function
+        we will draw and plot the simulation. Call the resources render function
         too to plot the resources heatmap.
         """
         draw_now = fig is None
@@ -635,9 +635,9 @@ class PredatorPreyEnvGridObs(PredatorPreyEnv):
         return signal
 
 
-class PredatorPreyEnvDistanceObs(PredatorPreyEnv):
+class PredatorPreySimDistanceObs(PredatorPreySimulation):
     """
-    PredatorPrey environment where observations are of the distance from each
+    PredatorPrey simulation where observations are of the distance from each
     other agent within the view.
     """
     def step(self, joint_actions, **kwargs):
@@ -652,10 +652,10 @@ class PredatorPreyEnvDistanceObs(PredatorPreyEnv):
 
     def render(self, *args, fig=None, **kwargs):
         """
-        Visualize the state of the environment. If a figure is received, then we
+        Visualize the state of the simulation. If a figure is received, then we
         will draw but not actually plot because we assume the caller will do the
         work (e.g. with an Animation object). If there is no figure received, then
-        we will draw and plot the environment.
+        we will draw and plot the simulation.
         """
         draw_now = fig is None
         if draw_now:

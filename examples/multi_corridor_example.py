@@ -1,14 +1,14 @@
-from admiral.envs.corridor import MultiCorridor
+from admiral.sim.corridor import MultiCorridor
 from admiral.managers import TurnBasedManager
 from admiral.external import MultiAgentWrapper
 
-env = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
+sim = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
 
-env_name = "MultiCorridor"
+sim_name = "MultiCorridor"
 from ray.tune.registry import register_env
-register_env(env_name, lambda env_config: env)
+register_env(sim_name, lambda sim_config: sim)
 
-agents = env.unwrapped.agents
+agents = sim.unwrapped.agents
 policies = {
     'corridor': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
 }
@@ -21,8 +21,8 @@ def policy_mapping_fn(agent_id):
 # Experiment parameters
 params = {
     'experiment': {
-        'title': f'{env_name}',
-        'env_creator': lambda config=None: env,
+        'title': f'{sim_name}',
+        'sim_creator': lambda config=None: sim,
     },
     'ray_tune': {
         'run_or_experiment': 'PG',
@@ -33,8 +33,8 @@ params = {
         },
         'verbose': 2,
         'config': {
-            # --- Environment ---
-            'env': env_name,
+            # --- Simulation ---
+            'env': sim_name,
             'horizon': 200,
             'env_config': {},
             # --- Multiagent ---
@@ -46,7 +46,7 @@ params = {
             # --- Parallelism ---
             # Number of workers per experiment: int
             "num_workers": 7,
-            # Number of environments that each worker starts: int
+            # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
     }

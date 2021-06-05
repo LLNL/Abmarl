@@ -1,12 +1,12 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import VelocityState, ContinuousPositionState
-from admiral.envs.components.actor import AccelerationMovementActor, ContinuousCollisionActor
-from admiral.envs.components.observer import VelocityObserver, PositionObserver
-from admiral.envs.components.agent import VelocityAgent, AcceleratingAgent, \
+from admiral.sim.components.state import VelocityState, ContinuousPositionState
+from admiral.sim.components.actor import AccelerationMovementActor, ContinuousCollisionActor
+from admiral.sim.components.observer import VelocityObserver, PositionObserver
+from admiral.sim.components.agent import VelocityAgent, AcceleratingAgent, \
     VelocityObservingAgent, PositionObservingAgent, ActingAgent, CollisionAgent, ComponentAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -18,7 +18,7 @@ class FixedLandmark(ComponentAgent): pass
 class MovingLandmark(VelocityAgent): pass
 
 
-class ParticleEnv(AgentBasedSimulation):
+class ParticleSim(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -130,19 +130,19 @@ if __name__ == "__main__":
         'moving_landmark0': MovingLandmark(id='moving_landmark0', max_speed=1),
     }
 
-    env = ParticleEnv(
+    sim = ParticleSim(
         agents=agents,
         region=10,
         friction=0.0
     )
     fig = plt.figure()
-    env.reset()
-    env.render(fig=fig)
+    sim.reset()
+    sim.render(fig=fig)
 
     for _ in range(50):
         action = {
             agent.id: agent.action_space.sample() for agent in agents.values()
             if isinstance(agent, ActingAgent)
         }
-        env.step(action)
-        env.render(fig=fig)
+        sim.step(action)
+        sim.render(fig=fig)

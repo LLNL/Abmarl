@@ -39,12 +39,12 @@ def _start(full_trained_directory, requested_checkpoint, seed=None):
     )
     trainer.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
 
-    # Get the environment
-    env = experiment_mod.params['experiment']['env_creator'](
-        experiment_mod.params['ray_tune']['config']['env_config']
+    # Get the simulation
+    sim = experiment_mod.params['experiment']['sim_creator'](
+        experiment_mod.params['ray_tune']['config']['sim_config']
     )
 
-    return env, trainer
+    return sim, trainer
 
 
 def _finish():
@@ -54,21 +54,21 @@ def _finish():
 
 def run_analysis(full_trained_directory, full_subscript, parameters):
     """Analyze MARL policies from a saved policy through an analysis script"""
-    env, trainer = _start(full_trained_directory, parameters.checkpoint, parameters.seed)
+    sim, trainer = _start(full_trained_directory, parameters.checkpoint, parameters.seed)
 
     # Load the analysis module and run it
     analysis_mod = adu.custom_import_module(full_subscript)
-    analysis_mod.run(env, trainer)
+    analysis_mod.run(sim, trainer)
 
     _finish()
 
 
 def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
-    env, trainer = _start(full_trained_directory, parameters.checkpoint, seed=parameters.seed)
+    sim, trainer = _start(full_trained_directory, parameters.checkpoint, seed=parameters.seed)
 
     # Determine if we are single- or multi-agent case.
-    def _multi_get_action(obs, done=None, env=None, policy_agent_mapping=None, **kwargs):
+    def _multi_get_action(obs, done=None, sim=None, policy_agent_mapping=None, **kwargs):
         joint_action = {}
         if done is None:
             done = {agent: False for agent in obs}
@@ -91,7 +91,7 @@ def run_visualize(full_trained_directory, parameters):
         return done
 
     policy_agent_mapping = None
-    if isinstance(env, MultiAgentEnv):
+    if isinstance(sim, MultiAgentEnv):
         policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
         _get_action = _multi_get_action
         _get_done = _multi_get_done
@@ -101,7 +101,7 @@ def run_visualize(full_trained_directory, parameters):
 
     for episode in range(parameters.episodes):
         print('Episode: {}'.format(episode))
-        obs = env.reset()
+        obs = sim.reset()
         done = None
         all_done = False
         fig = plt.figure()
@@ -115,16 +115,16 @@ def run_visualize(full_trained_directory, parameters):
 
         def animate(i):
             nonlocal obs, done
-            env.render(fig=fig)
+            sim.render(fig=fig)
             plt.pause(1e-16)
             action = _get_action(
-                obs, done=done, env=env, trainer=trainer, policy_agent_mapping=policy_agent_mapping
+                obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
             )
-            obs, _, done, _ = env.step(action)
+            obs, _, done, _ = sim.step(action)
             if _get_done(done):
                 nonlocal all_done
                 all_done = True
-                env.render(fig=fig)
+                sim.render(fig=fig)
                 plt.pause(1e-16)
                 plt.close(fig)
 

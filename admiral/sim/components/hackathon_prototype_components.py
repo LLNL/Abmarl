@@ -4,7 +4,7 @@ from gym.spaces import Dict, Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs import PrincipleAgent
+from admiral.sim import PrincipleAgent
 
 
 class World:
@@ -184,7 +184,7 @@ class LifeAndDeath:
             print(f'{agent.id}: {agent.health}, {agent.is_alive}')
 
 
-class CompositeEnv:
+class CompositeSim:
     def __init__(self, agents=None, **kwargs):
         assert type(agents) is dict, "Agents must be a dict."
         for agent in agents.values():
@@ -241,7 +241,7 @@ agents = {f'agent{i}': DeathLifeAgent(
     life=1.0,
 ) for i in range(5)}
 
-env = CompositeEnv(
+sim = CompositeSim(
     region=region,
     agents=agents,
     max_value=max_value
@@ -252,12 +252,12 @@ env = CompositeEnv(
 # the random number generator, so the actions will be the same.
 for ep in range(3):
     print(f'Episode is {ep}')
-    env.reset()
-    env.render()
+    sim.reset()
+    sim.render()
 
     for i in range(24):
         print(i)
-        env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
-        env.render()
+        sim.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+        sim.render()
 
 plt.show()

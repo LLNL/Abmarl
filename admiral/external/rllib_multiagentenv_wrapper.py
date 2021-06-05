@@ -10,24 +10,24 @@ class MultiAgentWrapper(MultiAgentEnv):
     of MultiAgentEnv.
 
     Attributes:
-        env: The SimulationManager.
+        sim: The SimulationManager.
     """
-    def __init__(self, env):
+    def __init__(self, sim):
         from admiral.managers import SimulationManager
-        assert isinstance(env, SimulationManager)
-        self.env = env
+        assert isinstance(sim, SimulationManager)
+        self.sim = sim
 
     def reset(self):
         """See SimulationManager."""
-        return self.env.reset()
+        return self.sim.reset()
 
     def step(self, actions):
         """See SimulationManager."""
-        return self.env.step(actions)
+        return self.sim.step(actions)
 
     def render(self, *args, **kwargs):
         """See SimulationManager."""
-        return self.env.render(*args, **kwargs)
+        return self.sim.render(*args, **kwargs)
 
     @property
     def unwrapped(self):
@@ -38,6 +38,6 @@ class MultiAgentWrapper(MultiAgentEnv):
             The wrapped SimulationManager.
         """
         try:
-            return self.env.unwrapped
+            return self.sim.unwrapped
         except AttributeError:
-            return self.env
+            return self.sim

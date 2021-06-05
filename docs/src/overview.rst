@@ -30,14 +30,14 @@ demonstrates this workflow.
    :alt: Admiral usage workflow
 
    Admiral's usage workflow. An experiment configuration is used to train agents'
-   behaviors. The policies and environment are saved to an output directory. Behaviors can then
+   behaviors. The policies and simulation are saved to an output directory. Behaviors can then
    be analyzed or visualized from the output directory.
 
 
-Creating Agents and Environments
---------------------------------
+Creating Agents and Simulations
+-------------------------------
 
-Admiral provides three interfaces for setting up an agent-based simulation environment.
+Admiral provides three interfaces for setting up an agent-based simulations.
 
 .. _overview_agent:
 
@@ -46,16 +46,16 @@ Agent
 
 First, we have :ref:`Agents <api_agent>`. An agent is an object with an observation and
 action space. Many practitioners may be accustomed to gym.Env's interface, which
-defines the observation and action space for the *environment*. However, in heterogeneous
+defines the observation and action space for the *simulation*. However, in heterogeneous
 multiagent settings, each *agent* can have different spaces; thus we assign these
-spaces to the agents and not the environment.
+spaces to the agents and not the simulation.
 
 An agent can be created like so:
 
 .. code-block:: python
 
    from gym.spaces import Discrete, Box
-   from admiral.envs import Agent
+   from admiral.sim import Agent
    agent = Agent(
        id='agent0',
        observation_space=Box(-1, 1, (2,)),
@@ -71,17 +71,17 @@ Agent Based Simulation
 ``````````````````````
 Next, we define an :ref:`Agent Based Simulation <api_abs>`, or ABS for short, with the
 ususal ``reset`` and ``step``
-functions that we are used to seeing in RL environments. These functions, however, do
+functions that we are used to seeing in RL simulations. These functions, however, do
 not return anything; the state information must be obtained from the getters:
 ``get_obs``, ``get_reward``, ``get_done``, ``get_all_done``, and ``get_info``. The getters
 take an agent's id as input and return the respective information from the simulation's
-state. The ABS also contains a dictionary of agents that "live" in the environment.
+state. The ABS also contains a dictionary of agents that "live" in the simulation.
 
 An Agent Based Simulation can be created and used like so:
 
 .. code-block:: python
 
-   from admiral.envs import Agent, AgentBasedSimulation   
+   from admiral.sim import Agent, AgentBasedSimulation   
    class MySim(AgentBasedSimulation):
        def __init__(self, agents=None, **kwargs):
            self.agents = agents
@@ -89,15 +89,15 @@ An Agent Based Simulation can be created and used like so:
 
    # Create a dictionary of agents
    agents = {f'agent{i}': Agent(id=f'agent{i}', ...) for i in range(10)}
-   # Create the ABS environment with the agents
-   env = MySim(agents=agents)
-   env.reset()
+   # Create the ABS with the agents
+   sim = MySim(agents=agents)
+   sim.reset()
    # Get the observations
-   obs = {agent.id: env.get_obs(agent.id) for agent in agents.values()}
+   obs = {agent.id: sim.get_obs(agent.id) for agent in agents.values()}
    # Take some random actions
-   env.step({agent.id: agent.action_space.sample() for agent in agents.values()})
+   sim.step({agent.id: agent.action_space.sample() for agent in agents.values()})
    # See the reward for agent3
-   print(env.get_reward('agent3'))
+   print(sim.get_reward('agent3'))
 
 .. WARNING::
    Implementations of AgentBasedSimulation should call ``finalize`` at the
@@ -118,7 +118,7 @@ Simulation Managers
 ```````````````````
 
 The Agent Based Simulation interface does not specify an ordering for agents' interactions
-with the environment. This is left open to give our users maximal flexibility. However,
+with the simulation. This is left open to give our users maximal flexibility. However,
 in order to interace with RLlib's learning library, we provide a :ref:`Simulation Manager <api_sim>`
 which specifies the output from ``reset`` and ``step`` as RLlib expects it. Specifically,
 
@@ -130,19 +130,19 @@ described above. For convenience, we have provided two managers: :ref:`Turn Base
 which implements turn-based games; and :ref:`All Step <api_all_step>`, which has every non-done
 agent provide actions at each step.
 
-Simluation Managers "wrap" environments, and they can be used like so:
+Simluation Managers "wrap" simulations, and they can be used like so:
 
 .. code-block:: python
 
    from admiral.managers import AllStepManager
-   from admiral.envs import AgentBasedSimulation, Agent
+   from admiral.sim import AgentBasedSimulation, Agent
    class MySim(AgentBasedSimulation):
-       ... # Define some simulation environment
+       ... # Define some simulation
 
-   # Instatiate the environment
-   env = MySim(agents=...)
-   # Wrap the environment with the simulation manager
-   sim = AllStepManager(env)
+   # Instatiate the simulation
+   sim = MySim(agents=...)
+   # Wrap the simulation with the simulation manager
+   sim = AllStepManager(sim)
    # Get the observations for all agents
    obs = sim.reset()
    # Get simulation state for all non-done agents, regardless of which agents
@@ -167,29 +167,29 @@ Training with an Experiment Configuration
 In order to run experiments, we must define a configuration file that
 specifies Simulation and Trainer parameters. Here is the configuration file
 from the :ref:`Corridor tutorial<tutorial_multi_corridor>` that demonstrates a
-simple corridor environment with multiple agents.   
+simple corridor simulation with multiple agents.   
 
 .. code-block:: python
 
    # Import the MultiCorridor ABS, a simulation manager, and the multiagent
    # wrapper needed to connect to RLlib's trainers
-   from admiral.envs.corridor import MultiCorridor
+   from admiral.sim.corridor import MultiCorridor
    from admiral.managers import TurnBasedManager
    from admiral.external import MultiAgentWrapper
    
-   # Create and wrap the environment
+   # Create and wrap the simulation
    # NOTE: The agents in `MultiCorridor` are all homogeneous, so this simulation
    # just creates and stores the agents itself.
-   env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
+   sim = MultiAgentWrapper(AllStepManager(MultiCorridor()))
    
-   # Register the environment with RLlib
-   env_name = "MultiCorridor"
+   # Register the simulation with RLlib
+   sim_name = "MultiCorridor"
    from ray.tune.registry import register_env
-   register_env(env_name, lambda env_config: env)
+   register_env(sim_name, lambda sim_config: sim)
    
    # Set up the policies. In this experiment, all agents are homogeneous,
    # so we just use a single shared policy.
-   ref_agent = env.unwrapped.agents['agent0']
+   ref_agent = sim.unwrapped.agents['agent0']
    policies = {
        'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
    }
@@ -199,8 +199,8 @@ simple corridor environment with multiple agents.
    # Experiment parameters
    params = {
        'experiment': {
-           'title': f'{env_name}',
-           'env_creator': lambda config=None: env,
+           'title': f'{sim_name}',
+           'sim_creator': lambda config=None: sim,
        },
        'ray_tune': {
            'run_or_experiment': 'PG',
@@ -211,8 +211,8 @@ simple corridor environment with multiple agents.
            },
            'verbose': 2,
            'config': {
-               # --- Environment ---
-               'env': env_name,
+               # --- simulation ---
+               'env': sim_name,
                'horizon': 200,
                'env_config': {},
                # --- Multiagent ---
@@ -234,10 +234,10 @@ simple corridor environment with multiple agents.
 Experiment Parameters
 `````````````````````
 The strucutre of the parameters dictionary is very important. It *must* have an
-`experiment` key which contains both the `title` of the experiment and the `env_creator`
+`experiment` key which contains both the `title` of the experiment and the `sim_creator`
 function. This function should receive a config and, if appropriate, pass it to
 the simulation constructor. In the example configuration above, we just retrun the
-already-configured simulation. Without the title and environment creator, Admiral
+already-configured simulation. Without the title and simulation creator, Admiral
 may not behave as expected.
 
 The experiment parameters also contains information that will be passed directly
@@ -275,15 +275,15 @@ the training directory.
 Analyzing
 ---------
 
-The environment and trainer can also be loaded into a script for post-processing via the
+The simulation and trainer can also be loaded into a script for post-processing via the
 ``analyze`` command and custom subscripts. The subscript must implement the
 following function:
 
 .. code-block:: python
 
-   # Load the environment and the trainer from the experiment as objects
-   def run(env, trainer):
-       # Do whatever you want with the environment and the trained policies.
+   # Load the simulation and the trainer from the experiment as objects
+   def run(sim, trainer):
+       # Do whatever you want with the simulation and the trained policies.
        ...
 
 Analysis can then be performed using the command line interface:

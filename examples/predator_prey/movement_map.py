@@ -1,13 +1,13 @@
-def run(env, trainer):
+def run(sim, trainer):
     import numpy as np
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    sim = env.unwrapped
+    sim = sim.unwrapped
 
     # Create a grid
-    grid = np.zeros((sim.env.region, sim.env.region))
-    attack = np.zeros((sim.env.region, sim.env.region))
+    grid = np.zeros((sim.sim.region, sim.sim.region))
+    attack = np.zeros((sim.sim.region, sim.sim.region))
 
     # Run the trained policy
     policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']

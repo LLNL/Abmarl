@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from admiral.envs.components import ComponentAgent
+from admiral.sim.components import ComponentAgent
 
 
 def test_component_agent_defaults():

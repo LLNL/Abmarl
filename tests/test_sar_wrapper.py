@@ -1,5 +1,5 @@
-from admiral.envs.wrappers import SARWrapper
-from .helpers import MultiAgentEnv
+from admiral.sim.wrappers import SARWrapper
+from .helpers import MultiAgentSim
 
 
 # Individual wrappers
@@ -46,166 +46,166 @@ class ObservationActionRewardWrapper(ObservationWrapper, ActionWrapper, RewardWr
 
 # Tests
 def test_sar_wrapped():
-    env = MultiAgentEnv(5)
-    wrapped_env = SARWrapper(env)
-    assert wrapped_env.env == env
-    assert wrapped_env.unwrapped == env
-    assert wrapped_env.agents == env.agents
+    sim = MultiAgentSim(5)
+    wrapped_sim = SARWrapper(sim)
+    assert wrapped_sim.sim == sim
+    assert wrapped_sim.unwrapped == sim
+    assert wrapped_sim.agents == sim.agents
 
 
 def test_wrap_observation():
-    env = ObservationWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    sim = ObservationWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
-    assert env.get_reward('agent0') == 'Reward from agent0'
-    assert env.get_reward('agent1') == 'Reward from agent1'
-    assert env.get_reward('agent2') == 'Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_all_done() == "Done from all agents and/or environment."
-    assert env.get_info('agent0') == {'Action from agent0': 0}
-    assert env.get_info('agent1') == {'Action from agent1': 1}
-    assert env.get_info('agent2') == {'Action from agent2': 2}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    assert sim.get_reward('agent0') == 'Reward from agent0'
+    assert sim.get_reward('agent1') == 'Reward from agent1'
+    assert sim.get_reward('agent2') == 'Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_all_done() == "Done from all agents and/or simulation."
+    assert sim.get_info('agent0') == {'Action from agent0': 0}
+    assert sim.get_info('agent1') == {'Action from agent1': 1}
+    assert sim.get_info('agent2') == {'Action from agent2': 2}
 
 
 def test_wrap_action():
-    env = ActionWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Obs from agent0'
-    assert env.get_obs('agent1') == 'Obs from agent1'
-    assert env.get_obs('agent2') == 'Obs from agent2'
+    sim = ActionWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Obs from agent0'
+    assert sim.get_obs('agent1') == 'Obs from agent1'
+    assert sim.get_obs('agent2') == 'Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Obs from agent0'
-    assert env.get_obs('agent1') == 'Obs from agent1'
-    assert env.get_obs('agent2') == 'Obs from agent2'
-    assert env.get_reward('agent0') == 'Reward from agent0'
-    assert env.get_reward('agent1') == 'Reward from agent1'
-    assert env.get_reward('agent2') == 'Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_all_done() == "Done from all agents and/or environment."
-    assert env.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
-    assert env.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
-    assert env.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Obs from agent0'
+    assert sim.get_obs('agent1') == 'Obs from agent1'
+    assert sim.get_obs('agent2') == 'Obs from agent2'
+    assert sim.get_reward('agent0') == 'Reward from agent0'
+    assert sim.get_reward('agent1') == 'Reward from agent1'
+    assert sim.get_reward('agent2') == 'Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_all_done() == "Done from all agents and/or simulation."
+    assert sim.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
+    assert sim.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
+    assert sim.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
 
 
 def test_wrap_reward():
-    env = RewardWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Obs from agent0'
-    assert env.get_obs('agent1') == 'Obs from agent1'
-    assert env.get_obs('agent2') == 'Obs from agent2'
+    sim = RewardWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Obs from agent0'
+    assert sim.get_obs('agent1') == 'Obs from agent1'
+    assert sim.get_obs('agent2') == 'Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Obs from agent0'
-    assert env.get_obs('agent1') == 'Obs from agent1'
-    assert env.get_obs('agent2') == 'Obs from agent2'
-    assert env.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
-    assert env.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
-    assert env.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_all_done() == "Done from all agents and/or environment."
-    assert env.get_info('agent0') == {'Action from agent0': 0}
-    assert env.get_info('agent1') == {'Action from agent1': 1}
-    assert env.get_info('agent2') == {'Action from agent2': 2}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Obs from agent0'
+    assert sim.get_obs('agent1') == 'Obs from agent1'
+    assert sim.get_obs('agent2') == 'Obs from agent2'
+    assert sim.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
+    assert sim.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
+    assert sim.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_all_done() == "Done from all agents and/or simulation."
+    assert sim.get_info('agent0') == {'Action from agent0': 0}
+    assert sim.get_info('agent1') == {'Action from agent1': 1}
+    assert sim.get_info('agent2') == {'Action from agent2': 2}
 
 
 def test_wrap_observation_action():
-    env = ObservationActionWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    sim = ObservationActionWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
-    assert env.get_reward('agent0') == 'Reward from agent0'
-    assert env.get_reward('agent1') == 'Reward from agent1'
-    assert env.get_reward('agent2') == 'Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_all_done() == "Done from all agents and/or environment."
-    assert env.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
-    assert env.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
-    assert env.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    assert sim.get_reward('agent0') == 'Reward from agent0'
+    assert sim.get_reward('agent1') == 'Reward from agent1'
+    assert sim.get_reward('agent2') == 'Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_all_done() == "Done from all agents and/or simulation."
+    assert sim.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
+    assert sim.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
+    assert sim.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
 
 
 def test_wrap_observation_reward():
-    env = ObservationRewardWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    sim = ObservationRewardWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
-    assert env.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
-    assert env.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
-    assert env.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_info('agent0') == {'Action from agent0': 0}
-    assert env.get_info('agent1') == {'Action from agent1': 1}
-    assert env.get_info('agent2') == {'Action from agent2': 2}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    assert sim.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
+    assert sim.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
+    assert sim.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_info('agent0') == {'Action from agent0': 0}
+    assert sim.get_info('agent1') == {'Action from agent1': 1}
+    assert sim.get_info('agent2') == {'Action from agent2': 2}
 
 
 def test_wrap_action_reward():
-    env = ActionRewardWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Obs from agent0'
-    assert env.get_obs('agent1') == 'Obs from agent1'
-    assert env.get_obs('agent2') == 'Obs from agent2'
+    sim = ActionRewardWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Obs from agent0'
+    assert sim.get_obs('agent1') == 'Obs from agent1'
+    assert sim.get_obs('agent2') == 'Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Obs from agent0'
-    assert env.get_obs('agent1') == 'Obs from agent1'
-    assert env.get_obs('agent2') == 'Obs from agent2'
-    assert env.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
-    assert env.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
-    assert env.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
-    assert env.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
-    assert env.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Obs from agent0'
+    assert sim.get_obs('agent1') == 'Obs from agent1'
+    assert sim.get_obs('agent2') == 'Obs from agent2'
+    assert sim.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
+    assert sim.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
+    assert sim.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
+    assert sim.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
+    assert sim.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
 
 
 def test_wrap_observation_action_reward():
-    env = ObservationActionRewardWrapper(MultiAgentEnv())
-    env.reset()
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    sim = ObservationActionRewardWrapper(MultiAgentSim())
+    sim.reset()
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
 
-    env.step({agent_id: i for i, agent_id in enumerate(env.agents)})
-    assert env.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
-    assert env.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
-    assert env.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
-    assert env.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
-    assert env.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
-    assert env.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
-    assert env.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
-    assert env.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}
+    sim.step({agent_id: i for i, agent_id in enumerate(sim.agents)})
+    assert sim.get_obs('agent0') == 'Wrap Observation: Obs from agent0'
+    assert sim.get_obs('agent1') == 'Wrap Observation: Obs from agent1'
+    assert sim.get_obs('agent2') == 'Wrap Observation: Obs from agent2'
+    assert sim.get_reward('agent0') == 'Wrap Reward: Reward from agent0'
+    assert sim.get_reward('agent1') == 'Wrap Reward: Reward from agent1'
+    assert sim.get_reward('agent2') == 'Wrap Reward: Reward from agent2'
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_info('agent0') == {'Action from agent0': 'Wrap Action: 0'}
+    assert sim.get_info('agent1') == {'Action from agent1': 'Wrap Action: 1'}
+    assert sim.get_info('agent2') == {'Action from agent2': 'Wrap Action: 2'}

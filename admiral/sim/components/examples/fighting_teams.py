@@ -1,14 +1,14 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import GridPositionState, LifeState
-from admiral.envs.components.observer import TeamObserver, PositionObserver, HealthObserver, \
+from admiral.sim.components.state import GridPositionState, LifeState
+from admiral.sim.components.observer import TeamObserver, PositionObserver, HealthObserver, \
     LifeObserver
-from admiral.envs.components.actor import GridMovementActor, AttackActor
-from admiral.envs.components.done import TeamDeadDone
-from admiral.envs.components.agent import TeamObservingAgent, PositionObservingAgent, \
+from admiral.sim.components.actor import GridMovementActor, AttackActor
+from admiral.sim.components.done import TeamDeadDone
+from admiral.sim.components.agent import TeamObservingAgent, PositionObservingAgent, \
     HealthObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -18,7 +18,7 @@ class FightingTeamsAgent(
 ): pass
 
 
-class FightingTeamsEnv(AgentBasedSimulation):
+class FightingTeamsSim(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -111,21 +111,21 @@ if __name__ == '__main__':
     agents = {f'agent{i}': FightingTeamsAgent(
         id=f'agent{i}', attack_range=1, attack_strength=0.4, team=i % 2 + 1, move_range=1
     ) for i in range(24)}
-    env = FightingTeamsEnv(
+    sim = FightingTeamsSim(
         region=12,
         agents=agents,
         number_of_teams=2
     )
-    env.reset()
-    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    sim.reset()
+    print({agent_id: sim.get_obs(agent_id) for agent_id in sim.agents})
     fig = plt.gcf()
-    env.render(fig=fig)
+    sim.render(fig=fig)
 
     for _ in range(100):
         action_dict = {
-            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            agent.id: agent.action_space.sample() for agent in sim.agents.values()
             if agent.is_alive
         }
-        env.step(action_dict)
-        env.render(fig=fig)
-        print(env.get_all_done())
+        sim.step(action_dict)
+        sim.render(fig=fig)
+        print(sim.get_all_done())

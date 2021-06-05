@@ -148,8 +148,8 @@ class RavelDiscreteWrapper(SARWrapper):
     represented by arrays are converted into unique numbers. This is useful for building Q
     tables where each observation and action is a row and column of the Q table, respectively.
     """
-    def __init__(self, env):
-        super().__init__(env)
+    def __init__(self, sim):
+        super().__init__(sim)
         for agent_id, wrapped_agent in self.agents.items():
             assert check_space(wrapped_agent.observation_space), \
                 f"{agent_id}: observation must be discretizable."

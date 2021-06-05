@@ -1,6 +1,6 @@
 import numpy as np
 
-from admiral.envs import PrincipleAgent, ActingAgent, ObservingAgent
+from admiral.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
 # ------------------ #
@@ -393,7 +393,7 @@ class HarvestingAgent(ActingAgent, ComponentAgent):
 
 class ResourceObservingAgent(ObservingAgent, ComponentAgent):
     """
-    Agents can observe the resources in the environment.
+    Agents can observe the resources in the simulation.
 
     resource_view (int):
         Any resources within this range of the agent's position will be fully observed.

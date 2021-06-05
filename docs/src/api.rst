@@ -4,31 +4,31 @@ Admiral API Specification
 =========================
 
 
-Admiral Environments
+Admiral Simulations
 --------------------
 
 .. _api_agent:
 
-.. autoclass:: admiral.envs.PrincipleAgent
+.. autoclass:: admiral.sim.PrincipleAgent
 	:members:
 	:undoc-members:
 
-.. autoclass:: admiral.envs.ObservingAgent
+.. autoclass:: admiral.sim.ObservingAgent
 	:members:
 	:undoc-members:
 
-.. autoclass:: admiral.envs.ActingAgent
+.. autoclass:: admiral.sim.ActingAgent
 	:members:
 	:undoc-members:
 
-.. autoclass:: admiral.envs.Agent
+.. autoclass:: admiral.sim.Agent
 	:members:
 	:undoc-members:
 	:show-inheritance:
 
 .. _api_abs:
 
-.. autoclass:: admiral.envs.AgentBasedSimulation
+.. autoclass:: admiral.sim.AgentBasedSimulation
 	:members:
 	:undoc-members:
 

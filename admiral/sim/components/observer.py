@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod, abstractproperty
 from gym.spaces import Box, Dict
 import numpy as np
 
-from admiral.envs.components.agent import HealthObservingAgent, LifeObservingAgent, \
+from admiral.sim.components.agent import HealthObservingAgent, LifeObservingAgent, \
     AgentObservingAgent, PositionObservingAgent, SpeedAngleObservingAgent, \
     VelocityObservingAgent, ResourceObservingAgent, TeamObservingAgent, BroadcastObservingAgent, \
     SpeedAngleAgent, VelocityAgent, BroadcastingAgent, ComponentAgent

@@ -1,7 +1,7 @@
 from gym.spaces import Dict, Discrete
 import numpy as np
 
-from admiral.envs.components.agent import AgentObservingAgent, ObservingAgent, BroadcastingAgent
+from admiral.sim.components.agent import AgentObservingAgent, ObservingAgent, BroadcastingAgent
 
 
 def obs_filter_step(distance, view):

@@ -134,12 +134,12 @@ class AgentBasedSimulation(ABC):
     AgentBasedSimulation interface.
 
     Under this design model the observations, rewards, and done conditions of the
-    agents is treated as part of the environments internal state instead of as
-    output from reset and step. Thus, it is the environments responsibility to manage
+    agents is treated as part of the simulations internal state instead of as
+    output from reset and step. Thus, it is the simulations responsibility to manage
     rewards and dones as part of its state (e.g. via self.rewards dictionary).
 
-    This interface supports both single- and multi-agent environments by treating
-    the single-agent environment as a special case of the multi-agent, where there
+    This interface supports both single- and multi-agent simulations by treating
+    the single-agent simulation as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
     """
 
@@ -147,8 +147,8 @@ class AgentBasedSimulation(ABC):
     def agents(self):
         """
         A dict that maps the Agent's id to the Agent object. An Agent must be an
-        instance of PrincipleAgent. A multi-agent environment is expected to have
-        multiple entries in the dictionary, whereas a single-agent environment
+        instance of PrincipleAgent. A multi-agent simulation is expected to have
+        multiple entries in the dictionary, whereas a single-agent simulation
         should only have a single entry in the dictionary.
         """
 
@@ -177,7 +177,7 @@ class AgentBasedSimulation(ABC):
     @abstractmethod
     def reset(self, **kwargs):
         """
-        Reset the simulation environment to a start state, which may be randomly
+        Reset the simulation simulation to a start state, which may be randomly
         generated.
         """
         pass
@@ -185,7 +185,7 @@ class AgentBasedSimulation(ABC):
     @abstractmethod
     def step(self, action, **kwargs):
         """
-        Step the environment forward one discrete time-step. The action is a dictionary
+        Step the simulation forward one discrete time-step. The action is a dictionary
         that contains the action of each agent in this time-step.
         """
         pass
@@ -193,7 +193,7 @@ class AgentBasedSimulation(ABC):
     @abstractmethod
     def render(self, **kwargs):
         """
-        Render the environment for vizualization.
+        Render the simulation for vizualization.
         """
         pass
 
@@ -221,7 +221,7 @@ class AgentBasedSimulation(ABC):
     @abstractmethod
     def get_all_done(self, **kwargs):
         """
-        Return the environment's done status.
+        Return the simulation's done status.
         """
         pass
 

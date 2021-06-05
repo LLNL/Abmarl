@@ -8,33 +8,33 @@ class SARWrapper(Wrapper):
     and unwrap functions.
 
     Note: wrapping the action "goes the other way" than the reward and observation, like this:
-        obs:    env agent -> wrapper -> trainer
-        reward: env agent -> wrapper -> trainer
-        action: env agent <- wrapper <- trainer
+        obs:    sim agent -> wrapper -> trainer
+        reward: sim agent -> wrapper -> trainer
+        action: sim agent <- wrapper <- trainer
 
-    If you wrap an action, be aware that the wrapper must return what the environment
+    If you wrap an action, be aware that the wrapper must return what the simulation
     agents expect; whereas if you wrap an observation or reward, the wrapper must return
     what the trainer expects. The expectations are defined by the observation and
-    action spaces of the wrapped environment agents at initialization.
+    action spaces of the wrapped simulation agents at initialization.
     """
     def step(self, action_dict, **kwargs):
         """
         Wrap each of the agent's actions from the policies before passing them
-        to env.step.
+        to sim.step.
         """
-        self.env.step(
+        self.sim.step(
             {
-                agent_id: self.wrap_action(self.env.agents[agent_id], action)
+                agent_id: self.wrap_action(self.sim.agents[agent_id], action)
                 for agent_id, action in action_dict.items()
             },
             **kwargs
         )
 
     def get_obs(self, agent_id, **kwargs):
-        return self.wrap_observation(self.env.agents[agent_id], self.env.get_obs(agent_id))
+        return self.wrap_observation(self.sim.agents[agent_id], self.sim.get_obs(agent_id))
 
     def get_reward(self, agent_id, **kwargs):
-        return self.wrap_reward(self.env.get_reward(agent_id))
+        return self.wrap_reward(self.sim.get_reward(agent_id))
 
     # Default wrapping and unwrapping behavior. Override these in your custom wrapper.
     # Developer note: we have to have separate wrappers for each because we don't

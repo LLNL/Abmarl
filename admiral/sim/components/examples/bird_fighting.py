@@ -1,14 +1,14 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.state import ContinuousPositionState, SpeedAngleState, LifeState
-from admiral.envs.components.actor import SpeedAngleMovementActor, AttackActor
-from admiral.envs.components.observer import SpeedObserver, AngleObserver, PositionObserver, \
+from admiral.sim.components.state import ContinuousPositionState, SpeedAngleState, LifeState
+from admiral.sim.components.actor import SpeedAngleMovementActor, AttackActor
+from admiral.sim.components.observer import SpeedObserver, AngleObserver, PositionObserver, \
     LifeObserver, HealthObserver
-from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, AttackingAgent, \
+from admiral.sim.components.done import DeadDone
+from admiral.sim.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, AttackingAgent, \
     SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -18,7 +18,7 @@ class FightingBirdAgent(
 ): pass
 
 
-class FightingBirdsEnv(AgentBasedSimulation):
+class FightingBirdsSim(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -120,26 +120,26 @@ if __name__ == "__main__":
         ) for i in range(24)
     }
 
-    env = FightingBirdsEnv(
+    sim = FightingBirdsSim(
         region=20,
         agents=agents,
         attack_norm=2,
     )
     fig = plt.figure()
-    env.reset()
-    env.render(fig=fig)
+    sim.reset()
+    sim.render(fig=fig)
 
-    print(env.get_obs('bird0'))
+    print(sim.get_obs('bird0'))
 
     for i in range(50):
         action_dict = {
-            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            agent.id: agent.action_space.sample() for agent in sim.agents.values()
             if agent.is_alive
         }
-        env.step(action_dict)
-        env.render(fig=fig)
+        sim.step(action_dict)
+        sim.render(fig=fig)
         for agent in agents:
-            print(agent, ': ', env.get_done(agent))
+            print(agent, ': ', sim.get_done(agent))
         print('\n')
 
-    print(env.get_all_done())
+    print(sim.get_all_done())

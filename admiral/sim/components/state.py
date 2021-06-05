@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.envs.components.agent import SpeedAngleAgent, VelocityAgent, CollisionAgent, \
+from admiral.sim.components.agent import SpeedAngleAgent, VelocityAgent, CollisionAgent, \
     BroadcastingAgent
 
 
@@ -49,11 +49,11 @@ class BroadcastState:
 class LifeState:
     """
     Agents can die if their health falls below their minimal health value. Health
-    can decrease in a number of interactions. This environment provides an entropy
+    can decrease in a number of interactions. This simulation provides an entropy
     that indicates how much health an agent loses when apply_entropy is called.
     This is a generic entropy for the step. If you want to specify health changes
     for specific actions, such as being attacked or harvesting, you must write
-    it in the environment.
+    it in the simulation.
 
     agents (dict):
         Dictionary of agents.
@@ -114,7 +114,7 @@ class PositionState(ABC):
     Manages the agents' positions.
 
     region (int):
-        The size of the environment.
+        The size of the simulation map.
 
     agents (dict):
         The dictionary of agents.

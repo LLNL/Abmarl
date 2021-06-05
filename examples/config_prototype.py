@@ -1,19 +1,19 @@
-# ----------------------------- #
-# --- Setup the environment --- #
-# ----------------------------- #
+# ---------------------------- #
+# --- Setup the simulation --- #
+# ---------------------------- #
 
-import env_class, env_agents
+import sim_class, sim_agents
 from admiral.managers import SimulationManager
 from admiral.external import MultiAgentWrapper
 from ray.tune.registry import register_env
-env_config = {
-    # Fill in environment_configuration
+sim_config = {
+    # Fill in simulation configuration
 }
 
-env_creator = lambda env_config: MultiAgentWrapper(SimulationManager(env_class(env_config)))
-env = env_creator(env_config)
-env_name = "EnvironmentName"
-register_env(env_name, env_creator)
+sim_creator = lambda sim_config: MultiAgentWrapper(SimulationManager(sim_class(sim_config)))
+sim = sim_creator(sim_config)
+sim_name = "SimulationName"
+register_env(sim_name, sim_creator)
 
 # -------------------------- #
 # --- Setup the policies --- #
@@ -29,7 +29,7 @@ class CustomHeuristicPolicy(HeuristicPolicy):
         return [0 for _ in obs_batch], [], {}
 
 
-agents = env.agents
+agents = sim.agents
 policies = {
     'policy_0_name': (None, agents[0].observation_space, agents[0].action_space, {}),
     'policy_1_name': (None, agents[1].observation_space, agents[1].action_space, {}),
@@ -59,7 +59,7 @@ algo_name = 'PG'
 params = {
     'experiment': {
         'title': '{}'.format('The-title-of-this-experiment'),
-        'env_creator': env_creator,
+        'sim_creator': sim_creator,
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
@@ -67,9 +67,9 @@ params = {
             # Stopping criteria
         },
         'config': {
-            # --- Environment ---
-            'env': env_name,
-            'env_config': env_config,
+            # --- Simulation ---
+            'sim': sim_name,
+            'sim_config': sim_config,
             # --- Multiagent ---
             'multiagent': {
                 'policies': policies,

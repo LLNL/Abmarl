@@ -2,14 +2,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.envs.components.state import GridPositionState, GridResourceState, LifeState
-from admiral.envs.components.observer import PositionObserver, GridResourceObserver, \
+from admiral.sim.components.state import GridPositionState, GridResourceState, LifeState
+from admiral.sim.components.observer import PositionObserver, GridResourceObserver, \
     HealthObserver, LifeObserver
-from admiral.envs.components.actor import GridMovementActor, GridResourcesActor, AttackActor
-from admiral.envs.components.done import DeadDone
-from admiral.envs.components.agent import PositionObservingAgent, ResourceObservingAgent, \
+from admiral.sim.components.actor import GridMovementActor, GridResourcesActor, AttackActor
+from admiral.sim.components.done import DeadDone
+from admiral.sim.components.agent import PositionObservingAgent, ResourceObservingAgent, \
     HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -19,7 +19,7 @@ class FightForResourcesAgent(
 ): pass
 
 
-class FightForResourcesEnv(AgentBasedSimulation):
+class FightForResourcesSim(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -128,22 +128,22 @@ if __name__ == '__main__':
         id=f'agent{i}', attack_range=1, attack_strength=0.4, move_range=1, max_harvest=1.0,
         resource_view=3
     ) for i in range(6)}
-    env = FightForResourcesEnv(
+    sim = FightForResourcesSim(
         region=10,
         agents=agents
     )
-    env.reset()
-    print({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    sim.reset()
+    print({agent_id: sim.get_obs(agent_id) for agent_id in sim.agents})
     fig = plt.gcf()
-    env.render(fig=fig)
+    sim.render(fig=fig)
 
     for _ in range(50):
         action_dict = {
-            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            agent.id: agent.action_space.sample() for agent in sim.agents.values()
             if agent.is_alive
         }
-        env.step(action_dict)
-        env.render(fig=fig)
-        print({agent_id: env.get_done(agent_id) for agent_id in env.agents})
+        sim.step(action_dict)
+        sim.render(fig=fig)
+        print({agent_id: sim.get_done(agent_id) for agent_id in sim.agents})
 
-    print(env.get_all_done())
+    print(sim.get_all_done())

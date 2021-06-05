@@ -1,15 +1,15 @@
 import numpy as np
 import pytest
 
-from admiral.envs.corridor import MultiCorridor as Corridor
+from admiral.sim.corridor import MultiCorridor as Corridor
 from admiral.managers import AllStepManager
 
 
 def test_init():
-    env = Corridor()
-    sim = AllStepManager(env)
-    assert sim.env == env
-    assert sim.agents == env.agents
+    sim = Corridor()
+    sim = AllStepManager(sim)
+    assert sim.sim == sim
+    assert sim.agents == sim.agents
 
 
 def test_reset_and_step():
@@ -17,11 +17,11 @@ def test_reset_and_step():
     sim = AllStepManager(Corridor())
 
     obs = sim.reset()
-    assert sim.env.corridor[4].id == 'agent3'
-    assert sim.env.corridor[5].id == 'agent4'
-    assert sim.env.corridor[6].id == 'agent2'
-    assert sim.env.corridor[7].id == 'agent1'
-    assert sim.env.corridor[8].id == 'agent0'
+    assert sim.sim.corridor[4].id == 'agent3'
+    assert sim.sim.corridor[5].id == 'agent4'
+    assert sim.sim.corridor[6].id == 'agent2'
+    assert sim.sim.corridor[7].id == 'agent1'
+    assert sim.sim.corridor[8].id == 'agent0'
     assert sim.done_agents == set()
     assert obs['agent0'] == {'left': [True], 'position': [8], 'right': [False]}
     assert obs['agent1'] == {'left': [True], 'position': [7], 'right': [True]}

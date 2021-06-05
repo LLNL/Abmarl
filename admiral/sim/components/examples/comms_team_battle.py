@@ -1,16 +1,16 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.envs.components.agent import \
+from admiral.sim.components.agent import \
     AttackingAgent, BroadcastingAgent, GridMovementAgent, \
     PositionObservingAgent, LifeObservingAgent, TeamObservingAgent, AgentObservingAgent
-from admiral.envs.components.state import GridPositionState, BroadcastState, LifeState
-from admiral.envs.components.actor import GridMovementActor, AttackActor, BroadcastActor
-from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver
-from admiral.envs.components.done import TeamDeadDone
-from admiral.envs.components.wrappers.observer_wrapper import \
+from admiral.sim.components.state import GridPositionState, BroadcastState, LifeState
+from admiral.sim.components.actor import GridMovementActor, AttackActor, BroadcastActor
+from admiral.sim.components.observer import PositionObserver, LifeObserver, TeamObserver
+from admiral.sim.components.done import TeamDeadDone
+from admiral.sim.components.wrappers.observer_wrapper import \
     PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 from admiral.tools.matplotlib_utils import mscatter
 
 
@@ -21,7 +21,7 @@ class CommunicatingAgent(BroadcastingAgent, AllChannelsObservingAgent): pass
 class BattleAgent(AttackingAgent, GridMovementAgent, AllChannelsObservingAgent): pass
 
 
-class TeamBattleCommsEnv(AgentBasedSimulation):
+class TeamBattleCommsSim(AgentBasedSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
@@ -143,20 +143,20 @@ if __name__ == "__main__":
             move_range=1, attack_strength=1
         ),
     }
-    env = TeamBattleCommsEnv(
+    sim = TeamBattleCommsSim(
         region=15,
         agents=agents,
         number_of_teams=2
     )
-    env.reset()
+    sim.reset()
     fig = plt.figure()
-    env.render(fig=fig)
+    sim.render(fig=fig)
 
     for _ in range(50):
         action_dict = {
-            agent.id: agent.action_space.sample() for agent in env.agents.values()
+            agent.id: agent.action_space.sample() for agent in sim.agents.values()
             if agent.is_alive
         }
-        env.step(action_dict)
-        env.render(fig=fig)
-        print(env.get_all_done())
+        sim.step(action_dict)
+        sim.render(fig=fig)
+        print(sim.get_all_done())

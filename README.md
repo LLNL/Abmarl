@@ -4,13 +4,13 @@ Admiral is a package for developing agent-based simulations and training them wi
 multiagent reinforcement learning. We provide an intuitive command line interface
 for training, visualizing, and analyzing agent behavior. We define an Agent Based
 Simulation Interface and Simulation Managers, which control which agents interact
-with the environment at each step. We support integration with several popular environment
+with the simulation at each step. We support integration with several popular simulation
 interfaces, including gym.Env and MultiAgentEnv.
 
 Admiral is a layer in the Reinforcement Learning stack that sits on top of RLlib.
 We leverage RLlib’s framework for training agents and extend it to more easily support
-custom environments, algorithms, and policies. We enable researchers to rapidly
-prototype RL experiments and environment design and lower the barrier for pre-existing
+custom simulations, algorithms, and policies. We enable researchers to rapidly
+prototype RL experiments and simulation design and lower the barrier for pre-existing
 projects to prototype RL as a potential solution.
 
 <p align="center">
@@ -26,7 +26,7 @@ projects to prototype RL as a potential solution.
 * Install the requirements: `pip install -r requirements.txt`
 * Install Admiral: `pip install .` or `pip install -e .`
 
-Train a multicorridor environment:
+Train agents in a multicorridor simulation:
 ```
 admiral train examples/multi_corridor_example.py
 ```

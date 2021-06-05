@@ -1,6 +1,6 @@
 import pytest
 
-from admiral.envs import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
+from admiral.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
 
 
 def test_principle_agent_id():
@@ -148,18 +148,18 @@ def test_agent_based_simulation_agents():
     with pytest.raises(AssertionError):
         ABS(agents=agents_dict_bad_values)
 
-    env = ABS(agents=agents_dict)
-    assert env.agents == agents_dict
-    env.finalize()
+    sim = ABS(agents=agents_dict)
+    assert sim.agents == agents_dict
+    sim.finalize()
 
     with pytest.raises(AssertionError):
-        env.agents = agents_single_object
+        sim.agents = agents_single_object
 
     with pytest.raises(AssertionError):
-        env.agents = agents_list
+        sim.agents = agents_list
 
     with pytest.raises(AssertionError):
-        env.agents = agents_dict_key_id_no_match
+        sim.agents = agents_dict_key_id_no_match
 
     with pytest.raises(AssertionError):
         ABS(agents=agents_dict_bad_values)
