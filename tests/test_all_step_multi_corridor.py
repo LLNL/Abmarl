@@ -7,9 +7,9 @@ from admiral.managers import AllStepManager
 
 def test_init():
     sim = Corridor()
-    sim = AllStepManager(sim)
-    assert sim.sim == sim
-    assert sim.agents == sim.agents
+    wrapped_sim = AllStepManager(sim)
+    assert wrapped_sim.sim == sim
+    assert wrapped_sim.agents == sim.agents
 
 
 def test_reset_and_step():

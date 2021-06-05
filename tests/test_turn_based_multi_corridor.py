@@ -7,14 +7,14 @@ from admiral.managers import TurnBasedManager
 
 def test_init():
     sim = Corridor()
-    sim = TurnBasedManager(sim)
-    assert sim.sim == sim
-    assert sim.agents == sim.agents
-    assert next(sim.agent_order) == 'agent0'
-    assert next(sim.agent_order) == 'agent1'
-    assert next(sim.agent_order) == 'agent2'
-    assert next(sim.agent_order) == 'agent3'
-    assert next(sim.agent_order) == 'agent4'
+    wrapped_sim = TurnBasedManager(sim)
+    assert wrapped_sim.sim == sim
+    assert wrapped_sim.agents == sim.agents
+    assert next(wrapped_sim.agent_order) == 'agent0'
+    assert next(wrapped_sim.agent_order) == 'agent1'
+    assert next(wrapped_sim.agent_order) == 'agent2'
+    assert next(wrapped_sim.agent_order) == 'agent3'
+    assert next(wrapped_sim.agent_order) == 'agent4'
 
 
 def test_reset_and_step():
