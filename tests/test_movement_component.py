@@ -1,10 +1,10 @@
 import numpy as np
 
-from admiral.envs.components.state import GridPositionState, ContinuousPositionState, \
+from admiral.sim.components.state import GridPositionState, ContinuousPositionState, \
     SpeedAngleState, VelocityState
-from admiral.envs.components.actor import GridMovementActor, SpeedAngleMovementActor, \
+from admiral.sim.components.actor import GridMovementActor, SpeedAngleMovementActor, \
     AccelerationMovementActor
-from admiral.envs.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, VelocityAgent, \
+from admiral.sim.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, VelocityAgent, \
     GridMovementAgent, AcceleratingAgent
 
 

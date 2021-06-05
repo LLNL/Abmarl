@@ -1,5 +1,5 @@
-# Setup the environment
-from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
+# Setup the simulation
+from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
 from admiral.managers import AllStepManager
 
 region = 6
@@ -7,18 +7,18 @@ predators = [Predator(id=f'predator{i}', attack=1) for i in range(2)]
 prey = [Prey(id=f'prey{i}') for i in range(7)]
 agents = predators + prey
 
-env_config = {
+sim_config = {
     'region': region,
     'max_steps': 200,
     'agents': agents,
 }
-env_name = 'PredatorPrey'
+sim_name = 'PredatorPrey'
 
 from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
 from ray.tune.registry import register_env
-env = MultiAgentWrapper(AllStepManager(PredatorPreyEnv.build(env_config)))
-agents = env.unwrapped.agents
-register_env(env_name, lambda env_config: env)
+sim = MultiAgentWrapper(AllStepManager(PredatorPreySimulation.build(sim_config)))
+agents = sim.unwrapped.agents
+register_env(sim_name, lambda sim_config: sim)
 
 # Set up heuristic policies
 policies = {
@@ -41,7 +41,7 @@ algo_name = 'PG'
 params = {
     'experiment': {
         'title': '{}'.format('PredatorPrey'),
-        'env_creator': lambda config=None: env,
+        'sim_creator': lambda config=None: sim,
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
@@ -52,9 +52,9 @@ params = {
         },
         'verbose': 2,
         'config': {
-            # --- Environment ---
-            'env': env_name,
-            'env_config': env_config,
+            # --- Simulation ---
+            'env': sim_name,
+            'env_config': sim_config,
             'horizon': 200,
             # --- Multiagent ---
             'multiagent': {
@@ -65,7 +65,7 @@ params = {
             # --- Parallelism ---
             # Number of workers per experiment: int
             "num_workers": 7,
-            # Number of environments that each worker starts: int
+            # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             # 'simple_optimizer': True,
             # "postprocess_inputs": True

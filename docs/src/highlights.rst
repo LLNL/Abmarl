@@ -26,7 +26,7 @@ observation and action spaces.
    to move or to "attack" another agent in one of the nearby squares. The policy is just a simple
    2-layer MLP, each layer having 64 units. We don’t apply any kind of specialized
    architecture that encourages collaboration or competition. Each agent is simple: they do not
-   have a model of the simulation; they do not have a global view of the environment; their
+   have a model of the simulation; they do not have a global view of the simulation; their
    actions are only local in both space and in agent interaction (they can only
    interact with one agent at a time). Yet, we will see efficient and complex
    strategies emerge, collaboration and competition from the common or conflicting
@@ -115,7 +115,7 @@ to the strategies learned by multiple foragers interacting in the map at the sam
 time. Each forager is homogeneous with each other as described above: they can
 all move up to one square away, observe up to three squares away, and are rewarded
 the same way. The observations include other foragers in addition to the resources
-and map edges. All agents train a single policy. Below is a brief analysis of the
+and map edges. All agents share a single policy. Below is a brief analysis of the
 learned behaviors.
 
 Cover and explore

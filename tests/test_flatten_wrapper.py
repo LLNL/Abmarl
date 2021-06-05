@@ -1,10 +1,10 @@
 from gym.spaces import Dict, Tuple, Box, Discrete, MultiDiscrete, MultiBinary
 import numpy as np
 
-from admiral.envs import Agent
-from admiral.envs.wrappers import FlattenWrapper
-from admiral.envs.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
-from .helpers import MultiAgentEnv
+from admiral.sim import Agent
+from admiral.sim.wrappers import FlattenWrapper
+from admiral.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
+from .helpers import MultiAgentSim
 
 # --- Test flatten helper commands --- #
 
@@ -187,7 +187,7 @@ def test_flatten_space():
 
 
 # -- Test flatten wrappers --- #
-class MultiAgentContinuousGymSpaceEnv(MultiAgentEnv):
+class MultiAgentContinuousGymSpaceSim(MultiAgentSim):
     def __init__(self):
         self.params = {'params': "there are none"}
         self.agents = {
@@ -234,14 +234,14 @@ class MultiAgentContinuousGymSpaceEnv(MultiAgentEnv):
 
 
 def test_flatten_wrapper():
-    env = MultiAgentContinuousGymSpaceEnv()
-    wrapped_env = FlattenWrapper(env)
-    assert wrapped_env.unwrapped == env
-    for agent_id in wrapped_env.agents:
-        assert isinstance(wrapped_env.agents[agent_id].observation_space, Box)
-        assert isinstance(wrapped_env.agents[agent_id].action_space, Box)
-    env = wrapped_env
-    env.reset()
+    sim = MultiAgentContinuousGymSpaceSim()
+    wrapped_sim = FlattenWrapper(sim)
+    assert wrapped_sim.unwrapped == sim
+    for agent_id in wrapped_sim.agents:
+        assert isinstance(wrapped_sim.agents[agent_id].observation_space, Box)
+        assert isinstance(wrapped_sim.agents[agent_id].action_space, Box)
+    sim = wrapped_sim
+    sim.reset()
 
     action_0 = {
         'agent0': ({'first': 2, 'second': [-0.24, 1.9]}, [0, 1, 1]),
@@ -249,36 +249,36 @@ def test_flatten_wrapper():
         'agent2': {'alpha': [1, 1, 0]},
         'agent3': (2, np.array([0., 6.]), 1)
     }
-    env.step({
-        agent_id: env.unwrap_action(env.env.agents[agent_id], action)
+    sim.step({
+        agent_id: sim.unwrap_action(sim.sim.agents[agent_id], action)
         for agent_id, action in action_0.items()
     })
-    np.testing.assert_array_equal(env.get_obs('agent0'), [0, 1, 1, 0])
-    assert env.get_obs('agent1') == 0.98
-    np.testing.assert_array_equal(env.get_obs('agent2'), [1, 0])
-    np.testing.assert_array_equal(env.get_obs('agent3'), np.array([0, 1, 0, 0, -1, 1]))
+    np.testing.assert_array_equal(sim.get_obs('agent0'), [0, 1, 1, 0])
+    assert sim.get_obs('agent1') == 0.98
+    np.testing.assert_array_equal(sim.get_obs('agent2'), [1, 0])
+    np.testing.assert_array_equal(sim.get_obs('agent3'), np.array([0, 1, 0, 0, -1, 1]))
 
-    assert env.get_reward('agent0') == 'Reward from agent0'
-    assert env.get_reward('agent1') == 'Reward from agent1'
-    assert env.get_reward('agent2') == 'Reward from agent2'
-    assert env.get_reward('agent3') == 'Reward from agent3'
+    assert sim.get_reward('agent0') == 'Reward from agent0'
+    assert sim.get_reward('agent1') == 'Reward from agent1'
+    assert sim.get_reward('agent2') == 'Reward from agent2'
+    assert sim.get_reward('agent3') == 'Reward from agent3'
 
-    assert env.get_done('agent0') == 'Done from agent0'
-    assert env.get_done('agent1') == 'Done from agent1'
-    assert env.get_done('agent2') == 'Done from agent2'
-    assert env.get_done('agent3') == 'Done from agent3'
-    assert env.get_all_done() == "Done from all agents and/or environment."
+    assert sim.get_done('agent0') == 'Done from agent0'
+    assert sim.get_done('agent1') == 'Done from agent1'
+    assert sim.get_done('agent2') == 'Done from agent2'
+    assert sim.get_done('agent3') == 'Done from agent3'
+    assert sim.get_all_done() == "Done from all agents and/or simulation."
 
-    assert env.get_info('agent0')[0]['first'] == action_0['agent0'][0]['first']
+    assert sim.get_info('agent0')[0]['first'] == action_0['agent0'][0]['first']
     assert np.allclose(
-        env.get_info('agent0')[0]['second'], action_0['agent0'][0]['second'], atol=1.0e-7
+        sim.get_info('agent0')[0]['second'], action_0['agent0'][0]['second'], atol=1.0e-7
     )
-    np.testing.assert_array_equal(env.get_info('agent0')[1], action_0['agent0'][1])
-    np.testing.assert_array_equal(env.get_info('agent1'), action_0['agent1'])
-    np.testing.assert_array_equal(env.get_info('agent2')['alpha'], action_0['agent2']['alpha'])
-    np.testing.assert_array_equal(env.get_info('agent3')[0], action_0['agent3'][0])
-    np.testing.assert_array_equal(env.get_info('agent3')[1], action_0['agent3'][1])
-    np.testing.assert_array_equal(env.get_info('agent3')[2], action_0['agent3'][2])
+    np.testing.assert_array_equal(sim.get_info('agent0')[1], action_0['agent0'][1])
+    np.testing.assert_array_equal(sim.get_info('agent1'), action_0['agent1'])
+    np.testing.assert_array_equal(sim.get_info('agent2')['alpha'], action_0['agent2']['alpha'])
+    np.testing.assert_array_equal(sim.get_info('agent3')[0], action_0['agent3'][0])
+    np.testing.assert_array_equal(sim.get_info('agent3')[1], action_0['agent3'][1])
+    np.testing.assert_array_equal(sim.get_info('agent3')[2], action_0['agent3'][2])
 
 
     action_1 = {
@@ -287,20 +287,20 @@ def test_flatten_wrapper():
         'agent2': {'alpha': [1, 0, 0]},
         'agent3': (1, np.array([9., 4.]), 0)
     }
-    env.step({
-        agent_id: env.unwrap_action(env.env.agents[agent_id], action)
+    sim.step({
+        agent_id: sim.unwrap_action(sim.sim.agents[agent_id], action)
         for agent_id, action in action_1.items()
     })
-    assert env.get_info('agent0')[0]['first'] == action_1['agent0'][0]['first']
+    assert sim.get_info('agent0')[0]['first'] == action_1['agent0'][0]['first']
     assert np.allclose(
-        env.get_info('agent0')[0]['second'], action_1['agent0'][0]['second'], atol=1.0e-7
+        sim.get_info('agent0')[0]['second'], action_1['agent0'][0]['second'], atol=1.0e-7
     )
-    np.testing.assert_array_equal(env.get_info('agent0')[1], action_1['agent0'][1])
-    np.testing.assert_array_equal(env.get_info('agent1'), action_1['agent1'])
-    np.testing.assert_array_equal(env.get_info('agent2')['alpha'], action_1['agent2']['alpha'])
-    np.testing.assert_array_equal(env.get_info('agent3')[0], action_1['agent3'][0])
-    np.testing.assert_array_equal(env.get_info('agent3')[1], action_1['agent3'][1])
-    np.testing.assert_array_equal(env.get_info('agent3')[2], action_1['agent3'][2])
+    np.testing.assert_array_equal(sim.get_info('agent0')[1], action_1['agent0'][1])
+    np.testing.assert_array_equal(sim.get_info('agent1'), action_1['agent1'])
+    np.testing.assert_array_equal(sim.get_info('agent2')['alpha'], action_1['agent2']['alpha'])
+    np.testing.assert_array_equal(sim.get_info('agent3')[0], action_1['agent3'][0])
+    np.testing.assert_array_equal(sim.get_info('agent3')[1], action_1['agent3'][1])
+    np.testing.assert_array_equal(sim.get_info('agent3')[2], action_1['agent3'][2])
 
 
     action_2 = {
@@ -309,17 +309,17 @@ def test_flatten_wrapper():
         'agent2': {'alpha': [0, 0, 0]},
         'agent3': (0, np.array([7., 7.]), 0)
     }
-    env.step({
-        agent_id: env.unwrap_action(env.env.agents[agent_id], action)
+    sim.step({
+        agent_id: sim.unwrap_action(sim.sim.agents[agent_id], action)
         for agent_id, action in action_2.items()
     })
-    assert env.get_info('agent0')[0]['first'] == action_2['agent0'][0]['first']
+    assert sim.get_info('agent0')[0]['first'] == action_2['agent0'][0]['first']
     assert np.allclose(
-        env.get_info('agent0')[0]['second'], action_2['agent0'][0]['second'], atol=1.0e-7)
+        sim.get_info('agent0')[0]['second'], action_2['agent0'][0]['second'], atol=1.0e-7)
 
-    np.testing.assert_array_equal(env.get_info('agent0')[1], action_2['agent0'][1])
-    np.testing.assert_array_equal(env.get_info('agent1'), action_2['agent1'])
-    np.testing.assert_array_equal(env.get_info('agent2')['alpha'], action_2['agent2']['alpha'])
-    np.testing.assert_array_equal(env.get_info('agent3')[0], action_2['agent3'][0])
-    np.testing.assert_array_equal(env.get_info('agent3')[1], action_2['agent3'][1])
-    np.testing.assert_array_equal(env.get_info('agent3')[2], action_2['agent3'][2])
+    np.testing.assert_array_equal(sim.get_info('agent0')[1], action_2['agent0'][1])
+    np.testing.assert_array_equal(sim.get_info('agent1'), action_2['agent1'])
+    np.testing.assert_array_equal(sim.get_info('agent2')['alpha'], action_2['agent2']['alpha'])
+    np.testing.assert_array_equal(sim.get_info('agent3')[0], action_2['agent3'][0])
+    np.testing.assert_array_equal(sim.get_info('agent3')[1], action_2['agent3'][1])
+    np.testing.assert_array_equal(sim.get_info('agent3')[2], action_2['agent3'][2])

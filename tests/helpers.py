@@ -1,5 +1,5 @@
-from admiral.envs import AgentBasedSimulation
-from admiral.envs import Agent
+from admiral.sim import AgentBasedSimulation
+from admiral.sim import Agent
 
 from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
 import numpy as np
@@ -31,7 +31,7 @@ class FillInHelper(AgentBasedSimulation):
         pass
 
 
-class MultiAgentEnv(FillInHelper):
+class MultiAgentSim(FillInHelper):
     def __init__(self, num_agents=3):
         self.agents = {
             'agent' + str(i): Agent(
@@ -56,13 +56,13 @@ class MultiAgentEnv(FillInHelper):
         return "Done from " + agent_id
 
     def get_all_done(self, **kwargs):
-        return "Done from all agents and/or environment."
+        return "Done from all agents and/or simulation."
 
     def get_info(self, agent_id, **kwargs):
         return {'Action from ' + agent_id: self.action[agent_id]}
 
 
-class MultiAgentGymSpacesEnv(MultiAgentEnv):
+class MultiAgentGymSpacesSim(MultiAgentSim):
     def __init__(self):
         self.params = {'params': "there are none"}
         self.agents = {

@@ -1,7 +1,7 @@
 import numpy as np
 
-from admiral.envs.components.agent import AttackingAgent
-from admiral.envs.components.actor import AttackActor
+from admiral.sim.components.agent import AttackingAgent
+from admiral.sim.components.actor import AttackActor
 
 
 def test_position_based_attack_actor():

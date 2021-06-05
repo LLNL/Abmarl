@@ -45,7 +45,7 @@ Simulation itself, like so:
    from gym.spaces import Box, Discrete, MultiBinary
    import numpy as np
 
-   from admiral.envs import Agent, AgentBasedSimulation
+   from admiral.sim import Agent, AgentBasedSimulation
 
    class MultiCorridor(AgentBasedSimulation):
 
@@ -154,8 +154,8 @@ the agents' actions at each step. For each agent, we'll capture the following ca
 .. ATTENTION::
    Our reward schema reveals a training
    dynamic that is not present in single-agent simulations: an agent's reward
-   does not entirely depend on its own interaction with the environment but can
-   be affected by other agents' interactions with the environment. In this case, agents
+   does not entirely depend on its own interaction with the simulation but can
+   be affected by other agents' actions. In this case, agents
    are slightly penalized for being "bumped into" when other agents attempt to move
    onto their square, even though the "offended" agent did not directly cause the
    collision. This is discussed in MARL literature and captured in the way
@@ -260,16 +260,16 @@ with RLlib.
 .. code-block:: python
 
    # MultiCorridor is the simulation we created above
-   from admiral.envs.corridor import MultiCorridor
+   from admiral.sim.corridor import MultiCorridor
    from admiral.managers import TurnBasedManager
    # MultiAgentWrapper needed to connect with RLlib
    from admiral.external import MultiAgentWrapper
 
    # Create an instance of the simulation and register it
-   env = MultiAgentWrapper(AllStepManager(MultiCorridor()))
-   env_name = "MultiCorridor"
+   sim = MultiAgentWrapper(AllStepManager(MultiCorridor()))
+   sim_name = "MultiCorridor"
    from ray.tune.registry import register_env
-   register_env(env_name, lambda env_config: env)
+   register_env(sim_name, lambda sim_config: sim)
 
 Policy Setup
 ````````````
@@ -281,7 +281,7 @@ single policy and map all agents to that policy.
 
 .. code-block:: python
 
-   ref_agent = env.unwrapped.agents['agent0']
+   ref_agent = sim.unwrapped.agents['agent0']
    policies = {
        'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
    }
@@ -298,8 +298,8 @@ into a parameters dictionary that will be read by Admiral and used to launch RLl
 
    params = {
        'experiment': {
-           'title': f'{env_name}',
-           'env_creator': lambda config=None: env,
+           'title': f'{sim_name}',
+           'sim_creator': lambda config=None: sim,
        },
        'ray_tune': {
            'run_or_experiment': 'PG',
@@ -310,8 +310,8 @@ into a parameters dictionary that will be read by Admiral and used to launch RLl
            },
            'verbose': 2,
            'config': {
-               # --- Environment ---
-               'env': env_name,
+               # --- Simulation ---
+               'env': sim_name,
                'horizon': 200,
                'env_config': {},
                # --- Multiagent ---
@@ -322,7 +322,7 @@ into a parameters dictionary that will be read by Admiral and used to launch RLl
                # --- Parallelism ---
                # Number of workers per experiment: int
                "num_workers": 7,
-               # Number of environments that each worker starts: int
+               # Number of simulations that each worker starts: int
                "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
            },
        }

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from admiral.envs import AgentBasedSimulation
+from admiral.sim import AgentBasedSimulation
 
 
 class SimulationManager(ABC):
@@ -12,14 +12,14 @@ class SimulationManager(ABC):
     flow.
 
     Attributes:
-        env: The AgentBasedSimulation.
+        sim: The AgentBasedSimulation.
         agents: The agents that are in the AgentBasedSimulation.
     """
-    def __init__(self, env):
-        assert isinstance(env, AgentBasedSimulation), \
+    def __init__(self, sim):
+        assert isinstance(sim, AgentBasedSimulation), \
             "SimulationManager can only interface with AgentBasedSimulation."
-        self.env = env
-        self.agents = env.agents
+        self.sim = sim
+        self.agents = sim.agents
 
     @abstractmethod
     def reset(self, **kwargs):
@@ -27,7 +27,7 @@ class SimulationManager(ABC):
         Reset the simulation.
 
         Returns:
-            The first obersvation of the agent(s).
+            The first observation of the agent(s).
         """
         pass
 
@@ -51,4 +51,4 @@ class SimulationManager(ABC):
         pass
 
     def render(self, **kwargs):
-        self.env.render(**kwargs)
+        self.sim.render(**kwargs)

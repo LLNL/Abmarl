@@ -5,7 +5,7 @@
 PredatorPrey
 ============
 
-PredatorPrey is a multiagent environment useful for exploring competitve behaviors
+PredatorPrey is a multiagent simulation useful for exploring competitve behaviors
 between groups of agents. Resources "grow" in a two-dimensional grid. Prey agents
 move around the grid harvesting resources, and predator agents move around the
 grid hunting the prey agents.
@@ -30,12 +30,12 @@ and attacking them when they are nearby. In order to learn this, they must be ab
 to see a subset of the grid around their position, and they must be able to distinguish
 between other predators and prey. We will reward the predators as follows:
 
-* The predator should be rewarded for successfully killing a prey agent.
+* The predator should be rewarded for successfully killing a prey.
 * The predator should be penalized for trying to move off the edge of the grid.
 * The predator should be penalized for taking too long.
 
 Concurrently, we will train prey agents to harvest resources while attempting to
-avoid predators. To learn this, prey agents must be able to see a subset off the
+avoid predators. To learn this, prey must be able to see a subset off the
 grid around them, both the resources available and any other agents. We will reward
 the prey as follows:
 
@@ -56,7 +56,7 @@ agents' respective child classes.
    from gym.spaces import Box, Discrete, Dict
    import numpy as np
    
-   from admiral.envs import PrincipleAgent, AgentBasedSimulation
+   from admiral.sim import PrincipleAgent, AgentBasedSimulation
 
    class PredatorPreyAgent(PrincipleAgent, ABC):
        @abstractmethod
@@ -100,7 +100,7 @@ The PredatorPrey Simulation
 The PredatorPrey Simulation needs much detailed explanation, which we believe will
 distract from this tutorial. Suffice it to say that we have created a simulation
 that works with the above agents and captures our desired features. This simulation
-can be found in full `in our repo <https://github.com/LLNL/Admiral/blob/main/admiral/envs/predator_prey/predator_prey.py>`_.
+can be found in full `in our repo <https://github.com/LLNL/Admiral/blob/main/admiral/sim/predator_prey/predator_prey.py>`_.
 
 Training the Predator Prey Simulation
 -------------------------------------
@@ -133,8 +133,8 @@ single `params` dictionary. Below is the full configuration file:
 
 .. code-block:: python
 
-   # Setup the environment
-   from admiral.envs.predator_prey import PredatorPreyEnv, Predator, Prey
+   # Setup the simulation
+   from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
    from admiral.managers import AllStepManager
    
    region = 6
@@ -142,18 +142,18 @@ single `params` dictionary. Below is the full configuration file:
    prey = [Prey(id=f'prey{i}') for i in range(7)]
    agents = predators + prey
    
-   env_config = {
+   sim_config = {
        'region': region,
        'max_steps': 200,
        'agents': agents,
    }
-   env_name = 'PredatorPrey'
+   sim_name = 'PredatorPrey'
    
    from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
    from ray.tune.registry import register_env
-   env = MultiAgentWrapper(AllStepManager(PredatorPreyEnv.build(env_config)))
-   agents = env.unwrapped.agents
-   register_env(env_name, lambda env_config: env)
+   sim = MultiAgentWrapper(AllStepManager(PredatorPreySimulation.build(sim_config)))
+   agents = sim.unwrapped.agents
+   register_env(simv_name, lambda sim_config: sim)
    
    # Set up policies
    policies = {
@@ -170,7 +170,7 @@ single `params` dictionary. Below is the full configuration file:
    params = {
        'experiment': {
            'title': '{}'.format('PredatorPrey'),
-           'env_creator': lambda config=None: env,
+           'sim_creator': lambda config=None: sim,
        },
        'ray_tune': {
            'run_or_experiment': "PG",
@@ -181,9 +181,9 @@ single `params` dictionary. Below is the full configuration file:
            },
            'verbose': 2,
            'config': {
-               # --- Environment ---
-               'env': env_name,
-               'env_config': env_config,
+               # --- Simulation ---
+               'env': sim_name,
+               'env_config': sim_config,
                'horizon': 200,
                # --- Multiagent ---
                'multiagent': {
@@ -194,7 +194,7 @@ single `params` dictionary. Below is the full configuration file:
                # --- Parallelism ---
                # Number of workers per experiment: int
                "num_workers": 7,
-               # Number of environments that each worker starts: int
+               # Number of simulations that each worker starts: int
                "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
                # 'simple_optimizer': True,
                # "postprocess_inputs": True
@@ -245,19 +245,19 @@ often a predator attacks from each grid square.
 
 .. code-block:: python
 
-   def run(env, agent):
+   def run(sim, trainer):
        import numpy as np
        import seaborn as sns
        import matplotlib.pyplot as plt
    
-       sim = env.unwrapped
+       sim = sim.unwrapped
    
        # Create a grid
-       grid = np.zeros((sim.env.region, sim.env.region))
-       attack = np.zeros((sim.env.region, sim.env.region))
+       grid = np.zeros((sim.sim.region, sim.sim.region))
+       attack = np.zeros((sim.sim.region, sim.sim.region))
    
        # Run the trained policy
-       policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
+       policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
        for episode in range(100): # Run 100 trajectories
            print('Episode: {}'.format(episode))
            obs = sim.reset()
@@ -269,7 +269,7 @@ often a predator attacks from each grid square.
                for agent_id, agent_obs in obs.items():
                    if done[agent_id]: continue # Don't get actions for dead agents
                    policy_id = policy_agent_mapping(agent_id)
-                   action = agent.compute_action(agent_obs, policy_id=policy_id)
+                   action = trainer.compute_action(agent_obs, policy_id=policy_id)
                    joint_action[agent_id] = action
                obs, _, done, _ = sim.step(joint_action)
                pox, poy = sim.agents['predator0'].position

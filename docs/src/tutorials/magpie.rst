@@ -5,8 +5,8 @@
 Magpie
 ======
 
-The prospect of applying MuliAgent Reinforcement Learning algorithms in HPC
-environments is very attractive. As a first step, we demonstrate that
+The prospect of applying MuliAgent Reinforcement Learning algorithms on HPC
+systems is very attractive. As a first step, we demonstrate that
 admiral can be used with `magpie <https://github.com/LLNL/magpie>`_ to create batch
 jobs for running on multiple compute nodes.
 

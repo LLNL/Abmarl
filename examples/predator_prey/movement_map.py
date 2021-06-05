@@ -1,16 +1,16 @@
-def run(env, agent):
+def run(sim, trainer):
     import numpy as np
     import seaborn as sns
     import matplotlib.pyplot as plt
 
-    sim = env.unwrapped
+    sim = sim.unwrapped
 
     # Create a grid
-    grid = np.zeros((sim.env.region, sim.env.region))
-    attack = np.zeros((sim.env.region, sim.env.region))
+    grid = np.zeros((sim.sim.region, sim.sim.region))
+    attack = np.zeros((sim.sim.region, sim.sim.region))
 
     # Run the trained policy
-    policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
+    policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
     for episode in range(100): # Run 100 trajectories
         print('Episode: {}'.format(episode))
         obs = sim.reset()
@@ -22,7 +22,7 @@ def run(env, agent):
             for agent_id, agent_obs in obs.items():
                 if done[agent_id]: continue # Don't get actions for dead agents
                 policy_id = policy_agent_mapping(agent_id)
-                action = agent.compute_action(agent_obs, policy_id=policy_id)
+                action = trainer.compute_action(agent_obs, policy_id=policy_id)
                 joint_action[agent_id] = action
             obs, _, done, _ = sim.step(joint_action)
             pox, poy = sim.agents['predator0'].position

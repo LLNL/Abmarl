@@ -1,5 +1,5 @@
-from admiral.envs.components.agent import ComponentAgent as Agent
-from admiral.envs.components.state import LifeState
+from admiral.sim.components.agent import ComponentAgent as Agent
+from admiral.sim.components.state import LifeState
 
 
 def test_health_agents():

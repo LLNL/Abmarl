@@ -1,6 +1,6 @@
 import numpy as np
 
-from admiral.envs.components.examples.predator_prey_example import PredatorPreyEnvGridBased, \
+from admiral.sim.components.examples.predator_prey_example import PredatorPreySimGridBased, \
     PreyAgent, PredatorAgent
 from admiral.managers import AllStepManager
 
@@ -27,7 +27,7 @@ def test_all_step_grid_based_predator_prey():
         [0.  , 0.  , 0.9 , 0.  , 0.  ],
         [0.  , 0.18, 0.97, 0.  , 0.94]
     ])
-    env = AllStepManager(PredatorPreyEnvGridBased(
+    sim = AllStepManager(PredatorPreySimGridBased(
         region=5,
         agents=agents,
         number_of_teams=2,
@@ -35,7 +35,7 @@ def test_all_step_grid_based_predator_prey():
         initial_resources=initial_resources,
     ))
 
-    obs = env.reset()
+    obs = sim.reset()
     np.testing.assert_array_equal(obs['prey0']['position'][:,:,1], np.array([
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
         [-1., -1., -1., -1., -1., -1., -1., -1., -1.],
@@ -120,7 +120,7 @@ def test_all_step_grid_based_predator_prey():
     ]))
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'prey0': {'move': np.array([-1, -1]), 'harvest': 0.},
         'prey1': {'move': np.array([-1,  0]), 'harvest': 0.},
         'predator0': {'move': np.array([1, 1]), 'attack': False},
@@ -215,7 +215,7 @@ def test_all_step_grid_based_predator_prey():
     assert not done['__all__']
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'prey0': {'move': np.array([0, 0]), 'harvest': 0.5},
         'prey1': {'move': np.array([0,  1]), 'harvest': 0.5},
         'predator0': {'move': np.array([0, 0]), 'attack': True},
@@ -309,7 +309,7 @@ def test_all_step_grid_based_predator_prey():
     assert not done['__all__']
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'prey1': {'move': np.array([1,  0]), 'harvest': 0},
         'predator0': {'move': np.array([1, 1]), 'attack': False},
     })
@@ -368,7 +368,7 @@ def test_all_step_grid_based_predator_prey():
     assert not done['__all__']
 
 
-    obs, reward, done, _ = env.step({
+    obs, reward, done, _ = sim.step({
         'prey1': {'move': np.array([0,  0]), 'harvest': 0.5},
         'predator0': {'move': np.array([0, 0]), 'attack': True},
     })
