@@ -30,12 +30,12 @@ and attacking them when they are nearby. In order to learn this, they must be ab
 to see a subset of the grid around their position, and they must be able to distinguish
 between other predators and prey. We will reward the predators as follows:
 
-* The predator should be rewarded for successfully killing a prey agent.
+* The predator should be rewarded for successfully killing a prey.
 * The predator should be penalized for trying to move off the edge of the grid.
 * The predator should be penalized for taking too long.
 
 Concurrently, we will train prey agents to harvest resources while attempting to
-avoid predators. To learn this, prey agents must be able to see a subset off the
+avoid predators. To learn this, prey must be able to see a subset off the
 grid around them, both the resources available and any other agents. We will reward
 the prey as follows:
 
@@ -245,7 +245,7 @@ often a predator attacks from each grid square.
 
 .. code-block:: python
 
-   def run(env, agent):
+   def run(env, trainer):
        import numpy as np
        import seaborn as sns
        import matplotlib.pyplot as plt
@@ -257,7 +257,7 @@ often a predator attacks from each grid square.
        attack = np.zeros((sim.env.region, sim.env.region))
    
        # Run the trained policy
-       policy_agent_mapping = agent.config['multiagent']['policy_mapping_fn']
+       policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
        for episode in range(100): # Run 100 trajectories
            print('Episode: {}'.format(episode))
            obs = sim.reset()
@@ -269,7 +269,7 @@ often a predator attacks from each grid square.
                for agent_id, agent_obs in obs.items():
                    if done[agent_id]: continue # Don't get actions for dead agents
                    policy_id = policy_agent_mapping(agent_id)
-                   action = agent.compute_action(agent_obs, policy_id=policy_id)
+                   action = trainer.compute_action(agent_obs, policy_id=policy_id)
                    joint_action[agent_id] = action
                obs, _, done, _ = sim.step(joint_action)
                pox, poy = sim.agents['predator0'].position

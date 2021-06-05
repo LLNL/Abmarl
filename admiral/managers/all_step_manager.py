@@ -4,7 +4,7 @@ from .simulation_manager import SimulationManager
 class AllStepManager(SimulationManager):
     """
     The AllStepManager gets the observations of all agents at reset. At step, it gets
-    the obsersvations of all the agents that are not done. Once all the agents
+    the observations of all the agents that are not done. Once all the agents
     are done, the manager returns all done.
     """
     def reset(self, **kwargs):

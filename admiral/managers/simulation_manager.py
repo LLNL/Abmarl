@@ -27,7 +27,7 @@ class SimulationManager(ABC):
         Reset the simulation.
 
         Returns:
-            The first obersvation of the agent(s).
+            The first observation of the agent(s).
         """
         pass
 

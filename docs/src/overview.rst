@@ -282,7 +282,7 @@ following function:
 .. code-block:: python
 
    # Load the environment and the trainer from the experiment as objects
-   def run(env, agent):
+   def run(env, trainer):
        # Do whatever you want with the environment and the trained policies.
        ...
 
