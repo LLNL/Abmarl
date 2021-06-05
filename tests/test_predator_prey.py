@@ -132,7 +132,9 @@ def test_build_max_steps():
 
 
 def test_builder_observation_mode():
-    sim = PredatorPreySimulation.build({'observation_mode': PredatorPreySimulation.ObservationMode.DISTANCE})
+    sim = PredatorPreySimulation.build(
+        {'observation_mode': PredatorPreySimulation.ObservationMode.DISTANCE}
+    )
     assert isinstance(sim, PredatorPreySimDistanceObs)
 
     agents = sim.agents
@@ -843,9 +845,15 @@ def test_attack_distances():
     sim.step(action_dict)
     assert sim.get_reward('predator0') == \
         sim.reward_map['predator'][PredatorPreySimulation.ActionStatus.GOOD_ATTACK]
-    assert sim.get_reward('prey0') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.EATEN]
-    assert sim.get_reward('prey1') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.NO_MOVE]
-    assert sim.get_reward('prey2') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.NO_MOVE]
+    assert sim.get_reward('prey0') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.EATEN
+    ]
+    assert sim.get_reward('prey1') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.NO_MOVE
+    ]
+    assert sim.get_reward('prey2') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.NO_MOVE
+    ]
     assert not sim.get_done('predator0')
     assert sim.get_done('prey0')
     assert not sim.get_done('prey1')
@@ -856,8 +864,12 @@ def test_attack_distances():
     sim.step(action_dict)
     assert sim.get_reward('predator0') == \
         sim.reward_map['predator'][PredatorPreySimulation.ActionStatus.BAD_ATTACK]
-    assert sim.get_reward('prey1') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.NO_MOVE]
-    assert sim.get_reward('prey2') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.NO_MOVE]
+    assert sim.get_reward('prey1') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.NO_MOVE
+    ]
+    assert sim.get_reward('prey2') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.NO_MOVE
+    ]
     assert not sim.get_done('predator0')
     assert not sim.get_done('prey1')
     assert not sim.get_done('prey2')
@@ -869,8 +881,12 @@ def test_attack_distances():
     sim.step(action_dict)
     assert sim.get_reward('predator0') == \
         sim.reward_map['predator'][PredatorPreySimulation.ActionStatus.GOOD_ATTACK]
-    assert sim.get_reward('prey1') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.EATEN]
-    assert sim.get_reward('prey2') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.NO_MOVE]
+    assert sim.get_reward('prey1') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.EATEN
+    ]
+    assert sim.get_reward('prey2') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.NO_MOVE
+    ]
     assert not sim.get_done('predator0')
     assert sim.get_done('prey1')
     assert not sim.get_done('prey2')
@@ -880,7 +896,9 @@ def test_attack_distances():
     sim.step(action_dict)
     assert sim.get_reward('predator0') == \
         sim.reward_map['predator'][PredatorPreySimulation.ActionStatus.BAD_ATTACK]
-    assert sim.get_reward('prey2') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.NO_MOVE]
+    assert sim.get_reward('prey2') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.NO_MOVE
+    ]
     assert not sim.get_done('predator0')
     assert not sim.get_done('prey2')
     assert not sim.get_all_done()
@@ -978,16 +996,36 @@ def test_diagonal_moves():
         'prey11': {'move': np.array([-1, 1]), 'harvest': 0},
     }
     sim.step(action)
-    assert sim.get_reward('prey0') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey1') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey2') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey3') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey4') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey5') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey6') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey7') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey8') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
-    assert sim.get_reward('prey9') == sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
+    assert sim.get_reward('prey0') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey1') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey2') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey3') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey4') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey5') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey6') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey7') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey8') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
+    assert sim.get_reward('prey9') == sim.reward_map['prey'][
+        PredatorPreySimulation.ActionStatus.BAD_MOVE
+    ]
     assert sim.get_reward('prey10') == \
         sim.reward_map['prey'][PredatorPreySimulation.ActionStatus.BAD_MOVE]
     assert sim.get_reward('prey11') == \
