@@ -13,7 +13,12 @@ custom environments, algorithms, and policies. We enable researchers to rapidly
 prototype RL experiments and environment design and lower the barrier for pre-existing
 projects to prototype RL as a potential solution.
 
-BADGES HERE OR ABOVE
+<p align="center">
+  <img src="https://github.com/LLNL/Admiral/actions/workflows/build-and-test.yml/badge.svg" alt="Build and Test Badge" />
+  <img src="https://github.com/LLNL/Admiral/actions/workflows/build-docs.yml/badge.svg" alt="Sphinx docs Badge" />
+  <img src="https://github.com/LLNL/Admiral/actions/workflows/lint.yml/badge.svg" alt="Lint Badge" />
+</p>
+
 
 ## Getting started
 
@@ -30,6 +35,8 @@ admiral train examples/multi_corridor_example.py
 
 You can find the latest Admiral documentation, on
 [our ReadTheDocs page](https://abmarl.readthedocs.io/en/latest/index.html).
+
+[![Documentation Status](https://readthedocs.org/projects/abmarl/badge/?version=latest)](https://abmarl.readthedocs.io/en/latest/?badge=latest)
 
 
 ## Contact
