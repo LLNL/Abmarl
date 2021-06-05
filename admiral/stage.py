@@ -41,7 +41,7 @@ def _start(full_trained_directory, requested_checkpoint, seed=None):
 
     # Get the simulation
     sim = experiment_mod.params['experiment']['sim_creator'](
-        experiment_mod.params['ray_tune']['config']['sim_config']
+        experiment_mod.params['ray_tune']['config']['env_config']
     )
 
     return sim, trainer
