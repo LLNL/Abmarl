@@ -1,9 +1,9 @@
 from enum import IntEnum
 
-from gym.spaces import Dict, Box, Discrete, MultiBinary
+from gym.spaces import Box, Discrete, MultiBinary
 import numpy as np
 
-from admiral.sim import AgentBasedSimulation, Agent
+from admiral.sim import Agent, AgentBasedSimulation
 
 
 class MultiCorridor(AgentBasedSimulation):
@@ -29,11 +29,11 @@ class MultiCorridor(AgentBasedSimulation):
             agents[f'agent{i}'] = Agent(
                 id=f'agent{i}',
                 action_space=Discrete(3),
-                observation_space=Dict({
+                observation_space={
                     'position': Box(0, self.end-1, (1,), np.int),
                     'left': MultiBinary(1),
                     'right': MultiBinary(1)
-                })
+                }
             )
         self.agents = agents
 
