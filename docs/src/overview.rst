@@ -275,8 +275,9 @@ the training directory.
 Analyzing
 ---------
 
-The simulation and trainer can also be loaded into a script for post-processing via the
-``analyze`` command. The analysis script must implement the following function:
+The simulation and trainer can also be loaded into an analysis script for post-processing via the
+``analyze`` command. The analysis script must implement the following `run` function.
+Below is an example that can serve as a starting point.
 
 .. code-block:: python
 
