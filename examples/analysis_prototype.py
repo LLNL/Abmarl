@@ -1,12 +1,8 @@
 def run(sim, trainer):
     """
-    Analyze the behavior of your trained policies using the simulation and agent from your RL
-    experiment. The simulation is likely wrapped by the MultiAgentWrapper; you
-    can use the unwrapped property to get the Simulation Manager.
+    Analyze the behavior of your trained policies using the simulation and trainer
+    from your RL experiment.
     """
-
-    sim = sim.unwrapped
-
     # Run the simulation with actions chosen from the trained policies
     policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
     # for episode in range(num_episodes):
