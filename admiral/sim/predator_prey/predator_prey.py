@@ -4,8 +4,7 @@ from enum import IntEnum
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
-from admiral.sim import PrincipleAgent
-from admiral.sim import AgentBasedSimulation
+from admiral.sim import PrincipleAgent, AgentBasedSimulation
 
 
 class PredatorPreyAgent(PrincipleAgent, ABC):
@@ -33,10 +32,7 @@ class PredatorPreyAgent(PrincipleAgent, ABC):
         """
         Determine if the agent has been successfully configured.
         """
-        if super().configured and self.move is not None and self.view is not None:
-            return True
-        else:
-            return False
+        return super().configured and self.move is not None and self.view is not None
 
 
 class Prey(PredatorPreyAgent):
@@ -55,10 +51,7 @@ class Prey(PredatorPreyAgent):
         """
         Determine if the agent has been successfully configured.
         """
-        if super().configured and self.harvest_amount is not None:
-            return True
-        else:
-            return False
+        return super().configured and self.harvest_amount is not None
 
     @property
     def value(self):
@@ -86,10 +79,7 @@ class Predator(PredatorPreyAgent):
         """
         Determine if the agent has been successfully configured.
         """
-        if super().configured and self.attack is not None:
-            return True
-        else:
-            return False
+        return super().configured and self.attack is not None
 
     @property
     def value(self):
