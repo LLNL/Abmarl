@@ -180,7 +180,7 @@ simple corridor simulation with multiple agents.
    # Create and wrap the simulation
    # NOTE: The agents in `MultiCorridor` are all homogeneous, so this simulation
    # just creates and stores the agents itself.
-   sim = MultiAgentWrapper(AllStepManager(MultiCorridor()))
+   sim = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
    
    # Register the simulation with RLlib
    sim_name = "MultiCorridor"
