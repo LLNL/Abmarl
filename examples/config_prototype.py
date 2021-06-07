@@ -19,15 +19,6 @@ register_env(sim_name, sim_creator)
 # --- Setup the policies --- #
 # -------------------------- #
 
-from abmarl.pols import HeuristicPolicy
-
-
-class CustomHeuristicPolicy(HeuristicPolicy):
-    """A custom heuristic policy for you the design"""
-    def compute_actions(self, obs_batch, *args, **kwargs):
-        # return [some_action for _ in obs_batch], [], {}
-        return [0 for _ in obs_batch], [], {}
-
 
 agents = sim.agents
 policies = {
