@@ -153,7 +153,7 @@ single `params` dictionary. Below is the full configuration file:
    from ray.tune.registry import register_env
    sim = MultiAgentWrapper(AllStepManager(PredatorPreySimulation.build(sim_config)))
    agents = sim.unwrapped.agents
-   register_env(simv_name, lambda sim_config: sim)
+   register_env(sim_name, lambda sim_config: sim)
    
    # Set up policies
    policies = {

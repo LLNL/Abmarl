@@ -8,9 +8,9 @@ sim_name = "MultiCorridor"
 from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
-agents = sim.unwrapped.agents
+ref_agent = sim.unwrapped.agents['agent0']
 policies = {
-    'corridor': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {})
+    'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
 }
 
 
@@ -29,7 +29,7 @@ params = {
         'checkpoint_freq': 50,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 20_000,
+            'episodes_total': 2000,
         },
         'verbose': 2,
         'config': {

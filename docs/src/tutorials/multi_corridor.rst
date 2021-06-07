@@ -266,7 +266,7 @@ with RLlib.
    from admiral.external import MultiAgentWrapper
 
    # Create an instance of the simulation and register it
-   sim = MultiAgentWrapper(AllStepManager(MultiCorridor()))
+   sim = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
    sim_name = "MultiCorridor"
    from ray.tune.registry import register_env
    register_env(sim_name, lambda sim_config: sim)
@@ -306,7 +306,7 @@ into a parameters dictionary that will be read by Admiral and used to launch RLl
            'checkpoint_freq': 50,
            'checkpoint_at_end': True,
            'stop': {
-               'episodes_total': 20_000,
+               'episodes_total': 2000,
            },
            'verbose': 2,
            'config': {
