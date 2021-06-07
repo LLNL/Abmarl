@@ -38,3 +38,6 @@ jobs:
         flake8 tests/ --count  --max-line-length 100 --indent-size 4 --doctests \
         --per-file-ignores="tests/test_predator_prey.py:E128" \
         --ignore="E261,E701,E731,E226,E231,E202,E241,E203,E303,E201"
+        # Lint the docs directory
+        flake8 docs/ --exclude=docs/build/* --count  --max-line-length 100 --indent-size 4 \
+        --doctests
