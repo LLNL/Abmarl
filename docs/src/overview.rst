@@ -227,6 +227,10 @@ simple corridor simulation with multiple agents.
        }
    }
    
+.. WARNING::
+   The simulation must be a :ref:`Simulation Manager <sim-man>` or an
+   :ref:`External Wrapper <external>` as described above.
+   
 .. NOTE::
    This example has ``num_workers`` set to 7 for a computer with 8 CPU's.
    You may need to adjust this for your computer to be `<cpu count> - 1`.

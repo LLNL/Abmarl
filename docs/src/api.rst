@@ -32,8 +32,8 @@ Admiral Simulations
 	:members:
 	:undoc-members:
 
-.. _api_sim:
 
+.. _api_sim:
 
 Admiral Simulation Managers
 ---------------------------
@@ -54,8 +54,8 @@ Admiral Simulation Managers
 	:members:
 	:undoc-members:
 
-.. _api_gym_wrapper:
 
+.. _api_gym_wrapper:
 
 Admiral External Integration
 ----------------------------
