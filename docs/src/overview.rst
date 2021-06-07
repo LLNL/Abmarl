@@ -227,6 +227,10 @@ simple corridor simulation with multiple agents.
        }
    }
    
+.. WARNING::
+   The simulation must be a :ref:`Simulation Manager <sim-man>` or an
+   :ref:`External Wrapper <external>` as described above.
+   
 .. NOTE::
    This example has ``num_workers`` set to 7 for a computer with 8 CPU's.
    You may need to adjust this for your computer to be `<cpu count> - 1`.
@@ -275,16 +279,42 @@ the training directory.
 Analyzing
 ---------
 
-The simulation and trainer can also be loaded into a script for post-processing via the
-``analyze`` command and custom subscripts. The subscript must implement the
-following function:
+The simulation and trainer can also be loaded into an analysis script for post-processing via the
+``analyze`` command. The analysis script must implement the following `run` function.
+Below is an example that can serve as a starting point.
 
 .. code-block:: python
 
    # Load the simulation and the trainer from the experiment as objects
    def run(sim, trainer):
-       # Do whatever you want with the simulation and the trained policies.
-       ...
+       """
+       Analyze the behavior of your trained policies using the simulation and trainer
+       from your RL experiment.
+
+       Args:
+           sim:
+               Simulation Manager object from the experiment.
+           trainer:
+               Trainer that computes actions using the trained policies.
+       """
+       # Run the simulation with actions chosen from the trained policies
+       policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
+       for episode in range(100):
+           print('Episode: {}'.format(episode))
+           obs = sim.reset()
+           done = {agent: False for agent in obs}
+           while True: # Run until the episode ends
+               # Get actions from policies
+               joint_action = {}
+               for agent_id, agent_obs in obs.items():
+                   if done[agent_id]: continue # Don't get actions for done agents
+                   policy_id = policy_agent_mapping(agent_id)
+                   action = trainer.compute_action(agent_obs, policy_id=policy_id)
+                   joint_action[agent_id] = action
+               # Step the simulation
+               obs, reward, done, info = sim.step(joint_action)
+               if done['__all__']:
+                   break
 
 Analysis can then be performed using the command line interface:
 

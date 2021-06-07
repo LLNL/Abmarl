@@ -250,8 +250,6 @@ often a predator attacks from each grid square.
        import seaborn as sns
        import matplotlib.pyplot as plt
    
-       sim = sim.unwrapped
-   
        # Create a grid
        grid = np.zeros((sim.sim.region, sim.sim.region))
        attack = np.zeros((sim.sim.region, sim.sim.region))

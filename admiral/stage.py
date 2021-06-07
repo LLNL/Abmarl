@@ -8,6 +8,7 @@ from ray.rllib.env import MultiAgentEnv
 from ray.tune.registry import get_trainable_cls
 
 from admiral.tools import utils as adu
+from admiral.managers import SimulationManager
 
 
 def _start(full_trained_directory, requested_checkpoint, seed=None):
@@ -55,6 +56,11 @@ def _finish():
 def run_analysis(full_trained_directory, full_subscript, parameters):
     """Analyze MARL policies from a saved policy through an analysis script"""
     sim, trainer = _start(full_trained_directory, parameters.checkpoint, parameters.seed)
+
+    # The sim may be wrapped by an external wrapper, which we support, but we need
+    # to unwrap it.
+    if not isinstance(sim, SimulationManager):
+        sim = sim.unwrapped
 
     # Load the analysis module and run it
     analysis_mod = adu.custom_import_module(full_subscript)
