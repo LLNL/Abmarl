@@ -1,13 +1,13 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.sim.components.state import VelocityState, ContinuousPositionState
-from admiral.sim.components.actor import AccelerationMovementActor, ContinuousCollisionActor
-from admiral.sim.components.observer import VelocityObserver, PositionObserver
-from admiral.sim.components.agent import VelocityAgent, AcceleratingAgent, \
+from abmarl.sim.components.state import VelocityState, ContinuousPositionState
+from abmarl.sim.components.actor import AccelerationMovementActor, ContinuousCollisionActor
+from abmarl.sim.components.observer import VelocityObserver, PositionObserver
+from abmarl.sim.components.agent import VelocityAgent, AcceleratingAgent, \
     VelocityObservingAgent, PositionObservingAgent, ActingAgent, CollisionAgent, ComponentAgent
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class ParticleAgent(

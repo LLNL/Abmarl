@@ -1,17 +1,17 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.sim.components.agent import \
+from abmarl.sim.components.agent import \
     AttackingAgent, BroadcastingAgent, GridMovementAgent, \
     PositionObservingAgent, LifeObservingAgent, TeamObservingAgent, AgentObservingAgent
-from admiral.sim.components.state import GridPositionState, BroadcastState, LifeState
-from admiral.sim.components.actor import GridMovementActor, AttackActor, BroadcastActor
-from admiral.sim.components.observer import PositionObserver, LifeObserver, TeamObserver
-from admiral.sim.components.done import TeamDeadDone
-from admiral.sim.components.wrappers.observer_wrapper import \
+from abmarl.sim.components.state import GridPositionState, BroadcastState, LifeState
+from abmarl.sim.components.actor import GridMovementActor, AttackActor, BroadcastActor
+from abmarl.sim.components.observer import PositionObserver, LifeObserver, TeamObserver
+from abmarl.sim.components.done import TeamDeadDone
+from abmarl.sim.components.wrappers.observer_wrapper import \
     PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class AllChannelsObservingAgent(

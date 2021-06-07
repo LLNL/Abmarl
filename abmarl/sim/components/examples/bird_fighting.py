@@ -1,15 +1,15 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.sim.components.state import ContinuousPositionState, SpeedAngleState, LifeState
-from admiral.sim.components.actor import SpeedAngleMovementActor, AttackActor
-from admiral.sim.components.observer import SpeedObserver, AngleObserver, PositionObserver, \
+from abmarl.sim.components.state import ContinuousPositionState, SpeedAngleState, LifeState
+from abmarl.sim.components.actor import SpeedAngleMovementActor, AttackActor
+from abmarl.sim.components.observer import SpeedObserver, AngleObserver, PositionObserver, \
     LifeObserver, HealthObserver
-from admiral.sim.components.done import DeadDone
-from admiral.sim.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, AttackingAgent, \
+from abmarl.sim.components.done import DeadDone
+from abmarl.sim.components.agent import SpeedAngleAgent, SpeedAngleActingAgent, AttackingAgent, \
     SpeedAngleObservingAgent, PositionObservingAgent, LifeObservingAgent, HealthObservingAgent
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class FightingBirdAgent(

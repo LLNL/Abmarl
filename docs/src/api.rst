@@ -1,71 +1,71 @@
-.. Admiral documentation API.
+.. Abmarl documentation API.
 
-Admiral API Specification
+Abmarl API Specification
 =========================
 
 
-Admiral Simulations
+Abmarl Simulations
 --------------------
 
 .. _api_agent:
 
-.. autoclass:: admiral.sim.PrincipleAgent
+.. autoclass:: abmarl.sim.PrincipleAgent
 	:members:
 	:undoc-members:
 
-.. autoclass:: admiral.sim.ObservingAgent
+.. autoclass:: abmarl.sim.ObservingAgent
 	:members:
 	:undoc-members:
 
-.. autoclass:: admiral.sim.ActingAgent
+.. autoclass:: abmarl.sim.ActingAgent
 	:members:
 	:undoc-members:
 
-.. autoclass:: admiral.sim.Agent
+.. autoclass:: abmarl.sim.Agent
 	:members:
 	:undoc-members:
 	:show-inheritance:
 
 .. _api_abs:
 
-.. autoclass:: admiral.sim.AgentBasedSimulation
+.. autoclass:: abmarl.sim.AgentBasedSimulation
 	:members:
 	:undoc-members:
 
 
 .. _api_sim:
 
-Admiral Simulation Managers
+Abmarl Simulation Managers
 ---------------------------
 
-.. autoclass:: admiral.managers.SimulationManager
+.. autoclass:: abmarl.managers.SimulationManager
 	:members:
 	:undoc-members:
 
 .. _api_turn_based:
 
-.. autoclass:: admiral.managers.TurnBasedManager
+.. autoclass:: abmarl.managers.TurnBasedManager
 	:members:
 	:undoc-members:
 
 .. _api_all_step:
 
-.. autoclass:: admiral.managers.AllStepManager
+.. autoclass:: abmarl.managers.AllStepManager
 	:members:
 	:undoc-members:
 
 
 .. _api_gym_wrapper:
 
-Admiral External Integration
+Abmarl External Integration
 ----------------------------
 
-.. autoclass:: admiral.external.GymWrapper
+.. autoclass:: abmarl.external.GymWrapper
 	:members:
 	:undoc-members:
 
 .. _api_ma_wrapper:
 
-.. autoclass:: admiral.external.MultiAgentWrapper
+.. autoclass:: abmarl.external.MultiAgentWrapper
 	:members:
 	:undoc-members:

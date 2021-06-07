@@ -1,13 +1,13 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.sim.components.state import GridPositionState, LifeState
-from admiral.sim.components.observer import GridPositionTeamBasedObserver
-from admiral.sim.components.actor import GridMovementActor
-from admiral.sim.components.agent import PositionObservingAgent, AgentObservingAgent, \
+from abmarl.sim.components.state import GridPositionState, LifeState
+from abmarl.sim.components.observer import GridPositionTeamBasedObserver
+from abmarl.sim.components.actor import GridMovementActor
+from abmarl.sim.components.agent import PositionObservingAgent, AgentObservingAgent, \
     GridMovementAgent
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class ObservingTeamMovementAgent(PositionObservingAgent, AgentObservingAgent, GridMovementAgent):

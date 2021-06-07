@@ -2,14 +2,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.sim.components.state import GridPositionState, LifeState, GridResourceState
-from admiral.sim.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
-from admiral.sim.components.actor import GridMovementActor, AttackActor, GridResourcesActor
-from admiral.sim.components.done import TeamDeadDone
-from admiral.sim.components.agent import AgentObservingAgent, PositionObservingAgent, \
+from abmarl.sim.components.state import GridPositionState, LifeState, GridResourceState
+from abmarl.sim.components.observer import GridPositionTeamBasedObserver, GridResourceObserver
+from abmarl.sim.components.actor import GridMovementActor, AttackActor, GridResourcesActor
+from abmarl.sim.components.done import TeamDeadDone
+from abmarl.sim.components.agent import AgentObservingAgent, PositionObservingAgent, \
     ResourceObservingAgent, GridMovementAgent, AttackingAgent, HarvestingAgent
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class PreyAgent(

@@ -1,9 +1,9 @@
-from admiral.algs.monte_carlo import exploring_starts, epsilon_soft, off_policy
-from admiral.sim.corridor import MultiCorridor as Corridor
-from admiral.managers import AllStepManager
-from admiral.sim.wrappers import RavelDiscreteWrapper
-from admiral.external import GymWrapper
-from admiral.pols import RandomFirstActionPolicy, EpsilonSoftPolicy, GreedyPolicy
+from abmarl.algs.monte_carlo import exploring_starts, epsilon_soft, off_policy
+from abmarl.sim.corridor import MultiCorridor as Corridor
+from abmarl.managers import AllStepManager
+from abmarl.sim.wrappers import RavelDiscreteWrapper
+from abmarl.external import GymWrapper
+from abmarl.pols import RandomFirstActionPolicy, EpsilonSoftPolicy, GreedyPolicy
 
 
 def test_exploring_starts_corridor():

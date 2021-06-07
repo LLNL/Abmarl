@@ -3,7 +3,7 @@ from enum import IntEnum
 from gym.spaces import Box, Discrete, MultiBinary
 import numpy as np
 
-from admiral.sim import Agent, AgentBasedSimulation
+from abmarl.sim import Agent, AgentBasedSimulation
 
 
 class MultiCorridor(AgentBasedSimulation):

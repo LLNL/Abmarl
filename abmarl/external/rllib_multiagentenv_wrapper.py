@@ -13,7 +13,7 @@ class MultiAgentWrapper(MultiAgentEnv):
         sim: The SimulationManager.
     """
     def __init__(self, sim):
-        from admiral.managers import SimulationManager
+        from abmarl.managers import SimulationManager
         assert isinstance(sim, SimulationManager)
         self.sim = sim
 

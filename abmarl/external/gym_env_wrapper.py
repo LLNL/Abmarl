@@ -8,7 +8,7 @@ class GymWrapper(GymEnv):
     in the simulation.
     """
     def __init__(self, sim):
-        from admiral.managers import SimulationManager
+        from abmarl.managers import SimulationManager
         assert isinstance(sim, SimulationManager)
         assert len(sim.agents) == 1 # Can only work with single agents
         self.sim = sim

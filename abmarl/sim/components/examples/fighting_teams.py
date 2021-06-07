@@ -1,15 +1,15 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.sim.components.state import GridPositionState, LifeState
-from admiral.sim.components.observer import TeamObserver, PositionObserver, HealthObserver, \
+from abmarl.sim.components.state import GridPositionState, LifeState
+from abmarl.sim.components.observer import TeamObserver, PositionObserver, HealthObserver, \
     LifeObserver
-from admiral.sim.components.actor import GridMovementActor, AttackActor
-from admiral.sim.components.done import TeamDeadDone
-from admiral.sim.components.agent import TeamObservingAgent, PositionObservingAgent, \
+from abmarl.sim.components.actor import GridMovementActor, AttackActor
+from abmarl.sim.components.done import TeamDeadDone
+from abmarl.sim.components.agent import TeamObservingAgent, PositionObservingAgent, \
     HealthObservingAgent, LifeObservingAgent, GridMovementAgent, AttackingAgent
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class FightingTeamsAgent(

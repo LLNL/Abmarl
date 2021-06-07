@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from admiral.sim import AgentBasedSimulation
+from abmarl.sim import AgentBasedSimulation
 
 
 class SimulationManager(ABC):

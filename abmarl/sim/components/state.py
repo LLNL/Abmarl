@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from admiral.sim.components.agent import SpeedAngleAgent, VelocityAgent, CollisionAgent, \
+from abmarl.sim.components.agent import SpeedAngleAgent, VelocityAgent, CollisionAgent, \
     BroadcastingAgent
 
 

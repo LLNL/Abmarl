@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from admiral.sim.corridor import MultiCorridor as Corridor
-from admiral.managers import TurnBasedManager
+from abmarl.sim.corridor import MultiCorridor as Corridor
+from abmarl.managers import TurnBasedManager
 
 
 def test_init():

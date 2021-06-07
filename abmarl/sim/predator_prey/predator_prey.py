@@ -4,7 +4,7 @@ from enum import IntEnum
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
-from admiral.sim import PrincipleAgent, AgentBasedSimulation
+from abmarl.sim import PrincipleAgent, AgentBasedSimulation
 
 
 class PredatorPreyAgent(PrincipleAgent, ABC):
@@ -384,7 +384,7 @@ class PredatorPreySimulation(AgentBasedSimulation):
                 config['rewards'] = rewards
 
         # --- resources --- #
-        from admiral.sim.modules import GridResources
+        from abmarl.sim.modules import GridResources
         if 'resources' not in sim_config:
             sim_config['resources'] = {}
         sim_config['resources']['region'] = config['region']

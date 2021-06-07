@@ -1,8 +1,8 @@
 from gym.spaces import Box, MultiBinary, Discrete, Dict
 import numpy as np
 
-from admiral.sim import Agent
-from admiral.sim.corridor import MultiCorridor as Corridor
+from abmarl.sim import Agent
+from abmarl.sim.corridor import MultiCorridor as Corridor
 
 
 def test_corridor_attributes():

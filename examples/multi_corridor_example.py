@@ -1,6 +1,6 @@
-from admiral.sim.corridor import MultiCorridor
-from admiral.managers import TurnBasedManager
-from admiral.external import MultiAgentWrapper
+from abmarl.sim.corridor import MultiCorridor
+from abmarl.managers import TurnBasedManager
+from abmarl.external import MultiAgentWrapper
 
 sim = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
 

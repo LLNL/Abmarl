@@ -1,4 +1,4 @@
-.. Admiral documentation MultiCorridor tutorial.
+.. Abmarl documentation MultiCorridor tutorial.
 
 .. _tutorial_multi_corridor:
 
@@ -45,7 +45,7 @@ Simulation itself, like so:
    from gym.spaces import Box, Discrete, MultiBinary
    import numpy as np
 
-   from admiral.sim import Agent, AgentBasedSimulation
+   from abmarl.sim import Agent, AgentBasedSimulation
 
    class MultiCorridor(AgentBasedSimulation):
 
@@ -159,7 +159,7 @@ the agents' actions at each step. For each agent, we'll capture the following ca
    are slightly penalized for being "bumped into" when other agents attempt to move
    onto their square, even though the "offended" agent did not directly cause the
    collision. This is discussed in MARL literature and captured in the way
-   we have designed our Simulation Managers. In Admiral, we favor capturing the rewards
+   we have designed our Simulation Managers. In Abmarl, we favor capturing the rewards
    as part of the simulation's state and only "flushing" them once they rewards are
    asked for in ``get_reward``.
 
@@ -250,7 +250,7 @@ Simulation Setup
 ````````````````
 
 We'll start by setting up the simulation we have just built.
-Then we'll choose a Simulation Manager. Admiral comes with two built-In
+Then we'll choose a Simulation Manager. Abmarl comes with two built-In
 managers: `TurnBasedManager`, where only a single agent takes a turn per step, and
 `AllStepManager`, where all non-done agents take a turn per step. For this experiment,
 we'll use the `TurnBasedManager`. Then, we'll wrap the simulation with our `MultiAgentWrapper`,
@@ -260,10 +260,10 @@ with RLlib.
 .. code-block:: python
 
    # MultiCorridor is the simulation we created above
-   from admiral.sim.corridor import MultiCorridor
-   from admiral.managers import TurnBasedManager
+   from abmarl.sim.corridor import MultiCorridor
+   from abmarl.managers import TurnBasedManager
    # MultiAgentWrapper needed to connect with RLlib
-   from admiral.external import MultiAgentWrapper
+   from abmarl.external import MultiAgentWrapper
 
    # Create an instance of the simulation and register it
    sim = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
@@ -292,7 +292,7 @@ Experiment Parameters
 `````````````````````
 
 Having setup the simulation and policies, we can now bundle all that information
-into a parameters dictionary that will be read by Admiral and used to launch RLlib.
+into a parameters dictionary that will be read by Abmarl and used to launch RLlib.
 
 .. code-block:: python
 
@@ -331,23 +331,23 @@ into a parameters dictionary that will be read by Admiral and used to launch RLl
 Command Line interface
 ``````````````````````
 With the configuration file complete, we can utilize the command line interface
-to train our agents. We simply type ``admiral train multi_corridor_example.py``,
+to train our agents. We simply type ``abmarl train multi_corridor_example.py``,
 where `multi_corridor_example.py` is the name of our configuration file. This will launch
-Admiral, which will process the file and launch RLlib according to the
+Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
-in real time in tensorboard with ``tensorboard --logdir ~/admiral_results``.
+in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
 
 
 Visualizing the Trained Behaviors
 `````````````````````````````````
 We can visualize the agents' learned behavior with the ``visualize`` command, which
 takes as argument the output directory from the training session stored in
-``~/admiral_results``. For example, the command
+``~/abmarl_results``. For example, the command
 
 .. code-block::
 
-   admiral visualize ~/admiral_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
+   abmarl visualize ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
 
 will load the experiment (notice that the directory name is the experiment
 title from the configuration file appended with a timestamp) and display an animation
@@ -374,7 +374,7 @@ behaviors and the training process. Some ideas are:
   most commonly occur.
 * And much, much more!
 
-As we attempt these extra challenges, we will experience one of Admiral's strongest
+As we attempt these extra challenges, we will experience one of Abmarl's strongest
 features: the ease with which we can modify our experiment
 file and launch another training job, going through the pipeline from
 experiment setup to behavior visualization and analysis!

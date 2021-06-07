@@ -1,6 +1,6 @@
-.. Admiral documentation highlights.
+.. Abmarl documentation highlights.
 
-Admiral Highlights
+Abmarl Highlights
 ==================
 
 

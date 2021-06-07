@@ -8,7 +8,7 @@ if __name__ == "__main__":
     import time
     home = os.path.expanduser("~")
     output_dir = os.path.join(
-        home, 'admiral_results/{}_{}'.format(
+        home, 'abmarl_results/{}_{}'.format(
             params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
         )
     )

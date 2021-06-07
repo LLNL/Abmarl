@@ -8,7 +8,7 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 
 # -- Project information -----------------------------------------------------
 
-project = 'Admiral'
+project = 'Abmarl'
 copyright = '2021, LLNL'
 author = 'Edward Rusu'
 

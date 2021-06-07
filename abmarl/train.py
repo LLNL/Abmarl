@@ -1,4 +1,4 @@
-from admiral.tools import utils as adu
+from abmarl.tools import utils as adu
 
 
 def run(full_config_path):
@@ -14,7 +14,7 @@ def run(full_config_path):
     import time
     home = os.path.expanduser("~")
     output_dir = os.path.join(
-        home, 'admiral_results/{}_{}'.format(
+        home, 'abmarl_results/{}_{}'.format(
             title, time.strftime('%Y-%m-%d_%H-%M')
         )
     )

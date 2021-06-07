@@ -2,10 +2,10 @@
 from gym.spaces import Discrete
 import numpy as np
 
-from admiral.managers import SimulationManager
-from admiral.external import GymWrapper
-from admiral.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
-from admiral.tools import numpy_utils as npu
+from abmarl.managers import SimulationManager
+from abmarl.external import GymWrapper
+from abmarl.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
+from abmarl.tools import numpy_utils as npu
 
 from .generate_episode import generate_episode
 

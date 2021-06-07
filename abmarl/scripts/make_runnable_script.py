@@ -29,5 +29,5 @@ def create_parser(subparsers):
 
 
 def run(full_config_path, parameters):
-    from admiral import make_runnable
+    from abmarl import make_runnable
     make_runnable.run(full_config_path, parameters)

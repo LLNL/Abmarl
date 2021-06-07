@@ -3,29 +3,29 @@
 import argparse
 import os
 
-from admiral.scripts import train_script as train
-from admiral.scripts import analyze_script as analyze
-from admiral.scripts import visualize_script as visualize
-from admiral.scripts import make_runnable_script as runnable
+from abmarl.scripts import train_script as train
+from abmarl.scripts import analyze_script as analyze
+from abmarl.scripts import visualize_script as visualize
+from abmarl.scripts import make_runnable_script as runnable
 
 EXAMPLE_USAGE = """
 Example usage for training:
-    admiral train my_experiment.py
+    abmarl train my_experiment.py
 
 Example usage for analysis:
-    admiral analyze my_experiment_directory/ my_analysis_script.py
+    abmarl analyze my_experiment_directory/ my_analysis_script.py
 
 Example usage for visualizing:
-    admiral visualize my_experiment_directory/ --some-args
+    abmarl visualize my_experiment_directory/ --some-args
 
 Example usage for converting to runnable script:
-    admiral make-runnable my_experiment.py --some-args
+    abmarl make-runnable my_experiment.py --some-args
 """
 
 
 def cli():
     parser = argparse.ArgumentParser(
-        prog='admiral',
+        prog='abmarl',
         description="Train, analyze, and visualize MARL policies.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=EXAMPLE_USAGE

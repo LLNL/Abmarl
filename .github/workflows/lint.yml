@@ -26,9 +26,9 @@ jobs:
     - name: Lint with flake8
       run: |
         # Lint source directory
-        flake8 admiral/ --count  --max-line-length 100 --indent-size 4 --doctests \
-        --per-file-ignores="__init__.py:F401 admiral/sim/wrappers/communication_wrapper.py,\
-        admiral/sim/components/wrappers/observer_wrapper.py,admiral/algs/monte_carlo.py:W504" \
+        flake8 abmarl/ --count  --max-line-length 100 --indent-size 4 --doctests \
+        --per-file-ignores="__init__.py:F401 abmarl/sim/wrappers/communication_wrapper.py,\
+        abmarl/sim/components/wrappers/observer_wrapper.py,abmarl/algs/monte_carlo.py:W504" \
         --ignore="E261,E701,E731,E226"
         # Lint examples directory
         flake8 examples/ --count  --max-line-length 100 --indent-size 4 --doctests \

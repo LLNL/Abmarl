@@ -15,5 +15,5 @@ def create_parser(subparsers):
 
 
 def run(full_trained_directory, full_subscript, parameters):
-    from admiral import stage
+    from abmarl import stage
     stage.run_analysis(full_trained_directory, full_subscript, parameters)

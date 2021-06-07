@@ -1,6 +1,6 @@
 import numpy as np
 
-from admiral.sim import PrincipleAgent, ActingAgent, ObservingAgent
+from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
 # ------------------ #

@@ -3,8 +3,8 @@
 # ---------------------------- #
 
 import sim_class, sim_agents
-from admiral.managers import SimulationManager
-from admiral.external import MultiAgentWrapper
+from abmarl.managers import SimulationManager
+from abmarl.external import MultiAgentWrapper
 from ray.tune.registry import register_env
 sim_config = {
     # Fill in simulation configuration
@@ -19,7 +19,7 @@ register_env(sim_name, sim_creator)
 # --- Setup the policies --- #
 # -------------------------- #
 
-from admiral.pols import HeuristicPolicy
+from abmarl.pols import HeuristicPolicy
 
 
 class CustomHeuristicPolicy(HeuristicPolicy):

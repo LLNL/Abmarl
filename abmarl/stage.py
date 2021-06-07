@@ -7,8 +7,8 @@ import ray.rllib
 from ray.rllib.env import MultiAgentEnv
 from ray.tune.registry import get_trainable_cls
 
-from admiral.tools import utils as adu
-from admiral.managers import SimulationManager
+from abmarl.tools import utils as adu
+from abmarl.managers import SimulationManager
 
 
 def _start(full_trained_directory, requested_checkpoint, seed=None):

@@ -4,12 +4,12 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name='admiral',
+    name='abmarl',
     version='0.1.0',
     description='Agent Based Simulation and MultiAgent Reinforcement Learning',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/llnl/admiral',
+    url='https://github.com/llnl/abmarl',
     author='Edward Rusu',
     author_email='rusu1@llnl.gov',
     license='BSD 3',
@@ -24,7 +24,6 @@ setuptools.setup(
     ],
     project_urls={
         'Highlights': 'https://abmarl.readthedocs.io/en/latest/highlights.html',
-        'Source': 'https://github.com/llnl/admiral',
         'Documentation': 'https://abmarl.readthedocs.io/en/latest/index.html',
     },
     packages=setuptools.find_packages(),
@@ -37,7 +36,7 @@ setuptools.setup(
     python_required='>=3.7',
     entry_points={
         'console_scripts': [
-            'admiral=admiral.scripts.scripts:cli'
+            'abmarl=abmarl.scripts.scripts:cli'
         ]
     },
 )

@@ -4,7 +4,7 @@ from gym.spaces import Dict, Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from admiral.sim import PrincipleAgent
+from abmarl.sim import PrincipleAgent
 
 
 class World:

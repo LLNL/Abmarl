@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from admiral.tools import gym_utils as gu
+from abmarl.tools import gym_utils as gu
 
 
 class PrincipleAgent:

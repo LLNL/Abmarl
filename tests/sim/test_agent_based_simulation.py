@@ -1,6 +1,6 @@
 import pytest
 
-from admiral.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
+from abmarl.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
 
 
 def test_principle_agent_id():

@@ -1,4 +1,4 @@
-from admiral.sim import AgentBasedSimulation
+from abmarl.sim import AgentBasedSimulation
 
 
 class Wrapper(AgentBasedSimulation):

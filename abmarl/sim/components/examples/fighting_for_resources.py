@@ -2,15 +2,15 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 
-from admiral.sim.components.state import GridPositionState, GridResourceState, LifeState
-from admiral.sim.components.observer import PositionObserver, GridResourceObserver, \
+from abmarl.sim.components.state import GridPositionState, GridResourceState, LifeState
+from abmarl.sim.components.observer import PositionObserver, GridResourceObserver, \
     HealthObserver, LifeObserver
-from admiral.sim.components.actor import GridMovementActor, GridResourcesActor, AttackActor
-from admiral.sim.components.done import DeadDone
-from admiral.sim.components.agent import PositionObservingAgent, ResourceObservingAgent, \
+from abmarl.sim.components.actor import GridMovementActor, GridResourcesActor, AttackActor
+from abmarl.sim.components.done import DeadDone
+from abmarl.sim.components.agent import PositionObservingAgent, ResourceObservingAgent, \
     HealthObservingAgent, LifeObservingAgent, GridMovementAgent, HarvestingAgent, AttackingAgent
-from admiral.sim import AgentBasedSimulation
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.sim import AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class FightForResourcesAgent(

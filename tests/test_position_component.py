@@ -1,9 +1,9 @@
 import numpy as np
 
-from admiral.sim.components.state import GridPositionState, LifeState
-from admiral.sim.components.observer import GridPositionBasedObserver, \
+from abmarl.sim.components.state import GridPositionState, LifeState
+from abmarl.sim.components.observer import GridPositionBasedObserver, \
     GridPositionTeamBasedObserver, RelativePositionObserver
-from admiral.sim.components.agent import PositionObservingAgent, AgentObservingAgent, \
+from abmarl.sim.components.agent import PositionObservingAgent, AgentObservingAgent, \
     ComponentAgent
 
 

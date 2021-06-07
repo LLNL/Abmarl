@@ -2,10 +2,10 @@ from gym.spaces import Dict, Discrete, Box
 import numpy as np
 import pytest
 
-from admiral.sim.predator_prey import PredatorPreySimulation, PredatorPreySimDistanceObs, \
+from abmarl.sim.predator_prey import PredatorPreySimulation, PredatorPreySimDistanceObs, \
     PredatorPreySimGridObs
-from admiral.sim.predator_prey import Predator, Prey
-from admiral.sim.modules import GridResources
+from abmarl.sim.predator_prey import Predator, Prey
+from abmarl.sim.modules import GridResources
 
 
 def test_build_fails():

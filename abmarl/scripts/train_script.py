@@ -13,5 +13,5 @@ def create_parser(subparsers):
 
 
 def run(full_config_path):
-    from admiral import train
+    from abmarl import train
     train.run(full_config_path)
