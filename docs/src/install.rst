@@ -5,33 +5,27 @@
 Installation
 ============
 
-Simple Installation
--------------------
-Install from the requirements file. This uses tensorflow and installs all you need
-to run the examples.
+User Installation
+-----------------
+You can install admiral via `pip`:
 
-* Install the requirements: ``pip install -r requirements.txt``
-* Install Admiral: ``pip install .`` or ``pip install -e .``
+.. code-block::
+
+   pip install admiral
 
 
-Detailed Installation
----------------------
-Install each package as needed.
+.. ATTENTION::
+   Upload the wheel to pip and confirm.
 
-For Training
-````````````
 
-* Install tensorflow or pytorch
-* Install ray rllib v1.2.0: ``pip install ray[rllib]==1.2.0``
-* Install Admiral: ``pip install .`` or ``pip install -e .``
+Developer Installation
+----------------------
+To install Admiral for development, first clone the repository and then install
+via pip's development mode:
 
-For Visualizing
-```````````````
+.. code-block::
 
-* Install matplotlib: ``pip install matplotlib``
-
-For the Tutorials
-`````````````````
-
-* Install seaborn: ``pip install seaborn``
-
+   git clone git@github.com:LLNL/Admiral.git
+   cd admiral
+   pip install -r requirements.txt
+   pip install -e . --no-deps
