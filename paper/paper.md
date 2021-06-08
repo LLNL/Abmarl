@@ -15,7 +15,7 @@ authors:
 affiliations:
  - name: Lawrence Livermore National Laboratory
 date: 9 June 2021 # TODO: Update this!
-bibliography: paper/paper.bib
+bibliography: paper.bib
 ---
 
 # Summary
@@ -26,7 +26,7 @@ interface for engaging with the full workflow of MARL experimentation: training,
 visualizing, and analyzing agent behavior. We define an Agent-Based Simulation
 Interface and Simulation Manager, which control which agents interact with the
 simulation at each step. We support integration with popular reinforcement learning
-simulation interfaces, including gym.Env `[@gym]` and MultiAgentEnv `[@rllib]`.
+simulation interfaces, including gym.Env [@gym] and MultiAgentEnv [@rllib].
 We leverage RLlib's framework for reinforcement learning and extend it to more easily
 support custom simulations, algorithms, and policies. We enable researchers to
 rapidly prototype MARL experiments and simulation design and lower the barrier
@@ -34,10 +34,10 @@ for pre-existing projects to prototype RL as a potential solution.
 
 # Statement of need
 
-In 2016, `@gym` published OpenAi Gym, an interface for single-agent simulations. This interface
+In 2016, @gym published OpenAi Gym, an interface for single-agent simulations. This interface
 defined one of the most popular connections between simulation and training in reinformcent learning
 experimentation. It has been used by many simulation benchmarks for single-agent
-reinforcement learning, including the Arcade Learning Environment `[@arcade]`.
+reinforcement learning, including the Arcade Learning Environment [@arcade].
 Since then the field of DRL has exploded in both algorithm development
 and simulation design, and over the past a few years researchers have been extending
 their interest to MultiAgent Reinforcement Learning (MARL).
@@ -45,10 +45,10 @@ their interest to MultiAgent Reinforcement Learning (MARL).
 MARL has shown exceptional promise towards artificial
 general intelligence. Surprisingly complex and hierarchical behavior emerges in the
 interaction among multiple agents, especially when those agents differ in their
-objectives `[@hide-n-seek]`. Several projects have attempted to define a standard set
-of benchmark scenarios for MultiAgent problems; such as MAgent `[@magent]`, Starcraft `[@smac]`, and
-Neural MMO `[@neuralmmo]`. However, each of these couples the interface with the 
-underlying simulation. Notably, `@pettingzoo` has attempted to unify some of
+objectives [@hide-n-seek]. Several projects have attempted to define a standard set
+of benchmark scenarios for MultiAgent problems; such as MAgent [@magent], Starcraft [@smac], and
+Neural MMO [@neuralmmo]. However, each of these couples the interface with the 
+underlying simulation. Notably, @pettingzoo has attempted to unify some of
 the more popular simulations under a single interface, giving researchers easier
 and access to these simulations. While this is a step towards
 a standard multiagent interace, these are still tied to a specific set of already-built simulations
@@ -72,7 +72,7 @@ the barrier for new researchers to join the field.
 Abmarl has been used in the following research efforts:
 
 1. Abmarl has been used in Hybrid Information-driven Multi-agent Reinforcement Learning
-`[@hybrid]`, where multiple agents work together to construct a posterior distribution of a
+[@hybrid], where multiple agents work together to construct a posterior distribution of a
 chemical plume's source location. Each agent is equipped with a set of discrete
 actions that are heuristically implemented, and the high-level choosing of each action is
 trained using MARL. The simulation was setup using Abmarl's Simulation interface
