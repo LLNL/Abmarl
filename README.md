@@ -22,9 +22,16 @@ projects to prototype RL as a potential solution.
 
 ## Getting started
 
-* Clone the repository
-* Install the requirements: `pip install -r requirements.txt`
-* Install Admiral: `pip install .` or `pip install -e .`
+To use Admiral, install via pip: `pip install abmarl`
+
+To develop Admiral, clone the repository and install via pip's development mode:
+
+```
+git clone git@github.com:LLNL/Admiral.git
+cd admiral
+pip install -r requirements.txt
+pip install -e . --no-deps
+```
 
 Train agents in a multicorridor simulation:
 ```
