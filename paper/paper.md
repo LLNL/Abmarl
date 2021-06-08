@@ -92,7 +92,7 @@ Main points:
 
 <!-- Brief section highlighting Abmarl's use in plume and emergent adversarial behaviors. -->
 
-# Mathematics
+<!-- # Mathematics
 
 Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
 
@@ -137,4 +137,4 @@ Figure sizes can be customized by adding an optional second parameter:
 We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
 Oh, and support from Kathryn Johnston during the genesis of this project.
 
-# References
+# References -->
