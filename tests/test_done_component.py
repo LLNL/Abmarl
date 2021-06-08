@@ -1,8 +1,8 @@
 import numpy as np
 
-from admiral.sim.components.agent import ComponentAgent as Agent
-from admiral.sim.components.state import LifeState, ContinuousPositionState
-from admiral.sim.components.done import DeadDone, TeamDeadDone, TooCloseDone
+from abmarl.sim.components.agent import ComponentAgent as Agent
+from abmarl.sim.components.state import LifeState, ContinuousPositionState
+from abmarl.sim.components.done import DeadDone, TeamDeadDone, TooCloseDone
 
 
 def test_dead_done_condition():

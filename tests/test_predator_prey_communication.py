@@ -1,7 +1,7 @@
 import numpy as np
 
-from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
-from admiral.sim.wrappers import CommunicationHandshakeWrapper
+from abmarl.sim.predator_prey import PredatorPreySimulation, Predator, Prey
+from abmarl.sim.wrappers import CommunicationHandshakeWrapper
 
 
 def test_communication():

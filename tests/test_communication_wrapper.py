@@ -1,7 +1,7 @@
 from gym.spaces import Discrete
 import numpy as np
 
-from admiral.sim.wrappers import CommunicationHandshakeWrapper
+from abmarl.sim.wrappers import CommunicationHandshakeWrapper
 
 from .helpers import MultiAgentGymSpacesSim
 

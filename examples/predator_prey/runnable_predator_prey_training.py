@@ -1,6 +1,6 @@
 # Setup the simulation
-from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
-from admiral.managers import AllStepManager
+from abmarl.sim.predator_prey import PredatorPreySimulation, Predator, Prey
+from abmarl.managers import AllStepManager
 
 region = 6
 predators = [Predator(id=f'predator{i}', attack=1) for i in range(2)]
@@ -14,7 +14,7 @@ sim_config = {
 }
 sim_name = 'PredatorPrey'
 
-from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
+from abmarl.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
 from ray.tune.registry import register_env
 sim = MultiAgentWrapper(AllStepManager(PredatorPreySimulation.build(sim_config)))
 agents = sim.unwrapped.agents
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     import time
     home = os.path.expanduser("~")
     output_dir = os.path.join(
-        home, 'admiral_results/{}_{}'.format(
+        home, 'abmarl_results/{}_{}'.format(
             params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
         )
     )

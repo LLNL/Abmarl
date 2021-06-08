@@ -1,9 +1,9 @@
 import numpy as np
 
-from admiral.sim.components.agent import HarvestingAgent, ResourceObservingAgent
-from admiral.sim.components.state import GridResourceState
-from admiral.sim.components.observer import GridResourceObserver
-from admiral.sim.components.actor import GridResourcesActor
+from abmarl.sim.components.agent import HarvestingAgent, ResourceObservingAgent
+from abmarl.sim.components.state import GridResourceState
+from abmarl.sim.components.observer import GridResourceObserver
+from abmarl.sim.components.actor import GridResourcesActor
 
 
 class ResourcesTestAgent(ResourceObservingAgent, HarvestingAgent): pass

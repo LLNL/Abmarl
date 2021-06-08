@@ -1,7 +1,7 @@
 import numpy as np
 
-from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
-from admiral.managers import TurnBasedManager
+from abmarl.sim.predator_prey import PredatorPreySimulation, Predator, Prey
+from abmarl.managers import TurnBasedManager
 
 
 def test_turn_based_predator_prey_distance():

@@ -1,8 +1,8 @@
 import numpy as np
 
-from admiral.sim.components.state import VelocityState, ContinuousPositionState
-from admiral.sim.components.actor import AccelerationMovementActor, ContinuousCollisionActor
-from admiral.sim.components.actor import VelocityAgent, AcceleratingAgent, CollisionAgent
+from abmarl.sim.components.state import VelocityState, ContinuousPositionState
+from abmarl.sim.components.actor import AccelerationMovementActor, ContinuousCollisionActor
+from abmarl.sim.components.actor import VelocityAgent, AcceleratingAgent, CollisionAgent
 
 
 class ParticleAgent(VelocityAgent, AcceleratingAgent, CollisionAgent): pass

@@ -1,8 +1,8 @@
 import numpy as np
 
-from admiral.sim.components.examples.predator_prey_example import PredatorPreySimGridBased, \
+from abmarl.sim.components.examples.predator_prey_example import PredatorPreySimGridBased, \
     PreyAgent, PredatorAgent
-from admiral.managers import AllStepManager
+from abmarl.managers import AllStepManager
 
 
 def test_all_step_grid_based_predator_prey():

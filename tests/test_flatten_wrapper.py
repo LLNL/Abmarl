@@ -1,9 +1,9 @@
 from gym.spaces import Dict, Tuple, Box, Discrete, MultiDiscrete, MultiBinary
 import numpy as np
 
-from admiral.sim import Agent
-from admiral.sim.wrappers import FlattenWrapper
-from admiral.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
+from abmarl.sim import Agent
+from abmarl.sim.wrappers import FlattenWrapper
+from abmarl.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
 from .helpers import MultiAgentSim
 
 # --- Test flatten helper commands --- #

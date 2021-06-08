@@ -1,9 +1,9 @@
-.. Admiral documentation overview.
+.. Abmarl documentation overview.
 
 Design
 ======
 
-A reinforcement learning experiment in Admiral contains two interacting components:
+A reinforcement learning experiment in Abmarl contains two interacting components:
 a Simulation and a Trainer.
 
 The Simulation contains agent(s) who can observe the state (or a substate) of the
@@ -18,7 +18,7 @@ are one-to-many with agents, meaning that there can be multiple agents using
 the same policy. Policies may be heuristic (i.e. coded by the researcher) or trainable
 by the RL algorithm.
 
-In Admiral, the Simulation and Trainer are specified in a single Python configuration
+In Abmarl, the Simulation and Trainer are specified in a single Python configuration
 file. Once these components are set up, they are passed as parameters to
 RLlib's tune command, which will launch the RLlib application and begin the training
 process. The training process will save checkpoints to an output directory,
@@ -27,9 +27,9 @@ demonstrates this workflow.
 
 .. figure:: .images/workflow.png
    :width: 100 %
-   :alt: Admiral usage workflow
+   :alt: Abmarl usage workflow
 
-   Admiral's usage workflow. An experiment configuration is used to train agents'
+   Abmarl's usage workflow. An experiment configuration is used to train agents'
    behaviors. The policies and simulation are saved to an output directory. Behaviors can then
    be analyzed or visualized from the output directory.
 
@@ -37,7 +37,7 @@ demonstrates this workflow.
 Creating Agents and Simulations
 -------------------------------
 
-Admiral provides three interfaces for setting up an agent-based simulations.
+Abmarl provides three interfaces for setting up an agent-based simulations.
 
 .. _overview_agent:
 
@@ -55,7 +55,7 @@ An agent can be created like so:
 .. code-block:: python
 
    from gym.spaces import Discrete, Box
-   from admiral.sim import Agent
+   from abmarl.sim import Agent
    agent = Agent(
        id='agent0',
        observation_space=Box(-1, 1, (2,)),
@@ -81,7 +81,7 @@ An Agent Based Simulation can be created and used like so:
 
 .. code-block:: python
 
-   from admiral.sim import Agent, AgentBasedSimulation   
+   from abmarl.sim import Agent, AgentBasedSimulation   
    class MySim(AgentBasedSimulation):
        def __init__(self, agents=None, **kwargs):
            self.agents = agents
@@ -109,7 +109,7 @@ An Agent Based Simulation can be created and used like so:
    information in the Agent Based Simulation with various dictionaries. For example,
    we could have ``action_spaces`` and ``observation_spaces`` that
    maps agents' ids to their action spaces and observation spaces, respectively.
-   In Admiral, we favor the dataclass approach and use it throughout the package
+   In Abmarl, we favor the dataclass approach and use it throughout the package
    and documentation.
 
 .. _sim-man:
@@ -134,8 +134,8 @@ Simluation Managers "wrap" simulations, and they can be used like so:
 
 .. code-block:: python
 
-   from admiral.managers import AllStepManager
-   from admiral.sim import AgentBasedSimulation, Agent
+   from abmarl.managers import AllStepManager
+   from abmarl.sim import AgentBasedSimulation, Agent
    class MySim(AgentBasedSimulation):
        ... # Define some simulation
 
@@ -173,9 +173,9 @@ simple corridor simulation with multiple agents.
 
    # Import the MultiCorridor ABS, a simulation manager, and the multiagent
    # wrapper needed to connect to RLlib's trainers
-   from admiral.sim.corridor import MultiCorridor
-   from admiral.managers import TurnBasedManager
-   from admiral.external import MultiAgentWrapper
+   from abmarl.sim.corridor import MultiCorridor
+   from abmarl.managers import TurnBasedManager
+   from abmarl.external import MultiAgentWrapper
    
    # Create and wrap the simulation
    # NOTE: The agents in `MultiCorridor` are all homogeneous, so this simulation
@@ -241,7 +241,7 @@ The strucutre of the parameters dictionary is very important. It *must* have an
 `experiment` key which contains both the `title` of the experiment and the `sim_creator`
 function. This function should receive a config and, if appropriate, pass it to
 the simulation constructor. In the example configuration above, we just retrun the
-already-configured simulation. Without the title and simulation creator, Admiral
+already-configured simulation. Without the title and simulation creator, Abmarl
 may not behave as expected.
 
 The experiment parameters also contains information that will be passed directly
@@ -251,23 +251,23 @@ to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
 Command Line
 ````````````
 With the configuration file complete, we can utilize the command line interface
-to train our agents. We simply type ``admiral train multi_corridor_example.py``,
+to train our agents. We simply type ``abmarl train multi_corridor_example.py``,
 where `multi_corridor_example.py` is the name of our configuration file. This will launch
-Admiral, which will process the file and launch RLlib according to the
+Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
-in real time in tensorboard with ``tensorboard --logdir ~/admiral_results``.
+in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
 
 
 Visualizing
 -----------
 We can visualize the agents' learned behavior with the ``visualize`` command, which
 takes as argument the output directory from the training session stored in
-``~/admiral_results``. For example, the command
+``~/abmarl_results``. For example, the command
 
 .. code-block::
 
-   admiral visualize ~/admiral_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
+   abmarl visualize ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
 
 will load the experiment (notice that the directory name is the experiment
 title from the configuration file appended with a timestamp) and display an animation
@@ -320,7 +320,7 @@ Analysis can then be performed using the command line interface:
 
 .. code-block::
 
-   admiral analyze ~/admiral_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
+   abmarl analyze ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
 
 See the :ref:`Predator Prey tutorial <tutorial_predator_prey>` for an example of
 analyzing trained agent behavior.
@@ -328,7 +328,7 @@ analyzing trained agent behavior.
 Running at scale with HPC
 -------------------------
 
-Admiral also supports some functionality for training at scale. See the
+Abmarl also supports some functionality for training at scale. See the
 :ref:`magpie tutorial <tutorial_magpie>`, which provides a walkthrough
 for launching a training experiment on multiple compute nodes with slurm.
 

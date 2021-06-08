@@ -1,4 +1,4 @@
-from admiral.algs.generate_episode import generate_episode
+from abmarl.algs.generate_episode import generate_episode
 
 
 class Sim:

@@ -1,37 +1,27 @@
-.. Admiral documentation installation instructions.
+.. Abmarl documentation installation instructions.
 
 .. _installation:
 
 Installation
 ============
 
-Simple Installation
--------------------
-Install from the requirements file. This uses tensorflow and installs all you need
-to run the examples.
+User Installation
+-----------------
+You can install abmarl via `pip`:
 
-* Install the requirements: ``pip install -r requirements.txt``
-* Install Admiral: ``pip install .`` or ``pip install -e .``
+.. code-block::
+
+   pip install abmarl
 
 
-Detailed Installation
----------------------
-Install each package as needed.
+Developer Installation
+----------------------
+To install Abmarl for development, first clone the repository and then install
+via pip's development mode:
 
-For Training
-````````````
+.. code-block::
 
-* Install tensorflow or pytorch
-* Install ray rllib v1.2.0: ``pip install ray[rllib]==1.2.0``
-* Install Admiral: ``pip install .`` or ``pip install -e .``
-
-For Visualizing
-```````````````
-
-* Install matplotlib: ``pip install matplotlib``
-
-For the Tutorials
-`````````````````
-
-* Install seaborn: ``pip install seaborn``
-
+   git clone git@github.com:LLNL/Abmarl.git
+   cd abmarl
+   pip install -r requirements.txt
+   pip install -e . --no-deps
