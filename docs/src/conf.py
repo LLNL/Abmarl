@@ -8,12 +8,12 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 
 # -- Project information -----------------------------------------------------
 
-project = 'Admiral'
+project = 'Abmarl'
 copyright = '2021, LLNL'
 author = 'Edward Rusu'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1.0'
+release = '0.1.1'
 
 
 # -- General configuration ---------------------------------------------------

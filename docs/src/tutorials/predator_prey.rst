@@ -1,4 +1,4 @@
-.. Admiral documentation PredatorPrey tutorial.
+.. Abmarl documentation PredatorPrey tutorial.
 
 .. _tutorial_predator_prey:
 
@@ -56,7 +56,7 @@ agents' respective child classes.
    from gym.spaces import Box, Discrete, Dict
    import numpy as np
    
-   from admiral.sim import PrincipleAgent, AgentBasedSimulation
+   from abmarl.sim import PrincipleAgent, AgentBasedSimulation
 
    class PredatorPreyAgent(PrincipleAgent, ABC):
        @abstractmethod
@@ -100,7 +100,7 @@ The PredatorPrey Simulation
 The PredatorPrey Simulation needs much detailed explanation, which we believe will
 distract from this tutorial. Suffice it to say that we have created a simulation
 that works with the above agents and captures our desired features. This simulation
-can be found in full `in our repo <https://github.com/LLNL/Admiral/blob/main/admiral/sim/predator_prey/predator_prey.py>`_.
+can be found in full `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/predator_prey/predator_prey.py>`_.
 
 Training the Predator Prey Simulation
 -------------------------------------
@@ -134,8 +134,8 @@ single `params` dictionary. Below is the full configuration file:
 .. code-block:: python
 
    # Setup the simulation
-   from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
-   from admiral.managers import AllStepManager
+   from abmarl.sim.predator_prey import PredatorPreySimulation, Predator, Prey
+   from abmarl.managers import AllStepManager
    
    region = 6
    predators = [Predator(id=f'predator{i}', attack=1) for i in range(2)]
@@ -149,7 +149,7 @@ single `params` dictionary. Below is the full configuration file:
    }
    sim_name = 'PredatorPrey'
    
-   from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
+   from abmarl.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
    from ray.tune.registry import register_env
    sim = MultiAgentWrapper(AllStepManager(PredatorPreySimulation.build(sim_config)))
    agents = sim.unwrapped.agents
@@ -208,12 +208,12 @@ Using the Command Line
 Training
 ''''''''
 With the configuration script complete, we can utilize the command line interface
-to train our predator. We simply type ``admiral train predator_prey_training.py``,
-where `predator_prey_training.py` is our configuration file. This will launch Admiral,
+to train our predator. We simply type ``abmarl train predator_prey_training.py``,
+where `predator_prey_training.py` is our configuration file. This will launch Abmarl,
 which will process the script and launch RLlib according to the
 specified parameters. This particular example should take about 10 minutes to
 train, depending on your compute capabilities. You can view the performance in
-real time in tensorboard with ``tensorboard --logdir ~/admiral_results``.
+real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
 We can find the rewards associated with the policies on the second page of tensorboard.
 
 
@@ -222,11 +222,11 @@ Visualizing
 Having successfully trained predators to attack prey, we can vizualize the agents'
 learned behavior with the `visualize` command,
 which takes as argument the output directory from the training session stored
-in `~/admiral_results`. For example, the command
+in `~/abmarl_results`. For example, the command
 
 .. code-block:: python
 
-   admiral visualize ~/admiral_results/PredatorPrey-2020-08-25_09-30/ -n 5 --record
+   abmarl visualize ~/abmarl_results/PredatorPrey-2020-08-25_09-30/ -n 5 --record
 
 
 will load the training session (notice that the
@@ -287,7 +287,7 @@ We can run this analysis with
 
 .. code-block:: python
 
-   admiral analyze ~/admiral_results/PredatorPrey-2020-08-25_09-30/ movement_map.py
+   abmarl analyze ~/abmarl_results/PredatorPrey-2020-08-25_09-30/ movement_map.py
 
 which renders the following image for us
 

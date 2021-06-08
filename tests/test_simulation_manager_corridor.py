@@ -1,7 +1,7 @@
 import numpy as np
 
-from admiral.managers import TurnBasedManager, AllStepManager
-from admiral.sim.corridor import MultiCorridor as Corridor
+from abmarl.managers import TurnBasedManager, AllStepManager
+from abmarl.sim.corridor import MultiCorridor as Corridor
 
 
 def test_managers_are_same_for_single_agent():

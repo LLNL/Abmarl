@@ -1,7 +1,7 @@
 from gym.spaces import Discrete, Dict
 import pytest
 
-from admiral.tools import gym_utils as gu
+from abmarl.tools import gym_utils as gu
 
 
 def test_check_space():

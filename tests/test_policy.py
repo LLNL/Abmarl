@@ -1,11 +1,11 @@
 import numpy as np
 import pytest
 
-from admiral.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
+from abmarl.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
 
 
 def test_abstract_policy():
-    from admiral.pols.policy import Policy
+    from abmarl.pols.policy import Policy
     with pytest.raises(TypeError):
         Policy(np.zeros((2,3)))
 

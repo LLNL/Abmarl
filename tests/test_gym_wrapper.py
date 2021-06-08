@@ -1,7 +1,7 @@
 import pytest
 
-from admiral.managers import AllStepManager
-from admiral.external import GymWrapper
+from abmarl.managers import AllStepManager
+from abmarl.external import GymWrapper
 
 from .helpers import MultiAgentSim
 

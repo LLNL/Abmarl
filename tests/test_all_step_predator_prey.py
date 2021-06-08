@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 
-from admiral.sim.predator_prey import PredatorPreySimulation, Predator, Prey
-from admiral.managers import AllStepManager
+from abmarl.sim.predator_prey import PredatorPreySimulation, Predator, Prey
+from abmarl.managers import AllStepManager
 
 
 def test_turn_based_predator_prey_distance():

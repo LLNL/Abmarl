@@ -1,4 +1,4 @@
-.. Admiral documentation installation instructions.
+.. Abmarl documentation installation instructions.
 
 .. _installation:
 
@@ -7,7 +7,7 @@ Installation
 
 User Installation
 -----------------
-You can install admiral via `pip`:
+You can install abmarl via `pip`:
 
 .. code-block::
 
@@ -16,12 +16,12 @@ You can install admiral via `pip`:
 
 Developer Installation
 ----------------------
-To install Admiral for development, first clone the repository and then install
+To install Abmarl for development, first clone the repository and then install
 via pip's development mode:
 
 .. code-block::
 
-   git clone git@github.com:LLNL/Admiral.git
-   cd admiral
+   git clone git@github.com:LLNL/Abmarl.git
+   cd abmarl
    pip install -r requirements.txt
    pip install -e . --no-deps

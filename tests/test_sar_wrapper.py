@@ -1,4 +1,4 @@
-from admiral.sim.wrappers import SARWrapper
+from abmarl.sim.wrappers import SARWrapper
 from .helpers import MultiAgentSim
 
 

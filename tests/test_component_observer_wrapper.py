@@ -1,15 +1,15 @@
 import numpy as np
 
-from admiral.sim.components.agent import SpeedAngleAgent, VelocityAgent, BroadcastingAgent
-from admiral.sim.components.state import GridPositionState, LifeState, SpeedAngleState, \
+from abmarl.sim.components.agent import SpeedAngleAgent, VelocityAgent, BroadcastingAgent
+from abmarl.sim.components.state import GridPositionState, LifeState, SpeedAngleState, \
     VelocityState, BroadcastState
-from admiral.sim.components.observer import HealthObserver, LifeObserver, PositionObserver, \
+from abmarl.sim.components.observer import HealthObserver, LifeObserver, PositionObserver, \
     RelativePositionObserver, SpeedObserver, AngleObserver, VelocityObserver, TeamObserver
-from admiral.sim.components.wrappers.observer_wrapper import \
+from abmarl.sim.components.wrappers.observer_wrapper import \
     PositionRestrictedObservationWrapper, TeamBasedCommunicationWrapper
-from admiral.sim.components.actor import BroadcastActor
+from abmarl.sim.components.actor import BroadcastActor
 
-from admiral.sim.components.agent import AgentObservingAgent, VelocityObservingAgent, \
+from abmarl.sim.components.agent import AgentObservingAgent, VelocityObservingAgent, \
     PositionObservingAgent, SpeedAngleObservingAgent, TeamObservingAgent, LifeObservingAgent, \
     HealthObservingAgent
 

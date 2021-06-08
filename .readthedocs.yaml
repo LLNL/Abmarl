@@ -13,7 +13,7 @@ python:
   version: 3.7
   install:
     - requirements: docs/requirements.txt
-    # Below will install admiral to the RTD virtual environment so that the API build works.
+    # Below will install abmarl to the RTD virtual environment so that the API build works.
     - method: pip
       path: .
 

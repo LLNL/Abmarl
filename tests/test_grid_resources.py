@@ -1,6 +1,6 @@
 import numpy as np
 
-from admiral.sim.modules import GridResources
+from abmarl.sim.modules import GridResources
 
 
 def test_builder():

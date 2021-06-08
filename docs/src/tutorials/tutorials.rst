@@ -1,4 +1,4 @@
-.. Admiral documentation tutorials.
+.. Abmarl documentation tutorials.
 
 Full Tutorials
 ==============

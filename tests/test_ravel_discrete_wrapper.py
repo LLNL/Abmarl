@@ -1,6 +1,6 @@
-from admiral.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
-from admiral.sim.wrappers import RavelDiscreteWrapper
-from admiral.sim import Agent
+from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
+from abmarl.sim.wrappers import RavelDiscreteWrapper
+from abmarl.sim import Agent
 
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np
