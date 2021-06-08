@@ -14,10 +14,6 @@ You can install abmarl via `pip`:
    pip install abmarl
 
 
-.. ATTENTION::
-   Upload the wheel to pip and confirm.
-
-
 Developer Installation
 ----------------------
 To install Abmarl for development, first clone the repository and then install
