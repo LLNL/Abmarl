@@ -50,7 +50,7 @@ You can find the latest Abmarl documentation, on
 
 ### Reporting Issues
 
-Please use our issue tracker to report any issues or submit feature requests. Great
+Please use our issue tracker to report any bugs or submit feature requests. Great
 bug reports tend to have:
 - A quick summary and/or background
 - Steps to reproduce, sample code is best.
@@ -59,7 +59,7 @@ bug reports tend to have:
 
 ### Contributing
 
-Please submit any changes via pull requests from a forked repository. Find out
+Please submit contributions via pull requests from a forked repository. Find out
 more about this process [here](https://guides.github.com/introduction/flow/index.html).
 All contributions are under the BSD 3 License that covers the project.
 
