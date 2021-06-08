@@ -90,6 +90,15 @@ Main points:
 
 # Highlights
 
+Abmarl has been used in the following research efforts:
+
+1. Abmarl has been used in Hybrid Information-driven Multi-agent Reinforcement Learning
+`[@hybrid]`, where multiple agents work together to construct a posterior distribution of a
+chemical plume's source location. Each agent is equipped with a set of discrete
+actions that are heuristically implemented, and the high-choosing of each action is
+trained using MARL. The simulation was setup using Abmarl's Simulation interface
+and the training was mananged via our command line interface.
+
 <!-- Brief section highlighting Abmarl's use in plume and emergent adversarial behaviors. -->
 
 <!-- # Mathematics
