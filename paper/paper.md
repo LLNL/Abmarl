@@ -14,7 +14,7 @@ authors:
     affiliation: 1
 affiliations:
  - name: Lawrence Livermore National Laboratory
-date: 8 June 2021 # TODO: Update this!
+date: 9 June 2021 # TODO: Update this!
 bibliography: paper.bib
 ---
 
@@ -26,15 +26,15 @@ interface for engaging with the full workflow of MARL experimentation: training,
 visualizing, and analyzing agent behavior. We define an Agent-Based Simulation
 Interface and Simulation Manager, which control which agents interact with the
 simulation at each step. We support integration with popular reinforcement learning
-simulation interfaces, including gym.Env and MultiAgentEnv. We leverage RLlib's
-framework for reinforcement learning and extend it to more easily
+simulation interfaces, including gym.Env `[@gym]` and MultiAgentEnv `[@rllib]`.
+We leverage RLlib's framework for reinforcement learning and extend it to more easily
 support custom simulations, algorithms, and policies. We enable researchers to
 rapidly prototype MARL experiments and simulation design and lower the barrier
 for pre-existing projects to prototype RL as a potential solution.
 
-<!-- TODO: rllib citation -->
-
 # Statement of need
+
+
 
 <!-- TODO: Supply a statement of need of connecting Agent Based Simulations with MultiAgent
 Reinforcement Learning.
