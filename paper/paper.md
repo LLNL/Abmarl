@@ -35,8 +35,8 @@ for pre-existing projects to prototype RL as a potential solution.
 # Statement of need
 
 In 2016, `@gym` published OpenAi Gym, an interface for single-agent simulations. This interface
-has become one of the most popular connections between simulation and training in reinformcent learning
-experimentation. It has been used by the standard set of benchmarks for single-agent
+defined one of the most popular connections between simulation and training in reinformcent learning
+experimentation. It has been used by many simulation benchmarks for single-agent
 reinforcement learning, including the Arcade Learning Environment `[@arcade]`.
 Since then the field of DRL has exploded in both algorithm development
 and simulation design, and over the past a few years researchers have been extending
@@ -45,48 +45,27 @@ their interest to MultiAgent Reinforcement Learning (MARL).
 MARL has shown exceptional promise towards artificial
 general intelligence. Surprisingly complex and hierarchical behavior emerges in the
 interaction among multiple agents, especially when those agents differ in their
-objectives `[@hide-n-seek]`....
-
-... Several projects have attempted to define a standard set
+objectives `[@hide-n-seek]`. Several projects have attempted to define a standard set
 of benchmark scenarios for MultiAgent problems; such as MAgent `[@magent]`, Starcraft `[@smac]`, and
 Neural MMO `[@neuralmmo]`. However, each of these couples the interface with the 
 underlying simulation. Notably, `@pettingzoo` has attempted to unify some of
 the more popular simulations under a single interface, giving researchers easier
 and access to these simulations. While this is a step towards
-a standard multiagent interace, these are still tied to a specific set of already-built simulations.
+a standard multiagent interace, these are still tied to a specific set of already-built simulations
+with limited flexibility.
 
-Abmarl provides 
+Abmarl defines a generalized interface for multiagent simulations that is versatile,
+generalizable, extendible, and intuitive. Rather than adapting gym's interface for a targetted
+multiagent simulation, we have built an interface from scratch that allows for the greatest flexbility
+while still connecting to the top open-source RL library, namely RLlib. Our interface
+manages the loop between agents and the trainer, enabling the researcher to focus
+on simulation design or algorithmic development without worrying about the data exchange.
 
-Abmarl appr
-
-...
-The field of MARL provides an overwhelming set of choices for
-the simulations, the learning algorithms, and the software frameworks. Among these,
-RLlib `[@rllib]` has risen as one of the top choices, supporting many state-of-the-art
-algorithms, support for training on HPC platforms, and an open-ended simulation interface.
-Although RLlib provides the skeleton for connecting simulations with trainers, its
-simulation interface does not provide 
-While their most popular `MultiAgentEnv`.
-
-
-
-
-Running MultiAgent Reinforcement Learning experiments 
-
-<!-- TODO: Supply a statement of need of connecting Agent Based Simulations with MultiAgent
-Reinforcement Learning.
-Main points:
-1. Gym.Env is a standard interfance for single-agent RL that allowed practitioners
-    to set a speciic goal towards an simulation design, reuse other's work, create
-    algorithms designed for a single simulation interface.
-2. Movement towards MARL, and while there have been lots of great baseline simulatoin
-    (include citations here), they have all been tied to specific simulation.
-3. Abmarl provides an interface for simulations that are naturally implemented
-    as agent-based simulations.
-4. Additionally, Abmarl simplifies the "learning curve" needed to get started with
-    MARL libraries, such as RLlib, lowering the barrier for researchers who are
-    interested in usinng RL in their work.
--->
+Finally, Abmarl's intuitive command-line interface gives researchers a running-start
+in MARL experimentation. We handle all the workflow elements needed to setup, run,
+and reproduce MARL experiments, providing direct abilities to train, visualize,
+and anaylze experiments. We streamline the savy-practictioners experience and lower
+the barrier for new researchers to join the field.
 
 # Highlights
 
@@ -95,11 +74,17 @@ Abmarl has been used in the following research efforts:
 1. Abmarl has been used in Hybrid Information-driven Multi-agent Reinforcement Learning
 `[@hybrid]`, where multiple agents work together to construct a posterior distribution of a
 chemical plume's source location. Each agent is equipped with a set of discrete
-actions that are heuristically implemented, and the high-choosing of each action is
+actions that are heuristically implemented, and the high-level choosing of each action is
 trained using MARL. The simulation was setup using Abmarl's Simulation interface
 and the training was mananged via our command line interface.
-
-<!-- Brief section highlighting Abmarl's use in plume and emergent adversarial behaviors. -->
+2. Abmarl has been used to study emergent behaviors in scnearios involving teams
+of heterogeneous agents, where each teammate shares the same objective. The
+competition among teams results in collaboration among team members and competition
+among the teams, all from a sparse reward schema. This is ongoing research.
+3. Abmarl will also provide a cirriculum of tasks in MARL scenarios to serve as
+a benchmark for new algorithms. The framework for this is open-ended and user-friendly,
+allowing researchers to easily define a virtually inifinte set of grid-based simulations
+for training. This is ongoing development.
 
 <!-- # Mathematics
 
@@ -141,9 +126,12 @@ and referenced from text using \autoref{fig:example}.
 Figure sizes can be customized by adding an optional second parameter:
 ![Caption for example figure.](figure.png){ width=20% }
 
+-->
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
+This work was performed under the auspices of the U.S. Department of Energy by
+Lawrence Livermore National Laboratory under contract DE-AC52-07NA27344. Lawrence 
+Livermore National Security, LLC through the support of LDRD 20-SI-005, 20-COMP-015,
+and 21-COMP-017. LLNL-CODE-815883.
 
-# References -->
+# References
