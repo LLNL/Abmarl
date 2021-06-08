@@ -11,11 +11,7 @@ You can install admiral via `pip`:
 
 .. code-block::
 
-   pip install admiral
-
-
-.. ATTENTION::
-   Upload the wheel to pip and confirm.
+   pip install abmarl
 
 
 Developer Installation

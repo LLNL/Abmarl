@@ -22,7 +22,7 @@ projects to prototype RL as a potential solution.
 
 ## Getting started
 
-To use Admiral, install via pip: `pip install admiral`
+To use Admiral, install via pip: `pip install abmarl`
 
 To develop Admiral, clone the repository and install via pip's development mode:
 
