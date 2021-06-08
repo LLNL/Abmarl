@@ -34,16 +34,53 @@ for pre-existing projects to prototype RL as a potential solution.
 
 # Statement of need
 
+In 2016, `@gym` published OpenAi Gym, an interface for single-agent simulations. This interface
+has become one of the most popular connections between simulation and training in reinformcent learning
+experimentation. It has been used by the standard set of benchmarks for single-agent
+reinforcement learning, including the Arcade Learning Environment `[@arcade]`.
+Since then the field of DRL has exploded in both algorithm development
+and simulation design, and over the past a few years researchers have been extending
+their interest to MultiAgent Reinforcement Learning (MARL).
 
+MARL has shown exceptional promise towards artificial
+general intelligence. Surprisingly complex and hierarchical behavior emerges in the
+interaction among multiple agents, especially when those agents differ in their
+objectives `[@hide-n-seek]`....
+
+... Several projects have attempted to define a standard set
+of benchmark scenarios for MultiAgent problems; such as MAgent `[@magent]`, Starcraft `[@smac]`, and
+Neural MMO `[@neuralmmo]`. However, each of these couples the interface with the 
+underlying simulation. Notably, `@pettingzoo` has attempted to unify some of
+the more popular simulations under a single interface, giving researchers easier
+and access to these simulations. While this is a step towards
+a standard multiagent interace, these are still tied to a specific set of already-built simulations.
+
+Abmarl provides 
+
+Abmarl appr
+
+...
+The field of MARL provides an overwhelming set of choices for
+the simulations, the learning algorithms, and the software frameworks. Among these,
+RLlib `[@rllib]` has risen as one of the top choices, supporting many state-of-the-art
+algorithms, support for training on HPC platforms, and an open-ended simulation interface.
+Although RLlib provides the skeleton for connecting simulations with trainers, its
+simulation interface does not provide 
+While their most popular `MultiAgentEnv`.
+
+
+
+
+Running MultiAgent Reinforcement Learning experiments 
 
 <!-- TODO: Supply a statement of need of connecting Agent Based Simulations with MultiAgent
 Reinforcement Learning.
 Main points:
 1. Gym.Env is a standard interfance for single-agent RL that allowed practitioners
-    to set a speciic goal towards an environment design, reuse other's work, create
+    to set a speciic goal towards an simulation design, reuse other's work, create
     algorithms designed for a single simulation interface.
-2. Movement towards MARL, and while there have been lots of great baseline environments
-    (include citations here), they have all been tied to specific environments.
+2. Movement towards MARL, and while there have been lots of great baseline simulatoin
+    (include citations here), they have all been tied to specific simulation.
 3. Abmarl provides an interface for simulations that are naturally implemented
     as agent-based simulations.
 4. Additionally, Abmarl simplifies the "learning curve" needed to get started with
