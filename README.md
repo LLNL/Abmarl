@@ -20,7 +20,7 @@ projects to prototype RL as a potential solution.
 </p>
 
 
-## Getting started
+## Quickstart
 
 * Clone the repository
 * Install the requirements: `pip install -r requirements.txt`
@@ -39,7 +39,24 @@ You can find the latest Admiral documentation, on
 [![Documentation Status](https://readthedocs.org/projects/abmarl/badge/?version=latest)](https://abmarl.readthedocs.io/en/latest/?badge=latest)
 
 
-## Contact
+## Community
+
+### Reporting Issues
+
+Please use our issue tracker to report any issues or submit feature requests. Great
+bug reports tend to have:
+- A quick summary and/or background
+- Steps to reproduce, sample code is best.
+- What you expected would happen
+- What actually happens
+
+### Contributing
+
+Please submit any changes via pull requests from a forked repository. Find out
+more about this process [here](https://guides.github.com/introduction/flow/index.html).
+All contributions are under the BSD 3 License that covers the project.
+
+### Additional support
 
 * Edward Rusu, rusu1@llnl.gov
 * Ruben Glatt, glatt1@llnl.gov
@@ -47,4 +64,3 @@ You can find the latest Admiral documentation, on
 ## Release
 
 LLNL-CODE-815883
-
