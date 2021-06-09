@@ -39,6 +39,11 @@ Train agents in a multicorridor simulation:
 abmarl train examples/multi_corridor_example.py
 ```
 
+Visualize trained behavior:
+```
+abmarl visualize ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
+```
+
 ## Documentation
 
 You can find the latest Abmarl documentation, on
