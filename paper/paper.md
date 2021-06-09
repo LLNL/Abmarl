@@ -30,7 +30,7 @@ simulation interfaces, including gym.Env [@gym] and MultiAgentEnv [@rllib].
 We leverage RLlib's framework for reinforcement learning and extend it to more easily
 support custom simulations, algorithms, and policies. We enable researchers to
 rapidly prototype MARL experiments and simulation design and lower the barrier
-for pre-existing projects to prototype RL as a potential solution.
+for pre-existing projects to prototype Reinforcement Learning (RL) as a potential solution.
 
 # Statement of need
 
@@ -38,9 +38,9 @@ In 2016, @gym published OpenAi Gym, an interface for single-agent simulations. T
 quickly became one of the most popular connections between simulation and training
 in reinformcent learning experimentation. It has been used by many simulation benchmarks
 for single-agent reinforcement learning, including the Arcade Learning Environment [@arcade].
-Since then the field of DRL has exploded in both algorithm development
-and simulation design, and over the past a few years researchers have been extending
-their interest to Multi-Agent Reinforcement Learning (MARL).
+Since then the field of Deep Reinforcemenet Learning (DRL) has exploded in both
+algorithm development and simulation design, and over the past few years researchers
+have been extending their interest to Multi-Agent Reinforcement Learning (MARL).
 
 MARL has shown exceptional promise towards artificial
 general intelligence. Surprisingly complex and hierarchical behavior emerges in the
@@ -48,17 +48,17 @@ interaction among multiple agents, especially when those agents differ in their
 objectives [@hide-n-seek]. Several projects have attempted to define a standard set
 of benchmark scenarios for Multi-Agent problems; such as MAgent [@magent], Starcraft [@smac], and
 Neural MMO [@neuralmmo]. However, each of these couples the interface with the 
-underlying simulation. Notably, @pettingzoo has attempted to unify some of
+underlying simulation. Notably, @pettingzoo have attempted to unify some of
 the more popular simulations under a single interface, giving researchers easier
-faster access to these simulations. While this is a step towards
+access to these simulations. While this is a step towards
 a standard multi-agent interace, these are still tied to a specific set of already-built
 simulations with limited flexibility.
 
 Abmarl defines a generalized interface for multi-agent simulations that is versatile,
 generalizable, extendible, and intuitive. Rather than adapting gym's interface for a targetted
 multi-agent simulation, we have built an interface from scratch that allows for
-the greatest flexbility while still connecting to the top open-source RL library,
-namely RLlib [@rllib]. Our interface manages the loop between agents and the trainer,
+the greatest flexbility while connecting to one of the most advanced general-purpose
+open-source library, RLlib [@rllib]. Our interface manages the loop between agents and the trainer,
 enabling the researcher to focus on simulation design and algorithmic development
 without worrying about the data exchange.
 
