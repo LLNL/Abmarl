@@ -68,26 +68,6 @@ and reproduce MARL experiments, providing direct abilities to train, visualize,
 and anaylze experiments. We streamline the savy-practictioners experience and lower
 the barrier for new researchers to join the field.
 
-# Highlights
-
-Abmarl is being used in the following research efforts:
-
-1. Hybrid Information-driven Multi-Agent Reinforcement Learning
-[@hybrid], where multiple agents work together to construct a posterior distribution of a
-chemical plume's source location. Each agent is equipped with a set of discrete
-actions that are heuristically implemented, and the high-level choosing of each action is
-trained using MARL. The simulation was setup using Abmarl's Simulation interface
-and the training was mananged via our command line interface.
-2. Studying emergent behaviors in scnearios involving teams
-of heterogeneous agents, where each teammate shares the same objective, resulting
-in collaboration within teams and competition between the teams, all from a sparse
-reward schema. The simulation was setup using Abmarl's Simulation interface
-and the training was mananged via our command line interface. This is ongoing research.
-3. A cirriculum of tasks in MARL scenarios to serve as a benchmark for new algorithms.
-The framework for this is open-ended and user-friendly, allowing researchers to
-easily define a virtually inifinte set of grid-based simulations for training.
-This is ongoing development.
-
 # Acknowledgements
 
 This work was performed under the auspices of the U.S. Department of Energy by
