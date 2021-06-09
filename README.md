@@ -24,7 +24,8 @@ projects to prototype RL as a potential solution.
 
 To use Abmarl, install via pip: `pip install abmarl`
 
-To develop Abmarl, clone the repository and install via pip's development mode:
+To develop Abmarl, clone the repository and install via pip's development mode.
+Note: Abmarl requires `python3.7+`.
 
 ```
 git clone git@github.com:LLNL/Abmarl.git
@@ -37,6 +38,14 @@ Train agents in a multicorridor simulation:
 ```
 abmarl train examples/multi_corridor_example.py
 ```
+
+Visualize trained behavior:
+```
+abmarl visualize ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ -n 5 --record
+```
+
+Note: If you install with `conda,` then you must also include `ffmpeg` in your
+virtual environment.
 
 ## Documentation
 

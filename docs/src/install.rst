@@ -17,7 +17,7 @@ You can install abmarl via `pip`:
 Developer Installation
 ----------------------
 To install Abmarl for development, first clone the repository and then install
-via pip's development mode:
+via pip's development mode. Note: Abmarl requires `python3.7+`.
 
 .. code-block::
 
@@ -25,3 +25,8 @@ via pip's development mode:
    cd abmarl
    pip install -r requirements.txt
    pip install -e . --no-deps
+
+
+.. WARNING::
+   If you are using `conda` to manage your virtual environment, then you must also
+   install ffmpeg.

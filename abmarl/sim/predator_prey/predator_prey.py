@@ -261,62 +261,54 @@ class PredatorPreySimulation(AgentBasedSimulation):
     @classmethod
     def build(cls, sim_config={}):
         """
-        Parameters
-        ----------
-
-        region: int
-            The size of the discrete space.
-            Region must be >= 2.
-            Default 10.
-
-        max_steps: int
-            The maximum number of steps per episode.
-            Must be >= 1.
-            Default 200.
-
-        observation_mode: ObservationMode enum
-            Either GRID or DISTANCE. In GRID, the agents see a grid of values around them as
-            large as their view. In DISTANCE, the agents see the distance between themselves and
-            other agents that they can see. Note: communication only works with
-            DISTANCE observation mode.
-            Default GRID.
-
-        rewards: dict
-            A dictionary that maps the various action status to a reward per each
-            agent type. Any agent type that you create must have mappings for all
-            possible action statuses for that agent type. The default is {
-                'predator': {
-                    BAD_MOVE: -region,
-                    GOOD_MOVE: -1,
-                    NO_MOVE: 0,
-                    BAD_ATTACK: -region,
-                    GOOD_ATTACK: region**2
-                },
-                'prey': {
-                    BAD_MOVE: -2,
-                    GOOD_MOVE: region,
-                    NO_MOVE: region,
-                    EATEN: -region**2
-                },
-            }
-
-        resources: dictionary of resource-related parameters.
-            See GridResources documentation for more information.
-
-        agents: list of PredatorPreyAgent objects.
-            You can set the parameters for each of the agent that will override
-            the default parameters. For example,
-                agents = [
-                    Prey(id='prey0', view=7, move=2),
-                    Predator(id='predator1', view=3, attack=2),
-                    Prey(id='prey2', view=5, move=3),
-                    Predator(id='predator3', view=2, move=2, attack=1),
-                    Predator(id='predator4', view=0, attack=3)
-                ]
+        Args:
+            region: int
+                The size of the discrete space.
+                Region must be >= 2.
+                Default 10.
+            max_steps: int
+                The maximum number of steps per episode.
+                Must be >= 1.
+                Default 200.
+            observation_mode: ObservationMode enum
+                Either GRID or DISTANCE. In GRID, the agents see a grid of values around them as
+                large as their view. In DISTANCE, the agents see the distance between themselves and
+                other agents that they can see. Note: communication only works with
+                DISTANCE observation mode.
+                Default GRID.
+            rewards: dict
+                A dictionary that maps the various action status to a reward per each
+                agent type. Any agent type that you create must have mappings for all
+                possible action statuses for that agent type. The default is {
+                    'predator': {
+                        BAD_MOVE: -region,
+                        GOOD_MOVE: -1,
+                        NO_MOVE: 0,
+                        BAD_ATTACK: -region,
+                        GOOD_ATTACK: region**2
+                    },
+                    'prey': {
+                        BAD_MOVE: -2,
+                        GOOD_MOVE: region,
+                        NO_MOVE: region,
+                        EATEN: -region**2
+                    },
+                }
+            resources: dictionary of resource-related parameters.
+                See GridResources documentation for more information.
+            agents: list of PredatorPreyAgent objects.
+                You can set the parameters for each of the agent that will override
+                the default parameters. For example,
+                    agents = [
+                        Prey(id='prey0', view=7, move=2),
+                        Predator(id='predator1', view=3, attack=2),
+                        Prey(id='prey2', view=5, move=3),
+                        Predator(id='predator3', view=2, move=2, attack=1),
+                        Predator(id='predator4', view=0, attack=3)
+                    ]
 
         Returns:
-        --------
-        Configured instance of PredatorPreySimulation with configured PredatorPreyAgents.
+            Configured instance of PredatorPreySimulation with configured PredatorPreyAgents.
         """
         config = {  # default config
             'region': 10,
