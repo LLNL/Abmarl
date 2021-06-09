@@ -25,3 +25,8 @@ via pip's development mode. Note: Abmarl requires `python3.7+`.
    cd abmarl
    pip install -r requirements.txt
    pip install -e . --no-deps
+
+
+.. WARNING::
+   If you are using `conda` to manage your virtual environment, then you must also
+   install ffmpeg.
