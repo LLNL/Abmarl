@@ -132,7 +132,6 @@ def run_visualize(full_trained_directory, parameters):
                 all_done = True
                 sim.render(fig=fig)
                 plt.pause(1e-16)
-                plt.close(fig)
 
         anim = FuncAnimation(
             fig, animate, frames=gen_frame_until_done, repeat=False,
@@ -143,5 +142,6 @@ def run_visualize(full_trained_directory, parameters):
         plt.show(block=False)
         while not all_done:
             plt.pause(1)
+        plt.close(fig)
 
     _finish()

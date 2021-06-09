@@ -33,10 +33,9 @@ observation and action spaces.
    interest among agents.
 
 
-In the various examples below, each policy is a two-layer MLP, with 64 unites in
+In the various examples below, each policy is a two-layer MLP, with 64 units in
 each layer. We use RLlib's A2C Trainer with default parameters and train for
-two million episodes on a compute node with 72 CPUs, a process that takes 3-4
-hours per experiment.
+two million episodes on a compute node with 72 CPUs.
 
 .. ATTENTION::
    This page makes heavy use of animated graphics. It is best to read this content

@@ -14,11 +14,11 @@ def exploring_starts(sim, iteration=10_000, gamma=0.9, horizon=200):
     """
     Estimate an optimal policy over an simulation using monte carlo policy estimation.
 
-    Parameters:
+    Args:
         sim: The simulation, obviously.
-        iteration = The number of times to iterate the learning algorithm.
-        gamma = The discount factor
-        horizon = the time horizon for the trajectory.
+        iteration: The number of times to iterate the learning algorithm.
+        gamma: The discount factor
+        horizon: the time horizon for the trajectory.
 
     Returns:
         sim: The simulation. Algorithms may wrap simulations before training in them, so this
@@ -58,11 +58,11 @@ def epsilon_soft(sim, iteration=10_000, gamma=0.9, epsilon=0.1, horizon=200):
     Estimate an optimal policy over a simulation using monte carlo policy estimation. The policy
     is technically non-optimal because it is epsilon-soft.
 
-    Parameters:
+    Args:
         sim: The simulation, obviously.
-        iteration = The number of times to iterate the learning algorithm.
-        gamme = The discount factor
-        epsilon = The exploration probability.
+        iteration: The number of times to iterate the learning algorithm.
+        gamme: The discount factor
+        epsilon: The exploration probability.
 
     Returns:
         sim: The simulation. Algorithms may wrap simulations before training in them, so this
@@ -102,10 +102,10 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
     Off-policy Monte Carlo control estimates an optimal policy in a simulation. Trains a greedy
     policy be generating trajectories from an epsilon-soft behavior policy.
 
-    Parameters:
+    Args:
         sim: The simulation, obviously.
-        iteration = The number of times to iterate the learning algorithm.
-        gamme = The discount factor
+        iteration: The number of times to iterate the learning algorithm.
+        gamme: The discount factor
 
     Returns:
         sim: The simulation. Algorithms may wrap simulations before training in them, so this
