@@ -7,7 +7,7 @@ def custom_import_module(full_config_path):
     Import and execute a python file as a module. Useful for import the experiment module and the
     analysis module.
 
-    Parameters:
+    Args:
         full_config_path: Full path to the python file.
 
     Returns: The python file as a module

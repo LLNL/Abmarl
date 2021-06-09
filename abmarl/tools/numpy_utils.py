@@ -8,7 +8,7 @@ def array_in_array(search_element, elements, axis=0):
     entity, so the match has to be across the entire array, not just on the elements within the
     array.
 
-    Parameters:
+    Args:
         search_element: numpy array that we want to match
         elements: numpy ndarray that we search for a match
         axis: which axis we want to search along. Support 0 and 1.
