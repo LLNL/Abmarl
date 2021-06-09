@@ -62,7 +62,8 @@ open-source library, RLlib [@rllib]. Our interface manages the loop between agen
 enabling the researcher to focus on simulation design and algorithmic development
 without worrying about the data exchange.
 
-Finally, Abmarl's intuitive command-line interface gives researchers a running-start
+We tuned Abmarl's intuitive command-line interface through practical experience
+while working on [@hybrid]. Our interface gives researchers a running-start
 in MARL experimentation. We handle all the workflow elements needed to setup, run,
 and reproduce MARL experiments, providing direct abilities to train, visualize,
 and anaylze experiments. We streamline the savy-practictioners experience and lower
