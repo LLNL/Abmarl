@@ -1,9 +1,9 @@
 ---
-title: 'Abmarl: Connecting Agent-Based Simulations with MultiAgent Reinforcement Learning'
+title: 'Abmarl: Connecting Agent-Based Simulations with Multi-Agent Reinforcement Learning'
 tags:
   - Python
   - agent-based simulation
-  - multiagent reinforcement learning
+  - multi-agent reinforcement learning
   - machine learning
   - agent-based modeling
 authors:
@@ -21,7 +21,7 @@ bibliography: paper.bib
 # Summary
 
 Abmarl is a package for developing Agent-Based Simulations and training them
-with MultiAgent Reinforcement Learning (MARL). We provide an intuitive command line
+with Multi-Agent Reinforcement Learning (MARL). We provide an intuitive command line
 interface for engaging with the full workflow of MARL experimentation: training,
 visualizing, and analyzing agent behavior. We define an Agent-Based Simulation
 Interface and Simulation Manager, which control which agents interact with the
@@ -40,26 +40,27 @@ in reinformcent learning experimentation. It has been used by many simulation be
 for single-agent reinforcement learning, including the Arcade Learning Environment [@arcade].
 Since then the field of DRL has exploded in both algorithm development
 and simulation design, and over the past a few years researchers have been extending
-their interest to MultiAgent Reinforcement Learning (MARL).
+their interest to Multi-Agent Reinforcement Learning (MARL).
 
 MARL has shown exceptional promise towards artificial
 general intelligence. Surprisingly complex and hierarchical behavior emerges in the
 interaction among multiple agents, especially when those agents differ in their
 objectives [@hide-n-seek]. Several projects have attempted to define a standard set
-of benchmark scenarios for MultiAgent problems; such as MAgent [@magent], Starcraft [@smac], and
+of benchmark scenarios for Multi-Agent problems; such as MAgent [@magent], Starcraft [@smac], and
 Neural MMO [@neuralmmo]. However, each of these couples the interface with the 
 underlying simulation. Notably, @pettingzoo has attempted to unify some of
 the more popular simulations under a single interface, giving researchers easier
 faster access to these simulations. While this is a step towards
-a standard multiagent interace, these are still tied to a specific set of already-built simulations
-with limited flexibility.
+a standard multi-agent interace, these are still tied to a specific set of already-built
+simulations with limited flexibility.
 
-Abmarl defines a generalized interface for multiagent simulations that is versatile,
+Abmarl defines a generalized interface for multi-agent simulations that is versatile,
 generalizable, extendible, and intuitive. Rather than adapting gym's interface for a targetted
-multiagent simulation, we have built an interface from scratch that allows for the greatest flexbility
-while still connecting to the top open-source RL library, namely RLlib [@rllib]. Our interface
-manages the loop between agents and the trainer, enabling the researcher to focus
-on simulation design and algorithmic development without worrying about the data exchange.
+multi-agent simulation, we have built an interface from scratch that allows for
+the greatest flexbility while still connecting to the top open-source RL library,
+namely RLlib [@rllib]. Our interface manages the loop between agents and the trainer,
+enabling the researcher to focus on simulation design and algorithmic development
+without worrying about the data exchange.
 
 Finally, Abmarl's intuitive command-line interface gives researchers a running-start
 in MARL experimentation. We handle all the workflow elements needed to setup, run,
@@ -71,7 +72,7 @@ the barrier for new researchers to join the field.
 
 Abmarl is being used in the following research efforts:
 
-1. Hybrid Information-driven MultiAgent Reinforcement Learning
+1. Hybrid Information-driven Multi-Agent Reinforcement Learning
 [@hybrid], where multiple agents work together to construct a posterior distribution of a
 chemical plume's source location. Each agent is equipped with a set of discrete
 actions that are heuristically implemented, and the high-level choosing of each action is
