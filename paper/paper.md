@@ -67,7 +67,11 @@ while working on [@hybrid]. Our interface gives researchers a running-start
 in MARL experimentation. We handle all the workflow elements needed to setup, run,
 and reproduce MARL experiments, providing direct abilities to train, visualize,
 and anaylze experiments. We streamline the savy-practictioners experience and lower
-the barrier for new researchers to join the field.
+the barrier for new researchers to join the field. The analysis module sets this
+framework apart from others as it provides a simple command line interface to add
+analytics to trained policies, allowing the user to generate additional statistics
+and visualizations of agent and simulation metrics after the policy has been trained.
+
 
 # Acknowledgements
 
