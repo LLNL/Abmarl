@@ -24,7 +24,8 @@ projects to prototype RL as a potential solution.
 
 To use Abmarl, install via pip: `pip install abmarl`
 
-To develop Abmarl, clone the repository and install via pip's development mode:
+To develop Abmarl, clone the repository and install via pip's development mode.
+Note: Abmarl requires `python3.7+`.
 
 ```
 git clone git@github.com:LLNL/Abmarl.git
