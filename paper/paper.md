@@ -36,7 +36,7 @@ for pre-existing projects to prototype Reinforcement Learning (RL) as a potentia
 
 In 2016, @gym published OpenAi Gym, an interface for single-agent simulations. This interface
 quickly became one of the most popular connections between simulation and training
-in reinformcent learning experimentation. It has been used by many simulation benchmarks
+in RL experimentation. It has been used by many simulation benchmarks
 for single-agent reinforcement learning, including the Arcade Learning Environment [@arcade].
 Since then the field of Deep Reinforcemenet Learning (DRL) has exploded in both
 algorithm development and simulation design, and over the past few years researchers
@@ -54,22 +54,22 @@ access to these simulations. While this is a step towards
 a standard multi-agent interace, these are still tied to a specific set of already-built
 simulations with limited flexibility.
 
-Abmarl defines a generalized interface for multi-agent simulations that is versatile,
-generalizable, extendible, and intuitive. Rather than adapting gym's interface for a targetted
+Abmarl defines an interface for multi-agent simulations that is versatile,
+extendible, and intuitive. Rather than adapting gym's interface for a targetted
 multi-agent simulation, we have built an interface from scratch that allows for
-the greatest flexbility while connecting to one of the most advanced general-purpose
-open-source library, RLlib [@rllib]. Our interface manages the loop between agents and the trainer,
-enabling the researcher to focus on simulation design and algorithmic development
-without worrying about the data exchange.
+the greatest flexbility while connecting to one of the most advanced, general-purpose, and
+open-source libraries: RLlib [@rllib]. Our interface manages the loop between agents
+and the trainer, enabling the researcher to focus on simulation design and algorithmic
+development without worrying about the data exchange.
 
-We tuned Abmarl's intuitive command-line interface through practical experience
+We developed and tuned Abmarl's intuitive command-line interface through practical experience
 while working on [@hybrid]. Our interface gives researchers a running-start
 in MARL experimentation. We handle all the workflow elements needed to setup, run,
 and reproduce MARL experiments, providing direct abilities to train, visualize,
-and anaylze experiments. We streamline the savvy-practictioners’ experience and lower
-the barrier for new researchers to join the field. The analysis module sets this
-framework apart from others as it provides a simple command line interface to add
-analytics to trained policies, allowing the user to generate additional statistics
+and anaylze experiments. We streamline the savvy-practictioner's experience and lower
+the barrier for new researchers to join the field. The analysis module sets Abmarl
+apart from others as it provides a simple command line interface to add
+analytics to trained policies, allowing researchers to generate additional statistics
 and visualizations of agent and simulation metrics after the policy has been trained.
 
 
