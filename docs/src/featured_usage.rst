@@ -1,6 +1,6 @@
 .. Abmarl documentation highlights.
 
-Abmarl Highlights
+Featured Use Cases
 ==================
 
 
