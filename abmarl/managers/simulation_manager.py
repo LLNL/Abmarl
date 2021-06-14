@@ -20,6 +20,15 @@ class SimulationManager(ABC):
             "SimulationManager can only interface with AgentBasedSimulation."
         self.sim = sim
         self.agents = sim.agents
+    
+    @property
+    def done_agents(self):
+        return self._done_agents
+    
+    @done_agents.setter
+    def done_agents(self, value):
+        assert type(value) is set, "Done agents must be a set."
+        self._done_agents = value
 
     @abstractmethod
     def reset(self, **kwargs):
