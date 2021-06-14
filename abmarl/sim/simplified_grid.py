@@ -93,7 +93,7 @@ class GridSim(AgentBasedSimulation):
         """
         agent = self.agents[agent_id]
         # Generate a completely empty grid
-        view = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
+        local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
         # TODO: distinguish between empty out of bounds and empty in bounds.
         
         # Copy the section of the grid around the agent's location
@@ -102,10 +102,12 @@ class GridSim(AgentBasedSimulation):
         r_upper = min([self.rows - 1, r + agent.view_range]) + 1
         c_lower = max([0, c - agent.view_range])
         c_upper = min([self.cols - 1, c+agent.view_range]) + 1
-        signal[
+        local_grid[
             (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
             (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
         ] = self.grid[r_lower:r_upper, c_lower:c_upper]
+
+        local_visible = np.ones((agent.view_range * 2 + 1, agent.view_range * 2 + 1))
 
         factor = np.sqrt(0.5)
     
@@ -140,9 +142,19 @@ class GridSim(AgentBasedSimulation):
                     upper_point = (rel_pos[1] + factor, rel_pos[0] - factor)
                     lower_point = (rel_pos[1] - factor, rel_pos[0] + factor)
 
-                # generate two lines from agent center to wall corners
-                # all points/cells between those two lines and behind the wall are masked off.
+        for other in self.agents.values():
+            if isinstance(other, WallAgent):
+                x_diff = other.position[1] - agent.position[1]
+                y_diff = agent.position[0] - other.position[0]
+                if 0 < x_diff < agent.view_range and 0 < y_diff < agent.view_range:
+                    upper_line = lambda x: (y_diff + factor) / (x_diff - factor) * x
+                    lower_line = lambda x: (y_diff - factor) / (x_diff + factor) * x
+                    for x in range(x_diff, agent.view_range):
+                        for y in range(y_diff, agent.view_range):
+                            if lower_line(x) < y < upper_line(x):
+                                mask[x, y] = 0
 
+        mask = np.flipud(np.transpose(mask))
 
 
 
