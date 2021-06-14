@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim import PrincipleAgent, ActingAgent, AgentBasedSimulation
+from abmarl.tools.matplotlib_utils import mscatter
 
 class GridAgent(PrincipleAgent):
     @property
@@ -65,6 +66,10 @@ class GridSim(AgentBasedSimulation):
         ax = fig.gca()
 
         # Draw the agents
+        shape_dict = {
+            agent.id: 'o' if isinstance(agent, ExploringAgent) else 's'
+            for agent in self.agents.values()
+        }
         ax.set(xlim=(0, self.cols), ylim=(0, self.rows))
         ax.set_xticks(np.arange(0, self.cols, 1))
         ax.set_yticks(np.arange(0, self.rows, 1))
@@ -76,7 +81,8 @@ class GridSim(AgentBasedSimulation):
         agents_y = [
             self.rows - 0.5 - agent.position[0] for agent in self.agents.values()
         ]
-        plt.scatter(agents_x, agents_y, s=200, edgecolor='black', facecolor='gray')
+        shape = [shape_dict[agent_id] for agent_id in shape_dict]
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
 
         plt.plot()
         plt.pause(1e-6)
@@ -112,15 +118,19 @@ class GridSim(AgentBasedSimulation):
         pass
 
 fig = plt.figure()
-exploring_agents = {
-    f'agent{i}': ExploringAgent(id=f'agent{i}', move_range=1) for i in range(5)
+explorers = {
+    f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1) for i in range(5)
 }
-sim = GridSim(rows=8, cols=12, agents=exploring_agents)
+walls = {
+    f'wall{i}': WallAgent(id=f'wall{i}') for i in range(12)
+}
+agents = {**explorers, **walls}
+sim = GridSim(rows=8, cols=12, agents=agents)
 sim.reset()
 sim.render(fig=fig)
 
-for _ in range(50):
-    action = {agent.id: agent.action_space.sample() for agent in exploring_agents.values()}
+for _ in range(100):
+    action = {agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)}
     import pprint; pprint.pprint(action)
     sim.step(action)
     sim.render(fig=fig)
