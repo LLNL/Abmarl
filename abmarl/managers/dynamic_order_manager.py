@@ -37,7 +37,7 @@ class DynamicOrderManager(SimulationManager):
         agent_id = next(iter(action_dict))
         assert agent_id not in self.done_agents, \
             "Received an action for an agent that is already done."
-        self.just_done = set() # Flush just_done set
+        self.sim.just_done.clear()
         self.sim.step(action_dict, **kwargs)
         
         obs, rewards, dones, infos = {}, {}, {'__all__': self.sim.get_all_done()}, {}
@@ -53,12 +53,12 @@ class DynamicOrderManager(SimulationManager):
                     infos[agent] = self.sim.get_info(agent)
         else: # Simulation is not done. Get the output for the next agent and all agents who recently finished
             # All agents who finished in this step
-            for agent in self.just_done:
+            for agent in self.sim.just_done:
                 assert agent not in self.done_agents, f"{agent.id} marked as just finished, but it had previously been marked as finished."
-                obs[next_agent] = self.sim.get_obs(agent)
-                rewards[next_agent] = self.sim.get_reward(agent)
-                dones[next_agent] = self.sim.get_done(agent)
-                infos[next_agent] = self.sim.get_info(agent)
+                obs[agent] = self.sim.get_obs(agent)
+                rewards[agent] = self.sim.get_reward(agent)
+                dones[agent] = self.sim.get_done(agent)
+                infos[agent] = self.sim.get_info(agent)
                 self.done_agents.add(agent)
 
             # The agent expected to send an action in the next step
@@ -80,6 +80,7 @@ if __name__ == '__main__':
             self.agents = agents
         
         def reset(self, **kwargs):
+            self.just_done = set()
             self.next_agent = random.choice(list(self.agents.keys()))
         
         def step(self, action_dict, **kwargs):
