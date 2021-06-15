@@ -8,11 +8,9 @@ from abmarl.tools.matplotlib_utils import mscatter
 
 
 class GridAgent(PrincipleAgent):
-    def __init__(self, encode=None, initial_position=None, **kwargs):
+    def __init__(self, initial_position=None, **kwargs):
         super().__init__(**kwargs)
-        self.encode = encode
         self.initial_position = initial_position
-        self.render_shape = 's'
 
     @property
     def initial_position(self):
@@ -48,7 +46,7 @@ class GridAgent(PrincipleAgent):
     
     @property
     def render_shape(self):
-        return self._render_shape
+        return getattr(self, '_render_shape', 's')
     
     @render_shape.setter
     def render_shape(self, value):
@@ -311,12 +309,14 @@ if __name__ == "__main__":
         Custom WallAgent with default encoding as 1.
         """
         def __init__(self, encode=1, **kwargs):
-            super().__init__(**{'encode': encode, **kwargs})
+            super().__init__(**kwargs)
+            self.encode = encode
 
     class ExploringAgent(MovingAgent, GridObservingAgent):
-        def __init__(self, encode=2, **kwargs):
-            super().__init__(**{'encode': encode, **kwargs})
-            self.render_shape = 'o'
+        def __init__(self, encode=2, render_shape='o', **kwargs):
+            super().__init__(**kwargs)
+            self.encode = encode
+            self.render_shape = render_shape
 
     fig = plt.figure()
     explorers = {
