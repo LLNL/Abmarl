@@ -12,27 +12,27 @@ for i in range(1):
     # x_diff = x_diffs[i]
     # y_diff = y_diffs[i]
 
-    r_diff = 0
-    c_diff = 1
+    r_diff = 2
+    c_diff = 4
 
-    if grid[c_diff + view, r_diff + view] != 1: continue # I cannot see the wall because its behind another wall
+    if grid[r_diff + view, c_diff + view] != 1: continue # I cannot see the wall because its behind another wall
 
-    if c_diff > 0 and r_diff == 0:
-        upper = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-        lower = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+    if c_diff > 0 and r_diff == 0: # Wall to the right of agent
+        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
         for c in range(c_diff, view+1):
             for r in range(-view, view+1):
-                if upper(c) < r < lower(c):
-                    grid[c + view, r + view] = 0
+                if lower(c) < r < upper(c):
+                    grid[r + view, c + view] = 0
 
 
-    elif c_diff > 0 and r_diff > 0:
+    elif c_diff > 0 and r_diff > 0: # Wall below-right of agent
         upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
         lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-        for x in range(c_diff, view+1):
-            for y in range(r_diff, view+1):
-                if lower(x) < y < upper(x):
-                    grid[x + view, y + view] = 0
+        for c in range(c_diff, view+1):
+            for r in range(r_diff, view+1):
+                if lower(c) < r < upper(c):
+                    grid[r + view, c + view] = 0
 
 
     elif c_diff == 0 and r_diff > 0:
@@ -88,7 +88,8 @@ for i in range(1):
                 if lower(x) < y < upper(x):
                     grid[x + view, y + view] = 0
     
-    grid[c_diff + view, r_diff + view] = 2
+    grid[r_diff + view, c_diff + view] = 2
 
-print(np.flipud(np.transpose(grid)))
+# print(np.flipud(np.transpose(grid)))
+print(grid)
 
