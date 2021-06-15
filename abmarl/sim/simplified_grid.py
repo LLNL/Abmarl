@@ -2,7 +2,7 @@ from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from abmarl.sim import PrincipleAgent, Agent, ActingAgent, AgentBasedSimulation
+from abmarl.sim import PrincipleAgent, Agent, ActingAgent, ObservingAgent, AgentBasedSimulation
 from abmarl.tools.matplotlib_utils import mscatter
 
 
@@ -45,18 +45,18 @@ class GridAgent(PrincipleAgent):
         self._encode = value
 
 
-class WallAgent(GridAgent):
-    def __init__(self, encode=2, **kwargs):
-        super().__init__(**{'encode': encode, **kwargs})
-
-
-class ExploringAgent(GridAgent, Agent):
-    def __init__(self, encode=1, view_range=None, move_range=None, **kwargs):
-        super().__init__(**{'encode': encode, **kwargs})
+class GridObservingAgent(GridAgent, ObservingAgent):
+    def __init__(self, view_range=None, **kwargs):
+        super().__init__(**kwargs)
         self.view_range = view_range
+        self.observation_space['grid'] = Box(-np.inf, np.inf, (view_range, view_range), np.int)
+
+
+class MovingAgent(GridAgent, ActingAgent):
+    def __init__(self, move_range=None, **kwargs):
+        super().__init__(**kwargs)
         self.move_range = move_range
-        self.action_space = Box(-move_range, move_range, (2,), np.int)
-        self.observation_space = Box(-np.inf, np.inf, (view_range, view_range), np.int)
+        self.action_space['move'] = Box(-move_range, move_range, (2,), np.int)
 
 
 class GridSim(AgentBasedSimulation):
@@ -105,7 +105,7 @@ class GridSim(AgentBasedSimulation):
     def step(self, action_dict):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            new_position = agent.position + action
+            new_position = agent.position + action['move']
             if 0 <= new_position[0] < self.rows and \
                     0 <= new_position[1] < self.cols and \
                     self.grid[new_position[0], new_position[1]] is None:
@@ -250,7 +250,7 @@ class GridSim(AgentBasedSimulation):
                 else: # Cell blocked by wall. Indicate invisible with -2
                     obs[r, c] = -2
 
-        return obs
+        return {'grid': obs}
 
     def get_reward(self, agent_id, **kwargs):
         """
@@ -299,6 +299,18 @@ def build_grid_sim(object_registry, file_name):
 
 
 if __name__ == "__main__":
+    
+    class WallAgent(GridAgent):
+        """
+        Custom WallAgent with default encoding as 1.
+        """
+        def __init__(self, encode=1, **kwargs):
+            super().__init__(**{'encode': encode, **kwargs})
+
+    class ExploringAgent(MovingAgent, GridObservingAgent):
+        def __init__(self, encode=2, **kwargs):
+            super().__init__(**{'encode': encode, **kwargs})
+
     fig = plt.figure()
     explorers = {
         f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3)
