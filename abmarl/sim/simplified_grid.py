@@ -1,9 +1,11 @@
 
+from abc import abstractproperty
+
 from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from abmarl.sim import PrincipleAgent, ActingAgent, AgentBasedSimulation
+from abmarl.sim import PrincipleAgent, Agent, ActingAgent, AgentBasedSimulation
 from abmarl.tools.matplotlib_utils import mscatter
 
 class GridAgent(PrincipleAgent):
@@ -14,15 +16,27 @@ class GridAgent(PrincipleAgent):
     @position.setter
     def position(self, value):
         self._position = value
+    
+    @abstractproperty
+    def encode(self):
+        pass
 
-class WallAgent(GridAgent): pass
+class WallAgent(GridAgent):
+    @property
+    def encode(self):
+        return 2
 
-class ExploringAgent(GridAgent, ActingAgent):
+class ExploringAgent(GridAgent, Agent):
     def __init__(self, view_range=None, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.view_range = view_range
         self.move_range = move_range
         self.action_space = Box(-move_range, move_range, (2,), np.int)
+        self.observation_space = Box(-np.inf, np.inf, (view_range, view_range), np.int)
+    
+    @property
+    def encode(self):
+        return 1
 
 
 
@@ -110,87 +124,90 @@ class GridSim(AgentBasedSimulation):
         # Generate an observation mask. The agent's observation can be blocked
         # by walls, which hide the cells "behind" them. In the mask, 1 means that
         # this square is visibile, 0 means that it is invisible.
-        mask = np.ones((2 * agent.view + 1, 2 * agent.view + 1))
+        mask = np.ones((2 * agent.view_range + 1, 2 * agent.view_range + 1))
         for other in self.agents.values():
             if isinstance(other, WallAgent):
                 r_diff, c_diff = other.position - agent.position
-                if -agent.view <= r_diff <= agent.view and \
-                        agent.view <= c_diff <= agent.view:
+                if -agent.view_range <= r_diff <= agent.view_range and \
+                        -agent.view_range <= c_diff <= agent.view_range:
                     if c_diff > 0 and r_diff == 0: # Wall is to the right of agent
                         upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
                         lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, agent.view+1):
-                            for r in range(-agent.view, agent.view+1):
+                        for c in range(c_diff, agent.view_range+1):
+                            for r in range(-agent.view_range, agent.view_range+1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if lower(c) < r < upper(c):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff > 0 and r_diff > 0: # Wall is below-right of agent
                         upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
                         lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, agent.view+1):
-                            for r in range(r_diff, agent.view+1):
+                        for c in range(c_diff, agent.view_range+1):
+                            for r in range(r_diff, agent.view_range+1):
                                 if c == c_diff and r == r_diff: continue # Don't mask the wall
                                 if lower(c) < r < upper(c):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff == 0 and r_diff > 0: # Wall is below the agent
                         left = lambda t: (c_diff - 0.5) / (r_diff - 0.5) * t
                         right = lambda t: (c_diff + 0.5) / (r_diff - 0.5) * t
-                        for c in range(-agent.view, agent.view+1):
-                            for r in range(r_diff, agent.view+1):
+                        for c in range(-agent.view_range, agent.view_range+1):
+                            for r in range(r_diff, agent.view_range+1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if left(r) < c < right(r):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff < 0 and r_diff > 0: # Wall is below-left of agent
                         upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
                         lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, -agent.view-1, -1):
-                            for r in range(r_diff, agent.view+1):
+                        for c in range(c_diff, -agent.view_range-1, -1):
+                            for r in range(r_diff, agent.view_range+1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if lower(c) < r < upper(c):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff < 0 and r_diff == 0: # Wall is left of agent
                         upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
                         lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, -agent.view-1, -1):
-                            for r in range(-agent.view, agent.view+1):
+                        for c in range(c_diff, -agent.view_range-1, -1):
+                            for r in range(-agent.view_range, agent.view_range+1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if lower(c) < r < upper(c):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff < 0 and r_diff < 0: # Wall is above-left of agent
                         upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
                         lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, -agent.view - 1, -1):
-                            for r in range(r_diff, -agent.view - 1, -1):
+                        for c in range(c_diff, -agent.view_range - 1, -1):
+                            for r in range(r_diff, -agent.view_range - 1, -1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if lower(c) < r < upper(c):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff == 0 and r_diff < 0: # Wall is above the agent
                         left = lambda t: (c_diff - 0.5) / (r_diff + 0.5) * t
                         right = lambda t: (c_diff + 0.5) / (r_diff + 0.5) * t
-                        for c in range(-agent.view, agent.view+1):
-                            for r in range(r_diff, -agent.view - 1, -1):
+                        for c in range(-agent.view_range, agent.view_range+1):
+                            for r in range(r_diff, -agent.view_range - 1, -1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if left(r) < c < right(r):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
                     elif c_diff > 0 and r_diff < 0: # Wall is above-right of agent
                         upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
                         lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, agent.view+1):
-                            for r in range(r_diff, -agent.view - 1, -1):
+                        for c in range(c_diff, agent.view_range+1):
+                            for r in range(r_diff, -agent.view_range - 1, -1):
                                 if c == c_diff and r == r_diff: continue # don't mask the wall
                                 if lower(c) < r < upper(c):
-                                    mask[r + agent.view, c + agent.view] = 0
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
 
         # Convolve the grid observation with the mask.
-        obs = np.zeros((agent.view, agent.view), dtype='uint8')
-        for r in range(agent.view):
-            for c in range(agent.view):
+        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
+        for r in range(2 * agent.view_range + 1):
+            for c in range(2 * agent.view_range + 1):
                 if mask[r, c]:
                     obj = local_grid[r, c]
                     if obj is None:
                         obs[r, c] = 0
                     else:
-                        obs[r, c] = obj.endcode()
+                        obs[r, c] = obj.encode
+                else: # Cell blocked by wall. Indicate invisible with -2
+                    obs[r, c] = -2
+                # TODO: Indicate out of bounds with -1. Prioritize mask over out of bounds.
 
         return obs
 
@@ -220,7 +237,7 @@ class GridSim(AgentBasedSimulation):
 
 fig = plt.figure()
 explorers = {
-    f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1) for i in range(5)
+    f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3) for i in range(5)
 }
 walls = {
     f'wall{i}': WallAgent(id=f'wall{i}') for i in range(12)
@@ -230,8 +247,17 @@ sim = GridSim(rows=8, cols=12, agents=agents)
 sim.reset()
 sim.render(fig=fig)
 
+# Agents move around
 for _ in range(100):
     action = {agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)}
-    import pprint; pprint.pprint(action)
     sim.step(action)
     sim.render(fig=fig)
+
+# Examine the agents' observations
+from pprint import pprint
+for agent in explorers.values():
+    print(agent.position)
+    pprint(sim.get_obs(agent.id))
+    print()
+
+plt.show()
