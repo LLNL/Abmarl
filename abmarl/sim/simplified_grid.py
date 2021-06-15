@@ -7,9 +7,22 @@ from abmarl.sim import PrincipleAgent, Agent, ActingAgent, AgentBasedSimulation
 from abmarl.tools.matplotlib_utils import mscatter
 
 class GridAgent(PrincipleAgent):
-    def __init__(self, encode=None, **kwargs):
+    def __init__(self, encode=None, initial_position=None, **kwargs):
         super().__init__(**kwargs)
         self.encode = encode
+        self.initial_position = initial_position
+
+    @property
+    def initial_position(self):
+        return self._initial_position
+
+    @initial_position.setter
+    def initial_position(self, value):
+        if value is not None:
+            assert type(value) is np.ndarray, "Initial position must be a numpy array."
+            assert value.shape == (2,), "Initial position must be a 2-dimensional array."
+            assert value.dtype in [np.int, np.float], "Initial position must be numerical."
+        self._initial_position = value
 
     @property
     def position(self):
@@ -50,15 +63,33 @@ class GridSim(AgentBasedSimulation):
         self.cols = cols
         # Dictionary lookup by id
         self.agents = agents
-        # Grid lookup by position
-        self.grid = np.empty((rows, cols), dtype=object)
         
         self.finalize()
     
     def reset(self, **kwargs):
-        # Choose unique positions in the grid
+        # Grid lookup by position
+        self.grid = np.empty((rows, cols), dtype=object)
+
+        # Prioritize placing agents with initial positions. We must keep track
+        # of which positions have been taken so that the random placement below doesn't
+        # try to place an agent in an already-taken position.
+        ravelled_positions_taken = set()
+        for agent in self.agents.values():
+            if agent.initial_position is not None:
+                r, c = agent.initial_position
+                assert self.grid[r, c] is None, f"{agent.id} has the same initial position as {self.grid[r, c].id}. All initial positions must be unique."
+                agent.position = agent.initial_position
+                self.grid[r, c] = agent
+                ravelled_positions_taken.add(
+                    np.ravel_multi_index(agent.initial_position, (self.rows, self.cols))
+                )
+
+        # Now randomly place any other agent who did not come with an initial position.
+        ravelled_positions_available = [
+            i for i in range(self.rows * self.cols) if i not in ravelled_positions_taken
+        ]
         rs, cs = np.unravel_index(
-            np.random.choice(self.rows * self.cols, len(self.agents), False),
+            np.random.choice(ravelled_positions_available, len(self.agents), False),
             shape=(self.rows, self.cols)
         )
         for ndx, agent in enumerate(self.agents.values()): # Assuming all agents are GridAgent
@@ -239,30 +270,31 @@ class GridSim(AgentBasedSimulation):
         """
         pass
 
-fig = plt.figure()
-explorers = {
-    f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3) for i in range(5)
-}
-explorers['explorer0'].encode = 5
-walls = {
-    f'wall{i}': WallAgent(id=f'wall{i}') for i in range(12)
-}
-agents = {**explorers, **walls}
-sim = GridSim(rows=8, cols=12, agents=agents)
-sim.reset()
-sim.render(fig=fig)
-
-# Agents move around
-for _ in range(100):
-    action = {agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)}
-    sim.step(action)
+if __name__ == "__main__":
+    fig = plt.figure()
+    explorers = {
+        f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3) for i in range(5)
+    }
+    explorers['explorer0'].encode = 5
+    walls = {
+        f'wall{i}': WallAgent(id=f'wall{i}') for i in range(12)
+    }
+    agents = {**explorers, **walls}
+    sim = GridSim(rows=8, cols=12, agents=agents)
+    sim.reset()
     sim.render(fig=fig)
 
-# Examine the agents' observations
-from pprint import pprint
-for agent in explorers.values():
-    print(agent.position)
-    pprint(sim.get_obs(agent.id))
-    print()
+    # Agents move around
+    for _ in range(100):
+        action = {agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)}
+        sim.step(action)
+        sim.render(fig=fig)
 
-plt.show()
+    # Examine the agents' observations
+    from pprint import pprint
+    for agent in explorers.values():
+        print(agent.position)
+        pprint(sim.get_obs(agent.id))
+        print()
+
+    plt.show()
