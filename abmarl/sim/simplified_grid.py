@@ -271,6 +271,27 @@ class GridSim(AgentBasedSimulation):
         """
         pass
 
+
+def build_grid_sim(object_registry, file_name):
+    assert 0 not in object_registry, "0 is reserved for empty space."
+    agents = {}
+    n = 0
+    with open(file_name, 'r') as fp:
+        lines = fp.read().splitlines()
+        cols = len(lines[0].split(' '))
+        rows = len(lines)
+        for row, line in enumerate(lines):
+            chars = line.split(' ')
+            assert len(chars) == cols, f"Mismatched number of columns per row in {file_name}"
+            for col, char in enumerate(chars):
+                if char in object_registry:
+                    agent = object_registry[char](n)
+                    agent.initial_position = np.array([row, col])
+                    agents[agent.id] = agent
+                    n += 1
+
+    return GridSim(rows=rows, cols=cols, agents=agents)
+
 if __name__ == "__main__":
     fig = plt.figure()
     explorers = {
