@@ -181,41 +181,18 @@ class GridSim(AgentBasedSimulation):
                                 if lower(c) < r < upper(c):
                                     mask[r + agent.view, c + agent.view] = 0
 
-
-
-
-
-        # Make it so the agent sees what it's carrying
-        # We do this by placing the carried object at the agent's position
-        # in the agent's partially observable view
-        agent_pos = grid.width // 2, grid.height - 1
-        if self.carrying:
-            grid.set(*agent_pos, self.carrying)
-        else:
-            grid.set(*agent_pos, None)
-        # --- end gen_obs_grid()
-
-        # --- grid.encode
-        if vis_mask is None:
-            vis_mask = np.ones((self.width, self.height), dtype=bool)
-
-        array = np.zeros((self.width, self.height, 3), dtype='uint8')
-
-        for i in range(self.width):
-            for j in range(self.height):
-                if vis_mask[i, j]:
-                    v = self.get(i, j)
-
-                    if v is None:
-                        array[i, j, 0] = OBJECT_TO_IDX['empty']
-                        array[i, j, 1] = 0
-                        array[i, j, 2] = 0
-
+        # Convolve the grid observation with the mask.
+        obs = np.zeros((agent.view, agent.view), dtype='uint8')
+        for r in range(agent.view):
+            for c in range(agent.view):
+                if mask[r, c]:
+                    obj = local_grid[r, c]
+                    if obj is None:
+                        obs[r, c] = 0
                     else:
-                        array[i, j, :] = v.encode()
+                        obs[r, c] = obj.endcode()
 
-        image = array
-        # --- end grid.encode
+        return obs
 
     def get_reward(self, agent_id, **kwargs):
         """
