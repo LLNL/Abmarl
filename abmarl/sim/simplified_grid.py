@@ -107,75 +107,80 @@ class GridSim(AgentBasedSimulation):
             (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
         ] = self.grid[r_lower:r_upper, c_lower:c_upper]
 
+        # Generate an observation mask. The agent's observation can be blocked
+        # by walls, which hide the cells "behind" them. In the mask, 1 means that
+        # this square is visibile, 0 means that it is invisible.
         mask = np.ones((2 * agent.view + 1, 2 * agent.view + 1))
-
         for other in self.agents.values():
             if isinstance(other, WallAgent):
-                x_diff = other.position[1] - agent.position[1]
-                y_diff = agent.position[0] - other.position[0]
-                if -agent.view <= x_diff <= agent.view and \
-                        agent.view <= y_diff <= agent.view and \
-                        mask[x_diff + agent.view, y_diff + agent.view] != 0:
-                    if x_diff > 0 and y_diff == 0:
-                        upper = lambda t: (y_diff + 0.5) / (x_diff - 0.5) * t
-                        lower = lambda t: (y_diff - 0.5) / (x_diff - 0.5) * t
-                        for x in range(x_diff, agent.view+1):
-                            for y in range(-agent.view, agent.view+1):
-                                if lower(x) < y < upper(x):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff > 0 and y_diff > 0:
-                        upper = lambda t: (y_diff + 0.5) / (x_diff - 0.5) * t
-                        lower = lambda t: (y_diff - 0.5) / (x_diff + 0.5) * t
-                        for x in range(x_diff, agent.view+1):
-                            for y in range(y_diff, agent.view+1):
-                                if lower(x) < y < upper(x):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff == 0 and y_diff > 0:
-                        left = lambda t: (x_diff - 0.5) / (y_diff - 0.5) * t
-                        right = lambda t: (x_diff + 0.5) / (y_diff - 0.5) * t
-                        for x in range(-agent.view, agent.view+1):
-                            for y in range(y_diff, agent.view+1):
-                                if left(y) < x < right(y):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff < 0 and y_diff > 0:
-                        upper = lambda t: (y_diff + 0.5) / (x_diff + 0.5) * t
-                        lower = lambda t: (y_diff - 0.5) / (x_diff - 0.5) * t
-                        for x in range(x_diff, -agent.view-1, -1):
-                            for y in range(y_diff, agent.view+1):
-                                if lower(x) < y < upper(x):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff < 0 and y_diff == 0:
-                        upper = lambda t: (y_diff + 0.5) / (x_diff + 0.5) * t
-                        lower = lambda t: (y_diff - 0.5) / (x_diff + 0.5) * t
-                        for x in range(x_diff, -agent.view-1, -1):
-                            for y in range(-agent.view, agent.view+1):
-                                if lower(x) < y < upper(x):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff < 0 and y_diff < 0:
-                        upper = lambda t: (y_diff + 0.5) / (x_diff - 0.5) * t
-                        lower = lambda t: (y_diff - 0.5) / (x_diff + 0.5) * t
-                        for x in range(x_diff, -agent.view - 1, -1):
-                            for y in range(y_diff, -agent.view - 1, -1):
-                                if lower(x) < y < upper(x):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff == 0 and y_diff < 0:
-                        left = lambda t: (x_diff - 0.5) / (y_diff + 0.5) * t
-                        right = lambda t: (x_diff + 0.5) / (y_diff + 0.5) * t
-                        for x in range(-agent.view, agent.view+1):
-                            for y in range(y_diff, -agent.view - 1, -1):
-                                if left(y) < x < right(y):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    elif x_diff > 0 and y_diff < 0:
-                        upper = lambda t: (y_diff + 0.5) / (x_diff + 0.5) * t
-                        lower = lambda t: (y_diff - 0.5) / (x_diff - 0.5) * t
-                        for x in range(x_diff, agent.view+1):
-                            for y in range(y_diff, -agent.view - 1, -1):
-                                if lower(x) < y < upper(x):
-                                    mask[x + agent.view, y + agent.view] = 0
-                    
-                    mask[x_diff + agent.view, y_diff + agent.view] = 2
+                r_diff, c_diff = other.position - agent.position
+                if -agent.view <= r_diff <= agent.view and \
+                        agent.view <= c_diff <= agent.view:
+                    if c_diff > 0 and r_diff == 0: # Wall is to the right of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                        for c in range(c_diff, agent.view+1):
+                            for r in range(-agent.view, agent.view+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff > 0 and r_diff > 0: # Wall is below-right of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                        for c in range(c_diff, agent.view+1):
+                            for r in range(r_diff, agent.view+1):
+                                if c == c_diff and r == r_diff: continue # Don't mask the wall
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff == 0 and r_diff > 0: # Wall is below the agent
+                        left = lambda t: (c_diff - 0.5) / (r_diff - 0.5) * t
+                        right = lambda t: (c_diff + 0.5) / (r_diff - 0.5) * t
+                        for c in range(-agent.view, agent.view+1):
+                            for r in range(r_diff, agent.view+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if left(r) < c < right(r):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff < 0 and r_diff > 0: # Wall is below-left of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                        for c in range(c_diff, -agent.view-1, -1):
+                            for r in range(r_diff, agent.view+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff < 0 and r_diff == 0: # Wall is left of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                        for c in range(c_diff, -agent.view-1, -1):
+                            for r in range(-agent.view, agent.view+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff < 0 and r_diff < 0: # Wall is above-left of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                        for c in range(c_diff, -agent.view - 1, -1):
+                            for r in range(r_diff, -agent.view - 1, -1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff == 0 and r_diff < 0: # Wall is above the agent
+                        left = lambda t: (c_diff - 0.5) / (r_diff + 0.5) * t
+                        right = lambda t: (c_diff + 0.5) / (r_diff + 0.5) * t
+                        for c in range(-agent.view, agent.view+1):
+                            for r in range(r_diff, -agent.view - 1, -1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if left(r) < c < right(r):
+                                    mask[r + agent.view, c + agent.view] = 0
+                    elif c_diff > 0 and r_diff < 0: # Wall is above-right of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                        for c in range(c_diff, agent.view+1):
+                            for r in range(r_diff, -agent.view - 1, -1):
+                                if c == c_diff and r == r_diff: continue # don't mask the wall
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view, c + agent.view] = 0
 
-        mask = np.flipud(np.transpose(mask))
 
 
 
