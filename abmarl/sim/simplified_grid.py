@@ -1,10 +1,10 @@
-
 from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim import PrincipleAgent, Agent, ActingAgent, AgentBasedSimulation
 from abmarl.tools.matplotlib_utils import mscatter
+
 
 class GridAgent(PrincipleAgent):
     def __init__(self, encode=None, initial_position=None, **kwargs):
@@ -27,15 +27,15 @@ class GridAgent(PrincipleAgent):
     @property
     def position(self):
         return self._position
-    
+
     @position.setter
     def position(self, value):
         self._position = value
-    
+
     @property
     def encode(self):
         return self._encode
-    
+
     @encode.setter
     def encode(self, value):
         assert type(value) is int, f"{self.id}'s encoding must be an integer."
@@ -44,9 +44,11 @@ class GridAgent(PrincipleAgent):
         assert value != 0, "0 encoding reserved for empty cell."
         self._encode = value
 
+
 class WallAgent(GridAgent):
     def __init__(self, encode=2, **kwargs):
         super().__init__(**{'encode': encode, **kwargs})
+
 
 class ExploringAgent(GridAgent, Agent):
     def __init__(self, encode=1, view_range=None, move_range=None, **kwargs):
@@ -63,9 +65,9 @@ class GridSim(AgentBasedSimulation):
         self.cols = cols
         # Dictionary lookup by id
         self.agents = agents
-        
+
         self.finalize()
-    
+
     def reset(self, **kwargs):
         # Grid lookup by position
         self.grid = np.empty((self.rows, self.cols), dtype=object)
@@ -77,7 +79,8 @@ class GridSim(AgentBasedSimulation):
         for agent in self.agents.values():
             if agent.initial_position is not None:
                 r, c = agent.initial_position
-                assert self.grid[r, c] is None, f"{agent.id} has the same initial position as {self.grid[r, c].id}. All initial positions must be unique."
+                assert self.grid[r, c] is None, f"{agent.id} has the same initial " + \
+                    f"position as {self.grid[r, c].id}. All initial positions must be unique."
                 agent.position = agent.initial_position
                 self.grid[r, c] = agent
                 ravelled_positions_taken.add(
@@ -93,17 +96,19 @@ class GridSim(AgentBasedSimulation):
             shape=(self.rows, self.cols)
         )
         for ndx, agent in enumerate(self.agents.values()): # Assuming all agents are GridAgent
-            if agent.initial_position is None: # Only assign random position to agents without initial_position
+            if agent.initial_position is None:
                 r = rs[ndx]
                 c = cs[ndx]
                 agent.position = np.array([r, c])
                 self.grid[r, c] = agent
-    
+
     def step(self, action_dict):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             new_position = agent.position + action
-            if 0 <= new_position[0] < self.rows and 0 <= new_position[1] < self.cols and self.grid[new_position[0], new_position[1]] is None:
+            if 0 <= new_position[0] < self.rows and \
+                    0 <= new_position[1] < self.cols and \
+                    self.grid[new_position[0], new_position[1]] is None:
                 self.grid[agent.position[0], agent.position[1]] = None
                 agent.position = new_position
                 self.grid[agent.position[0], agent.position[1]] = agent
@@ -144,7 +149,7 @@ class GridSim(AgentBasedSimulation):
         # Generate a completely empty grid
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
         local_grid.fill(-1)
-        
+
         # Copy the section of the grid around the agent's location
         (r, c) = agent.position
         r_lower = max([0, r - agent.view_range])
@@ -292,10 +297,12 @@ def build_grid_sim(object_registry, file_name):
 
     return GridSim(rows=rows, cols=cols, agents=agents)
 
+
 if __name__ == "__main__":
     fig = plt.figure()
     explorers = {
-        f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3) for i in range(5)
+        f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3)
+        for i in range(5)
     }
     explorers['explorer0'].encode = 5
     walls = {
@@ -308,7 +315,10 @@ if __name__ == "__main__":
 
     # Agents move around
     for _ in range(100):
-        action = {agent.id: agent.action_space.sample() for agent in agents.values() if isinstance(agent, ActingAgent)}
+        action = {
+            agent.id: agent.action_space.sample() for agent in agents.values()
+            if isinstance(agent, ActingAgent)
+        }
         sim.step(action)
         sim.render(fig=fig)
 

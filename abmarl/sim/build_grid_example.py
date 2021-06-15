@@ -1,11 +1,7 @@
 
-from pprint import pprint
-
 from matplotlib import pyplot as plt
-import numpy as np
 
 from abmarl.sim.simplified_grid import WallAgent, ExploringAgent, build_grid_sim
-from abmarl.sim import ActingAgent, ObservingAgent
 
 object_registry = {
     'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
