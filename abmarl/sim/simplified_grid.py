@@ -108,7 +108,7 @@ class GridSim(AgentBasedSimulation):
         agent = self.agents[agent_id]
         # Generate a completely empty grid
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
-        # TODO: distinguish between empty out of bounds and empty in bounds.
+        local_grid.fill(-1)
         
         # Copy the section of the grid around the agent's location
         (r, c) = agent.position
@@ -201,13 +201,14 @@ class GridSim(AgentBasedSimulation):
             for c in range(2 * agent.view_range + 1):
                 if mask[r, c]:
                     obj = local_grid[r, c]
-                    if obj is None:
+                    if obj == -1: # Out of bounds
+                        obs[r, c] = -1
+                    elif obj is None: # Empty
                         obs[r, c] = 0
-                    else:
+                    else: # Something there, so get its encoding
                         obs[r, c] = obj.encode
                 else: # Cell blocked by wall. Indicate invisible with -2
                     obs[r, c] = -2
-                # TODO: Indicate out of bounds with -1. Prioritize mask over out of bounds.
 
         return obs
 
