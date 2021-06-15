@@ -1,3 +1,4 @@
+
 from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
@@ -11,6 +12,7 @@ class GridAgent(PrincipleAgent):
         super().__init__(**kwargs)
         self.encode = encode
         self.initial_position = initial_position
+        self.render_shape = 's'
 
     @property
     def initial_position(self):
@@ -43,6 +45,14 @@ class GridAgent(PrincipleAgent):
         assert value != -1, "-1 encoding reserved for out of bounds."
         assert value != 0, "0 encoding reserved for empty cell."
         self._encode = value
+    
+    @property
+    def render_shape(self):
+        return self._render_shape
+    
+    @render_shape.setter
+    def render_shape(self, value):
+        self._render_shape = value
 
 
 class GridObservingAgent(GridAgent, ObservingAgent):
@@ -120,10 +130,6 @@ class GridSim(AgentBasedSimulation):
         ax = fig.gca()
 
         # Draw the agents
-        shape_dict = {
-            agent.id: 'o' if isinstance(agent, ExploringAgent) else 's'
-            for agent in self.agents.values()
-        }
         ax.set(xlim=(0, self.cols), ylim=(0, self.rows))
         ax.set_xticks(np.arange(0, self.cols, 1))
         ax.set_yticks(np.arange(0, self.rows, 1))
@@ -135,7 +141,7 @@ class GridSim(AgentBasedSimulation):
         agents_y = [
             self.rows - 0.5 - agent.position[0] for agent in self.agents.values()
         ]
-        shape = [shape_dict[agent_id] for agent_id in shape_dict]
+        shape = [agent.render_shape for agent in self.agents.values()]
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
 
         plt.plot()
@@ -310,6 +316,7 @@ if __name__ == "__main__":
     class ExploringAgent(MovingAgent, GridObservingAgent):
         def __init__(self, encode=2, **kwargs):
             super().__init__(**{'encode': encode, **kwargs})
+            self.render_shape = 'o'
 
     fig = plt.figure()
     explorers = {
