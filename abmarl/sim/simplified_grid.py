@@ -107,145 +107,78 @@ class GridSim(AgentBasedSimulation):
             (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
         ] = self.grid[r_lower:r_upper, c_lower:c_upper]
 
-        local_visible = np.ones((agent.view_range * 2 + 1, agent.view_range * 2 + 1))
-
-        factor = np.sqrt(0.5)
-    
-        # Generate a mask around the agent's location. The mask will filter out
-        # elements of the grid by view-blocking agents.
-        for other in self.agents.values():
-            if isinstance(other, WallAgent):
-                # get relative position between agent and wall
-                rel_pos = other.position - agent.position
-                if rel_pos[0] == 0 and rel_pos[1] > 0: # Wall is right of agent
-                    upper_point = (rel_pos[1] - factor, rel_pos[0] - factor)
-                    lower_point = (rel_pos[1] - factor, rel_pos[0] + factor)
-                elif rel_pos[0] < 0 and rel_pos[1] > 0: # Wall is above-right of agent
-                    upper_point = (rel_pos[1] - factor, rel_pos[0] - factor)
-                    lower_point = (rel_pos[1] + factor, rel_pos[0] + factor)
-                elif rel_pos[0] < 0  and rel_pos[1] == 0 : # Wall is above the agent
-                    upper_point = (rel_pos[1] - factor, rel_pos[0] + factor)
-                    lower_point = (rel_pos[1] + factor, rel_pos[0] + factor)
-                elif rel_pos[0] < 0 and rel_pos[1] < 0: # Wall is above-left of agent
-                    upper_point = (rel_pos[1] - factor, rel_pos[1] + factor)
-                    lower_point = (rel_pos[1] + factor, rel_pos[1] - factor)
-                elif rel_pos[0] == 0 and rel_pos[1] < 0: # Wall is left of agent
-                    upper_point = (rel_pos[1] + factor, rel_pos[0] - factor)
-                    lower_point = (rel_pos[1] + factor, rel_pos[0] + factor)
-                elif rel_pos[0] > 0 and rel_pos[1] < 0: # Wall is below-left of agent
-                    upper_point = (rel_pos[1] - factor, rel_pos[0] - factor)
-                    lower_point = (rel_pos[1] + factor, rel_pos[0] + factor)
-                elif rel_pos[0] > 0 and rel_pos[1] == 0: # Wall is below the agent
-                    upper_point = (rel_pos[1] - factor, rel_pos[0] - factor)
-                    lower_point = (rel_pos[1] + factor, rel_pos[0] - factor)
-                elif rel_pos[0] > 0 and rel_pos[1] > 0: # Wall is below-right of agent
-                    upper_point = (rel_pos[1] + factor, rel_pos[0] - factor)
-                    lower_point = (rel_pos[1] - factor, rel_pos[0] + factor)
+        mask = np.ones((2 * agent.view + 1, 2 * agent.view + 1))
 
         for other in self.agents.values():
             if isinstance(other, WallAgent):
                 x_diff = other.position[1] - agent.position[1]
                 y_diff = agent.position[0] - other.position[0]
-                if 0 < x_diff < agent.view_range and 0 < y_diff < agent.view_range:
-                    upper_line = lambda x: (y_diff + factor) / (x_diff - factor) * x
-                    lower_line = lambda x: (y_diff - factor) / (x_diff + factor) * x
-                    for x in range(x_diff, agent.view_range):
-                        for y in range(y_diff, agent.view_range):
-                            if lower_line(x) < y < upper_line(x):
-                                mask[x, y] = 0
+                if -agent.view <= x_diff <= agent.view and \
+                        agent.view <= y_diff <= agent.view and \
+                        mask[x_diff + agent.view, y_diff + agent.view] != 0:
+                    if x_diff > 0 and y_diff == 0:
+                        upper = lambda t: (y_diff + 0.5) / (x_diff - 0.5) * t
+                        lower = lambda t: (y_diff - 0.5) / (x_diff - 0.5) * t
+                        for x in range(x_diff, agent.view+1):
+                            for y in range(-agent.view, agent.view+1):
+                                if lower(x) < y < upper(x):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff > 0 and y_diff > 0:
+                        upper = lambda t: (y_diff + 0.5) / (x_diff - 0.5) * t
+                        lower = lambda t: (y_diff - 0.5) / (x_diff + 0.5) * t
+                        for x in range(x_diff, agent.view+1):
+                            for y in range(y_diff, agent.view+1):
+                                if lower(x) < y < upper(x):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff == 0 and y_diff > 0:
+                        left = lambda t: (x_diff - 0.5) / (y_diff - 0.5) * t
+                        right = lambda t: (x_diff + 0.5) / (y_diff - 0.5) * t
+                        for x in range(-agent.view, agent.view+1):
+                            for y in range(y_diff, agent.view+1):
+                                if left(y) < x < right(y):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff < 0 and y_diff > 0:
+                        upper = lambda t: (y_diff + 0.5) / (x_diff + 0.5) * t
+                        lower = lambda t: (y_diff - 0.5) / (x_diff - 0.5) * t
+                        for x in range(x_diff, -agent.view-1, -1):
+                            for y in range(y_diff, agent.view+1):
+                                if lower(x) < y < upper(x):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff < 0 and y_diff == 0:
+                        upper = lambda t: (y_diff + 0.5) / (x_diff + 0.5) * t
+                        lower = lambda t: (y_diff - 0.5) / (x_diff + 0.5) * t
+                        for x in range(x_diff, -agent.view-1, -1):
+                            for y in range(-agent.view, agent.view+1):
+                                if lower(x) < y < upper(x):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff < 0 and y_diff < 0:
+                        upper = lambda t: (y_diff + 0.5) / (x_diff - 0.5) * t
+                        lower = lambda t: (y_diff - 0.5) / (x_diff + 0.5) * t
+                        for x in range(x_diff, -agent.view - 1, -1):
+                            for y in range(y_diff, -agent.view - 1, -1):
+                                if lower(x) < y < upper(x):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff == 0 and y_diff < 0:
+                        left = lambda t: (x_diff - 0.5) / (y_diff + 0.5) * t
+                        right = lambda t: (x_diff + 0.5) / (y_diff + 0.5) * t
+                        for x in range(-agent.view, agent.view+1):
+                            for y in range(y_diff, -agent.view - 1, -1):
+                                if left(y) < x < right(y):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    elif x_diff > 0 and y_diff < 0:
+                        upper = lambda t: (y_diff + 0.5) / (x_diff + 0.5) * t
+                        lower = lambda t: (y_diff - 0.5) / (x_diff - 0.5) * t
+                        for x in range(x_diff, agent.view+1):
+                            for y in range(y_diff, -agent.view - 1, -1):
+                                if lower(x) < y < upper(x):
+                                    mask[x + agent.view, y + agent.view] = 0
+                    
+                    mask[x_diff + agent.view, y_diff + agent.view] = 2
 
         mask = np.flipud(np.transpose(mask))
 
 
 
-        # # --- gen_obs_grid
-        # # ------ get_view_extents
-        # # Facing right
-        # if self.agent_dir == 0:
-        #     topX = self.agent_pos[0]
-        #     topY = self.agent_pos[1] - self.agent_view_size // 2
-        # # Facing down
-        # elif self.agent_dir == 1:
-        #     topX = self.agent_pos[0] - self.agent_view_size // 2
-        #     topY = self.agent_pos[1]
-        # # Facing left
-        # elif self.agent_dir == 2:
-        #     topX = self.agent_pos[0] - self.agent_view_size + 1
-        #     topY = self.agent_pos[1] - self.agent_view_size // 2
-        # # Facing up
-        # elif self.agent_dir == 3:
-        #     topX = self.agent_pos[0] - self.agent_view_size // 2
-        #     topY = self.agent_pos[1] - self.agent_view_size + 1
-        # else:
-        #     assert False, "invalid agent direction"
-
-        # botX = topX + self.agent_view_size
-        # botY = topY + self.agent_view_size
-
-        # # ------ end get_view_exts
-
-
-        # # ------ grid.slice
-        # grid = Grid(width, height)
-
-        # for j in range(0, height):
-        #     for i in range(0, width):
-        #         x = topX + i
-        #         y = topY + j
-
-        #         if x >= 0 and x < self.width and \
-        #            y >= 0 and y < self.height:
-        #             v = self.get(x, y)
-        #         else:
-        #             v = Wall()
-
-        #         grid.set(i, j, v)
-        # # ------ end.grid.slice
-        
-        # for i in range(self.agent_dir + 1):
-        #     grid = grid.rotate_left()
-
-        # Process occluders and visibility
-        # Note that this incurs some performance cost
-
-        # ------ grid.process_vis
-        mask = np.zeros(shape=(grid.rows, grid.cols), dtype=np.bool)
-
-        mask[agent.position[0], agent.position[1]] = True
-
-        for j in reversed(range(0, grid.height)):
-            for i in range(0, grid.width-1):
-                if not mask[i, j]:
-                    continue
-
-                cell = grid.get(i, j)
-                if cell and not cell.see_behind():
-                    continue
-
-                mask[i+1, j] = True
-                if j > 0:
-                    mask[i+1, j-1] = True
-                    mask[i, j-1] = True
-
-            for i in reversed(range(1, grid.width)):
-                if not mask[i, j]:
-                    continue
-
-                cell = grid.get(i, j)
-                if cell and not cell.see_behind():
-                    continue
-
-                mask[i-1, j] = True
-                if j > 0:
-                    mask[i-1, j-1] = True
-                    mask[i, j-1] = True
-
-        for j in range(0, grid.height):
-            for i in range(0, grid.width):
-                if not mask[i, j]:
-                    grid.set(i, j, None)
-        vis_mask = mask
-        # ------ end grid.process_vis
 
         # Make it so the agent sees what it's carrying
         # We do this by placing the carried object at the agent's position
