@@ -26,6 +26,9 @@ class GridAgent(PrincipleAgent):
     @encode.setter
     def encode(self, value):
         assert type(value) is int, f"{self.id}'s encoding must be an integer."
+        assert value != -2, "-2 encoding reserved for masked observation."
+        assert value != -1, "-1 encoding reserved for out of bounds."
+        assert value != 0, "0 encoding reserved for empty cell."
         self._encode = value
 
 class WallAgent(GridAgent):
