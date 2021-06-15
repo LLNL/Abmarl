@@ -1,6 +1,4 @@
 
-from abc import abstractproperty
-
 from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
@@ -9,6 +7,10 @@ from abmarl.sim import PrincipleAgent, Agent, ActingAgent, AgentBasedSimulation
 from abmarl.tools.matplotlib_utils import mscatter
 
 class GridAgent(PrincipleAgent):
+    def __init__(self, encode=None, **kwargs):
+        super().__init__(**kwargs)
+        self.encode = encode
+
     @property
     def position(self):
         return self._position
@@ -17,28 +19,26 @@ class GridAgent(PrincipleAgent):
     def position(self, value):
         self._position = value
     
-    @abstractproperty
-    def encode(self):
-        pass
-
-class WallAgent(GridAgent):
     @property
     def encode(self):
-        return 2
+        return self._encode
+    
+    @encode.setter
+    def encode(self, value):
+        assert type(value) is int, f"{self.id}'s encoding must be an integer."
+        self._encode = value
+
+class WallAgent(GridAgent):
+    def __init__(self, encode=2, **kwargs):
+        super().__init__(**{'encode': encode, **kwargs})
 
 class ExploringAgent(GridAgent, Agent):
-    def __init__(self, view_range=None, move_range=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, encode=1, view_range=None, move_range=None, **kwargs):
+        super().__init__(**{'encode': encode, **kwargs})
         self.view_range = view_range
         self.move_range = move_range
         self.action_space = Box(-move_range, move_range, (2,), np.int)
         self.observation_space = Box(-np.inf, np.inf, (view_range, view_range), np.int)
-    
-    @property
-    def encode(self):
-        return 1
-
-
 
 
 class GridSim(AgentBasedSimulation):
@@ -240,6 +240,7 @@ fig = plt.figure()
 explorers = {
     f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3) for i in range(5)
 }
+explorers['explorer0'].encode = 5
 walls = {
     f'wall{i}': WallAgent(id=f'wall{i}') for i in range(12)
 }
