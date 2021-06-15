@@ -68,7 +68,7 @@ class GridSim(AgentBasedSimulation):
     
     def reset(self, **kwargs):
         # Grid lookup by position
-        self.grid = np.empty((rows, cols), dtype=object)
+        self.grid = np.empty((self.rows, self.cols), dtype=object)
 
         # Prioritize placing agents with initial positions. We must keep track
         # of which positions have been taken so that the random placement below doesn't
@@ -93,10 +93,11 @@ class GridSim(AgentBasedSimulation):
             shape=(self.rows, self.cols)
         )
         for ndx, agent in enumerate(self.agents.values()): # Assuming all agents are GridAgent
-            r = rs[ndx]
-            c = cs[ndx]
-            agent.position = np.array([r, c])
-            self.grid[r, c] = agent
+            if agent.initial_position is None: # Only assign random position to agents without initial_position
+                r = rs[ndx]
+                c = cs[ndx]
+                agent.position = np.array([r, c])
+                self.grid[r, c] = agent
     
     def step(self, action_dict):
         for agent_id, action in action_dict.items():
