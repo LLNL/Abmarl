@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 
 from abmarl.sim.grid_world import GridWorldBaseComponent, MovingAgent
+from abmarl.sim.grid_world.state import GridWorldState
 
 class ActionBaseComponent(GridWorldBaseComponent, ABC):
     """
@@ -38,20 +39,26 @@ class ActionBaseComponent(GridWorldBaseComponent, ABC):
 class MoveAction(ActionBaseComponent):
     """
     Process moving agents.
-    """    
+    """
+    def __init__(self, grid_state=None, **kwargs):
+        self.grid_state = grid_state
+
     def process_action(self, agent, action_dict, **kwargs):
         action = action_dict[self.key]
-        new_position = agent.position + action
-        if 0 <= new_position[0] < self.rows and \
-                0 <= new_position[1] < self.cols and \
-                self.grid[new_position[0], new_position[1]] is None:
-            self.grid[agent.position[0], agent.position[1]] = None
-            agent.position = new_position
-            self.grid[agent.position[0], agent.position[1]] = agent
+        self.grid_state.modify_position(agent, action)
 
     @property
     def key(self):
         return "move"
+
+    @property
+    def grid_state(self):
+        return self._grid_state
+    
+    @grid_state.setter
+    def grid_state(self, value):
+        assert isinstance(value, GridWorldState), "Grid state must be a GridState object."
+        self._grid_state = value
     
     # @property
     # def corresponding_agent(self):
