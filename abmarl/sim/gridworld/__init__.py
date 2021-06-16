@@ -10,9 +10,7 @@ class GridWorldBaseComponent(ABC):
     """
     Component base class from which all components will inherit.
 
-    The base class stores the agents dictionary. The base class also stores the
-    dimensions of the grid world. It creates a 2d np array for indexing the agents
-    on their positions.
+    Every component has access to the dictionary of agents.
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
