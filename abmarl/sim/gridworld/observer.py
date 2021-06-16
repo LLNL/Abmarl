@@ -23,7 +23,7 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         """
         The key in the observation dictionary.
 
-        All obsersvers in the gridworld framework use dictionary observations.
+        All observers in the gridworld framework use dictionary observations.
         We can build up complex observation spaces with multiple components by
         assigning each component an entry in the observation dictionary. Observations
         will be a dictionary even if your simulation only has one Observer.
@@ -48,6 +48,7 @@ class GridObserver(ObserverBaseComponent):
     def __init__(self, grid_state=None, **kwargs):
         super().__init__(**kwargs)
         self.grid_state = grid_state
+        # TODO: Assign observation space
 
     @property
     def grid_state(self):
