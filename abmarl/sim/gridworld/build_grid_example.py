@@ -1,18 +1,8 @@
 
 from matplotlib import pyplot as plt
 
-from abmarl.sim.simplified_grid import GridAgent, MovingAgent, GridObservingAgent, build_grid_sim
-
-class WallAgent(GridAgent):
-    """
-    Custom WallAgent with default encoding as 1.
-    """
-    def __init__(self, encoding=1, **kwargs):
-        super().__init__(**{'encoding': encoding, **kwargs})
-
-class ExploringAgent(MovingAgent, GridObservingAgent):
-    def __init__(self, encoding=2, **kwargs):
-        super().__init__(**{'encoding': encoding, **kwargs})
+from abmarl.sim.gridworld import build_grid_sim
+from abmarl.sim.gridworld.gridworld_example import WallAgent, ExploringAgent, GridSim
         
 object_registry = {
     'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
@@ -23,7 +13,8 @@ file_name = 'starting_grid.txt'
 
 fig = plt.figure()
 
-sim = build_grid_sim(object_registry, file_name)
+config = build_grid_sim(file_name, object_registry)
+sim = GridSim(**config)
 sim.reset()
 sim.render(fig=fig)
 

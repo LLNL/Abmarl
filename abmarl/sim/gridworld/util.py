@@ -28,7 +28,7 @@ def build_grid_sim(file_name, object_registry):
             along the top and bottom rows.
     
     Returns:
-        A 3-element tuple. The first element is the number of rows in the grid.
+        A 3-element dict. The first element is the number of rows in the grid.
         The second element is the number of columns in the grid. The third element
         is the dictionary of agents.
     """
