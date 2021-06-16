@@ -3,68 +3,33 @@ from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
 
-from abmarl.sim import PrincipleAgent, Agent, ActingAgent, ObservingAgent, AgentBasedSimulation
+from abmarl.sim import AgentBasedSimulation
+from abmarl.sim.grid_world import GridWorldAgent, GridObservingAgent, MovingAgent
 from abmarl.tools.matplotlib_utils import mscatter
 
 
-class GridAgent(PrincipleAgent):
-    def __init__(self, initial_position=None, **kwargs):
+class WallAgent(GridWorldAgent):
+    """
+    Wall agents, immobile and view blocking.
+
+    Args:
+        encoding: Default encoding is 1.
+    """
+    def __init__(self, encoding=1, **kwargs):
         super().__init__(**kwargs)
-        self.initial_position = initial_position
+        self.encoding = encoding
 
-    @property
-    def initial_position(self):
-        return self._initial_position
+class ExploringAgent(MovingAgent, GridObservingAgent):
+    """
+    Exploring agents, moving around and observing the grid.
 
-    @initial_position.setter
-    def initial_position(self, value):
-        if value is not None:
-            assert type(value) is np.ndarray, "Initial position must be a numpy array."
-            assert value.shape == (2,), "Initial position must be a 2-dimensional array."
-            assert value.dtype in [np.int, np.float], "Initial position must be numerical."
-        self._initial_position = value
-
-    @property
-    def position(self):
-        return self._position
-
-    @position.setter
-    def position(self, value):
-        self._position = value
-
-    @property
-    def encode(self):
-        return self._encode
-
-    @encode.setter
-    def encode(self, value):
-        assert type(value) is int, f"{self.id}'s encoding must be an integer."
-        assert value != -2, "-2 encoding reserved for masked observation."
-        assert value != -1, "-1 encoding reserved for out of bounds."
-        assert value != 0, "0 encoding reserved for empty cell."
-        self._encode = value
-    
-    @property
-    def render_shape(self):
-        return getattr(self, '_render_shape', 's')
-    
-    @render_shape.setter
-    def render_shape(self, value):
-        self._render_shape = value
-
-
-class GridObservingAgent(GridAgent, ObservingAgent):
-    def __init__(self, view_range=None, **kwargs):
+    Args:
+        encoding: Default encoding is 2.
+    """
+    def __init__(self, encoding=2, render_shape='o', **kwargs):
         super().__init__(**kwargs)
-        self.view_range = view_range
-        self.observation_space['grid'] = Box(-np.inf, np.inf, (view_range, view_range), np.int)
-
-
-class MovingAgent(GridAgent, ActingAgent):
-    def __init__(self, move_range=None, **kwargs):
-        super().__init__(**kwargs)
-        self.move_range = move_range
-        self.action_space['move'] = Box(-move_range, move_range, (2,), np.int)
+        self.encoding = encoding
+        self.render_shape = render_shape
 
 
 class GridSim(AgentBasedSimulation):
@@ -250,7 +215,7 @@ class GridSim(AgentBasedSimulation):
                     elif obj is None: # Empty
                         obs[r, c] = 0
                     else: # Something there, so get its encoding
-                        obs[r, c] = obj.encode
+                        obs[r, c] = obj.encoding
                 else: # Cell blocked by wall. Indicate invisible with -2
                     obs[r, c] = -2
 
@@ -304,26 +269,14 @@ def build_grid_sim(object_registry, file_name):
 
 if __name__ == "__main__":
     
-    class WallAgent(GridAgent):
-        """
-        Custom WallAgent with default encoding as 1.
-        """
-        def __init__(self, encode=1, **kwargs):
-            super().__init__(**kwargs)
-            self.encode = encode
-
-    class ExploringAgent(MovingAgent, GridObservingAgent):
-        def __init__(self, encode=2, render_shape='o', **kwargs):
-            super().__init__(**kwargs)
-            self.encode = encode
-            self.render_shape = render_shape
+    from abmarl.sim import ActingAgent
 
     fig = plt.figure()
     explorers = {
         f'explorer{i}': ExploringAgent(id=f'explorer{i}', move_range=1, view_range=3)
         for i in range(5)
     }
-    explorers['explorer0'].encode = 5
+    explorers['explorer0'].encoding = 5
     walls = {
         f'wall{i}': WallAgent(id=f'wall{i}') for i in range(12)
     }

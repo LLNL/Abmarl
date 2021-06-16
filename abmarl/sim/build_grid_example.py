@@ -7,12 +7,12 @@ class WallAgent(GridAgent):
     """
     Custom WallAgent with default encoding as 1.
     """
-    def __init__(self, encode=1, **kwargs):
-        super().__init__(**{'encode': encode, **kwargs})
+    def __init__(self, encoding=1, **kwargs):
+        super().__init__(**{'encoding': encoding, **kwargs})
 
 class ExploringAgent(MovingAgent, GridObservingAgent):
-    def __init__(self, encode=2, **kwargs):
-        super().__init__(**{'encode': encode, **kwargs})
+    def __init__(self, encoding=2, **kwargs):
+        super().__init__(**{'encoding': encoding, **kwargs})
         
 object_registry = {
     'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
