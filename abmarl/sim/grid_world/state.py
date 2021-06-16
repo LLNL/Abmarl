@@ -1,9 +1,22 @@
 
+from abc import ABC, abstractmethod
+
 import numpy as np
 
 from abmarl.sim.grid_world import GridWorldBaseComponent
 
-class GridWorldState(GridWorldBaseComponent):
+class StateBaseComponent(GridWorldBaseComponent, ABC):
+    """
+    Abstract State Component base from which all state components wil inherit.
+    """
+    @abstractmethod
+    def reset(self, **kwargs):
+        """
+        Resets the part of the state for which it is responsible.
+        """
+        pass
+
+class GridWorldState(StateBaseComponent):
     """
     Manage the agent's positions and the grid.
     """
