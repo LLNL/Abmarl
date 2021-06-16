@@ -5,6 +5,7 @@ import numpy as np
 
 from abmarl.sim.gridworld import GridWorldBaseComponent
 
+
 class StateBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract State Component base from which all state components will inherit.
@@ -15,6 +16,7 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
         Resets the part of the state for which it is responsible.
         """
         pass
+
 
 class GridWorldState(StateBaseComponent):
     """

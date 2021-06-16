@@ -1,5 +1,4 @@
 
-from gym.spaces import Box
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -21,6 +20,7 @@ class WallAgent(GridWorldAgent):
     def __init__(self, encoding=1, **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
+
 
 class ExploringAgent(MovingAgent, GridObservingAgent):
     """
@@ -117,7 +117,7 @@ class GridSim(AgentBasedSimulation):
 
 
 if __name__ == "__main__":
-    
+
     from abmarl.sim import ActingAgent
 
     fig = plt.figure()
@@ -149,7 +149,7 @@ if __name__ == "__main__":
         print(agent.position)
         pprint(sim.get_obs(agent.id)['grid'])
         print()
-    
+
     # Ensure proper observation space
     for agent in explorers.values():
         print(agent.observation_space)

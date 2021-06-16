@@ -7,6 +7,7 @@ import numpy as np
 from abmarl.sim.gridworld import GridWorldBaseComponent, GridObservingAgent
 from abmarl.sim.gridworld.state import GridWorldState
 
+
 class ObserverBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract Observer Component base from which all observer components will inherit.
@@ -42,6 +43,7 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         """
         pass
 
+
 class GridObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's location.
@@ -61,7 +63,7 @@ class GridObserver(ObserverBaseComponent):
         GridWorldState object that tracks the state of the grid.
         """
         return self._grid_state
-    
+
     @grid_state.setter
     def grid_state(self, value):
         assert isinstance(value, GridWorldState), "Grid State must be a GridState object."
@@ -73,14 +75,14 @@ class GridObserver(ObserverBaseComponent):
         This observers key is "grid".
         """
         return 'grid'
-    
+
     @property
     def supported_agent_type(self):
         """
         This Observer works with GridObservingAgents.
         """
         return GridObservingAgent
-    
+
     def get_obs(self, agent, **kwargs):
         """
         The agent observes a sub-grid centered on its position.
@@ -93,7 +95,7 @@ class GridObserver(ObserverBaseComponent):
         """
         if not isinstance(agent, GridObservingAgent):
             return {}
-        
+
         # Generate a completely empty grid
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
         local_grid.fill(-1)

@@ -1,8 +1,7 @@
 
-from gym.spaces import Box
 import numpy as np
 
-from abmarl.sim import PrincipleAgent, Agent, ActingAgent, ObservingAgent, AgentBasedSimulation
+from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
 class GridWorldAgent(PrincipleAgent):
@@ -54,14 +53,14 @@ class GridWorldAgent(PrincipleAgent):
         assert value != -1, "-1 encoding reserved for out of bounds."
         assert value != 0, "0 encoding reserved for empty cell."
         self._encoding = value
-    
+
     @property
     def render_shape(self):
         """
         The agent's shape in the rendered grid.
         """
         return getattr(self, '_render_shape', 's')
-    
+
     @render_shape.setter
     def render_shape(self, value):
         self._render_shape = value
@@ -72,7 +71,7 @@ class GridWorldAgent(PrincipleAgent):
         Specify if this agent blocks other agent's observations.
         """
         return self._view_blocking
-    
+
     @view_blocking.setter
     def view_blocking(self, value):
         assert type(value) is bool, "View blocking must be either True or False."

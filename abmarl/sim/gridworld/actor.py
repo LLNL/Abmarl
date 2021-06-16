@@ -7,6 +7,7 @@ from gym.spaces import Box
 from abmarl.sim.gridworld import GridWorldBaseComponent, MovingAgent
 from abmarl.sim.gridworld.state import GridWorldState
 
+
 class ActorBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract Actor Component class from which all Actor Components will inherit.
@@ -68,7 +69,7 @@ class MoveActor(ActorBaseComponent):
         GridWorldState object that tracks the state of the grid.
         """
         return self._grid_state
-    
+
     @grid_state.setter
     def grid_state(self, value):
         assert isinstance(value, GridWorldState), "Grid state must be a GridState object."
@@ -80,7 +81,7 @@ class MoveActor(ActorBaseComponent):
         This Actor's key is "move".
         """
         return "move"
-    
+
     @property
     def supported_agent_type(self):
         """
