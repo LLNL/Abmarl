@@ -7,28 +7,83 @@ from abmarl.sim.gridworld import GridWorldBaseComponent, GridObservingAgent
 from abmarl.sim.gridworld.state import GridWorldState
 
 class ObserverBaseComponent(GridWorldBaseComponent, ABC):
+    """
+    Abstract Observer Component base from which all observer components will inherit.
+    """
     @abstractmethod
-    def get_obs(self, agent, **kwargs): pass
+    def get_obs(self, agent, **kwargs):
+        """
+        Return this agent's observation.
+        """
+        pass
 
     @property
     @abstractmethod
-    def key(self): pass
+    def key(self):
+        """
+        The key in the observation dictionary.
 
+        All obsersvers in the gridworld framework use dictionary observations.
+        We can build up complex observation spaces with multiple components by
+        assigning each component an entry in the observation dictionary. Observations
+        will be a dictionary even if your simulation only has one Observer.
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def supported_agent_type(self):
+        """
+        The type of Agent that this Observer works with.
+
+        If an agent is this type, the Observer will add its channel to the
+        agent's observation space and will produce observations for this agent.
+        """
+        pass
 
 class GridObserver(ObserverBaseComponent):
+    """
+    Observe a subset of the grid centered on the agent's location.
+    """
     def __init__(self, grid_state=None, **kwargs):
         super().__init__(**kwargs)
         self.grid_state = grid_state
+
+    @property
+    def grid_state(self):
+        """
+        GridWorldState object that tracks the state of the grid.
+        """
+        return self._grid_state
+    
+    @grid_state.setter
+    def grid_state(self, value):
+        assert isinstance(value, GridWorldState), "Grid State must be a GridState object."
+        self._grid_state = value
+
+    @property
+    def key(self):
+        """
+        This observers key is "grid".
+        """
+        return 'grid'
+    
+    @property
+    def supported_agent_type(self):
+        """
+        This Observer works with GridObservingAgents.
+        """
+        return GridObservingAgent
     
     def get_obs(self, agent, **kwargs):
         """
         The agent observes a sub-grid centered on its position.
 
         The observation contains other agents, empty spaces, out of bounds, and
-        masked cells, which are blocked from view by walls.
+        masked cells, which can be blocked from view by other view-blocking agents.
 
         Returns:
-            The observation as a dictionary keyed on this class's key.
+            The observation as a dictionary.
         """
         if not isinstance(agent, GridObservingAgent):
             return {}
@@ -138,17 +193,3 @@ class GridObserver(ObserverBaseComponent):
                     obs[r, c] = -2
 
         return {self.key: obs}
-
-    @property
-    def grid_state(self):
-        return self._grid_state
-    
-    @grid_state.setter
-    def grid_state(self, value):
-        assert isinstance(value, GridWorldState), "Grid State must be a GridState object."
-        self._grid_state = value
-
-    @property
-    def key(self):
-        return 'grid'
-
