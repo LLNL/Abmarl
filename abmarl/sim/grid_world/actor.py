@@ -45,8 +45,9 @@ class MoveActor(ActorBaseComponent):
         self.grid_state = grid_state
 
     def process_action(self, agent, action_dict, **kwargs):
-        action = action_dict[self.key]
-        self.grid_state.set_position(agent, agent.position + action)
+        if self.key in action_dict:
+            action = action_dict[self.key]
+            self.grid_state.set_position(agent, agent.position + action)
 
     @property
     def key(self):
