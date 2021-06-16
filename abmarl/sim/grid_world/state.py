@@ -8,6 +8,7 @@ class GridWorldState(GridWorldBaseComponent):
     Manage the agent's positions and the grid.
     """
     def __init__(self, rows=None, cols=None, **kwargs):
+        super().__init__(**kwargs)
         self.rows = rows
         self.cols = cols
 
@@ -50,7 +51,7 @@ class GridWorldState(GridWorldBaseComponent):
                 agent.position = np.array([r, c])
                 self.grid[r, c] = agent
 
-    def modify_position(self, agent, new_position, **kwargs):
+    def set_position(self, agent, new_position, **kwargs):
         """
         Attempt to assign a new position to an agent.
 

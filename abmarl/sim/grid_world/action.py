@@ -41,11 +41,12 @@ class MoveAction(ActionBaseComponent):
     Process moving agents.
     """
     def __init__(self, grid_state=None, **kwargs):
+        super().__init__(**kwargs)
         self.grid_state = grid_state
 
     def process_action(self, agent, action_dict, **kwargs):
         action = action_dict[self.key]
-        self.grid_state.modify_position(agent, action)
+        self.grid_state.set_position(agent, agent.position + action)
 
     @property
     def key(self):

@@ -5,6 +5,8 @@ import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.grid_world import GridWorldAgent, GridObservingAgent, MovingAgent
+from abmarl.sim.grid_world.state import GridWorldState
+from abmarl.sim.grid_world.action import MoveAction
 from abmarl.tools.matplotlib_utils import mscatter
 
 
@@ -33,58 +35,24 @@ class ExploringAgent(MovingAgent, GridObservingAgent):
 
 
 class GridSim(AgentBasedSimulation):
-    def __init__(self, rows=None, cols=None, agents=None, **kwargs):
-        self.rows = rows
-        self.cols = cols
-        # Dictionary lookup by id
-        self.agents = agents
+    def __init__(self, **kwargs):
+        self.agents = kwargs['agents']
+
+        # State Components
+        self.grid_state = GridWorldState(**kwargs)
+
+        # Action Components
+        self.move_actor = MoveAction(grid_state=self.grid_state, **kwargs)
 
         self.finalize()
 
     def reset(self, **kwargs):
-        # Grid lookup by position
-        self.grid = np.empty((self.rows, self.cols), dtype=object)
+        self.grid_state.reset(**kwargs)
 
-        # Prioritize placing agents with initial positions. We must keep track
-        # of which positions have been taken so that the random placement below doesn't
-        # try to place an agent in an already-taken position.
-        ravelled_positions_taken = set()
-        for agent in self.agents.values():
-            if agent.initial_position is not None:
-                r, c = agent.initial_position
-                assert self.grid[r, c] is None, f"{agent.id} has the same initial " + \
-                    f"position as {self.grid[r, c].id}. All initial positions must be unique."
-                agent.position = agent.initial_position
-                self.grid[r, c] = agent
-                ravelled_positions_taken.add(
-                    np.ravel_multi_index(agent.initial_position, (self.rows, self.cols))
-                )
-
-        # Now randomly place any other agent who did not come with an initial position.
-        ravelled_positions_available = [
-            i for i in range(self.rows * self.cols) if i not in ravelled_positions_taken
-        ]
-        rs, cs = np.unravel_index(
-            np.random.choice(ravelled_positions_available, len(self.agents), False),
-            shape=(self.rows, self.cols)
-        )
-        for ndx, agent in enumerate(self.agents.values()): # Assuming all agents are GridAgent
-            if agent.initial_position is None:
-                r = rs[ndx]
-                c = cs[ndx]
-                agent.position = np.array([r, c])
-                self.grid[r, c] = agent
-
-    def step(self, action_dict):
+    def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            new_position = agent.position + action['move']
-            if 0 <= new_position[0] < self.rows and \
-                    0 <= new_position[1] < self.cols and \
-                    self.grid[new_position[0], new_position[1]] is None:
-                self.grid[agent.position[0], agent.position[1]] = None
-                agent.position = new_position
-                self.grid[agent.position[0], agent.position[1]] = agent
+            self.move_actor.process_action(agent, action, **kwargs)
 
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -93,16 +61,16 @@ class GridSim(AgentBasedSimulation):
         ax = fig.gca()
 
         # Draw the agents
-        ax.set(xlim=(0, self.cols), ylim=(0, self.rows))
-        ax.set_xticks(np.arange(0, self.cols, 1))
-        ax.set_yticks(np.arange(0, self.rows, 1))
+        ax.set(xlim=(0, self.grid_state.cols), ylim=(0, self.grid_state.rows))
+        ax.set_xticks(np.arange(0, self.grid_state.cols, 1))
+        ax.set_yticks(np.arange(0, self.grid_state.rows, 1))
         ax.grid()
 
         agents_x = [
             agent.position[1] + 0.5 for agent in self.agents.values()
         ]
         agents_y = [
-            self.rows - 0.5 - agent.position[0] for agent in self.agents.values()
+            self.grid_state.rows - 0.5 - agent.position[0] for agent in self.agents.values()
         ]
         shape = [agent.render_shape for agent in self.agents.values()]
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
@@ -122,13 +90,13 @@ class GridSim(AgentBasedSimulation):
         # Copy the section of the grid around the agent's location
         (r, c) = agent.position
         r_lower = max([0, r - agent.view_range])
-        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
+        r_upper = min([self.grid_state.rows - 1, r + agent.view_range]) + 1
         c_lower = max([0, c - agent.view_range])
-        c_upper = min([self.cols - 1, c+agent.view_range]) + 1
+        c_upper = min([self.grid_state.cols - 1, c + agent.view_range]) + 1
         local_grid[
             (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
             (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
-        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
+        ] = self.grid_state.grid[r_lower:r_upper, c_lower:c_upper]
 
         # Generate an observation mask. The agent's observation can be blocked
         # by walls, which hide the cells "behind" them. In the mask, 1 means that
@@ -298,7 +266,7 @@ if __name__ == "__main__":
     from pprint import pprint
     for agent in explorers.values():
         print(agent.position)
-        pprint(sim.get_obs(agent.id))
+        pprint(sim.get_obs(agent.id)['grid'])
         print()
 
     plt.show()
