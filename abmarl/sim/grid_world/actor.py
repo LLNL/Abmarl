@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 from abmarl.sim.grid_world import GridWorldBaseComponent, MovingAgent
 from abmarl.sim.grid_world.state import GridWorldState
 
-class ActionBaseComponent(GridWorldBaseComponent, ABC):
+class ActorBaseComponent(GridWorldBaseComponent, ABC):
     """
-    Abstract ActionComponent class from which all ActionComponents will inherit.
+    Abstract Actor Component class from which all Actor Components will inherit.
     """
     @abstractmethod
     def process_action(self, agent, action, **kwargs):
@@ -36,7 +36,7 @@ class ActionBaseComponent(GridWorldBaseComponent, ABC):
     #     pass
 
 
-class MoveAction(ActionBaseComponent):
+class MoveActor(ActorBaseComponent):
     """
     Process moving agents.
     """

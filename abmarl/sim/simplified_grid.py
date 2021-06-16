@@ -6,7 +6,7 @@ import numpy as np
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.grid_world import GridWorldAgent, GridObservingAgent, MovingAgent
 from abmarl.sim.grid_world.state import GridWorldState
-from abmarl.sim.grid_world.action import MoveAction
+from abmarl.sim.grid_world.actor import MoveActor
 from abmarl.tools.matplotlib_utils import mscatter
 
 
@@ -42,7 +42,7 @@ class GridSim(AgentBasedSimulation):
         self.grid_state = GridWorldState(**kwargs)
 
         # Action Components
-        self.move_actor = MoveAction(grid_state=self.grid_state, **kwargs)
+        self.move_actor = MoveActor(grid_state=self.grid_state, **kwargs)
 
         self.finalize()
 
