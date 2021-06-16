@@ -4,10 +4,10 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
-from abmarl.sim.grid_world import GridWorldAgent, GridObservingAgent, MovingAgent
-from abmarl.sim.grid_world.state import GridWorldState
-from abmarl.sim.grid_world.actor import MoveActor
-from abmarl.sim.grid_world.observer import GridObserver
+from abmarl.sim.gridworld import GridWorldAgent, GridObservingAgent, MovingAgent
+from abmarl.sim.gridworld.state import GridWorldState
+from abmarl.sim.gridworld.actor import MoveActor
+from abmarl.sim.gridworld.observer import GridObserver
 from abmarl.tools.matplotlib_utils import mscatter
 
 

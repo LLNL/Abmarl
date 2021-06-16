@@ -3,8 +3,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from abmarl.sim.grid_world import GridWorldBaseComponent, GridObservingAgent
-from abmarl.sim.grid_world.state import GridWorldState
+from abmarl.sim.gridworld import GridWorldBaseComponent, GridObservingAgent
+from abmarl.sim.gridworld.state import GridWorldState
 
 class ObserverBaseComponent(GridWorldBaseComponent, ABC):
     @abstractmethod

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from abmarl.sim.grid_world import GridWorldBaseComponent
+from abmarl.sim.gridworld import GridWorldBaseComponent
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):
     """

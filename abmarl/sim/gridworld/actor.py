@@ -1,8 +1,8 @@
 
 from abc import ABC, abstractmethod
 
-from abmarl.sim.grid_world import GridWorldBaseComponent, MovingAgent
-from abmarl.sim.grid_world.state import GridWorldState
+from abmarl.sim.gridworld import GridWorldBaseComponent, MovingAgent
+from abmarl.sim.gridworld.state import GridWorldState
 
 class ActorBaseComponent(GridWorldBaseComponent, ABC):
     """
