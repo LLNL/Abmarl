@@ -19,6 +19,10 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
 class GridWorldState(StateBaseComponent):
     """
     Manage the agent's positions and the grid.
+
+    Attributes:
+        rows: The number of rows in the grid.
+        cols: The number of cols in the grid.
     """
     def __init__(self, rows=None, cols=None, **kwargs):
         super().__init__(**kwargs)
@@ -68,8 +72,10 @@ class GridWorldState(StateBaseComponent):
         """
         Attempt to assign a new position to an agent.
 
-        The new position must be in bounds and must not be occupied by another
-        agent.
+        Args:
+            agent: The agent whose position we are changing.
+            new_position: the new position must be in bounds and must not be occupied
+            by another agent.
         """
         if 0 <= new_position[0] < self.rows and \
                 0 <= new_position[1] < self.cols and \
