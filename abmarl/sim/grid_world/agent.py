@@ -9,9 +9,10 @@ class GridWorldAgent(PrincipleAgent):
     """
     The basic entity in the GridWorld.
     """
-    def __init__(self, initial_position=None, **kwargs):
+    def __init__(self, initial_position=None, view_blocking=False, **kwargs):
         super().__init__(**kwargs)
         self.initial_position = initial_position
+        self.view_blocking = view_blocking
 
     @property
     def initial_position(self):
@@ -64,6 +65,15 @@ class GridWorldAgent(PrincipleAgent):
     @render_shape.setter
     def render_shape(self, value):
         self._render_shape = value
+
+    @property
+    def view_blocking(self):
+        return self._view_blocking
+    
+    @view_blocking.setter
+    def view_blocking(self, value):
+        assert type(value) is bool, "View blocking must be either True or False."
+        self._view_blocking = value
 
 
 class GridObservingAgent(GridWorldAgent, ObservingAgent):
