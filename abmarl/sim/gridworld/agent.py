@@ -68,6 +68,9 @@ class GridWorldAgent(PrincipleAgent):
 
     @property
     def view_blocking(self):
+        """
+        Specify if this agent blocks other agent's observations.
+        """
         return self._view_blocking
     
     @view_blocking.setter
@@ -76,7 +79,14 @@ class GridWorldAgent(PrincipleAgent):
         self._view_blocking = value
 
 
+# TODO: the action/observation space key....
 class GridObservingAgent(GridWorldAgent, ObservingAgent):
+    """
+    Observe the grid up to view_range cells away.
+
+    Attributes:
+        view_range: The number of cells away this agent can observe in each step.
+    """
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
         self.view_range = view_range
@@ -84,6 +94,12 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
 
 
 class MovingAgent(GridWorldAgent, ActingAgent):
+    """
+    Move up to move_range cells away.
+
+    Attributes:
+        move_range: The number of cells away this ageant can move in one step.
+    """
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.move_range = move_range
