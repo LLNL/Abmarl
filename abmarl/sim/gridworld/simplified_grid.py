@@ -170,5 +170,9 @@ if __name__ == "__main__":
         print(agent.position)
         pprint(sim.get_obs(agent.id)['grid'])
         print()
+    
+    # Ensure proper observation space
+    for agent in explorers.values():
+        print(agent.observation_space)
 
     plt.show()

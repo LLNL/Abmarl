@@ -1,6 +1,9 @@
 
 from abc import ABC, abstractmethod
 
+import numpy as np
+from gym.spaces import Box
+
 from abmarl.sim.gridworld import GridWorldBaseComponent, MovingAgent
 from abmarl.sim.gridworld.state import GridWorldState
 
@@ -53,7 +56,11 @@ class MoveActor(ActorBaseComponent):
     def __init__(self, grid_state=None, **kwargs):
         super().__init__(**kwargs)
         self.grid_state = grid_state
-        # TODO: Assign action space
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.action_space[self.key] = Box(
+                    -agent.move_range, agent.move_range, (2,), np.int
+                )
 
     @property
     def grid_state(self):

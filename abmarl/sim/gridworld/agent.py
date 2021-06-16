@@ -79,7 +79,6 @@ class GridWorldAgent(PrincipleAgent):
         self._view_blocking = value
 
 
-# TODO: the action/observation space key....
 class GridObservingAgent(GridWorldAgent, ObservingAgent):
     """
     Observe the grid up to view_range cells away.
@@ -90,7 +89,6 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
         self.view_range = view_range
-        self.observation_space['grid'] = Box(-np.inf, np.inf, (view_range, view_range), np.int)
 
 
 class MovingAgent(GridWorldAgent, ActingAgent):
@@ -103,7 +101,3 @@ class MovingAgent(GridWorldAgent, ActingAgent):
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.move_range = move_range
-        self.action_space['move'] = Box(-move_range, move_range, (2,), np.int)
-
-
-

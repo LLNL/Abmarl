@@ -1,6 +1,7 @@
 
 from abc import ABC, abstractmethod
 
+from gym.spaces import Box
 import numpy as np
 
 from abmarl.sim.gridworld import GridWorldBaseComponent, GridObservingAgent
@@ -48,7 +49,11 @@ class GridObserver(ObserverBaseComponent):
     def __init__(self, grid_state=None, **kwargs):
         super().__init__(**kwargs)
         self.grid_state = grid_state
-        # TODO: Assign observation space
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.observation_space[self.key] = Box(
+                    -np.inf, np.inf, (agent.view_range, agent.view_range), np.int
+                )
 
     @property
     def grid_state(self):
