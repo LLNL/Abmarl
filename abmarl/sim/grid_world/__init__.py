@@ -14,10 +14,7 @@ class GridWorldBaseComponent(ABC):
     dimensions of the grid world. It creates a 2d np array for indexing the agents
     on their positions.
     """
-    def __init__(self, rows=None, cols=None, agents=None, **kwargs):
-        self.rows = rows
-        self.cols = cols
-        self.grid = np.empty((self.rows, self. cols), dtype=object)
+    def __init__(self, agents=None, **kwargs):
         self.agents = agents
     
     @property
