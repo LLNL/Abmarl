@@ -4,7 +4,7 @@ from abc import ABC
 import numpy as np
 
 from .agent import GridWorldAgent, GridObservingAgent, MovingAgent
-from .util import build_grid_sim
+from .util import build_grid_config
 
 
 class GridWorldBaseComponent(ABC):

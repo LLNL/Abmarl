@@ -60,16 +60,14 @@ class GridSim(AgentBasedSimulation):
 
     def render(self, fig=None, **kwargs):
         fig.clear()
-
-        # Draw the resources
         ax = fig.gca()
 
-        # Draw the agents
+        # Draw the gridlines
         ax.set(xlim=(0, self.grid_state.cols), ylim=(0, self.grid_state.rows))
         ax.set_xticks(np.arange(0, self.grid_state.cols, 1))
         ax.set_yticks(np.arange(0, self.grid_state.rows, 1))
         ax.grid()
-
+        # Draw the agents
         agents_x = [
             agent.position[1] + 0.5 for agent in self.agents.values()
         ]
@@ -83,41 +81,25 @@ class GridSim(AgentBasedSimulation):
         plt.pause(1e-6)
 
     def get_obs(self, agent_id, **kwargs):
-        """
-        Return the agent's observation.
-        """
         agent = self.agents[agent_id]
         return {
             **self.grid_observer.get_obs(agent, **kwargs)
         }
 
     def get_reward(self, agent_id, **kwargs):
-        """
-        Return the agent's reward.
-        """
         pass
 
     def get_done(self, agent_id, **kwargs):
-        """
-        Return the agent's done status.
-        """
         pass
 
     def get_all_done(self, **kwargs):
-        """
-        Return the simulation's done status.
-        """
         pass
 
     def get_info(self, agent_id, **kwargs):
-        """
-        Return the agent's info.
-        """
         pass
 
 
 if __name__ == "__main__":
-
     from abmarl.sim import ActingAgent
 
     fig = plt.figure()

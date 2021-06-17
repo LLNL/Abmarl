@@ -2,21 +2,21 @@
 import numpy as np
 
 
-def build_grid_sim(file_name, object_registry):
+def build_grid_config(file_name, object_registry):
     """
-    Build a custom grid with agents.
+    Build a custom grid config.
 
     Args:
         file_name: Name of the file that specifies the grid. In the file, each
             cell should be a single alphanumeric character indicating which agent
-            will be there. That agent will be given that initial position and start
-            there at the beginning of each episode. 0's are reserved for empty
+            will be at that position (from the perspective of looking down on the
+            grid). That agent will be given that initial position. 0's are reserved for empty
             space. For example:
             0 A W W W A 0
             0 0 0 0 0 0 0
             0 A W W W A 0
             will create a 3-by-7 grid with some agents along the top and bottom
-            of the grid and another type of agent in the corner.
+            of the grid and another type of agent in the corners.
         object_registry: A dictionary that maps characters from the file to a
             function that generates the agent. This must be a function because
             each agent must have unique id, which is generated here. For example,

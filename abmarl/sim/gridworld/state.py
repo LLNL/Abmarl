@@ -20,7 +20,9 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
 
 class GridWorldState(StateBaseComponent):
     """
-    Manage the agent's positions and the grid.
+    Manage the agent's positions in the grid.
+
+    Every agent occupies a unique square.
 
     Attributes:
         rows: The number of rows in the grid.
@@ -36,7 +38,7 @@ class GridWorldState(StateBaseComponent):
         Give agents their starting positions.
 
         We use the agent's initial position if it exists. Otherwise, we randomly
-        place the agent in the grid. Every agent will occupy a unique square.
+        place the agent in the grid.
         """
         # Grid lookup by position
         self.grid = np.empty((self.rows, self.cols), dtype=object)
@@ -52,7 +54,7 @@ class GridWorldState(StateBaseComponent):
                 agent.position = agent.initial_position
                 self.grid[r, c] = agent
                 ravelled_positions_taken.add(
-                    np.ravel_multi_index(agent.initial_position, (self.rows, self.cols))
+                    np.ravel_multi_index(agent.position, (self.rows, self.cols))
                 )
 
         # Now randomly place any other agent who did not come with an initial position.
@@ -77,7 +79,7 @@ class GridWorldState(StateBaseComponent):
         Args:
             agent: The agent whose position we are changing.
             new_position: the new position must be in bounds and must not be occupied
-            by another agent.
+                by another agent.
         """
         if 0 <= new_position[0] < self.rows and \
                 0 <= new_position[1] < self.cols and \

@@ -6,7 +6,7 @@ from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 class GridWorldAgent(PrincipleAgent):
     """
-    The basic entity in the GridWorld.
+    The base agent in the GridWorld.
     """
     def __init__(self, initial_position=None, view_blocking=False, **kwargs):
         super().__init__(**kwargs)
@@ -80,10 +80,10 @@ class GridWorldAgent(PrincipleAgent):
 
 class GridObservingAgent(GridWorldAgent, ObservingAgent):
     """
-    Observe the grid up to view_range cells away.
+    Observe the grid up to view_range cells.
 
     Attributes:
-        view_range: The number of cells away this agent can observe in each step.
+        view_range: The number of cells this agent can observe in each step.
     """
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
@@ -92,10 +92,10 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
 
 class MovingAgent(GridWorldAgent, ActingAgent):
     """
-    Move up to move_range cells away.
+    Move up to move_range cells.
 
     Attributes:
-        move_range: The number of cells away this ageant can move in one step.
+        move_range: The number of cells this ageant can move in one step.
     """
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)

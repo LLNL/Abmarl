@@ -20,7 +20,7 @@ class ActorBaseComponent(GridWorldBaseComponent, ABC):
         Args:
             agent: The acting agent.
             action_dict: The action dictionary for this agent in this step. The
-                dictionary will have different entries, each of which will be processed
+                dictionary may have different entries, each of which will be processed
                 by different Actors.
         """
         pass
@@ -31,7 +31,7 @@ class ActorBaseComponent(GridWorldBaseComponent, ABC):
         """
         The key in the action dictionary.
 
-        All actors in the gridworld framework use dictionary actions.
+        The action space of all acting agents in the gridworld framework is a dict.
         We can build up complex action spaces with multiple components by
         assigning each component an entry in the action dictionary. Actions
         will be a dictionary even if your simulation only has one Actor.
@@ -44,7 +44,7 @@ class ActorBaseComponent(GridWorldBaseComponent, ABC):
         """
         The type of Agent that this Actor works with.
 
-        If an agent is this type, the Actor will add its channel to the
+        If an agent is this type, the Actor will add its entry to the
         agent's action space and will process actions for this agent.
         """
         pass
@@ -85,19 +85,19 @@ class MoveActor(ActorBaseComponent):
     @property
     def supported_agent_type(self):
         """
-        This Observer works with GridObservingAgents.
+        This Actor works with MovingAgents.
         """
         return MovingAgent
 
     def process_action(self, agent, action_dict, **kwargs):
         """
-        The agent can move to nearby unoccupied squares.
+        The agent can move to nearby squares.
 
         Args:
             agent: Move the agent if it is a MovingAgent.
             action_dict: The action dictionary for this agent in this step. If
                 the agent is a MovingAgent, then the action dictionary will contain
-                the key, which for this Actor is "move".
+                the "move" entry.
         """
         if isinstance(agent, MovingAgent):
             action = action_dict[self.key]
