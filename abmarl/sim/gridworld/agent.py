@@ -100,3 +100,27 @@ class MovingAgent(GridWorldAgent, ActingAgent):
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.move_range = move_range
+
+
+class HealthAgent(GridWorldAgent):
+    """
+    Agents have health points and can die.
+
+    Health is bounded between 0 and 1.
+
+    Attributes:
+        initial_health: The agent's initial health between 0 and 1.
+    """
+    def __init__(self, initial_health=None, **kwargs):
+        super().__init__(**kwargs)
+        self.initial_health = initial_health
+    
+    @property
+    def initial_health(self):
+        return self._initial_health
+    
+    @initial_health.setter
+    def initial_health(self, value):
+        assert type(value) in [int, float], "Initial health must be a numeric value."
+        assert 0 < value <= 1, "Initial value must be between 0 and 1."
+        self._initial_health = value
