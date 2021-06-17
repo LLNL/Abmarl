@@ -124,7 +124,7 @@ if __name__ == "__main__":
         }
         sim.step(action)
         sim.render(fig=fig)
-    
+
     sim.reset()
     sim.render(fig=fig)
 
