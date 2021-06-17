@@ -1,7 +1,8 @@
 
 from matplotlib import pyplot as plt
 
-from abmarl.sim.simplified_grid import WallAgent, ExploringAgent, build_grid_sim
+from abmarl.sim.gridworld.util import build_grid_config
+from abmarl.sim.gridworld.gridworld_example import WallAgent, ExploringAgent, GridSim
 
 object_registry = {
     'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
@@ -12,7 +13,8 @@ file_name = 'starting_grid.txt'
 
 fig = plt.figure()
 
-sim = build_grid_sim(object_registry, file_name)
+config = build_grid_config(file_name, object_registry)
+sim = GridSim(**config)
 sim.reset()
 sim.render(fig=fig)
 
