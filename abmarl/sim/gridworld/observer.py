@@ -101,7 +101,7 @@ class GridObserver(ObserverBaseComponent):
             return {}
 
         # Generate a completely empty grid
-        # Fill the grid with out-of-bound values, which will then be replaced by
+        # Fill the grid with out-of-bounds values, which will then be replaced by
         # objects and empty space below.
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
         local_grid.fill(-1)
@@ -128,7 +128,7 @@ class GridObserver(ObserverBaseComponent):
         for other in self.agents.values():
             if other.view_blocking:
                 r_diff, c_diff = other.position - agent.position
-                # Is the other agent within the view range?
+                # Ensure the other agent within the view range
                 if -agent.view_range <= r_diff <= agent.view_range and \
                         -agent.view_range <= c_diff <= agent.view_range:
                     if c_diff > 0 and r_diff == 0: # Other is to the right of agent

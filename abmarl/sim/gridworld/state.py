@@ -22,7 +22,7 @@ class GridWorldState(StateBaseComponent):
     """
     Manage the agent's positions in the grid.
 
-    Every agent occupies a unique square.
+    Every agent occupies a unique cell.
 
     Attributes:
         rows: The number of rows in the grid.
