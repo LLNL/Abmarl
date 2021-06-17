@@ -16,7 +16,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
     so:
     MyCustomGridSim(GridWorldSimulation):
         ... # define the simulation, don't overwrite the builders.
-    
+
     sim = MyCustomGridSim.build(parameters)
     """
     @classmethod
@@ -41,7 +41,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         assert 0 < cols, "Cols must be a positive integer."
 
         return cls._build_sim(rows, cols, **kwargs)
-    
+
     @classmethod
     def build_sim_from_file(cls, file_name, object_registry, **kwargs):
         """
@@ -90,7 +90,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                         agent.initial_position = np.array([row, col])
                         agents[agent.id] = agent
                         n += 1
-        
+
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
 
     @classmethod
