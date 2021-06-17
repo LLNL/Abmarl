@@ -18,20 +18,14 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
         pass
 
 
-class GridWorldState(StateBaseComponent):
+class PositionState(StateBaseComponent):
     """
     Manage the agent's positions in the grid.
 
     Every agent occupies a unique cell.
-
-    Attributes:
-        rows: The number of rows in the grid.
-        cols: The number of cols in the grid.
     """
-    def __init__(self, rows=None, cols=None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.rows = rows
-        self.cols = cols
 
     def reset(self, **kwargs):
         """
@@ -41,7 +35,7 @@ class GridWorldState(StateBaseComponent):
         place the agent in the grid.
         """
         # Grid lookup by position
-        self.grid = np.empty((self.rows, self.cols), dtype=object)
+        self.grid.fill(None)
         # Prioritize placing agents with initial positions. We must keep track
         # of which positions have been taken so that the random placement below doesn't
         # try to place an agent in an already-taken position.
