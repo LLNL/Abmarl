@@ -6,7 +6,6 @@ import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import GridObservingAgent
-from abmarl.sim.gridworld.state import GridWorldState
 
 
 class ObserverBaseComponent(GridWorldBaseComponent, ABC):
@@ -52,26 +51,13 @@ class GridObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's position.
     """
-    def __init__(self, grid_state=None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.grid_state = grid_state
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
                     -np.inf, np.inf, (agent.view_range, agent.view_range), np.int
                 )
-
-    @property
-    def grid_state(self):
-        """
-        GridWorldState object that tracks the state of the grid.
-        """
-        return self._grid_state
-
-    @grid_state.setter
-    def grid_state(self, value):
-        assert isinstance(value, GridWorldState), "Grid State must be a GridState object."
-        self._grid_state = value
 
     @property
     def key(self):
@@ -97,7 +83,7 @@ class GridObserver(ObserverBaseComponent):
         Returns:
             The observation as a dictionary.
         """
-        if not isinstance(agent, GridObservingAgent):
+        if not isinstance(agent, self.supported_agent_type):
             return {}
 
         # Generate a completely empty grid
@@ -109,13 +95,13 @@ class GridObserver(ObserverBaseComponent):
         # Copy the section of the grid around the agent's position
         (r, c) = agent.position
         r_lower = max([0, r - agent.view_range])
-        r_upper = min([self.grid_state.rows - 1, r + agent.view_range]) + 1
+        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
         c_lower = max([0, c - agent.view_range])
-        c_upper = min([self.grid_state.cols - 1, c + agent.view_range]) + 1
+        c_upper = min([self.cols - 1, c + agent.view_range]) + 1
         local_grid[
             (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
             (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
-        ] = self.grid_state.grid[r_lower:r_upper, c_lower:c_upper]
+        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
 
         # Generate an observation mask. The agent's observation can be blocked
         # by other view-blocking agents, which hide the cells "behind" them. We
