@@ -3,6 +3,7 @@ from abc import ABC
 
 from abmarl.sim.gridworld.agent import GridWorldAgent
 
+
 class GridWorldBaseComponent(ABC):
     """
     Component base class from which all components will inherit.
