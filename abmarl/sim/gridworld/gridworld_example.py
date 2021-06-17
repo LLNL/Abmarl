@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
-from abmarl.sim.gridworld import GridWorldAgent, GridObservingAgent, MovingAgent
+from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent
 from abmarl.sim.gridworld.state import GridWorldState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import GridObserver

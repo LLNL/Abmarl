@@ -1,7 +1,7 @@
 
 from matplotlib import pyplot as plt
 
-from abmarl.sim.gridworld import build_grid_config
+from abmarl.sim.gridworld.util import build_grid_config
 from abmarl.sim.gridworld.gridworld_example import WallAgent, ExploringAgent, GridSim
 
 object_registry = {

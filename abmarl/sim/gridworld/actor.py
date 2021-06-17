@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 from gym.spaces import Box
 
-from abmarl.sim.gridworld import GridWorldBaseComponent, MovingAgent
+from abmarl.sim.gridworld.base import GridWorldBaseComponent
+from abmarl.sim.gridworld.agent import MovingAgent
 from abmarl.sim.gridworld.state import GridWorldState
 
 
