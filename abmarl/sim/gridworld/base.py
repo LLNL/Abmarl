@@ -158,6 +158,6 @@ class GridWorldBaseComponent(ABC):
     @grid.setter
     def grid(self, value):
         assert type(value) is np.ndarray, "The grid must be a numpy array."
-        assert len(value.size) == 2, "The grid must be a 2-dimensional array."
-        assert value.dtype is object, "The grid must be a numpy array of objects."
-        self._value = value
+        assert len(value.shape) == 2, "The grid must be a 2-dimensional array."
+        assert value.dtype is np.dtype(object), "The grid must be a numpy array of objects."
+        self._grid = value

@@ -65,19 +65,3 @@ class PositionState(StateBaseComponent):
                 c = cs[ndx]
                 agent.position = np.array([r, c])
                 self.grid[r, c] = agent
-
-    def set_position(self, agent, new_position, **kwargs):
-        """
-        Attempt to assign a new position to an agent.
-
-        Args:
-            agent: The agent whose position we are changing.
-            new_position: the new position must be in bounds and must not be occupied
-                by another agent.
-        """
-        if 0 <= new_position[0] < self.rows and \
-                0 <= new_position[1] < self.cols and \
-                self.grid[new_position[0], new_position[1]] is None:
-            self.grid[agent.position[0], agent.position[1]] = None
-            agent.position = new_position
-            self.grid[agent.position[0], agent.position[1]] = agent

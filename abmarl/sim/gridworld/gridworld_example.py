@@ -2,9 +2,9 @@
 from matplotlib import pyplot as plt
 import numpy as np
 
-from abmarl.sim import AgentBasedSimulation
+from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent
-from abmarl.sim.gridworld.state import GridWorldState
+from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import GridObserver
 from abmarl.tools.matplotlib_utils import mscatter
@@ -35,18 +35,18 @@ class ExploringAgent(MovingAgent, GridObservingAgent):
         self.render_shape = render_shape
 
 
-class GridSim(AgentBasedSimulation):
+class GridSim(GridWorldSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
 
         # State Components
-        self.grid_state = GridWorldState(**kwargs)
+        self.grid_state = PositionState(**kwargs)
 
         # Action Components
-        self.move_actor = MoveActor(grid_state=self.grid_state, **kwargs)
+        self.move_actor = MoveActor(**kwargs)
 
         # Observation Components
-        self.grid_observer = GridObserver(grid_state=self.grid_state, **kwargs)
+        self.grid_observer = GridObserver(**kwargs)
 
         self.finalize()
 
@@ -112,7 +112,7 @@ if __name__ == "__main__":
         f'wall{i}': WallAgent(id=f'wall{i}', view_blocking=True) for i in range(12)
     }
     agents = {**explorers, **walls}
-    sim = GridSim(rows=8, cols=12, agents=agents)
+    sim = GridSim.build_sim(rows=8, cols=12, agents=agents)
     sim.reset()
     sim.render(fig=fig)
 
