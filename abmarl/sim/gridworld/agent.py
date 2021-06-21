@@ -113,13 +113,23 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
 class MovingAgent(GridWorldAgent, ActingAgent):
     """
     Move up to move_range cells.
-
-    Attributes:
-        move_range: The number of cells this ageant can move in one step.
     """
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.move_range = move_range
+    
+    @property
+    def move_range(self):
+        """
+        The maximum number of cells away that the agent can move.
+        """
+        return self._move_range
+
+    @move_range.setter
+    def move_range(self, value):
+        assert type(value) is int, "Move range must be an integer."
+        assert 0 <= value, "Move range must be a nonnegative integer."
+        self._move_range = value
 
     @property
     def confiured(self):

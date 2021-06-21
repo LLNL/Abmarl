@@ -33,24 +33,6 @@ class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
 class PositionObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
-class GridMovementAgent(ActingAgent, ComponentAgent):
-    """
-    Agents can move up to some number of spaces away.
-
-    move_range (int):
-        The maximum number of cells away that the agent can move.
-    """
-    def __init__(self, move_range=None, **kwargs):
-        super().__init__(**kwargs)
-        assert move_range is not None, "move_range must be an integer"
-        self.move_range = move_range
-
-    @property
-    def configured(self):
-        """
-        Agents are configured if the move_range parameter is set.
-        """
-        return super().configured and self.move_range is not None
 
 
 class SpeedAngleAgent(ComponentAgent):
