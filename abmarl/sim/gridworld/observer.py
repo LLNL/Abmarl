@@ -17,6 +17,9 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         """
         Observe the state of the simulation.
 
+        Args:
+            agent: The agent for which we return an observation.
+
         Returns:
             This agent's observation.
         """
