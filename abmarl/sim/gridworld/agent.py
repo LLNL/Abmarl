@@ -77,7 +77,6 @@ class GridWorldAgent(PrincipleAgent):
         assert type(value) is bool, "View blocking must be either True or False."
         self._view_blocking = value
 
-
 class GridObservingAgent(GridWorldAgent, ObservingAgent):
     """
     Observe the grid up to view_range cells.
@@ -107,16 +106,31 @@ class HealthAgent(GridWorldAgent):
     Agents have health points and can die.
 
     Health is bounded between 0 and 1.
-
-    Attributes:
-        initial_health: The agent's initial health between 0 and 1.
     """
     def __init__(self, initial_health=None, **kwargs):
         super().__init__(**kwargs)
         self.initial_health = initial_health
+
+    @property
+    def health(self):
+        """
+        The agent's health throughout the simulation trajectory.
+
+        The health must always be between 0 and 1.
+        """
+        return self._health
+
+    @health.setter
+    def health(self, value):
+        assert type(value) in [int, float], "Health must be a numeric value."
+        assert 0 <= value <= 1, "Health must be between 0 and 1."
+        self._health = value
     
     @property
     def initial_health(self):
+        """
+        The agent's initial health between 0 and 1.
+        """
         return self._initial_health
     
     @initial_health.setter
@@ -124,3 +138,11 @@ class HealthAgent(GridWorldAgent):
         assert type(value) in [int, float], "Initial health must be a numeric value."
         assert 0 < value <= 1, "Initial value must be between 0 and 1."
         self._initial_health = value
+
+    @property
+    def is_alive(self):
+        """
+        The agent "is alive" if its health is greater than 0.
+        """
+        return self.health > 0
+
