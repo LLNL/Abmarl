@@ -5,7 +5,7 @@ import numpy as np
 from gym.spaces import Box, Discrete
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.state import HealthState
+from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 
 
@@ -55,13 +55,26 @@ class MoveActor(ActorBaseComponent):
     """
     Agents can move to unoccupied nearby squares.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, position_state=None, **kwargs):
         super().__init__(**kwargs)
+        self.position_state = position_state
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Box(
                     -agent.move_range, agent.move_range, (2,), np.int
                 )
+
+    @property
+    def position_state(self):
+        """
+        PositionState component that manages the state of the agents' positions.
+        """
+        return self._position_state
+
+    @position_state.setter
+    def position_state(self, value):
+        assert isinstance(value, PositionState), "Position state must be a PositionState object."
+        self._position_state = value
 
     @property
     def key(self):
@@ -90,12 +103,8 @@ class MoveActor(ActorBaseComponent):
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
             new_position = agent.position + action
-            if 0 <= new_position[0] < self.rows and \
-                    0 <= new_position[1] < self.cols and \
-                    self.grid[new_position[0], new_position[1]] is None:
-                self.grid[agent.position[0], agent.position[1]] = None
-                agent.position = new_position
-                self.grid[agent.position[0], agent.position[1]] = agent
+            self.position_state.update(agent, new_position)
+
 
 class AttackActor(ActorBaseComponent):
     """
