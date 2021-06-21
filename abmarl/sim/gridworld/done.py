@@ -35,33 +35,30 @@ class DoneBaseComponent(GridWorldBaseComponent, ABC):
         pass
 
 
-class DeadDone(DoneBaseComponent):
+class ActiveDone(DoneBaseComponent):
     """
-    Dead agents are indicated as done. Additionally, the simulation is over when
-    all the agents are dead.
+    Inactive agents are indicated as done.
     """
-
     def get_done(self, agent, **kwargs):
         """
-        Return True if the agent is dead. Otherwise, return False.
+        Return True if the agent is inactive. Otherwise, return False.
         """
-        if isinstance(agent, HealthAgent):
-            return not agent.active
+        return not agent.active
 
     def get_all_done(self, **kwargs):
         """
-        Return True if all agents are dead. Otherwise, return False.
+        Return True if all agents are inactive. Otherwise, return False.
         """
         for agent in self.agents.values():
-            if isinstance(agent, HealthAgent):
-                if agent.active:
-                    return False
+            if agent.active:
+                return False
         return True
 
 
+# TODO: How to capture this when some agents should not be considered, ex: Walls...
 class TeamDeadDone:
     """
-    Dead agents are indicated as done. Additionally, the simulation is over when
+    Inactive agents are indicated as done. Additionally, the simulation is over when
     the only agents remaining are on the same team.
     """
     def __init__(self, agents=None, number_of_teams=None, **kwargs):
