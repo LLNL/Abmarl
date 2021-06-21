@@ -264,31 +264,3 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     def confiured(self):
         return super().configured and self.attack_range is not None and \
             self.attack_strength is not None and self.attack_accuracy is not None
-
-
-class BroadcastingAgent(ActingAgent, GridWorldAgent):
-    """
-    Agents can broadcast their observations to other agents.
-    """
-    def __init__(self, broadcast_range, **kwargs):
-        super().__init__(**kwargs)
-        self.broadcast_range = broadcast_range
-
-    @property
-    def broadcast_range(self):
-        """
-        The range of the broadcast, centered around the agent's position.
-
-        Broadcast range must be a nonnegative integer.
-        """
-        return self._broadcast_range
-
-    @broadcast_range.setter
-    def broadcast_range(self, value):
-        assert type(value) is int, "Broadcast range must be an integer."
-        assert 0 <= value, "Broadcast range must be a nonnegative integer."
-        self._broadcast_range = value
-
-    @property
-    def configured(self):
-        return super().configured and self.broadcast_range is not None
