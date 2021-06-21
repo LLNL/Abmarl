@@ -157,9 +157,6 @@ class AttackActor(ActorBaseComponent):
     def number_of_teams(self):
         """
         The number of teams in the simulation.
-
-        The default is 0, which indicates that there are no teams, so attacking
-        is "free-for-all".
         """
         return self._number_of_teams
 
@@ -177,8 +174,13 @@ class AttackActor(ActorBaseComponent):
             team_matrix[attacking_team, attacked_team] = 0 or 1.
         0 indicates it cannot attack, 1 indicates that it can.
 
+        The team attack matrix must be (number_of_teams + 1) x (number_of_teams + 1)
+        in order to define the behavior of agents who do not have a team. Agents
+        without a team are treated as "team 0", and their "attackability" should
+        be specified using the 0th column and 0th row of the team attack matrix.
+
         If this is not specified, we build one that allows agents to attack any
-        other team, including agents who do not have a team.
+        other team. Agents who do not have a team cannot attack nor be attacked.
         """
         return self._team_attack_matrix
 
@@ -186,10 +188,11 @@ class AttackActor(ActorBaseComponent):
     def team_attack_matrix(self, value):
         if value is None:
             self._team_attack_matrix = -np.diag(np.ones(self.number_of_teams+1)) + 1
-            self._team_attack_matrix[0, 0] = 1
+            self._team_attack_matrix[0, :] = 0
+            self._team_attack_matrix[:, 0] = 0
         else:
             assert type(value) is np.ndarray, "Team attack matrix must be a numpy array."
-            assert value.shape == (self.number_of_teams, self._number_of_teams), \
+            assert value.shape == (self.number_of_teams + 1, self._number_of_teams + 1), \
                 "Team attack matrix size must be (number_of_teams x number_of_teams.)"
             self._team_attack_matrix = value
 
@@ -225,6 +228,7 @@ class AttackActor(ActorBaseComponent):
         """
         # "Kernel" for determining if an agent was attacked
         # TODO: search the nearby grid, not the dict of agents.
+        # TODO: Walls should block attack like they block view.
         def determine_attack(attacking_agent):
             for attacked_agent in self.agents.values():
                 if attacked_agent.id == attacking_agent.id:

@@ -81,7 +81,7 @@ class GridWorldAgent(PrincipleAgent):
     def confiured(self):
         return super().configured and self.encoding is not None
 
-class GridObservingAgent(GridWorldAgent, ObservingAgent):
+class GridObservingAgent(ObservingAgent, GridWorldAgent):
     """
     Observe the grid up to view_range cells.
 
@@ -110,7 +110,7 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
         return super().configured and self.view_range is not None
 
 
-class MovingAgent(GridWorldAgent, ActingAgent):
+class MovingAgent(ActingAgent, GridWorldAgent):
     """
     Move up to move_range cells.
     """
@@ -196,18 +196,19 @@ class TeamAgent(GridWorldAgent):
     @property
     def team(self):
         """
-        The agent's team must be an integer.
+        The agent's team must be a positive integer.
         """
         return self._team
 
     @team.setter
     def team(self, value):
-        assert type(value) is int, "Team must be an integer."
+        assert type(value) is int and 0 < value, "Team must be a positive integer."
         self._team = value
 
     @property
     def configured(self):
         return super().configured and self.team is not None
+
 
 class AttackingAgent(ActingAgent, GridWorldAgent):
     """
