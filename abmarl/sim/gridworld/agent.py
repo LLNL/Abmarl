@@ -151,13 +151,14 @@ class HealthAgent(GridWorldAgent):
         """
         The agent's health throughout the simulation trajectory.
 
-        The health must always be between 0 and 1.
+        The health will always be between 0 and 1.
         """
         return self._health
 
     @health.setter
     def health(self, value):
         assert type(value) in [int, float], "Health must be a numeric value."
+        self._health = min(max(value, 0), 1)
         assert 0 <= value <= 1, "Health must be between 0 and 1."
         self._health = value
     

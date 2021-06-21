@@ -133,3 +133,39 @@ class PositionState(StateBaseComponent):
             self.grid[agent.position[0], agent.position[1]] = agent
 
 
+class HealthState(StateBaseComponent):
+    """
+    Manage the state of the agents' healths.
+
+    Every HealthAgent has a health. If that health falls to zero, that agent dies
+    and is remove from the grid.
+    """
+    def reset(self, **kwargs):
+        """
+        Give HealthAgents their starting healths.
+
+        We use the agent's initial health if it exists. Otherwise, we randomly
+        assign a value between 0 and 1.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, HealthAgent):
+                if agent.initial_health is not None:
+                    agent.health = agent.initial_health
+                else:
+                    agent.health = np.random.uniform(0, 1)
+
+    def update(self, agent, new_health, **kwargs):
+        """
+        Attempt to update the agent's health.
+
+        If the health falls to zero, then the agent is removed from the grid.
+
+        Args:
+            agent: The agent whose health we attempt to update.
+            new_position: The new health.
+        """
+        if isinstance(agent, HealthAgent):
+            agent.health = new_health
+            if not agent.is_alive:
+                self.grid[agent.position[0], agent.position[1]] = None
+                agent.position = None
