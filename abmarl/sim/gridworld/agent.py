@@ -86,11 +86,24 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
     Observe the grid up to view_range cells.
 
     Attributes:
-        view_range: The number of cells this agent can observe in each step.
+        view_range: 
     """
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
         self.view_range = view_range
+    
+    @property
+    def view_range(self):
+        """
+        The number of cells "away" this agent can observe in each step.
+        """
+        return self._view_range
+
+    @view_range.setter
+    def view_range(self, value):
+        assert type(value) is int, "View range must be an integer."
+        assert 0 <= value, "View range must be a nonnegative integer."
+        self._view_range = value
 
     @property
     def confiured(self):

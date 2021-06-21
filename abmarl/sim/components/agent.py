@@ -25,35 +25,6 @@ class LifeObservingAgent(ObservingAgent, ComponentAgent): pass
 class HealthObservingAgent(ObservingAgent, ComponentAgent): pass
 
 
-# ----------------- #
-# --- Observing --- #
-# ----------------- #
-
-# TODO: move this to a more specific location
-class AgentObservingAgent(ObservingAgent, ComponentAgent):
-    """
-    Agents can observe other agents.
-
-    agent_view (int):
-        Any agent within this many spaces will be fully observed.
-    """
-    def __init__(self, agent_view=None, **kwargs):
-        """
-        Agents can see other agents up to some maximal distance away, indicated
-        by the view.
-        """
-        super().__init__(**kwargs)
-        assert agent_view is not None, "agent_view must be nonnegative integer"
-        self.agent_view = agent_view
-
-    @property
-    def configured(self):
-        """
-        Agents are configured if the agent_view parameter is set.
-        """
-        return super().configured and self.agent_view is not None
-
-
 # ----------------------------- #
 # --- Position and Movement --- #
 # ----------------------------- #
