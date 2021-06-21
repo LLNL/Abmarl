@@ -77,6 +77,10 @@ class GridWorldAgent(PrincipleAgent):
         assert type(value) is bool, "View blocking must be either True or False."
         self._view_blocking = value
 
+    @property
+    def confiured(self):
+        return super().configured and self.encoding is not None
+
 class GridObservingAgent(GridWorldAgent, ObservingAgent):
     """
     Observe the grid up to view_range cells.
@@ -87,6 +91,10 @@ class GridObservingAgent(GridWorldAgent, ObservingAgent):
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
         self.view_range = view_range
+
+    @property
+    def confiured(self):
+        return super().configured and self.view_range is not None
 
 
 class MovingAgent(GridWorldAgent, ActingAgent):
@@ -99,6 +107,10 @@ class MovingAgent(GridWorldAgent, ActingAgent):
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.move_range = move_range
+
+    @property
+    def confiured(self):
+        return super().configured and self.move_range is not None
 
 
 class HealthAgent(GridWorldAgent):
