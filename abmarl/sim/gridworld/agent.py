@@ -184,3 +184,59 @@ class TeamAgent(GridWorldAgent):
     @property
     def configured(self):
         return super().configured and self.team is not None
+
+class AttackingAgent(ActingAgent, GridWorldAgent):
+    """
+    Agents that can attack other agents.
+    """
+    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, 
+            **kwargs):
+        super().__init__(**kwargs)
+        self.attack_range = attack_range
+        self.attack_strength = attack_strength
+        self.attack_accuracy = attack_accuracy
+
+    @property
+    def attack_range(self):
+        """
+        The maximum range of the attack.
+        """
+        return self._attack_range
+
+    @attack_range.setter
+    def attack_range(self, value):
+        assert type(value) is int, "Attack range must be an integer."
+        assert 0 <= value, "Attack range must be a nonnegative integer."
+        self._attack_range = value
+
+    @property
+    def attack_strength(self):
+        """
+        How much of the attacked agent's health is depleted.
+        """
+        return self._attack_strength
+
+    @attack_strength.setter
+    def attack_strength(self, value):
+        assert type(value) in [int, float], "Attack strength must be a numeric value."
+        assert 0 <= value <= 1, "Attack strength must be between 0 and 1."
+        self._attack_strength = value
+
+    @property
+    def attack_accuracy(self):
+        """
+        The effective accuracy of the agent's attack. Should be between 0 and 1.
+        To make deterministic attacks, use 1.
+        """
+        return self._attack_accuracy
+
+    @attack_accuracy.setter
+    def attack_accuracy(self, value):
+        assert type(value) in [int, float], "Attack accuracy must be a numeric value."
+        assert 0 <= value <= 1, "Attack accuracy must be between 0 and 1."
+        self._attack_accuracy = value
+    
+    @property
+    def confiured(self):
+        return super().configured and self.attack_range is not None and \
+            self.attack_strength is not None and self.attack_accuracy is not None
