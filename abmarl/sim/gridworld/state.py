@@ -166,6 +166,6 @@ class HealthState(StateBaseComponent):
         """
         if isinstance(agent, HealthAgent):
             agent.health = new_health
-            if not agent.is_alive:
+            if not agent.active:
                 self.grid[agent.position[0], agent.position[1]] = None
                 agent.position = None

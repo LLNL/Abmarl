@@ -232,7 +232,7 @@ class AttackActor(ActorBaseComponent):
                 elif not isinstance(attacked_agent, HealthAgent):
                     # Attacked agent must be "attackable"
                     continue
-                elif not attacked_agent.is_alive:
+                elif not attacked_agent.active:
                     # Cannot attack a dead agent
                     continue
                 elif np.linalg.norm(

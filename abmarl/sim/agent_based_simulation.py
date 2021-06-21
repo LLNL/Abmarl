@@ -29,6 +29,17 @@ class PrincipleAgent:
     def seed(self, value):
         assert value is None or type(value) is int, "Seed must be an integer."
         self._seed = value
+    
+    @property
+    def active(self):
+        """
+        True if the agent is still active in the simulation.
+
+        Active means that the agent is in a valid state. For exmaple, if agents
+        can die, then active is True if the agents are alive or False if they're
+        dead.
+        """
+        return True
 
     @property
     def configured(self):

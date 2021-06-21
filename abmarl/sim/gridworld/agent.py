@@ -176,9 +176,9 @@ class HealthAgent(GridWorldAgent):
         self._initial_health = value
 
     @property
-    def is_alive(self):
+    def active(self):
         """
-        The agent "is alive" if its health is greater than 0.
+        The agent is active if its health is greater than 0.
         """
         return self.health > 0
 

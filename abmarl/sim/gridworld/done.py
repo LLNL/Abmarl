@@ -46,7 +46,7 @@ class DeadDone(DoneBaseComponent):
         Return True if the agent is dead. Otherwise, return False.
         """
         if isinstance(agent, HealthAgent):
-            return not agent.is_alive
+            return not agent.active
 
     def get_all_done(self, **kwargs):
         """
@@ -54,7 +54,7 @@ class DeadDone(DoneBaseComponent):
         """
         for agent in self.agents.values():
             if isinstance(agent, HealthAgent):
-                if agent.is_alive:
+                if agent.active:
                     return False
         return True
 
@@ -88,7 +88,7 @@ class TeamDeadDone:
             True if the agent is dead. Otherwise, return False.
         """
         if isinstance(agent, HealthAgent):
-            return not agent.is_alive
+            return not agent.active
 
     def get_all_done(self, **kwargs):
         """
@@ -98,6 +98,6 @@ class TeamDeadDone:
         """
         team = np.zeros(self.number_of_teams)
         for agent in self.agents.values():
-            if isinstance(agent, HealthAgent) and isinstance(agent, TeamAgent) and agent.is_alive:
+            if isinstance(agent, HealthAgent) and isinstance(agent, TeamAgent) and agent.active:
                 team[agent.team] += 1
         return sum(team != 0) <= 1
