@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from gym.spaces import Box
+from gym.spaces import Box, Discrete
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.state import HealthState, BroadcastState
@@ -113,6 +113,9 @@ class AttackActor(ActorBaseComponent):
         self.attack_norm = attack_norm
         self.number_of_teams = number_of_teams
         self.team_attack_matrix = team_attack_matrix
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.action_space[self.key] = Discrete(2)
 
     @property
     def health_state(self):
@@ -253,6 +256,9 @@ class BroadcastActor(ActorBaseComponent):
     def __init__(self, broadcast_state, **kwargs):
         super().__init__(**kwargs)
         self.broadcast_state = broadcast_state
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.action_space[self.key] = Discrete(2)
     
     @property
     def broadcast_state(self):
