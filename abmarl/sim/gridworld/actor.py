@@ -256,6 +256,6 @@ class AttackActor(ActorBaseComponent):
             if action: # Agent has chosen to attack
                 attacked_agent = determine_attack(attacking_agent)
                 if attacked_agent is not None:
-                    self.health_state.set_health(
+                    self.health_state.update(
                         attacked_agent, attacked_agent.health - attacking_agent.attack_strength
                     )
