@@ -108,9 +108,6 @@ class GridWorldBaseComponent(ABC):
     """
     def __init__(self, agents=None, grid=None, **kwargs):
         self.agents = agents
-        self.grid = grid
-        self._rows = grid.shape[0]
-        self._cols = grid.shape[1]
 
     @property
     def agents(self):
@@ -129,35 +126,3 @@ class GridWorldBaseComponent(ABC):
             assert agent_id == agent.id, \
                 "Keys of agents dict must be the same as the Agent's id."
         self._agents = value_agents
-
-    @property
-    def rows(self):
-        """
-        The number of rows in the grid.
-        """
-        return self._rows
-
-    @property
-    def cols(self):
-        """
-        The number of columns in the grid.
-        """
-        return self._cols
-
-    @property
-    def grid(self):
-        """
-        The grid indexes the agents by their position.
-
-        For example, an agent whose position is (3, 2) can be accessed through
-        the grid with self.grid[3, 2]. Components are responsible for maintaining
-        the connection between agent position and grid index.
-        """
-        return self._grid
-
-    @grid.setter
-    def grid(self, value):
-        assert type(value) is np.ndarray, "The grid must be a numpy array."
-        assert len(value.shape) == 2, "The grid must be a 2-dimensional array."
-        assert value.dtype is np.dtype(object), "The grid must be a numpy array of objects."
-        self._grid = value
