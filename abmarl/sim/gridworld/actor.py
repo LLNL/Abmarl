@@ -214,7 +214,7 @@ class AttackActor(ActorBaseComponent):
         The processing goes through a series of checks. The attack is possible
         if there is an attacked agent such that:
         1. The attacked agent is a HealthAgent.
-        2. The attacked agent is alive.
+        2. The attacked agent is active.
         3. The attacked agent is within range.
         4. The attacked agent is attackable according to the team attack matrix.
         

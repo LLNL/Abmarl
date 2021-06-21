@@ -43,7 +43,7 @@ class GridSim(GridWorldSimulation):
         self.grid_state = PositionState(**kwargs)
 
         # Action Components
-        self.move_actor = MoveActor(**kwargs)
+        self.move_actor = MoveActor(position_state=self.grid_state, **kwargs)
 
         # Observation Components
         self.grid_observer = GridObserver(**kwargs)
@@ -56,7 +56,8 @@ class GridSim(GridWorldSimulation):
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            self.move_actor.process_action(agent, action, **kwargs)
+            if agent.active:
+                self.move_actor.process_action(agent, action, **kwargs)
 
     def render(self, fig=None, **kwargs):
         fig.clear()

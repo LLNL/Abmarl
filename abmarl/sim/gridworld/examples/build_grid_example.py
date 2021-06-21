@@ -1,7 +1,7 @@
 
 from matplotlib import pyplot as plt
 
-from abmarl.sim.gridworld.gridworld_example import WallAgent, ExploringAgent, GridSim
+from abmarl.sim.gridworld.examples.gridworld_example import WallAgent, ExploringAgent, GridSim
 
 object_registry = {
     'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
