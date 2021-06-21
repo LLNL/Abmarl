@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-
+from abmarl.sim.gridworld.agent import HealthAgent
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):
     """
@@ -57,6 +57,17 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
         """
         pass
 
+    @abstractmethod
+    def update(self, agent, value, **kwargs):
+        """
+        Update the simulation state.
+
+        Args:
+            agent: The agent whose state we will attempt to update.
+            value: The proposed value for that agent.
+        """
+        pass
+
 
 class PositionState(StateBaseComponent):
     """
@@ -64,9 +75,6 @@ class PositionState(StateBaseComponent):
 
     Every agent occupies a unique cell.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def reset(self, **kwargs):
         """
         Give agents their starting positions.
@@ -105,3 +113,23 @@ class PositionState(StateBaseComponent):
                 c = cs[ndx]
                 agent.position = np.array([r, c])
                 self.grid[r, c] = agent
+
+    def update(self, agent, new_position, **kwargs):
+        """
+        Attempt to update the position of the agent.
+
+        If the new_position is inside the grid and not already occupied, then the
+        agent will move to that new position.
+
+        Args:
+            agent: The agent whose position we attempt to update.
+            new_position: The new position. This must be a 2-element numpy array.
+        """
+        if 0 <= new_position[0] < self.rows and \
+                0 <= new_position[1] < self.cols and \
+                self.grid[new_position[0], new_position[1]] is None:
+            self.grid[agent.position[0], agent.position[1]] = None
+            agent.position = new_position
+            self.grid[agent.position[0], agent.position[1]] = agent
+
+
