@@ -5,8 +5,8 @@ import numpy as np
 from gym.spaces import Box
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.state import HealthState
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
+from abmarl.sim.gridworld.state import HealthState, BroadcastState
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent, BroadcastingAgent
 
 
 class ActorBaseComponent(GridWorldBaseComponent, ABC):
@@ -247,3 +247,44 @@ class AttackActor(ActorBaseComponent):
                     self.health_state.set_health(
                         attacked_agent, attacked_agent.health - attacking_agent.attack_strength
                     )
+
+
+class BroadcastActor(ActorBaseComponent):
+    def __init__(self, broadcast_state, **kwargs):
+        super().__init__(**kwargs)
+        self.broadcast_state = broadcast_state
+    
+    @property
+    def broadcast_state(self):
+        """
+        Manage the broadcasting state of the simulation.
+        """
+        return self._broadcast_state
+    
+    @broadcast_state.setter
+    def broadcast_state(self, value):
+        assert isinstance(value, BroadcastState), \
+            "Broadcast State must be a BroadcastState object."
+        self._broadcast_state = value
+    
+    @property
+    def key(self):
+        """
+        This Actors key is "broadcast".
+        """
+        return 'broadcast'
+    
+    @property
+    def supported_agent_type(self):
+        """
+        This Actor works with BroadcastingAgents.
+        """
+        return BroadcastingAgent
+    
+    def process_action(self, agent, action_dict, **kwargs):
+        """
+        If the agent has chosen to broadcat, then update the broadcasting state.
+        """
+        if isinstance(agent, self.supported_agent_type):
+            action = action_dict[self.key]
+            self.broadcast_state.set_broadcast(agent, action)

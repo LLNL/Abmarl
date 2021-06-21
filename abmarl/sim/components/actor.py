@@ -8,45 +8,6 @@ from abmarl.sim.components.agent import AttackingAgent, GridMovementAgent, Harve
     CollisionAgent, BroadcastingAgent
 
 
-# --------------------- #
-# --- Communication --- #
-# --------------------- #
-
-class BroadcastActor(Actor):
-    """
-    BroadcastingAgents can choose to broadcast in this step or not.
-
-    broadcast_state (BroadcastState):
-        The broadcast state handler. Needed to modifying the agents' broadcasting state.
-
-    agents (dict):
-        Dictionary of agents.
-    """
-    def __init__(self, broadcast_state=None, **kwargs):
-        super().__init__(
-            instance=BroadcastingAgent,
-            space_func=lambda agent: Discrete(2),
-            **kwargs
-        )
-        self.broadcast_state = broadcast_state
-
-    def process_action(self, agent, action_dict, **kwargs):
-        """
-        Determine the agents new broadcasting state based on its action.
-
-        return: bool
-            The agent's broadcasting state.
-        """
-        broadcasting = self._get_action_from_dict(action_dict)
-        self.broadcast_state.modify_broadcast(agent, broadcasting)
-
-    @property
-    def channel(self):
-        return 'broadcast'
-
-    @property
-    def null_value(self):
-        return False
 
 
 # ----------------------------- #
