@@ -224,6 +224,7 @@ class AttackActor(ActorBaseComponent):
         the effects of the attack and updates the simulation state.
         """
         # "Kernel" for determining if an agent was attacked
+        # TODO: search the nearby grid, not the dict of agents.
         def determine_attack(attacking_agent):
             for attacked_agent in self.agents.values():
                 if attacked_agent.id == attacking_agent.id:
