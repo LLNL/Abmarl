@@ -115,10 +115,9 @@ class AttackActor(ActorBaseComponent):
     chosen. The effectiveness of the attack is determined by the attacking agent's
     strength and accuracy.
     """
-    def __init__(self, health_state=None, attack_norm=np.inf, **kwargs):
+    def __init__(self, health_state=None, **kwargs):
         super().__init__(**kwargs)
         self.health_state = health_state
-        self.attack_norm = attack_norm
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Discrete(2)
@@ -134,21 +133,6 @@ class AttackActor(ActorBaseComponent):
     def health_state(self, value):
         assert isinstance(value, HealthState), "Health state must be a HealthState object."
         self._health_state = value
-
-    @property
-    def attack_norm(self):
-        """
-        Norm used to measure the distance between agents.
-
-        Attack norm must be a positive integer or np.inf.
-        """
-        return self._attack_norm
-
-    @attack_norm.setter
-    def attack_norm(self, value):
-        assert (type(value) is int and 0 < value) or value == np.inf, \
-            "Attack norm must be a positive integer or np.inf"
-        self._attack_norm = value
 
     @property
     def key(self):
@@ -195,7 +179,7 @@ class AttackActor(ActorBaseComponent):
                     continue
                 elif np.linalg.norm(
                             attacking_agent.position - attacked_agent.position,
-                            self.attack_norm
+                            np.inf
                         ) > attacking_agent.attack_range:
                     # Agent is too far away
                     continue
