@@ -14,7 +14,8 @@ authors:
     affiliation: 1
 affiliations:
  - name: Lawrence Livermore National Laboratory
-date: 10 June 2021 # TODO: Update this!
+   index: 1
+date: 10 June 2021
 bibliography: paper.bib
 ---
 
