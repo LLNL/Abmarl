@@ -120,9 +120,10 @@ class AttackActor(ActorBaseComponent):
     chosen. The effectiveness of the attack is determined by the attacking agent's
     strength and accuracy.
     """
-    def __init__(self, health_state=None, **kwargs):
+    def __init__(self, health_state=None, attack_mapping=None, **kwargs):
         super().__init__(**kwargs)
         self.health_state = health_state
+        self.attack_mapping = attack_mapping
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Discrete(2)
@@ -138,6 +139,34 @@ class AttackActor(ActorBaseComponent):
     def health_state(self, value):
         assert isinstance(value, HealthState), "Health state must be a HealthState object."
         self._health_state = value
+
+    @property
+    def attack_mapping(self):
+        """
+        Dict that dictacts which agents the attacking agent can attack.
+
+        The dictionary maps the attacking agents' encodings to a list of encodings
+        that they can attack. For example, the folowing attack_mapping:
+        {
+            1: [3, 4, 5],
+            3: [2, 3],
+        }
+        means that agents whose encoding is 1 can attack other agents whose encodings
+        are 3, 4, or 5; and agents whose encoding is 3 can attack other agents whose
+        encodings are 2 or 3.
+        """
+        return self._attack_mapping
+
+    @attack_mapping.setter
+    def attack_mapping(self, value):
+        assert type(value) is dict, "Attack mapping must be dictionary."
+        for k, v in value.items():
+            assert type(k) is int, "All keys in attack mapping must be integer."
+            assert type(v) is list, "All values in attack mapping must be list."
+            for i in v:
+                assert type(i) is int, \
+                    "All elements in the attack mapping values must be integers."
+        self._attack_mapping = value
 
     @property
     def key(self):
@@ -159,9 +188,9 @@ class AttackActor(ActorBaseComponent):
 
         The processing goes through a series of checks. The attack is possible
         if there is an attacked agent such that:
-        1. The attacked agent is a HealthAgent.
-        2. The attacked agent is active.
-        3. The attacked agent is within range.
+        1. The attacked agent is active.
+        2. The attacked agent is within range.
+        3. The attacked agent is valid according to the attack_mapping.
         
         If the attack is possible, then we determine the success of the attack
         based on the attacking agent's accuracy. If the attack is successful, then
@@ -277,9 +306,10 @@ class AttackActor(ActorBaseComponent):
                         continue
                     if other.id == agent.id: # Cannot attack yourself
                         continue
-                    if not isinstance(other, HealthAgent): # Cannot attack this agent
-                        continue
                     elif not other.active: # Cannot attack inactive agents
+                        continue
+                    elif other.encoding not in self.attack_mapping[agent.encoding]:
+                        # Cannot attack this type of agent
                         continue
                     elif np.random.uniform() > agent.attack_accuracy:
                         continue
@@ -290,7 +320,7 @@ class AttackActor(ActorBaseComponent):
             action = action_dict[self.key]
             if action: # Agent has chosen to attack
                 attacked_agent = determine_attack(attacking_agent)
-                if attacked_agent is not None:
+                if attacked_agent is not None and isinstance(attacked_agent, HealthAgent):
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
                         self.grid[attacked_agent.position[0], attacked_agent.position[1]] = None

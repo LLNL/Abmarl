@@ -169,8 +169,12 @@ if __name__ == "__main__":
     agents = {**walls, **food, **foragers, **hunters}
 
     # Create simulation
+    attack_mapping = {
+        3: [2],
+        4: [3]
+    }
     sim = GridSim.build_sim(
-        rows=8, cols=12, agents=agents
+        rows=8, cols=12, agents=agents, attack_mapping=attack_mapping
     )
     sim.reset()
     sim.render(fig=fig)
