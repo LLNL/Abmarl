@@ -6,21 +6,13 @@ import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import GridObservingAgent
+from abmarl.sim.gridworld.state import PositionState
 
 
 class ObserverBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract Observer Component base from which all observer components will inherit.
     """
-    @abstractmethod
-    def get_obs(self, agent, **kwargs):
-        """
-        Observe the state of the simulation.
-
-        Returns:
-            This agent's observation.
-        """
-        pass
 
     @property
     @abstractmethod
@@ -43,6 +35,19 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
 
         If an agent is this type, the Observer will add its entry to the
         agent's observation space and will produce observations for this agent.
+        """
+        pass
+
+    @abstractmethod
+    def get_obs(self, agent, **kwargs):
+        """
+        Observe the state of the simulation.
+
+        Args:
+            agent: The agent for which we return an observation.
+
+        Returns:
+            This agent's observation.
         """
         pass
 

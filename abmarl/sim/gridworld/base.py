@@ -104,31 +104,13 @@ class GridWorldBaseComponent(ABC):
     """
     Component base class from which all components will inherit.
 
-    Every component has access to the dictionary of agents.
+    Every component has access to the dictionary of agents and the grid.
     """
     def __init__(self, agents=None, grid=None, **kwargs):
         self.agents = agents
         self.grid = grid
-        self._rows = grid.shape[0]
-        self._cols = grid.shape[1]
-
-    @property
-    def agents(self):
-        """
-        A dict that maps the Agent's id to the Agent object. All agents must be
-        GridWorldAgents.
-        """
-        return self._agents
-
-    @agents.setter
-    def agents(self, value_agents):
-        assert type(value_agents) is dict, "Agents must be a dict."
-        for agent_id, agent in value_agents.items():
-            assert isinstance(agent, GridWorldAgent), \
-                "Values of agents dict must be instance of GridWorldAgent."
-            assert agent_id == agent.id, \
-                "Keys of agents dict must be the same as the Agent's id."
-        self._agents = value_agents
+        self._rows = self.grid.shape[0]
+        self._cols = self.grid.shape[1]
 
     @property
     def rows(self):
@@ -161,3 +143,21 @@ class GridWorldBaseComponent(ABC):
         assert len(value.shape) == 2, "The grid must be a 2-dimensional array."
         assert value.dtype is np.dtype(object), "The grid must be a numpy array of objects."
         self._grid = value
+
+    @property
+    def agents(self):
+        """
+        A dict that maps the Agent's id to the Agent object. All agents must be
+        GridWorldAgents.
+        """
+        return self._agents
+
+    @agents.setter
+    def agents(self, value_agents):
+        assert type(value_agents) is dict, "Agents must be a dict."
+        for agent_id, agent in value_agents.items():
+            assert isinstance(agent, GridWorldAgent), \
+                "Values of agents dict must be instance of GridWorldAgent."
+            assert agent_id == agent.id, \
+                "Keys of agents dict must be the same as the Agent's id."
+        self._agents = value_agents

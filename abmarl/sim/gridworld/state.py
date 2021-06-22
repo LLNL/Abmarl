@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-
+from abmarl.sim.gridworld.agent import HealthAgent
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):
     """
@@ -24,9 +24,6 @@ class PositionState(StateBaseComponent):
 
     Every agent occupies a unique cell.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
     def reset(self, **kwargs):
         """
         Give agents their starting positions.
@@ -65,3 +62,25 @@ class PositionState(StateBaseComponent):
                 c = cs[ndx]
                 agent.position = np.array([r, c])
                 self.grid[r, c] = agent
+
+
+class HealthState(StateBaseComponent):
+    """
+    Manage the state of the agents' healths.
+
+    Every HealthAgent has a health. If that health falls to zero, that agent dies
+    and is remove from the grid.
+    """
+    def reset(self, **kwargs):
+        """
+        Give HealthAgents their starting healths.
+
+        We use the agent's initial health if it exists. Otherwise, we randomly
+        assign a value between 0 and 1.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, HealthAgent):
+                if agent.initial_health is not None:
+                    agent.health = agent.initial_health
+                else:
+                    agent.health = np.random.uniform(0, 1)

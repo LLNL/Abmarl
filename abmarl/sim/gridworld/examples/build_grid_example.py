@@ -1,10 +1,10 @@
 
 from matplotlib import pyplot as plt
 
-from abmarl.sim.gridworld.gridworld_example import WallAgent, ExploringAgent, GridSim
+from abmarl.sim.gridworld.examples.gridworld_example import WallAgent, FoodAgent, GridSim
 
 object_registry = {
-    'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
+    'A': lambda n: FoodAgent(id=f'explorer{n}', initial_health=1),
     'W': lambda n: WallAgent(id=f'wall{n}')
 }
 
