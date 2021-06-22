@@ -166,34 +166,125 @@ class AttackActor(ActorBaseComponent):
         If the attack is possible, then we determine the success of the attack
         based on the attacking agent's accuracy. If the attack is successful, then
         the attacked agent's health is depleted by the attacking agent's strength,
-        possible resulting in its death.
+        possibly resulting in its death.
         """
-        # "Kernel" for determining if an agent was attacked
-        # TODO: search the nearby grid, not the dict of agents.
-        # TODO: Walls should block attack like they block view.
-        def determine_attack(attacking_agent):
-            for attacked_agent in self.agents.values():
-                if attacked_agent.id == attacking_agent.id:
-                    # Cannot attack yourself
-                    continue
-                elif not isinstance(attacked_agent, HealthAgent):
-                    # Attacked agent must be "attackable"
-                    continue
-                elif not attacked_agent.active:
-                    # Cannot attack a dead agent
-                    continue
-                elif np.linalg.norm(
-                            attacking_agent.position - attacked_agent.position,
-                            np.inf
-                        ) > attacking_agent.attack_range:
-                    # Agent is too far away
-                    continue
-                elif np.random.uniform() > attacking_agent.attack_accuracy:
-                    # Attempted attack, but it failed
-                    continue
-                else:
-                    # The agent was successfully attacked!
-                    return attacked_agent
+        def determine_attack(agent):
+            # Generate a completely empty grid
+            local_grid = np.empty(
+                (agent.attack_range * 2 + 1, agent.attack_range * 2 + 1), dtype=object
+            )
+
+            # Copy the section of the grid around the agent's position
+            (r, c) = agent.position
+            r_lower = max([0, r - agent.attack_range])
+            r_upper = min([self.rows - 1, r + agent.attack_range]) + 1
+            c_lower = max([0, c - agent.attack_range])
+            c_upper = min([self.cols - 1, c + agent.attack_range]) + 1
+            local_grid[
+                (r_lower+agent.attack_range-r):(r_upper+agent.attack_range-r),
+                (c_lower+agent.attack_range-c):(c_upper+agent.attack_range-c)
+            ] = self.grid[r_lower:r_upper, c_lower:c_upper]
+
+            # Generate an observation mask. The agent's observation can be blocked
+            # by other view-blocking agents, which hide the cells "behind" them. We
+            # calculate the blocking by drawing rays from the center of the agent's
+            # position to the edges of the other agents' cell. All cells that are "behind"
+            # that cell and between the two rays are invisible to the observing agent.
+            # In the mask, 1 means that the cell is visibile, 0 means that it is
+            # invisible.
+            mask = np.ones((2 * agent.attack_range + 1, 2 * agent.attack_range + 1))
+            for other in self.agents.values():
+                if other.view_blocking:
+                    r_diff, c_diff = other.position - agent.position
+                    # Ensure the other agent within the view range
+                    if -agent.attack_range <= r_diff <= agent.attack_range and \
+                            -agent.attack_range <= c_diff <= agent.attack_range:
+                        if c_diff > 0 and r_diff == 0: # Other is to the right of agent
+                            upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                            lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                            for c in range(c_diff, agent.attack_range+1):
+                                for r in range(-agent.attack_range, agent.attack_range+1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if lower(c) < r < upper(c):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff > 0 and r_diff > 0: # Other is below-right of agent
+                            upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                            lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                            for c in range(c_diff, agent.attack_range+1):
+                                for r in range(r_diff, agent.attack_range+1):
+                                    if c == c_diff and r == r_diff: continue # Don't mask the other
+                                    if lower(c) < r < upper(c):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff == 0 and r_diff > 0: # Other is below the agent
+                            left = lambda t: (c_diff - 0.5) / (r_diff - 0.5) * t
+                            right = lambda t: (c_diff + 0.5) / (r_diff - 0.5) * t
+                            for c in range(-agent.attack_range, agent.attack_range+1):
+                                for r in range(r_diff, agent.attack_range+1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if left(r) < c < right(r):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff < 0 and r_diff > 0: # Other is below-left of agent
+                            upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                            lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                            for c in range(c_diff, -agent.attack_range-1, -1):
+                                for r in range(r_diff, agent.attack_range+1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if lower(c) < r < upper(c):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff < 0 and r_diff == 0: # Other is left of agent
+                            upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                            lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                            for c in range(c_diff, -agent.attack_range-1, -1):
+                                for r in range(-agent.attack_range, agent.attack_range+1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if lower(c) < r < upper(c):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff < 0 and r_diff < 0: # Other is above-left of agent
+                            upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                            lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                            for c in range(c_diff, -agent.attack_range - 1, -1):
+                                for r in range(r_diff, -agent.attack_range - 1, -1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if lower(c) < r < upper(c):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff == 0 and r_diff < 0: # Other is above the agent
+                            left = lambda t: (c_diff - 0.5) / (r_diff + 0.5) * t
+                            right = lambda t: (c_diff + 0.5) / (r_diff + 0.5) * t
+                            for c in range(-agent.attack_range, agent.attack_range+1):
+                                for r in range(r_diff, -agent.attack_range - 1, -1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if left(r) < c < right(r):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+                        elif c_diff > 0 and r_diff < 0: # Other is above-right of agent
+                            upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                            lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                            for c in range(c_diff, agent.attack_range+1):
+                                for r in range(r_diff, -agent.attack_range - 1, -1):
+                                    if c == c_diff and r == r_diff: continue # don't mask the other
+                                    if lower(c) < r < upper(c):
+                                        mask[r + agent.attack_range, c + agent.attack_range] = 0
+
+            # Convolve the local grid with the mask.
+            local_grid_size = (2 * agent.attack_range + 1)
+            rs, cs = np.unravel_index(
+                np.random.choice(local_grid_size ** 2, local_grid_size ** 2, False),
+                shape=(local_grid_size, local_grid_size)
+            )
+            for r, c in zip(rs, cs):
+                if mask[r, c]:
+                    other = local_grid[r, c]
+                    if other is None: # No agent here
+                        continue
+                    if other.id == agent.id: # Cannot attack yourself
+                        continue
+                    if not isinstance(other, HealthAgent): # Cannot attack this agent
+                        continue
+                    elif not other.active: # Cannot attack inactive agents
+                        continue
+                    elif np.random.uniform() > agent.attack_accuracy:
+                        continue
+                    else:
+                        return other
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
