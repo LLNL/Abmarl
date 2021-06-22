@@ -17,17 +17,6 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
         """
         pass
 
-    @abstractmethod
-    def update(self, agent, value, **kwargs):
-        """
-        Update the simulation state.
-
-        Args:
-            agent: The agent whose state we will attempt to update.
-            value: The proposed value for that agent.
-        """
-        pass
-
 
 class PositionState(StateBaseComponent):
     """
@@ -74,24 +63,6 @@ class PositionState(StateBaseComponent):
                 agent.position = np.array([r, c])
                 self.grid[r, c] = agent
 
-    def update(self, agent, new_position, **kwargs):
-        """
-        Attempt to update the position of the agent.
-
-        If the new_position is inside the grid and not already occupied, then the
-        agent will move to that new position.
-
-        Args:
-            agent: The agent whose position we attempt to update.
-            new_position: The new position. This must be a 2-element numpy array.
-        """
-        if 0 <= new_position[0] < self.rows and \
-                0 <= new_position[1] < self.cols and \
-                self.grid[new_position[0], new_position[1]] is None:
-            self.grid[agent.position[0], agent.position[1]] = None
-            agent.position = new_position
-            self.grid[agent.position[0], agent.position[1]] = agent
-
 
 class HealthState(StateBaseComponent):
     """
@@ -113,19 +84,3 @@ class HealthState(StateBaseComponent):
                     agent.health = agent.initial_health
                 else:
                     agent.health = np.random.uniform(0, 1)
-
-    def update(self, agent, new_health, **kwargs):
-        """
-        Attempt to update the agent's health.
-
-        If the health falls to zero, then the agent is removed from the grid.
-
-        Args:
-            agent: The agent whose health we attempt to update.
-            new_position: The new health.
-        """
-        if isinstance(agent, HealthAgent):
-            agent.health = new_health
-            if not agent.active:
-                self.grid[agent.position[0], agent.position[1]] = None
-                agent.position = None

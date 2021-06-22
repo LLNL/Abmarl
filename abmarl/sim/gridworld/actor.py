@@ -103,7 +103,12 @@ class MoveActor(ActorBaseComponent):
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
             new_position = agent.position + action
-            self.position_state.update(agent, new_position)
+            if 0 <= new_position[0] < self.rows and \
+                    0 <= new_position[1] < self.cols and \
+                    self.grid[new_position[0], new_position[1]] is None:
+                self.grid[agent.position[0], agent.position[1]] = None
+                agent.position = new_position
+                self.grid[agent.position[0], agent.position[1]] = agent
 
 
 class AttackActor(ActorBaseComponent):
@@ -160,8 +165,8 @@ class AttackActor(ActorBaseComponent):
         
         If the attack is possible, then we determine the success of the attack
         based on the attacking agent's accuracy. If the attack is successful, then
-        the attacking agent's strength is given to the Health State, which manages
-        the effects of the attack and updates the simulation state.
+        the attacked agent's health is depleted by the attacking agent's strength,
+        possible resulting in its death.
         """
         # "Kernel" for determining if an agent was attacked
         # TODO: search the nearby grid, not the dict of agents.
@@ -195,6 +200,7 @@ class AttackActor(ActorBaseComponent):
             if action: # Agent has chosen to attack
                 attacked_agent = determine_attack(attacking_agent)
                 if attacked_agent is not None:
-                    self.health_state.update(
-                        attacked_agent, attacked_agent.health - attacking_agent.attack_strength
-                    )
+                    attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                    if not attacked_agent.active:
+                        self.grid[attacked_agent.position[0], attacked_agent.position[1]] = None
+                        attacked_agent.position = None
