@@ -114,11 +114,6 @@ class MoveActor(ActorBaseComponent):
 class AttackActor(ActorBaseComponent):
     """
     Agents can attack other agents.
-
-    The other agent must be within the attack_range of the attacking agent. If
-    there are multiple attackable agents in the range, then one will be randomly
-    chosen. The effectiveness of the attack is determined by the attacking agent's
-    strength and accuracy.
     """
     def __init__(self, health_state=None, attack_mapping=None, **kwargs):
         super().__init__(**kwargs)
@@ -143,7 +138,7 @@ class AttackActor(ActorBaseComponent):
     @property
     def attack_mapping(self):
         """
-        Dict that dictacts which agents the attacking agent can attack.
+        Dict that dictates which agents the attacking agent can attack.
 
         The dictionary maps the attacking agents' encodings to a list of encodings
         that they can attack. For example, the folowing attack_mapping:
@@ -214,7 +209,7 @@ class AttackActor(ActorBaseComponent):
                 (c_lower+agent.attack_range-c):(c_upper+agent.attack_range-c)
             ] = self.grid[r_lower:r_upper, c_lower:c_upper]
 
-            # Generate an observation mask. The agent's observation can be blocked
+            # Generate an attack mask. The agent's attack can be blocked
             # by other view-blocking agents, which hide the cells "behind" them. We
             # calculate the blocking by drawing rays from the center of the agent's
             # position to the edges of the other agents' cell. All cells that are "behind"
@@ -293,7 +288,7 @@ class AttackActor(ActorBaseComponent):
                                     if lower(c) < r < upper(c):
                                         mask[r + agent.attack_range, c + agent.attack_range] = 0
 
-            # Convolve the local grid with the mask.
+            # Randomly scan the local grid for attackable agents.
             local_grid_size = (2 * agent.attack_range + 1)
             rs, cs = np.unravel_index(
                 np.random.choice(local_grid_size ** 2, local_grid_size ** 2, False),
