@@ -112,16 +112,13 @@ class AttackActor(ActorBaseComponent):
 
     The other agent must be within the attack_range of the attacking agent. If
     there are multiple attackable agents in the range, then one will be randomly
-    chosen. Attackable agents are determiend by the team_matrix. The effectiveness
-    of the attack is determined by the attacking agent's strength and accuracy.
+    chosen. The effectiveness of the attack is determined by the attacking agent's
+    strength and accuracy.
     """
-    def __init__(self, health_state=None, attack_norm=np.inf, team_attack_matrix=None,
-            number_of_teams=None, **kwargs):
+    def __init__(self, health_state=None, attack_norm=np.inf, **kwargs):
         super().__init__(**kwargs)
         self.health_state = health_state
         self.attack_norm = attack_norm
-        self.number_of_teams = number_of_teams
-        self.team_attack_matrix = team_attack_matrix
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Discrete(2)
@@ -154,49 +151,6 @@ class AttackActor(ActorBaseComponent):
         self._attack_norm = value
 
     @property
-    def number_of_teams(self):
-        """
-        The number of teams in the simulation.
-        """
-        return self._number_of_teams
-
-    @number_of_teams.setter
-    def number_of_teams(self, value):
-        assert type(value) is int and 0 <= value, "Number of teams must be a nonnegative integer."
-        self._number_of_teams = value
-
-    @property
-    def team_attack_matrix(self):
-        """
-        A matrix that indicates which teams can attack which other team.
-        
-        We use the value at the index, like so:
-            team_matrix[attacking_team, attacked_team] = 0 or 1.
-        0 indicates it cannot attack, 1 indicates that it can.
-
-        The team attack matrix must be (number_of_teams + 1) x (number_of_teams + 1)
-        in order to define the behavior of agents who do not have a team. Agents
-        without a team are treated as "team 0", and their "attackability" should
-        be specified using the 0th column and 0th row of the team attack matrix.
-
-        If this is not specified, we build one that allows agents to attack any
-        other team. Agents who do not have a team cannot attack nor be attacked.
-        """
-        return self._team_attack_matrix
-
-    @team_attack_matrix.setter
-    def team_attack_matrix(self, value):
-        if value is None:
-            self._team_attack_matrix = -np.diag(np.ones(self.number_of_teams+1)) + 1
-            self._team_attack_matrix[0, :] = 0
-            self._team_attack_matrix[:, 0] = 0
-        else:
-            assert type(value) is np.ndarray, "Team attack matrix must be a numpy array."
-            assert value.shape == (self.number_of_teams + 1, self._number_of_teams + 1), \
-                "Team attack matrix size must be (number_of_teams x number_of_teams.)"
-            self._team_attack_matrix = value
-
-    @property
     def key(self):
         """
         This Actor's key is "attack".
@@ -219,7 +173,6 @@ class AttackActor(ActorBaseComponent):
         1. The attacked agent is a HealthAgent.
         2. The attacked agent is active.
         3. The attacked agent is within range.
-        4. The attacked agent is attackable according to the team attack matrix.
         
         If the attack is possible, then we determine the success of the attack
         based on the attacking agent's accuracy. If the attack is successful, then
@@ -245,9 +198,6 @@ class AttackActor(ActorBaseComponent):
                             self.attack_norm
                         ) > attacking_agent.attack_range:
                     # Agent is too far away
-                    continue
-                elif not self.team_attack_matrix[attacking_agent.team, attacked_agent.team]:
-                    # Attacking agent cannot attack this agent
                     continue
                 elif np.random.uniform() > attacking_agent.attack_accuracy:
                     # Attempted attack, but it failed

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import HealthAgent, TeamAgent
+from abmarl.sim.gridworld.agent import HealthAgent
 
 class DoneBaseComponent(GridWorldBaseComponent, ABC):
     """
@@ -53,48 +53,3 @@ class ActiveDone(DoneBaseComponent):
             if agent.active:
                 return False
         return True
-
-
-# TODO: How to capture this when some agents should not be considered, ex: Walls...
-class TeamDeadDone:
-    """
-    Inactive agents are indicated as done. Additionally, the simulation is over when
-    the only agents remaining are on the same team.
-    """
-    def __init__(self, agents=None, number_of_teams=None, **kwargs):
-        super().__init__(**kwargs)
-        self.number_of_teams = number_of_teams
-
-    @property
-    def number_of_teams(self):
-        """
-        The number of teams in the simulation.
-
-        The number of teams must be a nonnegative integer.
-        """
-        return self._number_of_teams
-
-    @number_of_teams.setter
-    def number_of_teams(self, value):
-        assert type(value) is int and 0 <= value, "Number of teams must be a nonnegative integer."
-        self._number_of_teams = value
-
-    def get_done(self, agent, **kwargs):
-        """
-        Returns:
-            True if the agent is dead. Otherwise, return False.
-        """
-        if isinstance(agent, HealthAgent):
-            return not agent.active
-
-    def get_all_done(self, **kwargs):
-        """
-        Returns:
-            True if the only agents left alive are all on the same team. Otherwise,
-            return false.
-        """
-        team = np.zeros(self.number_of_teams)
-        for agent in self.agents.values():
-            if isinstance(agent, HealthAgent) and isinstance(agent, TeamAgent) and agent.active:
-                team[agent.team] += 1
-        return sum(team != 0) <= 1

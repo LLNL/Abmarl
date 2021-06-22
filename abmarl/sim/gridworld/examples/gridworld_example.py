@@ -4,7 +4,7 @@ import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
-    AttackingAgent, HealthAgent, TeamAgent
+    AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor
 from abmarl.sim.gridworld.observer import GridObserver
@@ -25,7 +25,7 @@ class WallAgent(GridWorldAgent):
         self.render_shape = render_shape
 
 
-class FoodAgent(HealthAgent, TeamAgent):
+class FoodAgent(HealthAgent):
     """
     Food Agents do not move and can be attacked by Foraging Agents.
     
@@ -37,7 +37,7 @@ class FoodAgent(HealthAgent, TeamAgent):
         self.encoding = encoding
 
 
-class ForagingAgent(HealthAgent, TeamAgent, AttackingAgent, MovingAgent, GridObservingAgent):
+class ForagingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
     """
     Foraging Agents can move, attack Food agents, and be attacked by Hunting agents.
     
@@ -51,7 +51,7 @@ class ForagingAgent(HealthAgent, TeamAgent, AttackingAgent, MovingAgent, GridObs
         self.render_shape = render_shape
 
 
-class HuntingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent, TeamAgent):
+class HuntingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
     """
     Hunting agents can move and attack Foraging agents.
 
@@ -152,33 +152,25 @@ if __name__ == "__main__":
         f'wall{i}': WallAgent(id=f'wall{i}', view_blocking=True) for i in range(7)
     }
     food = {
-        f'food{i}': FoodAgent(id=f'food{i}', initial_health=1, team=1) for i in range(5)
+        f'food{i}': FoodAgent(id=f'food{i}', initial_health=1) for i in range(5)
     }
     foragers = {
         f'forager{i}': ForagingAgent(
             id=f'forager{i}', initial_health=1, move_range=1, attack_range=1, attack_strength=1,
-            attack_accuracy=1, view_range=4, team=2
+            attack_accuracy=1, view_range=4
         ) for i in range(3)
     }
     hunters = {
         f'hunter{i}': HuntingAgent(
             id=f"hunter{i}", initial_health=1, move_range=1, attack_range=2, attack_strength=1,
-            attack_accuracy=1, view_range=3, team=3
+            attack_accuracy=1, view_range=3
         ) for i in range(1)
     }
     agents = {**walls, **food, **foragers, **hunters}
 
     # Create simulation
-    number_of_teams = 3
-    team_attack_matrix = np.array([
-        [0, 0, 0, 0], # Non-team agents (e.g. Walls) cannot attack anything 
-        [0, 0, 0, 0], # Food cannot attack anything
-        [0, 1, 0, 0], # Foragers can attack Food
-        [0, 0, 1, 0]  # Hunters can attack Foragers
-    ])
     sim = GridSim.build_sim(
-        rows=8, cols=12, number_of_teams=number_of_teams, team_attack_matrix=team_attack_matrix, 
-        agents=agents
+        rows=8, cols=12, agents=agents
     )
     sim.reset()
     sim.render(fig=fig)

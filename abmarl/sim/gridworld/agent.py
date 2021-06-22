@@ -176,33 +176,6 @@ class HealthAgent(GridWorldAgent):
         return self.health > 0
 
 
-class TeamAgent(GridWorldAgent):
-    """
-    Agents with team assignment.
-
-    The team value can be used to set rules for inter-agent interaction.
-    """
-    def __init__(self, team=None, **kwargs):
-        super().__init__(**kwargs)
-        self.team = team
-
-    @property
-    def team(self):
-        """
-        The agent's team must be a positive integer.
-        """
-        return self._team
-
-    @team.setter
-    def team(self, value):
-        assert type(value) is int and 0 < value, "Team must be a positive integer."
-        self._team = value
-
-    @property
-    def configured(self):
-        return super().configured and self.team is not None
-
-
 class AttackingAgent(ActingAgent, GridWorldAgent):
     """
     Agents that can attack other agents.
