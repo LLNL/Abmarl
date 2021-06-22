@@ -83,10 +83,7 @@ class GridWorldAgent(PrincipleAgent):
 
 class GridObservingAgent(ObservingAgent, GridWorldAgent):
     """
-    Observe the grid up to view_range cells.
-
-    Attributes:
-        view_range: 
+    Observe the grid up to view range cells away.
     """
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
@@ -95,14 +92,13 @@ class GridObservingAgent(ObservingAgent, GridWorldAgent):
     @property
     def view_range(self):
         """
-        The number of cells "away" this agent can observe in each step.
+        The number of cells away this agent can observe in each step.
         """
         return self._view_range
 
     @view_range.setter
     def view_range(self, value):
-        assert type(value) is int, "View range must be an integer."
-        assert 0 <= value, "View range must be a nonnegative integer."
+        assert type(value) is int and 0 <= value, "View range must be a nonnegative integer."
         self._view_range = value
 
     @property
@@ -127,8 +123,7 @@ class MovingAgent(ActingAgent, GridWorldAgent):
 
     @move_range.setter
     def move_range(self, value):
-        assert type(value) is int, "Move range must be an integer."
-        assert 0 <= value, "Move range must be a nonnegative integer."
+        assert type(value) is int and 0 <= value, "Move range must be a nonnegative integer."
         self._move_range = value
 
     @property
@@ -159,8 +154,6 @@ class HealthAgent(GridWorldAgent):
     def health(self, value):
         assert type(value) in [int, float], "Health must be a numeric value."
         self._health = min(max(value, 0), 1)
-        assert 0 <= value <= 1, "Health must be between 0 and 1."
-        self._health = value
     
     @property
     def initial_health(self):
@@ -230,14 +223,15 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
 
     @attack_range.setter
     def attack_range(self, value):
-        assert type(value) is int, "Attack range must be an integer."
-        assert 0 <= value, "Attack range must be a nonnegative integer."
+        assert type(value) is int and 0 <= value, "Attack range must be a nonnegative integer."
         self._attack_range = value
 
     @property
     def attack_strength(self):
         """
-        How much of the attacked agent's health is depleted.
+        The strength of the attack.
+
+        Should be between 0 and 1.
         """
         return self._attack_strength
 
@@ -250,8 +244,9 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     @property
     def attack_accuracy(self):
         """
-        The effective accuracy of the agent's attack. Should be between 0 and 1.
-        To make deterministic attacks, use 1.
+        The effective accuracy of the agent's attack.
+        
+        Should be between 0 and 1. To make deterministic attacks, use 1.
         """
         return self._attack_accuracy
 

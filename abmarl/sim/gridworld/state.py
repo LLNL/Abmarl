@@ -10,7 +10,6 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract State Component base from which all state components will inherit.
     """
-
     @abstractmethod
     def reset(self, **kwargs):
         """
