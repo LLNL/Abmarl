@@ -8,10 +8,11 @@ class GridWorldAgent(PrincipleAgent):
     """
     The base agent in the GridWorld.
     """
-    def __init__(self, initial_position=None, view_blocking=False, **kwargs):
+    def __init__(self, initial_position=None, view_blocking=False, overlappable=False, **kwargs):
         super().__init__(**kwargs)
         self.initial_position = initial_position
         self.view_blocking = view_blocking
+        self.overlappable = overlappable
 
     @property
     def initial_position(self):
@@ -76,6 +77,22 @@ class GridWorldAgent(PrincipleAgent):
     def view_blocking(self, value):
         assert type(value) is bool, "View blocking must be either True or False."
         self._view_blocking = value
+
+    @property
+    def overlappable(self):
+        """
+        Agents may be able to overlap each other.
+
+        Overlappable agents can overlap other overlappable agents if the Simulation
+        is using a OverlappableGrid. This means that multipe agents may be positioned
+        on the same square at the same time. Default is False.
+        """
+        return self._overlappable
+
+    @overlappable.setter
+    def overlappable(self, value):
+        assert type(value) is bool, "Overlappable must be a boolean."
+        self._overlappable = value
 
     @property
     def confiured(self):
