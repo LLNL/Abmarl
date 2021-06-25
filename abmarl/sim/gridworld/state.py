@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from abmarl.sim.gridworld.base import GridWorldBaseComponent
+from abmarl.sim.gridworld.base import GridWorldBaseComponent, NonOverlappingGrid
 from abmarl.sim.gridworld.agent import HealthAgent
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):
@@ -18,12 +18,18 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
         pass
 
 
-class PositionState(StateBaseComponent):
+class UniquePositionState(StateBaseComponent):
     """
     Manage the agent's positions in the grid.
 
     Every agent occupies a unique cell.
     """
+    @StateBaseComponent.grid.setter
+    def grid(self, value):
+        super(UniquePositionState, type(self)).grid.fset(self, value)
+        assert isinstance(value, NonOverlappingGrid), "The grid must be a NonOverlappingGrid object."
+        self._grid = value
+
     def reset(self, **kwargs):
         """
         Give agents their starting positions.
@@ -32,7 +38,7 @@ class PositionState(StateBaseComponent):
         place the agent in the grid.
         """
         # Grid lookup by position
-        self.grid.fill(None)
+        self.grid.reset()
         # Prioritize placing agents with initial positions. We must keep track
         # of which positions have been taken so that the random placement below doesn't
         # try to place an agent in an already-taken position.
