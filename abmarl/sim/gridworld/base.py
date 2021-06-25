@@ -58,10 +58,10 @@ class OverlappableGrid(Grid):
     A grid where agents can overlap.
     """
     def reset(self, **kwargs):
-        self.fill([])
+        self.fill(set())
 
     def add(self, ndx, agent):
-        self[ndx].append(agent)
+        self[ndx].add(agent)
 
     def remove(self, ndx, agent):
         self[ndx].remove(agent)
