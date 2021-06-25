@@ -122,9 +122,11 @@ class NonOverlappingGrid(Grid):
         """
         from_ndx = tuple(agent.position)
         to_ndx = tuple(to_ndx)
+        if to_ndx == from_ndx:
+            return True
         if self.query(agent, to_ndx):
-            self._place(agent, to_ndx)
             self.remove(agent, from_ndx)
+            self._place(agent, to_ndx)
             agent.position = np.array(to_ndx)
             return True
         else:
@@ -144,7 +146,9 @@ class OverlappableGrid(Grid):
     A grid where agents can overlap.
     """
     def reset(self, **kwargs):
-        self.fill(set())
+        for i in range(self.shape[0]):
+            for j in range(self.shape[1]):
+                self[i,j] = {}
 
     def query(self, agent, ndx):
         """
@@ -152,7 +156,9 @@ class OverlappableGrid(Grid):
         agent and the querying agent are overlappable.
         """
         ndx = tuple(ndx)
-        return self[ndx] is None or (next(iter(self[ndx])).overlappable and agent.overlappable)
+        return not self[ndx] or (
+            next(iter(self[ndx].values())).overlappable and agent.overlappable
+        )
 
     def place(self, agent, ndx):
         """
@@ -175,9 +181,11 @@ class OverlappableGrid(Grid):
         """
         from_ndx = tuple(agent.position)
         to_ndx = tuple(to_ndx)
-        if self.query(agent, to_ndx):
-            self._place(agent, to_ndx)
+        if to_ndx == from_ndx:
+            return True
+        elif self.query(agent, to_ndx):
             self.remove(agent, from_ndx)
+            self._place(agent, to_ndx)
             agent.position = np.array(to_ndx)
             return True
         else:
@@ -185,11 +193,11 @@ class OverlappableGrid(Grid):
 
     def remove(self, agent, ndx):
         ndx = tuple(ndx)
-        self[ndx].remove(agent)
+        del self[ndx][agent.id]
 
     def _place(self, agent, ndx):
         # Unprotected placement
-        self[ndx].add(agent)
+        self[ndx][agent.id] = agent
 
 
 class GridWorldSimulation(AgentBasedSimulation, ABC):

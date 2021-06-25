@@ -97,7 +97,7 @@ class OverlappingPositionState(StateBaseComponent):
                 r, c = agent.initial_position
                 assert self.grid.query(agent, (r, c)), "All initial positions must " + \
                     "be unique or agents with same initial positions must be overlappable."
-                self.grid.place(agent, (r, c))
+                assert self.grid.place(agent, (r, c))
                 if not agent.overlappable:
                     ravelled_positions_available.remove(
                         np.ravel_multi_index(agent.position, (self.rows, self.cols))
@@ -110,9 +110,9 @@ class OverlappingPositionState(StateBaseComponent):
         for agent in self.agents.values():
             if agent.initial_position is None and not agent.overlappable:
                 n = np.random.choice([*ravelled_positions_available], 1)
-                r, c = np.unravel_index(n, shape=(self.rows, self.cols))
-                self.grid.place(agent, (r, c))
-                ravelled_positions_available.remove(n)
+                r, c = np.unravel_index(n.item(), shape=(self.rows, self.cols))
+                assert self.grid.place(agent, (r, c))
+                ravelled_positions_available.remove(n.item())
 
         # Now place all remaining agents randomly in the available positions
         rs, cs = np.unravel_index(
@@ -123,7 +123,7 @@ class OverlappingPositionState(StateBaseComponent):
             if agent.initial_position is None and agent.overlappable:
                 r = rs[ndx]
                 c = cs[ndx]
-                self.grid.place(agent, (r, c))
+                assert self.grid.place(agent, (r, c))
 
 
 class HealthState(StateBaseComponent):
