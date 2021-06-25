@@ -101,6 +101,7 @@ class NonOverlappingGrid(Grid):
         """
         The cell is available for the agent if it is empty.
         """
+        ndx = tuple(ndx)
         return self[ndx] is None
 
     def place(self, agent, ndx):
@@ -130,6 +131,7 @@ class NonOverlappingGrid(Grid):
             return False
 
     def remove(self, agent, ndx):
+        ndx = tuple(ndx)
         self[ndx] = None
 
     def _place(self, agent, ndx):
@@ -149,6 +151,7 @@ class OverlappableGrid(Grid):
         The cell is available for the agent if it is empty or if both the occupying
         agent and the querying agent are overlappable.
         """
+        ndx = tuple(ndx)
         return self[ndx] is None or (next(iter(self[ndx])).overlappable and agent.overlappable)
 
     def place(self, agent, ndx):
@@ -181,6 +184,7 @@ class OverlappableGrid(Grid):
             return False
 
     def remove(self, agent, ndx):
+        ndx = tuple(ndx)
         self[ndx].remove(agent)
 
     def _place(self, agent, ndx):
