@@ -15,24 +15,63 @@ class Grid(np.ndarray, ABC):
     the underlying datatype used to store the agent there.
     """
     @abstractmethod
-    def add(self, ndx, agent):
+    def reset(self, **kwargs):
         """
-        Add an agent at the location in the grid.
-
-        Args:
-            ndx: A tuple for the index of the grid.
-            agent: The agent to place at this location.
+        Reset the grid to an empty state.
         """
         pass
 
     @abstractmethod
-    def remove(self, ndx, agent):
+    def place(self, agent, ndx):
         """
-        Remove an agent from the location in the grid.
+        Place an agent at an index.
+
+        If the placement is successful, the agent will be placed at that index
+        in the grid and the agent's position will be updated.
 
         Args:
-            ndx: A tuple for the index of the grid.
-            agent: The agent to remove from this location.
+            agent: The agent to place.
+            ndx: The new index for this agent.
+
+        Returns:
+            The successfulness of the placement.
+        """
+        pass
+
+    @abstractmethod
+    def move(self, agent, to_ndx):
+        """
+        Move an agent from one index to another.
+
+        If the move is successful, the agent will be placed at that index in the
+        grid and the agent's position will be updated.
+
+        Note: the agent will be removed from its old position in the grid.
+
+        Args:
+            agent: The agent to move.
+            to_ndx: The new index for this agent.
+
+        Returns:
+            The successfulness of the move.
+        """
+        pass
+
+    @abstractmethod
+    def remove(self, agent, ndx):
+        """
+        Remove an agent from an index.
+
+        Args:
+            agent: The agent to remove
+            ndx: The old index for this agent.
+        """
+        pass
+
+    @abstractmethod
+    def _place(self, agent, ndx):
+        """
+        Unprotected placement. Internal use only.
         """
         pass
 
@@ -44,13 +83,38 @@ class NonOverlappingGrid(Grid):
     def reset(self, **kwargs):
         self.fill(None)
 
-    def add(self, ndx, agent):
-        assert self[ndx] is None, \
-            f"Cannot add {agent.id} to location {ndx} because there is already an agent there."
-        self[ndx] = agent
+    def place(self, agent, ndx):
+        """
+        The placement is succesful if the new position is unoccupied.
+        """
+        ndx = tuple(ndx)
+        if self[ndx] is None:
+            self._place(agent, ndx)
+            agent.position = np.array(ndx)
+            return True
+        else:
+            return False
 
-    def remove(self, ndx, agent):
+    def move(self, agent, to_ndx):
+        """
+        The move is succesful if the new position is unoccupied.
+        """
+        from_ndx = tuple(agent.position)
+        to_ndx = tuple(to_ndx)
+        if self[to_ndx] is None:
+            self._place(agent, to_ndx)
+            self.remove(agent, from_ndx)
+            agent.position = np.array(to_ndx)
+            return True
+        else:
+            return False
+
+    def remove(self, agent, ndx):
         self[ndx] = None
+
+    def _place(self, agent, ndx):
+        # Unprotected placement
+        self[ndx] = agent
 
 
 class OverlappableGrid(Grid):
@@ -60,11 +124,41 @@ class OverlappableGrid(Grid):
     def reset(self, **kwargs):
         self.fill(set())
 
-    def add(self, ndx, agent):
-        self[ndx].add(agent)
+    def place(self, agent, ndx):
+        """
+        The placement is successful if the new position is unoccupied or if the
+        agent already occupying that position is overlappable AND this agent is
+        overlappable.
+        """
+        ndx = tuple(ndx)
+        if self[ndx] is None or (next(iter(self[ndx])).overlappable and agent.overlappable):
+            self._place(agent, ndx)
+            agent.position = np.array(ndx)
+            return True
+        else:
+            return False
 
-    def remove(self, ndx, agent):
+    def move(self, agent, to_ndx):
+        """
+        The move is successful if the new position is unoccupied or if the agent
+        already occupying that position is overlappable AND this agent is overlappable.
+        """
+        from_ndx = tuple(agent.position)
+        to_ndx = tuple(to_ndx)
+        if self[to_ndx] is None or (next(iter(self[to_ndx])).overlappable and agent.overlappable):
+            self._place(agent, to_ndx)
+            self.remove(agent, from_ndx)
+            agent.position = np.array(to_ndx)
+            return True
+        else:
+            return False
+
+    def remove(self, agent, ndx):
         self[ndx].remove(agent)
+
+    def _place(self, agent, ndx):
+        # Unprotected placement
+        self[ndx].add(agent)
 
 
 class GridWorldSimulation(AgentBasedSimulation, ABC):
