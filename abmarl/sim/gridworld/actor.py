@@ -91,11 +91,8 @@ class MoveActor(ActorBaseComponent):
             action = action_dict[self.key]
             new_position = agent.position + action
             if 0 <= new_position[0] < self.rows and \
-                    0 <= new_position[1] < self.cols and \
-                    self.grid[new_position[0], new_position[1]] is None:
-                self.grid[agent.position[0], agent.position[1]] = None
-                agent.position = new_position
-                self.grid[agent.position[0], agent.position[1]] = agent
+                    0 <= new_position[1] < self.cols:
+                self.grid.move(agent, new_position)
 
 
 class AttackActor(ActorBaseComponent):
@@ -305,5 +302,4 @@ class AttackActor(ActorBaseComponent):
                 if attacked_agent is not None and isinstance(attacked_agent, HealthAgent):
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
-                        self.grid[attacked_agent.position[0], attacked_agent.position[1]] = None
-                        attacked_agent.position = None
+                        self.grid.remove(attacked_agent, attacked_agent.position)

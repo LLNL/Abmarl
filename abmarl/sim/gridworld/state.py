@@ -46,10 +46,9 @@ class UniquePositionState(StateBaseComponent):
         for agent in self.agents.values():
             if agent.initial_position is not None:
                 r, c = agent.initial_position
-                assert self.grid[r, c] is None, f"{agent.id} has the same initial " + \
-                    f"position as {self.grid[r, c].id}. All initial positions must be unique."
+                assert self.grid.query(agent, (r, c)), "All initial positions must be unique."
                 agent.position = agent.initial_position
-                self.grid.add((r, c), agent)
+                self.grid.place(agent, (r, c))
                 ravelled_positions_taken.add(
                     np.ravel_multi_index(agent.position, (self.rows, self.cols))
                 )
@@ -67,41 +66,7 @@ class UniquePositionState(StateBaseComponent):
                 r = rs[ndx]
                 c = cs[ndx]
                 agent.position = np.array([r, c])
-                self.grid.add((r, c), agent)
-
-
-class OverlappingPositionState(StateBaseComponent):
-    """
-    Manages the agents' positions in the grid.
-
-    Multiple agents can occupy the same cell.
-    """
-    @StateBaseComponent.grid.setter
-    def grid(self, value):
-        super(OverlappingPositionState, type(self)).grid.fset(self, value)
-        assert isinstance(value, OverlappableGrid), "The grid must be a Overlappable grid."
-        self._grid = value
-
-    def reset(self, **kwargs):
-        """
-        Give agents their starting positions.
-
-        Use the agent's initial position if specified, otherwise randomly place
-        the agents in the grid.
-        """
-        self.grid.reset()
-        rs, cs = np.unravel_index(
-            np.random.choice(self.rows * self.cols, len(self.agents), True),
-            shape=(self.rows, self.cols)
-        )
-        for ndx, agent in enumerate(self.agents.values()):
-            if agent.initial_position is None:
-                r = rs[ndx]
-                c = cs[ndx]
-            else:
-                r, c = agent.initial_position
-            agent.position = np.array([r, c])
-            self.grid.add((r, c), agent)
+                self.grid.place(agent, (r, c))
 
 
 class HealthState(StateBaseComponent):
