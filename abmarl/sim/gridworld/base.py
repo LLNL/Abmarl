@@ -1,10 +1,70 @@
 
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent
+
+
+class Grid(np.ndarray, ABC):
+    """
+    A Grid is a numpy array that stores the positions of the agents.
+
+    Manages the agent positions through the add and remove functions while abstracting
+    the underlying datatype used to store the agent there.
+    """
+    @abstractmethod
+    def add(self, ndx, agent):
+        """
+        Add an agent at the location in the grid.
+
+        Args:
+            ndx: A tuple for the index of the grid.
+            agent: The agent to place at this location.
+        """
+        pass
+
+    @abstractmethod
+    def remove(self, ndx, agent):
+        """
+        Remove an agent from the location in the grid.
+
+        Args:
+            ndx: A tuple for the index of the grid.
+            agent: The agent to remove from this location.
+        """
+        pass
+
+
+class NonOverlappingGrid(Grid):
+    """
+    A grid where agents cannot overlap.
+    """
+    def reset(self, **kwargs):
+        self.fill(None)
+
+    def add(self, ndx, agent):
+        assert self[ndx] is None, \
+            f"Cannot add {agent.id} to location {ndx} because there is already an agent there."
+        self[ndx] = agent
+
+    def remove(self, ndx, agent):
+        self[ndx] = None
+
+
+class OverlappableGrid(Grid):
+    """
+    A grid where agents can overlap.
+    """
+    def reset(self, **kwargs):
+        self.fill([])
+
+    def add(self, ndx, agent):
+        self[ndx].append(agent)
+
+    def remove(self, ndx, agent):
+        self[ndx].remove(agent)
 
 
 class GridWorldSimulation(AgentBasedSimulation, ABC):
