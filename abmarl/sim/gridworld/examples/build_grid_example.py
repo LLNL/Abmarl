@@ -12,7 +12,7 @@ file_name = 'starting_grid.txt'
 
 fig = plt.figure()
 
-sim = GridSim.build_sim_from_file(file_name, object_registry)
+sim = GridSim.build_sim_from_file(file_name, object_registry, attack_mapping={})
 sim.reset()
 sim.render(fig=fig)
 

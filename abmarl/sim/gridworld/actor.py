@@ -5,7 +5,7 @@ import numpy as np
 from gym.spaces import Box, Discrete
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.state import HealthState, PositionState
+from abmarl.sim.gridworld.state import HealthState, UniquePositionState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 
 
@@ -73,7 +73,7 @@ class MoveActor(ActorBaseComponent):
 
     @position_state.setter
     def position_state(self, value):
-        assert isinstance(value, PositionState), "Position state must be a PositionState object."
+        assert isinstance(value, UniquePositionState), "Position state must be a PositionState object."
         self._position_state = value
 
     @property

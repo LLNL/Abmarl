@@ -154,8 +154,11 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
 
     @classmethod
-    def _build_sim(cls, rows, cols, **kwargs):
-        grid = np.empty((rows, cols), dtype=object)
+    def _build_sim(cls, rows, cols, overlapping=False, **kwargs):
+        if overlapping:
+            grid = OverlappableGrid((rows, cols), dtype=object)
+        else:
+            grid = NonOverlappingGrid((rows, cols), dtype=object)
         kwargs['grid'] = grid
         return cls(**kwargs)
 

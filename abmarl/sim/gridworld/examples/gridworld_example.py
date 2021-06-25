@@ -5,7 +5,7 @@ import numpy as np
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
     AttackingAgent, HealthAgent
-from abmarl.sim.gridworld.state import PositionState, HealthState
+from abmarl.sim.gridworld.state import UniquePositionState, HealthState
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor
 from abmarl.sim.gridworld.observer import GridObserver
 from abmarl.tools.matplotlib_utils import mscatter
@@ -70,12 +70,12 @@ class GridSim(GridWorldSimulation):
         self.agents = kwargs['agents']
 
         # State Components
-        self.grid_state = PositionState(**kwargs)
+        self.position_state = UniquePositionState(**kwargs)
         self.health_state = HealthState(**kwargs)
 
         # Action Components
         self.attack_actor = AttackActor(health_state=self.health_state, **kwargs)
-        self.move_actor = MoveActor(position_state=self.grid_state, **kwargs)
+        self.move_actor = MoveActor(position_state=self.position_state, **kwargs)
 
         # Observation Components
         self.grid_observer = GridObserver(**kwargs)
@@ -83,7 +83,7 @@ class GridSim(GridWorldSimulation):
         self.finalize()
 
     def reset(self, **kwargs):
-        self.grid_state.reset(**kwargs)
+        self.position_state.reset(**kwargs)
         self.health_state.reset(**kwargs)
 
     def step(self, action_dict, **kwargs):
@@ -104,9 +104,9 @@ class GridSim(GridWorldSimulation):
         ax = fig.gca()
 
         # Draw the gridlines
-        ax.set(xlim=(0, self.grid_state.cols), ylim=(0, self.grid_state.rows))
-        ax.set_xticks(np.arange(0, self.grid_state.cols, 1))
-        ax.set_yticks(np.arange(0, self.grid_state.rows, 1))
+        ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
+        ax.set_xticks(np.arange(0, self.position_state.cols, 1))
+        ax.set_yticks(np.arange(0, self.position_state.rows, 1))
         ax.grid()
 
         # Draw the agents
@@ -114,7 +114,7 @@ class GridSim(GridWorldSimulation):
             agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
         ]
         agents_y = [
-            self.grid_state.rows - 0.5 - agent.position[0]
+            self.position_state.rows - 0.5 - agent.position[0]
             for agent in self.agents.values() if agent.active
         ]
         shape = [agent.render_shape for agent in self.agents.values() if agent.active]
@@ -174,7 +174,7 @@ if __name__ == "__main__":
         4: [3]
     }
     sim = GridSim.build_sim(
-        rows=8, cols=12, agents=agents, attack_mapping=attack_mapping
+        rows=8, cols=12, agents=agents, attack_mapping=attack_mapping, overlapping=False
     )
     sim.reset()
     sim.render(fig=fig)
