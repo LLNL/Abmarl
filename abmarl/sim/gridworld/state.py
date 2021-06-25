@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from abmarl.sim.gridworld.base import GridWorldBaseComponent, NonOverlappingGrid
+from abmarl.sim.gridworld.base import GridWorldBaseComponent, NonOverlappingGrid, OverlappableGrid
 from abmarl.sim.gridworld.agent import HealthAgent
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):
@@ -35,7 +35,7 @@ class UniquePositionState(StateBaseComponent):
         Give agents their starting positions.
 
         We use the agent's initial position if it exists. Otherwise, we randomly
-        place the agent in the grid.
+        place the agent at unique cells in the grid.
         """
         # Grid lookup by position
         self.grid.reset()
@@ -49,7 +49,7 @@ class UniquePositionState(StateBaseComponent):
                 assert self.grid[r, c] is None, f"{agent.id} has the same initial " + \
                     f"position as {self.grid[r, c].id}. All initial positions must be unique."
                 agent.position = agent.initial_position
-                self.grid[r, c] = agent
+                self.grid.add((r, c), agent)
                 ravelled_positions_taken.add(
                     np.ravel_multi_index(agent.position, (self.rows, self.cols))
                 )
@@ -67,7 +67,41 @@ class UniquePositionState(StateBaseComponent):
                 r = rs[ndx]
                 c = cs[ndx]
                 agent.position = np.array([r, c])
-                self.grid[r, c] = agent
+                self.grid.add((r, c), agent)
+
+
+class OverlappingPositionState(StateBaseComponent):
+    """
+    Manages the agents' positions in the grid.
+
+    Multiple agents can occupy the same cell.
+    """
+    @StateBaseComponent.grid.setter
+    def grid(self, value):
+        super(OverlappingPositionState, type(self)).grid.fset(self, value)
+        assert isinstance(value, OverlappableGrid), "The grid must be a Overlappable grid."
+        self._grid = value
+
+    def reset(self, **kwargs):
+        """
+        Give agents their starting positions.
+
+        Use the agent's initial position if specified, otherwise randomly place
+        the agents in the grid.
+        """
+        self.grid.reset()
+        rs, cs = np.unravel_index(
+            np.random.choice(self.rows * self.cols, len(self.agents), True),
+            shape=(self.rows, self.cols)
+        )
+        for ndx, agent in enumerate(self.agents.values()):
+            if agent.initial_position is None:
+                r = rs[ndx]
+                c = cs[ndx]
+            else:
+                r, c = agent.initial_position
+            agent.position = np.array([r, c])
+            self.grid.add((r, c), agent)
 
 
 class HealthState(StateBaseComponent):
