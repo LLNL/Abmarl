@@ -22,6 +22,20 @@ class Grid(np.ndarray, ABC):
         pass
 
     @abstractmethod
+    def query(self, agent, ndx):
+        """
+        Query a cell in the grid to see if is available to this agent.
+
+        Args:
+            agent: The agent for which we are checking availabilty.
+            ndx: The cell to query.
+
+        Returns:
+            True if the cell is available for this agent, otherwise False.
+        """
+        pass
+
+    @abstractmethod
     def place(self, agent, ndx):
         """
         Place an agent at an index.
@@ -83,12 +97,18 @@ class NonOverlappingGrid(Grid):
     def reset(self, **kwargs):
         self.fill(None)
 
+    def query(self, agent, ndx):
+        """
+        The cell is available for the agent if it is empty.
+        """
+        return self[ndx] is None
+
     def place(self, agent, ndx):
         """
         The placement is succesful if the new position is unoccupied.
         """
         ndx = tuple(ndx)
-        if self[ndx] is None:
+        if self.query(agent, ndx):
             self._place(agent, ndx)
             agent.position = np.array(ndx)
             return True
@@ -101,7 +121,7 @@ class NonOverlappingGrid(Grid):
         """
         from_ndx = tuple(agent.position)
         to_ndx = tuple(to_ndx)
-        if self[to_ndx] is None:
+        if self.query(agent, to_ndx):
             self._place(agent, to_ndx)
             self.remove(agent, from_ndx)
             agent.position = np.array(to_ndx)
@@ -124,6 +144,13 @@ class OverlappableGrid(Grid):
     def reset(self, **kwargs):
         self.fill(set())
 
+    def query(self, agent, ndx):
+        """
+        The cell is available for the agent if it is empty or if both the occupying
+        agent and the querying agent are overlappable.
+        """
+        return self[ndx] is None or (next(iter(self[ndx])).overlappable and agent.overlappable)
+
     def place(self, agent, ndx):
         """
         The placement is successful if the new position is unoccupied or if the
@@ -131,7 +158,7 @@ class OverlappableGrid(Grid):
         overlappable.
         """
         ndx = tuple(ndx)
-        if self[ndx] is None or (next(iter(self[ndx])).overlappable and agent.overlappable):
+        if self.query(agent, ndx):
             self._place(agent, ndx)
             agent.position = np.array(ndx)
             return True
@@ -145,7 +172,7 @@ class OverlappableGrid(Grid):
         """
         from_ndx = tuple(agent.position)
         to_ndx = tuple(to_ndx)
-        if self[to_ndx] is None or (next(iter(self[to_ndx])).overlappable and agent.overlappable):
+        if self.query(agent, to_ndx):
             self._place(agent, to_ndx)
             self.remove(agent, from_ndx)
             agent.position = np.array(to_ndx)
