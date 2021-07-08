@@ -3,20 +3,20 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 # Import all the features that we need from the simulation components
-from admiral.envs.components.state import GridPositionState, LifeState
-from admiral.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
-from admiral.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
-from admiral.envs.components.actor import GridMovementActor, AttackActor
-from admiral.envs.components.done import AnyTeamDeadDone, TeamDeadDone
+from abmarl.envs.components.state import GridPositionState, LifeState
+from abmarl.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
+from abmarl.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
+from abmarl.envs.components.actor import GridMovementActor, AttackActor
+from abmarl.envs.components.done import AnyTeamDeadDone, TeamDeadDone
 
 # Environment needs a corresponding agent component
-from admiral.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
+from abmarl.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
 
 # Import the interface
-from admiral.envs import AgentBasedSimulation
+from abmarl.envs import AgentBasedSimulation
 
 # Import extra tools
-from admiral.tools.matplotlib_utils import mscatter
+from abmarl.tools.matplotlib_utils import mscatter
 
 # All HuntingForagingAgents
 # have a position, team, and life/death state

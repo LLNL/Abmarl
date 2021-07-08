@@ -6,8 +6,9 @@
 # --- Create the agents and the environment --- #
 
 # Import the simulation environment and agents
-# from admiral.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
-from admiral.envs.simple_env import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
+# from abmarl.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
+from abmarl.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, \
+    HuntingForagingAgent, FoodAgent
 
 # Instatiate the agents that will operate in this environment. All possible agent
 # attributes are listed below.
@@ -75,12 +76,12 @@ for agent in agents.values():
 
 # Now that you've created the environment, you must wrap it with a simulation manager,
 # which controls the timing of the simulation step.
-from admiral.managers import AllStepManager # All agents take the step at the same time
+from abmarl.managers import AllStepManager # All agents take the step at the same time
 env = AllStepManager(env)
 
 # We must wrap the environment with the MultiAgentWrapper so that it
 # works with RLlib
-from admiral.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
+from abmarl.external.rllib_multiagentenv_wrapper import MultiAgentWrapper
 env = MultiAgentWrapper(env)
 
 # Finally we must register the environment with RLlib
