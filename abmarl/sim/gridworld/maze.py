@@ -5,7 +5,7 @@ import random
 
 
 
-def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
+def generate_maze(rows, cols, wall_char='W', target_char='T', agents=None):
     ## Main code
     # Init variables
     cell_char = 0
@@ -32,31 +32,23 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
             line.append(unvisited_char)
         maze.append(line)
 
-    # Randomize starting point and set it a cell
-    starting_height = int(random.random()*rows)
-    starting_width = int(random.random()*cols)
-    if (starting_height == 0):
-        starting_height += 1
-    if (starting_height == rows-1):
-        starting_height -= 1
-    if (starting_width == 0):
-        starting_width += 1
-    if (starting_width == cols-1):
-        starting_width -= 1
+    # Set starting point as the middle
+    starting_row = int(rows/2)
+    starting_cell = int(cols/2)
 
     # Mark it as cell and add surrounding walls to the list
-    maze[starting_height][starting_width] = cell_char
+    maze[starting_row][starting_cell] = cell_char
     walls = []
-    walls.append([starting_height - 1, starting_width])
-    walls.append([starting_height, starting_width - 1])
-    walls.append([starting_height, starting_width + 1])
-    walls.append([starting_height + 1, starting_width])
+    walls.append([starting_row - 1, starting_cell])
+    walls.append([starting_row, starting_cell - 1])
+    walls.append([starting_row, starting_cell + 1])
+    walls.append([starting_row + 1, starting_cell])
 
     # Denote walls in maze
-    maze[starting_height-1][starting_width] = wall_char
-    maze[starting_height][starting_width - 1] = wall_char
-    maze[starting_height][starting_width + 1] = wall_char
-    maze[starting_height + 1][starting_width] = wall_char
+    maze[starting_row-1][starting_cell] = wall_char
+    maze[starting_row][starting_cell - 1] = wall_char
+    maze[starting_row][starting_cell + 1] = wall_char
+    maze[starting_row + 1][starting_cell] = wall_char
 
     while (walls):
         # Pick a random wall
@@ -212,8 +204,9 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
         for wall in walls:
             if (wall[0] == rand_wall[0] and wall[1] == rand_wall[1]):
                 walls.remove(wall)
-        
 
+    # Set the starting cell as the target
+    maze[starting_row][starting_cell] = target_char
 
     # Mark the remaining unvisited cells as walls
     for i in range(0, rows):
@@ -227,4 +220,4 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
             print(maze[i][j], end=" ")
         print('\n')
 
-generate_maze(5, 5)
+generate_maze(7, 7)
