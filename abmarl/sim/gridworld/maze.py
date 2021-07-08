@@ -9,6 +9,10 @@ def generate_maze(rows, cols, wall_char='W', target_char='T', agents=None):
     if agents is None:
         agents = []
 
+    # Add two rows and columns because we're going to remove the boundaries
+    # in the print function.
+    rows += 2
+    cols += 2
     cell_char = 0
     unvisited_char = 'u'
     maze = []
@@ -230,8 +234,8 @@ def generate_maze(rows, cols, wall_char='W', target_char='T', agents=None):
 
 
     # Print final maze
-    for i in range(0, rows):
-        for j in range(0, cols):
+    for i in range(1, rows-1):
+        for j in range(1, cols-1):
             print(maze[i][j], end=" ")
         print('\n')
 
