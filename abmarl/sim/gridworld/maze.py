@@ -5,7 +5,7 @@ import random
 
 
 
-def generate_maze(rows, cols, wall='w', target='T', agents=None):
+def generate_maze(rows, cols, wall_char='w', target='T', agents=None):
     ## Main code
     # Init variables
     cell_char = 'c'
@@ -53,10 +53,10 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
     walls.append([starting_height + 1, starting_width])
 
     # Denote walls in maze
-    maze[starting_height-1][starting_width] = 'w'
-    maze[starting_height][starting_width - 1] = 'w'
-    maze[starting_height][starting_width + 1] = 'w'
-    maze[starting_height + 1][starting_width] = 'w'
+    maze[starting_height-1][starting_width] = wall_char
+    maze[starting_height][starting_width - 1] = wall_char
+    maze[starting_height][starting_width + 1] = wall_char
+    maze[starting_height + 1][starting_width] = wall_char
 
     while (walls):
         # Pick a random wall
@@ -76,7 +76,7 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
                     # Upper cell
                     if (rand_wall[0] != 0):
                         if (maze[rand_wall[0]-1][rand_wall[1]] != cell_char):
-                            maze[rand_wall[0]-1][rand_wall[1]] = 'w'
+                            maze[rand_wall[0]-1][rand_wall[1]] = wall_char
                         if ([rand_wall[0]-1, rand_wall[1]] not in walls):
                             walls.append([rand_wall[0]-1, rand_wall[1]])
 
@@ -84,14 +84,14 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
                     # Bottom cell
                     if (rand_wall[0] != rows-1):
                         if (maze[rand_wall[0]+1][rand_wall[1]] != cell_char):
-                            maze[rand_wall[0]+1][rand_wall[1]] = 'w'
+                            maze[rand_wall[0]+1][rand_wall[1]] = wall_char
                         if ([rand_wall[0]+1, rand_wall[1]] not in walls):
                             walls.append([rand_wall[0]+1, rand_wall[1]])
 
                     # Leftmost cell
                     if (rand_wall[1] != 0):	
                         if (maze[rand_wall[0]][rand_wall[1]-1] != cell_char):
-                            maze[rand_wall[0]][rand_wall[1]-1] = 'w'
+                            maze[rand_wall[0]][rand_wall[1]-1] = wall_char
                         if ([rand_wall[0], rand_wall[1]-1] not in walls):
                             walls.append([rand_wall[0], rand_wall[1]-1])
                 
@@ -116,21 +116,21 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
                     # Upper cell
                     if (rand_wall[0] != 0):
                         if (maze[rand_wall[0]-1][rand_wall[1]] != cell_char):
-                            maze[rand_wall[0]-1][rand_wall[1]] = 'w'
+                            maze[rand_wall[0]-1][rand_wall[1]] = wall_char
                         if ([rand_wall[0]-1, rand_wall[1]] not in walls):
                             walls.append([rand_wall[0]-1, rand_wall[1]])
 
                     # Leftmost cell
                     if (rand_wall[1] != 0):
                         if (maze[rand_wall[0]][rand_wall[1]-1] != cell_char):
-                            maze[rand_wall[0]][rand_wall[1]-1] = 'w'
+                            maze[rand_wall[0]][rand_wall[1]-1] = wall_char
                         if ([rand_wall[0], rand_wall[1]-1] not in walls):
                             walls.append([rand_wall[0], rand_wall[1]-1])
 
                     # Rightmost cell
                     if (rand_wall[1] != cols-1):
                         if (maze[rand_wall[0]][rand_wall[1]+1] != cell_char):
-                            maze[rand_wall[0]][rand_wall[1]+1] = 'w'
+                            maze[rand_wall[0]][rand_wall[1]+1] = wall_char
                         if ([rand_wall[0], rand_wall[1]+1] not in walls):
                             walls.append([rand_wall[0], rand_wall[1]+1])
 
@@ -153,17 +153,17 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
                     # Mark the new walls
                     if (rand_wall[0] != rows-1):
                         if (maze[rand_wall[0]+1][rand_wall[1]] != cell_char):
-                            maze[rand_wall[0]+1][rand_wall[1]] = 'w'
+                            maze[rand_wall[0]+1][rand_wall[1]] = wall_char
                         if ([rand_wall[0]+1, rand_wall[1]] not in walls):
                             walls.append([rand_wall[0]+1, rand_wall[1]])
                     if (rand_wall[1] != 0):
                         if (maze[rand_wall[0]][rand_wall[1]-1] != cell_char):
-                            maze[rand_wall[0]][rand_wall[1]-1] = 'w'
+                            maze[rand_wall[0]][rand_wall[1]-1] = wall_char
                         if ([rand_wall[0], rand_wall[1]-1] not in walls):
                             walls.append([rand_wall[0], rand_wall[1]-1])
                     if (rand_wall[1] != cols-1):
                         if (maze[rand_wall[0]][rand_wall[1]+1] != cell_char):
-                            maze[rand_wall[0]][rand_wall[1]+1] = 'w'
+                            maze[rand_wall[0]][rand_wall[1]+1] = wall_char
                         if ([rand_wall[0], rand_wall[1]+1] not in walls):
                             walls.append([rand_wall[0], rand_wall[1]+1])
 
@@ -187,17 +187,17 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
                     # Mark the new walls
                     if (rand_wall[1] != cols-1):
                         if (maze[rand_wall[0]][rand_wall[1]+1] != cell_char):
-                            maze[rand_wall[0]][rand_wall[1]+1] = 'w'
+                            maze[rand_wall[0]][rand_wall[1]+1] = wall_char
                         if ([rand_wall[0], rand_wall[1]+1] not in walls):
                             walls.append([rand_wall[0], rand_wall[1]+1])
                     if (rand_wall[0] != rows-1):
                         if (maze[rand_wall[0]+1][rand_wall[1]] != cell_char):
-                            maze[rand_wall[0]+1][rand_wall[1]] = 'w'
+                            maze[rand_wall[0]+1][rand_wall[1]] = wall_char
                         if ([rand_wall[0]+1, rand_wall[1]] not in walls):
                             walls.append([rand_wall[0]+1, rand_wall[1]])
                     if (rand_wall[0] != 0):	
                         if (maze[rand_wall[0]-1][rand_wall[1]] != cell_char):
-                            maze[rand_wall[0]-1][rand_wall[1]] = 'w'
+                            maze[rand_wall[0]-1][rand_wall[1]] = wall_char
                         if ([rand_wall[0]-1, rand_wall[1]] not in walls):
                             walls.append([rand_wall[0]-1, rand_wall[1]])
 
@@ -219,7 +219,7 @@ def generate_maze(rows, cols, wall='w', target='T', agents=None):
     for i in range(0, rows):
         for j in range(0, cols):
             if (maze[i][j] == 'u'):
-                maze[i][j] = 'w'
+                maze[i][j] = wall_char
 
     # Print final maze
     for i in range(0, rows):
