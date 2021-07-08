@@ -9,7 +9,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
     ## Main code
     # Init variables
     cell_char = 0
-    unvisited = 'u'
+    unvisited_char = 'u'
     maze = []
 
     # Find number of surrounding cells
@@ -29,7 +29,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
     for i in range(0, rows):
         line = []
         for j in range(0, cols):
-            line.append(unvisited)
+            line.append(unvisited_char)
         maze.append(line)
 
     # Randomize starting point and set it a cell
@@ -64,7 +64,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
 
         # Check if it is a left wall
         if (rand_wall[1] != 0):
-            if (maze[rand_wall[0]][rand_wall[1]-1] == 'u' and maze[rand_wall[0]][rand_wall[1]+1] == cell_char):
+            if (maze[rand_wall[0]][rand_wall[1]-1] == unvisited_char and maze[rand_wall[0]][rand_wall[1]+1] == cell_char):
                 # Find the number of surrounding cells
                 s_cells = surroundingCells(rand_wall)
 
@@ -105,7 +105,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
 
         # Check if it is an upper wall
         if (rand_wall[0] != 0):
-            if (maze[rand_wall[0]-1][rand_wall[1]] == 'u' and maze[rand_wall[0]+1][rand_wall[1]] == cell_char):
+            if (maze[rand_wall[0]-1][rand_wall[1]] == unvisited_char and maze[rand_wall[0]+1][rand_wall[1]] == cell_char):
 
                 s_cells = surroundingCells(rand_wall)
                 if (s_cells < 2):
@@ -143,7 +143,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
 
         # Check the bottom wall
         if (rand_wall[0] != rows-1):
-            if (maze[rand_wall[0]+1][rand_wall[1]] == 'u' and maze[rand_wall[0]-1][rand_wall[1]] == cell_char):
+            if (maze[rand_wall[0]+1][rand_wall[1]] == unvisited_char and maze[rand_wall[0]-1][rand_wall[1]] == cell_char):
 
                 s_cells = surroundingCells(rand_wall)
                 if (s_cells < 2):
@@ -177,7 +177,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
 
         # Check the right wall
         if (rand_wall[1] != cols-1):
-            if (maze[rand_wall[0]][rand_wall[1]+1] == 'u' and maze[rand_wall[0]][rand_wall[1]-1] == cell_char):
+            if (maze[rand_wall[0]][rand_wall[1]+1] == unvisited_char and maze[rand_wall[0]][rand_wall[1]-1] == cell_char):
 
                 s_cells = surroundingCells(rand_wall)
                 if (s_cells < 2):
@@ -218,7 +218,7 @@ def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
     # Mark the remaining unvisited cells as walls
     for i in range(0, rows):
         for j in range(0, cols):
-            if (maze[i][j] == 'u'):
+            if (maze[i][j] == unvisited_char):
                 maze[i][j] = wall_char
 
     # Print final maze
