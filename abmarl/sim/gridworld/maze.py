@@ -5,10 +5,10 @@ import random
 
 
 
-def generate_maze(rows, cols, wall_char='w', target='T', agents=None):
+def generate_maze(rows, cols, wall_char='W', target='T', agents=None):
     ## Main code
     # Init variables
-    cell_char = 'c'
+    cell_char = 0
     unvisited = 'u'
     maze = []
 
