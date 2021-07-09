@@ -3,17 +3,17 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 # Import all the features that we need from the simulation components
-from abmarl.envs.components.state import GridPositionState, LifeState
-from abmarl.envs.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
-from abmarl.envs.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
-from abmarl.envs.components.actor import GridMovementActor, AttackActor
-from abmarl.envs.components.done import AnyTeamDeadDone, TeamDeadDone
+from abmarl.sim.components.state import GridPositionState, LifeState
+from abmarl.sim.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
+from abmarl.sim.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
+from abmarl.sim.components.actor import GridMovementActor, AttackActor
+from abmarl.sim.components.done import AnyTeamDeadDone, TeamDeadDone
 
 # Environment needs a corresponding agent component
-from abmarl.envs.components.agent import TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
+from abmarl.sim.components.agent import ComponentAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
 
 # Import the interface
-from abmarl.envs import AgentBasedSimulation
+from abmarl.sim import AgentBasedSimulation
 
 # Import extra tools
 from abmarl.tools.matplotlib_utils import mscatter
@@ -22,12 +22,12 @@ from abmarl.tools.matplotlib_utils import mscatter
 # have a position, team, and life/death state
 # can observe positions, teams, and life state of other agents
 # can move around the grid and attack other agents
-class HuntingForagingAgent(TeamAgent, PositionAgent, LifeAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent): pass
+class HuntingForagingAgent(AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent): pass
 
 # All FoodAgents
 # have a tema, position, and life
 # They are not really "agents" in the RL sense, they're just entities in the simulation for the foragers to gather.
-class FoodAgent(TeamAgent, PositionAgent, LifeAgent): pass
+class FoodAgent(ComponentAgent): pass
 
 # Create the simulation environment from the components
 class HuntingForagingEnv(AgentBasedSimulation):
@@ -46,7 +46,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # These components handle the observations that the agents receive whenever
         # get_obs is called. In this environment supports agents that can observe
         # the position, health, and team of other agents and itself.
-        self.partial_observer = GridPositionBasedObserver(position=self.position_state, **kwargs)
+        self.partial_observer = GridPositionBasedObserver(position_state=self.position_state, **kwargs)
         # position_observer = PositionObserver(position=self.position_state, **kwargs)
         # team_observer = TeamObserver(**kwargs)
         # life_observer = LifeObserver(**kwargs)
@@ -55,7 +55,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # Actor components
         # These components handle the actions in the step function. This environment
         # supports agents that can move around and attack agents from other teams.
-        self.move_actor = GridMovementActor(position=self.position_state, **kwargs)
+        self.move_actor = GridMovementActor(position_state=self.position_state, **kwargs)
         self.attack_actor = AttackActor(**kwargs)
 
         # Done components
@@ -87,7 +87,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
             # The actor processes the agents' attack action.
-            attacked_agent = self.attack_actor.process_attack(attacking_agent, action.get('attack', False), **kwargs)
+            attacked_agent = self.attack_actor.process_action(attacking_agent, action, **kwargs)
             # The attacked agent loses health depending on the strength of the attack.
             # If the agent loses all its health, it dies.
             if attacked_agent is not None:
@@ -102,7 +102,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
             # If an agent attempts to move out of bounds, the move is invalid,
             # and it will not move at all.
             proposed_amount_move = action.get('move', np.zeros(2))
-            amount_moved = self.move_actor.process_move(self.agents[agent_id], proposed_amount_move, **kwargs)
+            amount_moved = self.move_actor.process_action(self.agents[agent_id], action, **kwargs)
             if np.any(proposed_amount_move != amount_moved):
                 # This was a rejected move, so we penalize a bit for it
                 self.rewards[agent_id] -= 0.1

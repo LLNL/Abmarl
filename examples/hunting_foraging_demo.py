@@ -7,7 +7,7 @@
 
 # Import the simulation environment and agents
 # from abmarl.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
-from abmarl.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, \
+from abmarl.sim.components.examples.hunting_and_foraging import HuntingForagingEnv, \
     HuntingForagingAgent, FoodAgent
 
 # Instatiate the agents that will operate in this environment. All possible agent
