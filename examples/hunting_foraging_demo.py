@@ -67,11 +67,6 @@ env = HuntingForagingEnv(
     # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
 )
 
-# Hack the action space
-from gym.spaces import Discrete
-for agent in agents.values():
-    agent.action_space = Discrete(10)
-
 # --- Prepare the environment for use with RLlib --- #
 
 # Now that you've created the environment, you must wrap it with a simulation manager,
