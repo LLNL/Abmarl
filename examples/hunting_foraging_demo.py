@@ -140,7 +140,7 @@ params = {
         'checkpoint_freq': 10,
         'checkpoint_at_end': False,
         'stop': {
-            'episodes_total': 1_000_000,
+            'episodes_total': 20_000,
         },
         'verbose': 2,
         'config': {
@@ -153,7 +153,7 @@ params = {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 71,
+            "num_workers": 1,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             "rollout_fragment_length": 200,
             "batch_mode": "complete_episodes",
