@@ -1,5 +1,5 @@
-tensorflow==2.4.0
-ray[rllib]==1.2.0
+tensorflow
+ray[rllib]==1.4.0
 matplotlib
 seaborn
 sphinx
