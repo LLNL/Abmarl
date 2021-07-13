@@ -4,13 +4,14 @@ import numpy as np
 
 # Import all the features that we need from the simulation components
 from abmarl.sim.components.state import GridPositionState, LifeState
-from abmarl.sim.components.observer import PositionObserver, LifeObserver, TeamObserver, GridPositionBasedObserver
+from abmarl.sim.components.observer import PositionObserver, LifeObserver, TeamObserver
 from abmarl.sim.components.wrappers.observer_wrapper import PositionRestrictedObservationWrapper
 from abmarl.sim.components.actor import GridMovementActor, AttackActor
-from abmarl.sim.components.done import AnyTeamDeadDone, TeamDeadDone
+from abmarl.sim.components.done import AnyTeamDeadDone
 
 # Environment needs a corresponding agent component
-from abmarl.sim.components.agent import ComponentAgent, AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
+from abmarl.sim.components.agent import ComponentAgent, AttackingAgent, GridMovementAgent, \
+    AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent
 
 # Import the interface
 from abmarl.sim import AgentBasedSimulation
@@ -18,16 +19,23 @@ from abmarl.sim import AgentBasedSimulation
 # Import extra tools
 from abmarl.tools.matplotlib_utils import mscatter
 
+
 # All HuntingForagingAgents
 # have a position, team, and life/death state
 # can observe positions, teams, and life state of other agents
 # can move around the grid and attack other agents
-class HuntingForagingAgent(AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent, TeamObservingAgent, LifeObservingAgent): pass
+class HuntingForagingAgent(
+    AttackingAgent, GridMovementAgent, AgentObservingAgent, PositionObservingAgent,
+    TeamObservingAgent, LifeObservingAgent
+): pass
+
 
 # All FoodAgents
 # have a tema, position, and life
-# They are not really "agents" in the RL sense, they're just entities in the simulation for the foragers to gather.
+# They are not really "agents" in the RL sense, they're just entities in the
+# simulation for the foragers to gather.
 class FoodAgent(ComponentAgent): pass
+
 
 # Create the simulation environment from the components
 class HuntingForagingEnv(AgentBasedSimulation):
@@ -46,11 +54,12 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # These components handle the observations that the agents receive whenever
         # get_obs is called. In this environment supports agents that can observe
         # the position, health, and team of other agents and itself.
-        self.partial_observer = GridPositionBasedObserver(position_state=self.position_state, **kwargs)
-        # position_observer = PositionObserver(position=self.position_state, **kwargs)
-        # team_observer = TeamObserver(**kwargs)
-        # life_observer = LifeObserver(**kwargs)
-        # self.partial_observer = PositionRestrictedObservationWrapper([position_observer, team_observer, life_observer], **kwargs)
+        position_observer = PositionObserver(position_state=self.position_state, **kwargs)
+        team_observer = TeamObserver(**kwargs)
+        life_observer = LifeObserver(**kwargs)
+        self.partial_observer = PositionRestrictedObservationWrapper(
+            [position_observer, team_observer, life_observer], **kwargs
+        )
 
         # Actor components
         # These components handle the actions in the step function. This environment
@@ -63,13 +72,12 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # done when either:
         # (1) All the hunter have killed all the foragers.
         # (2) All the foragers have killed all the resources.
-        # self.done = AnyTeamDeadDone(**kwargs)
-        self.done = TeamDeadDone(**kwargs)
+        self.done = AnyTeamDeadDone(**kwargs)
 
         # This is needed at the end of init in every environment. It ensures that
         # agents have been configured correctly.
         self.finalize()
-    
+
     def reset(self, **kwargs):
         # The state handlers need to reset. Since the agents' teams do not change
         # throughout the episode, the team state does not need to reset.
@@ -82,7 +90,7 @@ class HuntingForagingEnv(AgentBasedSimulation):
         # reset it to zero.
         self.rewards = {agent: 0 for agent in self.agents}
 
-    def step(self, action_dict, **kwargs):        
+    def step(self, action_dict, **kwargs):
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
@@ -106,11 +114,11 @@ class HuntingForagingEnv(AgentBasedSimulation):
             if np.any(proposed_amount_move != amount_moved):
                 # This was a rejected move, so we penalize a bit for it
                 self.rewards[agent_id] -= 0.1
-        
+
         # Small penalty for every agent that acted in this time step to incentive rapid actions
         for agent_id in action_dict:
             self.rewards[agent_id] -= 0.01
-    
+
     def render(self, fig=None, shape_dict=None, **kwargs):
         fig.clear()
         render_condition = {agent.id: agent.is_alive for agent in self.agents.values()}
@@ -121,22 +129,30 @@ class HuntingForagingEnv(AgentBasedSimulation):
         ax.set_yticks(np.arange(0, self.position_state.region, 1))
         ax.grid()
 
-        agents_x = [agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]]
-        agents_y = [self.position_state.region - 0.5 - agent.position[0] for agent in self.agents.values() if render_condition[agent.id]]
+        agents_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values() if render_condition[agent.id]
+        ]
+        agents_y = [
+            self.position_state.region - 0.5 - agent.position[0]
+            for agent in self.agents.values() if render_condition[agent.id]
+        ]
 
         if shape_dict:
-            shape = [shape_dict[agent.team] for agent in self.agents.values() if render_condition[agent.id]]
+            shape = [
+                shape_dict[agent.team]
+                for agent in self.agents.values() if render_condition[agent.id]
+            ]
         else:
             shape = 'o'
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=100, edgecolor='black', facecolor='gray')
 
         plt.plot()
         plt.pause(1e-6)
-    
+
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return self.partial_observer.get_obs(agent, **kwargs)
-    
+
     def get_reward(self, agent_id, **kwargs):
         """
         Return the agents reward and reset it to zero.
@@ -147,17 +163,26 @@ class HuntingForagingEnv(AgentBasedSimulation):
 
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(self.agents[agent_id], **kwargs)
-    
+
     def get_all_done(self, **kwargs):
         return self.done.get_all_done(**kwargs)
-    
+
     def get_info(self, *args, **kwargs):
         return {}
 
+
 if __name__ == '__main__':
     food = {f'food{i}': FoodAgent(id=f'food{i}', team=1) for i in range(12)}
-    foragers = {f'forager{i}': HuntingForagingAgent(id=f'forager{i}', agent_view=5, team=2, move_range=1, attack_range=1, attack_strength=1) for i in range(7)}
-    hunters =  {f'hunter{i}':  HuntingForagingAgent(id=f'hunter{i}',  agent_view=2, team=3, move_range=1, attack_range=1, attack_strength=1) for i in range(2)}
+    foragers = {
+        f'forager{i}': HuntingForagingAgent(
+            id=f'forager{i}', agent_view=5, team=2, move_range=1, attack_range=1, attack_strength=1
+        ) for i in range(7)
+    }
+    hunters = {
+        f'hunter{i}': HuntingForagingAgent(
+            id=f'hunter{i}', agent_view=2, team=3, move_range=1, attack_range=1, attack_strength=1
+        ) for i in range(2)
+    }
     agents = {**food, **foragers, **hunters}
 
     region = 20
@@ -178,12 +203,17 @@ if __name__ == '__main__':
         3: 'd'
     }
 
-    import pprint; pprint.pprint({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
+    import pprint
+    pprint.pprint({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
     fig = plt.gcf()
     env.render(fig=fig, shape_dict=shape_dict)
 
     for _ in range(50):
-        action_dict = {agent.id: agent.action_space.sample() for agent in env.agents.values() if agent.is_alive and isinstance(agent, HuntingForagingAgent)}
+        action_dict = {
+            agent.id: agent.action_space.sample()
+            for agent in env.agents.values()
+            if agent.is_alive and isinstance(agent, HuntingForagingAgent)
+        }
         env.step(action_dict)
         env.render(fig=fig, shape_dict=shape_dict)
         print(env.get_all_done())
