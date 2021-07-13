@@ -365,7 +365,9 @@ class GridPositionTeamBasedObserver:
             if isinstance(agent, AgentObservingAgent) and \
                isinstance(agent, PositionObservingAgent):
                 agent.observation_space['position'] = Box(
-                    -1, np.inf, (agent.agent_view*2+1, agent.agent_view*2+1, self.number_of_teams),
+                    -1,
+                    len(self.agents),
+                    (agent.agent_view*2+1, agent.agent_view*2+1, self.number_of_teams),
                     np.int
                 )
 
