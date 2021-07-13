@@ -4,10 +4,10 @@ from enum import IntEnum
 from gym.spaces import Box, Discrete, Dict
 import numpy as np
 
-from abmarl.sim import PrincipleAgent, AgentBasedSimulation
+from abmarl.sim import Agent, AgentBasedSimulation
 
 
-class PredatorPreyAgent(PrincipleAgent, ABC):
+class PredatorPreyAgent(Agent, ABC):
     """
     In addition to their own agent-type-specific parameters, every Agent in the
     Predator Prey simulation will have the following parameters:

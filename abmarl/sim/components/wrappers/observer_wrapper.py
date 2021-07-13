@@ -118,7 +118,7 @@ class PositionRestrictedObservationWrapper:
 
     def null_value(self, channel):
         if channel == 'mask':
-            return 0
+            return np.array([0])
         else:
             return self._channel_observer_map[channel].null_value
 

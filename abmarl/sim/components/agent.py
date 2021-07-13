@@ -378,9 +378,10 @@ class HarvestingAgent(ActingAgent, ComponentAgent):
         The maximum amount of resources the agent can harvest from the cell it
         occupies.
     """
-    def __init__(self, max_harvest=None, **kwargs):
+    def __init__(self, min_harvest=0, max_harvest=None, **kwargs):
         super().__init__(**kwargs)
         assert max_harvest is not None, "max_harvest must be nonnegative number"
+        self.min_harvest = min_harvest
         self.max_harvest = max_harvest
 
     @property
@@ -388,7 +389,7 @@ class HarvestingAgent(ActingAgent, ComponentAgent):
         """
         Agents are configured if max_harvest is set.
         """
-        return super().configured and self.max_harvest is not None
+        return super().configured and self.max_harvest is not None and self.min_harvest is not None
 
 
 class ResourceObservingAgent(ObservingAgent, ComponentAgent):
