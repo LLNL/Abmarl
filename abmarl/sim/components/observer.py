@@ -79,7 +79,10 @@ class Observer(ABC):
             obs = {}
             for other in self.agents.values():
                 if isinstance(other, other_instance):
-                    obs[other.id] = getattr(other, attr)
+                    attr_obs = getattr(other, attr)
+                    if not isinstance(attr_obs, np.ndarray):
+                        attr_obs = np.array([attr_obs])
+                    obs[other.id] = attr_obs
                 else:
                     obs[other.id] = self.null_value
             return {self.channel: obs}
@@ -128,7 +131,7 @@ class BroadcastObserver(Observer):
 
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 
 # ----------------------- #
@@ -165,7 +168,7 @@ class HealthObserver(Observer):
 
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 
 class LifeObserver(Observer):
@@ -198,7 +201,7 @@ class LifeObserver(Observer):
 
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 
 # ----------------------------- #
@@ -452,7 +455,7 @@ class SpeedObserver(Observer):
 
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 
 class AngleObserver(Observer):
@@ -486,7 +489,7 @@ class AngleObserver(Observer):
 
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
 
 
 class VelocityObserver(Observer):
@@ -606,4 +609,4 @@ class TeamObserver(Observer):
 
     @property
     def null_value(self):
-        return -1
+        return np.array([-1])
