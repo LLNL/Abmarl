@@ -348,7 +348,7 @@ class GridResourcesActor(Actor):
     def __init__(self, resource_state=None, **kwargs):
         super().__init__(
             instance=HarvestingAgent,
-            space_func=lambda agent: Box(0, agent.max_harvest, (1,)),
+            space_func=lambda agent: Box(agent.min_harvest, agent.max_harvest, (1,)),
             **kwargs
         )
         self.resource_state = resource_state
