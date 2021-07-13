@@ -14,7 +14,10 @@ class TurnBasedManager(SimulationManager):
     """
     def __init__(self, sim):
         super().__init__(sim)
-        self.agent_order = cycle({agent.id for agent in self.agents if (isinstance(agent, ActingAgent) and isinstance(ActingAgent, ObservingAgent))})
+        self.agent_order = cycle({
+            agent.id for agent in self.agents.values()
+            if (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent))
+        })
 
     def reset(self, **kwargs):
         """
