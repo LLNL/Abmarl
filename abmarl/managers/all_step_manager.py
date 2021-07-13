@@ -13,9 +13,15 @@ class AllStepManager(SimulationManager):
         """
         Reset the simulation and return the observation of all the agents.
         """
-        self.done_agents = set(agent.id for agent in self.agents.values() if not (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent)))
+        self.done_agents = set(
+            agent.id for agent in self.agents.values()
+            if not (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent))
+        )
         self.sim.reset(**kwargs)
-        return {agent.id: self.sim.get_obs(agent.id) for agent in self.agents.values() if agent.id not in self.done_agents}
+        return {
+            agent.id: self.sim.get_obs(agent.id)
+            for agent in self.agents.values() if agent.id not in self.done_agents
+        }
 
     def step(self, action_dict, **kwargs):
         """

@@ -6,7 +6,6 @@
 # --- Create the agents and the environment --- #
 
 # Import the simulation environment and agents
-# from abmarl.envs.components.examples.hunting_and_foraging import HuntingForagingEnv, HuntingForagingAgent, FoodAgent
 from abmarl.sim.components.examples.hunting_and_foraging import HuntingForagingEnv, \
     HuntingForagingAgent, FoodAgent
 
@@ -32,8 +31,8 @@ foragers = {f'forager{i}': HuntingForagingAgent(
 ) for i in range(5)}
 
 # # Hunters try to eat all the foraging agents before all the food disappears.
-hunters =  {f'hunter{i}': HuntingForagingAgent(
-    id=f'hunter{i}', 
+hunters = {f'hunter{i}': HuntingForagingAgent(
+    id=f'hunter{i}',
     agent_view=2, # Partial Observation Mask: how far away this agent can see other agents.
     team=3, # Which team this agent is on
     move_range=1, # How far the agent can move within a single step.
@@ -64,7 +63,8 @@ env = HuntingForagingEnv(
     number_of_teams=3, # The number of teams
     agents=agents, # Give the environment the dictionary of agents we created above
     team_attack_matrix=team_attack_matrix,
-    # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that the attack radius is square box around the agent
+    # attack_norm=np.inf, # The norm to use. Default is np.inf, which means that
+    #   the attack radius is square box around the agent
 )
 
 # --- Prepare the environment for use with RLlib --- #
@@ -96,6 +96,8 @@ policies = {
     'foragers': (None, agents['forager0'].observation_space, agents['forager0'].action_space, {}),
     'hunters': (None, agents['hunter0'].observation_space, agents['hunter0'].action_space, {}),
 }
+
+
 def policy_mapping_fn(agent_id):
     if agents[agent_id].team == 2:
         return 'foragers'
@@ -116,7 +118,8 @@ def policy_mapping_fn(agent_id):
 # --- Setup the algorithm --- #
 # --------------------------- #
 
-# Full list of supported algorithms here: https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
+# Full list of supported algorithms here:
+# https://docs.ray.io/en/releases-0.8.5/rllib-algorithms.html
 algo_name = 'A2C'
 
 
@@ -124,7 +127,8 @@ algo_name = 'A2C'
 # --- Parameters --- #
 # ------------------ #
 
-# List of common ray_tune parameters here: https://docs.ray.io/en/latest/rllib-training.html#common-parameters
+# List of common ray_tune parameters here:
+# https://docs.ray.io/en/latest/rllib-training.html#common-parameters
 params = {
     'experiment': {
         'title': '{}'.format('ManyForager_5-ManySmartPredator_2-GridTeamObs-View_3-PenalizeDeath'),
@@ -135,7 +139,7 @@ params = {
         'checkpoint_freq': 10,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2000,
+            'episodes_total': 200,
         },
         'verbose': 2,
         'config': {
@@ -148,7 +152,7 @@ params = {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 7,
+            "num_workers": 0,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             "rollout_fragment_length": 200,
             "batch_mode": "complete_episodes",
@@ -172,11 +176,16 @@ if __name__ == "__main__":
     }
 
     obs = env.reset()
-    import pprint; pprint.pprint(obs)
+    import pprint
+    pprint.pprint(obs)
     env.render(fig=fig, shape_dict=shape_dict)
 
     for _ in range(100):
-        action_dict = {agent.id: agent.action_space.sample() for agent in agents.values() if agent.is_alive and isinstance(agent, HuntingForagingAgent)}
+        action_dict = {
+            agent.id: agent.action_space.sample()
+            for agent in agents.values()
+            if agent.is_alive and isinstance(agent, HuntingForagingAgent)
+        }
         obs, _, done, _ = env.step(action_dict)
         env.render(fig=fig, shape_dict=shape_dict)
         if done['__all__']:

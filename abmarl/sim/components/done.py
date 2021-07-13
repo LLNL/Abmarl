@@ -103,7 +103,7 @@ class AnyTeamDeadDone:
         self.agents = agents
         assert type(number_of_teams) is int, "number_of_teams must be a positive integer."
         self.number_of_teams = number_of_teams
-    
+
     def get_done(self, agent, **kwargs):
         """
         Return True if the agent is dead. Otherwise, return False.
@@ -120,6 +120,7 @@ class AnyTeamDeadDone:
             if agent.is_alive:
                 team[agent.team-1] += 1
         return any(team == 0)
+
 
 class TooCloseDone:
     """
