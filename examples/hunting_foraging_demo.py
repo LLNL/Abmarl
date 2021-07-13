@@ -128,27 +128,27 @@ algo_name = 'A2C'
 params = {
     'experiment': {
         'title': '{}'.format('ManyForager_5-ManySmartPredator_2-GridTeamObs-View_3-PenalizeDeath'),
-        # 'title': '{}'.format('TestRun'),
+        'sim_creator': lambda config=None: env,
     },
     'ray_tune': {
         'run_or_experiment': algo_name,
         'checkpoint_freq': 10,
-        'checkpoint_at_end': False,
+        'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 20_000,
+            'episodes_total': 2000,
         },
         'verbose': 2,
         'config': {
             # --- Environment ---
             'env': "HuntingForaging",
             'horizon': 200,
-            # 'env_config': {},
+            'env_config': {},
             # --- Multiagent ---
             'multiagent': {
                 'policies': policies,
                 'policy_mapping_fn': policy_mapping_fn,
             },
-            "num_workers": 1,
+            "num_workers": 7,
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
             "rollout_fragment_length": 200,
             "batch_mode": "complete_episodes",
