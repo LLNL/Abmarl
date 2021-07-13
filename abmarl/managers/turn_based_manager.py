@@ -15,7 +15,7 @@ class TurnBasedManager(SimulationManager):
     def __init__(self, sim):
         super().__init__(sim)
         self.agent_order = cycle({
-            agent.id for agent in self.agents.values()
+            agent_id: agent for agent_id, agent in self.agents.items()
             if (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent))
         })
 
