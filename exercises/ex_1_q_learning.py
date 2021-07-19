@@ -42,7 +42,7 @@ def q_learning(sim, iterations=10_000, gamma=0.95, alpha=0.1, epsilon=0.1, horiz
         "The Simulation must be wrapped with RavelDiscreteWrapper"
 
     # Setup the policy
-    # TODO: Create the q_table
+    # TODO: Initialize the q_table
     policy = EpsilonSoftPolicy(q_table, epsilon=epsilon)
 
     # Begin simulations
