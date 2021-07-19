@@ -40,7 +40,8 @@ def q_learning(sim, iterations=10_000, gamma=0.95, alpha=0.1, epsilon=0.1, horiz
 
     # Begin simulations
     for i in range(iterations):
-        print(f"Episode {i}")
+        if i % 100 == 0:
+            print(f"Episode {i}")
         obs = sim.reset()
         for _ in range(horizon):
             action = policy.act(obs)

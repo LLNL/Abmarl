@@ -4,7 +4,7 @@
 
 # In this exercise, we will write our own Q-learning method using the algorithm
 # defined in our class. The skeleton of the function is already in place for us;
-# we just need to fill out the details.
+# we just need to fill out the details where we see TODO.
 
 from gym.spaces import Discrete
 import numpy as np

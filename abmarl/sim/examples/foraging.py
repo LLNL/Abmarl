@@ -44,8 +44,9 @@ class ForagingSim(AgentBasedSimulation):
 
         self.reward = 0
 
-    def step(self, action):
+    def step(self, action_dict):
         forager = self.agents['forager']
+        action = action_dict['forager']
         if action == self.Actions.UP:
             if forager.position[0] != 0:
                 forager.position += np.array([-1, 0])
@@ -145,7 +146,7 @@ if __name__ == '__main__':
         sim.render(fig=fig)
         x = []
         for j in range(200):
-            sim.step(sim.agents['forager'].action_space.sample())
+            sim.step({'forager': sim.agents['forager'].action_space.sample()})
             reward = sim.get_reward('forager')
             if reward > 0:
                 print(sim.get_obs('forager'))
