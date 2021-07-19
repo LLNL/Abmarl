@@ -121,7 +121,9 @@ class ForagingSim(AgentBasedSimulation):
 
         shape = ['s' for _ in self.food]
         shape.append('o')
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
+        color = ['g' for _ in self.food]
+        color.append('b')
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor=color)
 
         plt.plot()
         plt.pause(1e-6)
