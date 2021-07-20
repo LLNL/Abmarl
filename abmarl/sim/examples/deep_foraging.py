@@ -1,4 +1,7 @@
 
+from enum import IntEnum
+
+from gym.spaces import Discrete
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -46,6 +49,21 @@ class FoodAgent(ComponentAgent):
 
 # Create the simulation environment from the components
 class DeepForagingSim(AgentBasedSimulation):
+    class Actions(IntEnum):
+        UP = 0
+        RIGHT = 1
+        DOWN = 2
+        LEFT = 3
+        HARVEST = 4
+
+    _action_mapping = {
+        Actions.UP: {'move': np.array([-1, 0]), 'attack': False},
+        Actions.RIGHT: {'move': np.array([0, 1]), 'attack': False},
+        Actions.DOWN: {'move': np.array([1, 0]), 'attack': False},
+        Actions.LEFT: {'move': np.array([0, -1]), 'attack': False},
+        Actions.HARVEST: {'move': np.array([0, 0]), 'attack': True}
+    }
+    
     def __init__(self, num_food, **kwargs):
         # Hack the number of food agents
         food = {f'food{i}': FoodAgent(id=f'food{i}') for i in range(num_food)}
@@ -89,6 +107,10 @@ class DeepForagingSim(AgentBasedSimulation):
         # agents have been configured correctly.
         self.finalize()
 
+        # Hack the forager's action space
+        self.agents['forager'].action_space = Discrete(5)
+
+
     def reset(self, **kwargs):
         # The state handlers need to reset. Since the agents' teams do not change
         # throughout the episode, the team state does not need to reset.
@@ -102,6 +124,10 @@ class DeepForagingSim(AgentBasedSimulation):
         self.rewards = {agent: 0 for agent in self.agents}
 
     def step(self, action_dict, **kwargs):
+        # Convert from discrete actions
+        for agent_id, action in action_dict.items():
+            action_dict[agent_id] = self._action_mapping[action]
+
         # Process attacking
         for agent_id, action in action_dict.items():
             attacking_agent = self.agents[agent_id]
@@ -183,51 +209,3 @@ class DeepForagingSim(AgentBasedSimulation):
 
     def get_info(self, *args, **kwargs):
         return {}
-
-
-if __name__ == '__main__':
-    food = {f'food{i}': FoodAgent(id=f'food{i}', team=1) for i in range(12)}
-    foragers = {
-        f'forager{i}': HuntingForagingAgent(
-            id=f'forager{i}', agent_view=5, team=2, move_range=1, attack_range=1, attack_strength=1
-        ) for i in range(7)
-    }
-    hunters = {
-        f'hunter{i}': HuntingForagingAgent(
-            id=f'hunter{i}', agent_view=2, team=3, move_range=1, attack_range=1, attack_strength=1
-        ) for i in range(2)
-    }
-    agents = {**food, **foragers, **hunters}
-
-    region = 20
-    team_attack_matrix = np.zeros((4, 4))
-    team_attack_matrix[2, 1] = 1
-    team_attack_matrix[3, 2] = 1
-    env = HuntingForagingEnv(
-        region=region,
-        agents=agents,
-        team_attack_matrix=team_attack_matrix,
-        number_of_teams=3,
-    )
-    env.reset()
-
-    shape_dict = {
-        1: 's',
-        2: 'o',
-        3: 'd'
-    }
-
-    import pprint
-    pprint.pprint({agent_id: env.get_obs(agent_id) for agent_id in env.agents})
-    fig = plt.gcf()
-    env.render(fig=fig, shape_dict=shape_dict)
-
-    for _ in range(50):
-        action_dict = {
-            agent.id: agent.action_space.sample()
-            for agent in env.agents.values()
-            if agent.is_alive and isinstance(agent, HuntingForagingAgent)
-        }
-        env.step(action_dict)
-        env.render(fig=fig, shape_dict=shape_dict)
-        print(env.get_all_done())
