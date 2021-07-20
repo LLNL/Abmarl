@@ -42,6 +42,11 @@ def q_learning(sim, iterations=10_000, gamma=0.95, alpha=0.1, epsilon=0.1, horiz
         "The Simulation must be wrapped with RavelDiscreteWrapper"
 
     # Setup the policy
+    # Hint: Recall that the simulation has an observation space and an action space,
+    # which can be used as the rows and columns of the Q-Table. The length of those
+    # spaces is stored in `n`. For example, sim.observation_space.n gives us the
+    # number of possible states in our simulation.
+    # Hint: numpy's random.normal can help with a random initialization.
     # TODO: Initialize the q_table
     policy = EpsilonSoftPolicy(q_table, epsilon=epsilon)
 
