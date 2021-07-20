@@ -1,5 +1,6 @@
 from gym import Env as GymEnv
 
+from abmarl.sim import ObservingAgent, ActingAgent
 
 class GymWrapper(GymEnv):
     """
@@ -10,9 +11,13 @@ class GymWrapper(GymEnv):
     def __init__(self, sim):
         from abmarl.managers import SimulationManager
         assert isinstance(sim, SimulationManager)
-        assert len(sim.agents) == 1 # Can only work with single agents
+        learning_agents = {
+            agent.id: agent for agent in sim.agents.values()
+            if isinstance(agent, ObservingAgent) and isinstance(agent, ActingAgent)
+        }
+        assert len(learning_agents) == 1 # Can only work with single agents
         self.sim = sim
-        self.agent_id, agent = next(iter(sim.agents.items()))
+        self.agent_id, agent = next(iter(learning_agents.items()))
         self.observation_space = agent.observation_space
         self.action_space = agent.action_space
 
