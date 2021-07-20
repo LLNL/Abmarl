@@ -221,7 +221,7 @@ class GridMovementActor(Actor):
 
     @property
     def null_value(self):
-        return np.zeros(2)
+        return np.zeros(2, dtype=np.int)
 
 
 class SpeedAngleMovementActor:
