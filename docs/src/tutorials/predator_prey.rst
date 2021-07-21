@@ -16,8 +16,8 @@ grid hunting the prey agents.
 
    Animation of predator and prey agents in a two-dimensional grid.
 
-The PredatorPrey simulation file can be found `here <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/predator_prey/predator_prey.py>`_,
-and the configuration file `here <https://github.com/LLNL/Abmarl/blob/main/examples/predator_prey/predator_prey_training.py>`_.
+This tutorial uses the `PredatorPrey simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/predator_prey/predator_prey.py>`_,
+and the `PredatorPrey configuration <https://github.com/LLNL/Abmarl/blob/main/examples/predator_prey/predator_prey_training.py>`_.
 
 .. ATTENTION::
    This tutorial requires seaborn for visualizing the resources. This can be easily
