@@ -17,6 +17,9 @@ they all have the same action space, observation space, and objective function.
 
    Animation of agents moving left and right in a corridor until they reach the end.
 
+This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/corridor/multi_corridor.py>`_
+and the `MultiCorridor configuration <https://github.com/LLNL/Abmarl/blob/main/examples/multi_corridor_example.py>`_.
+
 Creating the MultiCorridor Simulation
 -------------------------------------
 
