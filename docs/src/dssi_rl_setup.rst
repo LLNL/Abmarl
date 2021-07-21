@@ -12,7 +12,7 @@ If you have Mac or Linux, you can install ABMARL directly onto your machine.
 
 First, download the repository:
 
-.. code_block::
+.. code-block::
 
    git clone https://github.com/LLNL/Abmarl.git
    cd Abmarl
@@ -21,7 +21,7 @@ First, download the repository:
 
 Then, create a virtual environment and install ABMARL from the source
 
-.. code_block::
+.. code-block::
 
    python3 -m venv v_abmarl
    source v_abmarl/bin/activate
@@ -31,7 +31,7 @@ Then, create a virtual environment and install ABMARL from the source
 
 Test that your installation is successful
 
-.. code_block::
+.. code-block::
 
    abmarl train examples/multi_corridor_example.py
 
@@ -40,7 +40,7 @@ behavior in a subdirectory with the name of the simulation, `MultiCorridor`, fol
 by the date and time (e.g. `MultiCorridor_2021-07-20_17-36`). You can confirm the
 trained behavior with
 
-.. code_block::
+.. code-block::
 
    abmarl visualize ~/abmarl_results/MultiCorridor_2021-07-20_17-36/
 
@@ -58,13 +58,13 @@ installed on your system.
 Once you've done that, ssh onto the system of choice (probably flash for
 DSSI students).
 
-.. code_block
+.. code-block
 
    ssh -X -Y username@flash.llnl.gov
 
 Then, download the repository:
 
-.. code_block::
+.. code-block::
 
    git clone https://github.com/LLNL/Abmarl.git
    cd Abmarl
@@ -72,13 +72,13 @@ Then, download the repository:
 
 Then source the virtual environment
 
-.. code_block::
+.. code-block::
 
    source /usr/workspace/DSSI-RL/dssi-rl/bin/activate
 
 Test that your installation is successful
 
-.. code_block::
+.. code-block::
 
    abmarl train examples/multi_corridor_example.py
 
@@ -87,7 +87,7 @@ behavior in a subdirectory with the name of the simulation, `MultiCorridor`, fol
 by the date and time (e.g. `MultiCorridor_2021-07-20_17-36`). You can confirm the
 trained behavior with
 
-.. code_block::
+.. code-block::
 
    abmarl visualize ~/abmarl_results/MultiCorridor_2021-07-20_17-36/
 
