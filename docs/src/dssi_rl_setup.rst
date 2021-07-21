@@ -92,8 +92,3 @@ trained behavior with
    abmarl visualize ~/abmarl_results/MultiCorridor_2021-07-20_17-36/
 
 You should see five green squares moving to the right.
-
-
-.. WARNING::
-   If you are using `conda` to manage your virtual environment, then you must also
-   install ffmpeg.
