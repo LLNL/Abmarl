@@ -24,5 +24,6 @@ for pre-existing projects to prototype RL as a potential solution.
    overview
    featured_usage
    install
+   dssi_rl_setup
    tutorials/tutorials
    api
