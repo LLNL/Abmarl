@@ -69,7 +69,7 @@ First, download the repository:
 
 Then, create a virtual environment and install ABMARL from the source
 
-.. ATTENTION:
+.. ATTENTION::
    If you are installing on LC, you should setup your virtual environment using
    the system site packages, like so ``python3 -m venv --system-site-packages v_abmarl``
 
