@@ -5,8 +5,8 @@
 DSSI RL Setup
 =============
 
-Unix Users
-----------
+Unix Users (LC Users see below)
+-------------------------------
 
 If you have Mac or Linux, you can install ABMARL directly onto your machine.
 
@@ -47,11 +47,11 @@ trained behavior with
 You should see five green squares moving to the right.
 
 
-Windows/Amazon Workspace Users
-------------------------------
+Windows/Amazon Workspace Users/LC Users
+---------------------------------------
 
-If you have Windows and/or are using the Amazon Workspace, you can connect to LC
-via VNC and use the ABMARL installation on LC. You must have an LC account and
+If you have Windows and/or are using the Amazon Workspace, you can connect to CZ
+via VNC and use the ABMARL installation on CZ. You must have an LC account and
 `VNC viewer <https://hpc.llnl.gov/software/visualization-software/vnc-realvnc>`_
 installed on your system.
 
