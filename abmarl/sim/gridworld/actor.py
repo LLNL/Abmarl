@@ -93,6 +93,7 @@ class MoveActor(ActorBaseComponent):
             if 0 <= new_position[0] < self.rows and \
                     0 <= new_position[1] < self.cols:
                 self.grid.move(agent, new_position)
+                # TODO: Not clear that the move processing should be handled by the grid.
 
 
 class AttackActor(ActorBaseComponent):
@@ -191,7 +192,7 @@ class AttackActor(ActorBaseComponent):
             local_grid[
                 (r_lower+agent.attack_range-r):(r_upper+agent.attack_range-r),
                 (c_lower+agent.attack_range-c):(c_upper+agent.attack_range-c)
-            ] = self.grid[r_lower:r_upper, c_lower:c_upper]
+            ] = self.grid._internal[r_lower:r_upper, c_lower:c_upper]
 
             # Generate an attack mask. The agent's attack can be blocked
             # by other view-blocking agents, which hide the cells "behind" them. We
@@ -273,33 +274,30 @@ class AttackActor(ActorBaseComponent):
                                         mask[r + agent.attack_range, c + agent.attack_range] = 0
 
             # Randomly scan the local grid for attackable agents.
-            local_grid_size = (2 * agent.attack_range + 1)
-            rs, cs = np.unravel_index(
-                np.random.choice(local_grid_size ** 2, local_grid_size ** 2, False),
-                shape=(local_grid_size, local_grid_size)
-            )
-            for r, c in zip(rs, cs):
-                if mask[r, c]:
-                    other = local_grid[r, c]
-                    if other is None: # No agent here
-                        continue
-                    if other.id == agent.id: # Cannot attack yourself
-                        continue
-                    elif not other.active: # Cannot attack inactive agents
-                        continue
-                    elif other.encoding not in self.attack_mapping[agent.encoding]:
-                        # Cannot attack this type of agent
-                        continue
-                    elif np.random.uniform() > agent.attack_accuracy:
-                        continue
-                    else:
-                        return other
+            attackable_agents = []
+            for r in range(2 * agent.attack_range + 1):
+                for c in range(2 * agent.attack_range + 1):
+                    if mask[r, c]: # We can see this cell
+                        candidate_agents = local_grid[r, c]
+                        for other in candidate_agents.values():
+                            if other.id == agent.id: # Cannot attack yourself
+                                continue
+                            elif not other.active: # Cannot attack inactive agents
+                                continue
+                            elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                # Cannot attack this type of agent
+                                continue
+                            elif np.random.uniform() > agent.attack_accuracy:
+                                continue
+                            else:
+                                attackable_agents.append(other)
+            return np.random.choice(attackable_agents)
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
             if action: # Agent has chosen to attack
                 attacked_agent = determine_attack(attacking_agent)
-                if attacked_agent is not None and isinstance(attacked_agent, HealthAgent):
+                if attacked_agent is not None:
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
                         self.grid.remove(attacked_agent, attacked_agent.position)

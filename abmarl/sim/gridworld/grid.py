@@ -1,6 +1,7 @@
 
 import numpy as np
 
+# TODO: Consider "is a" ndarray as a design choice.
 class Grid:
     """
     A Grid has a numpy array that stores the agents at indicies of the array.
