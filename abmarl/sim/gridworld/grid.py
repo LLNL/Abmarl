@@ -91,14 +91,16 @@ class NonOverlappingGrid(Grid):
     A grid where agents cannot overlap.
     """
     def reset(self, **kwargs):
-        self.fill(None)
+        for i in range(self.shape[0]):
+            for j in range(self.shape[1]):
+                self[i,j] = {}
 
     def query(self, agent, ndx):
         """
         The cell is available for the agent if it is empty.
         """
         ndx = tuple(ndx)
-        return self[ndx] is None
+        return not self[ndx]
 
     def place(self, agent, ndx):
         """
@@ -130,11 +132,11 @@ class NonOverlappingGrid(Grid):
 
     def remove(self, agent, ndx):
         ndx = tuple(ndx)
-        self[ndx] = None
+        del self[ndx][agent.id]
 
     def _place(self, agent, ndx):
         # Unprotected placement
-        self[ndx] = agent
+        self[ndx][agent.id] = agent
 
 
 class OverlappableGrid(Grid):
