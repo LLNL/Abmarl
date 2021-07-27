@@ -36,7 +36,7 @@ Dependency Note
 ---------------
 Abmarl has the following dependencies
 
-* Python 3.7+
+* Python 3.7 or Python3.8
 * Tensorflow 2.4+
 * Ray 1.2.0
 * matplotlib
