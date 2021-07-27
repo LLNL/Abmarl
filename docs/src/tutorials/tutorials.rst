@@ -11,4 +11,5 @@ We provide tutorials that demonstrate how to train, visualize, and analyze MARL 
 
    multi_corridor
    predator_prey
+   gym
    magpie
