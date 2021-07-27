@@ -18,7 +18,7 @@ Simulation Setup
 
 We'll start by creating gym's built-in guessing game.
 
-.. code_block:: python
+.. code-block:: python
 
    import gym
    from ray.tune.registry import register_env
@@ -29,7 +29,7 @@ We'll start by creating gym's built-in guessing game.
 
 .. NOTE::
 
-   Even gym built-in environments need to be registered with RLlib.
+   Even gym's built-in environments need to be registered with RLlib.
 
 Experiment Parameters
 `````````````````````
