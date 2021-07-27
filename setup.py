@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='abmarl',
-    version='0.1.2',
+    version='0.1.3',
     description='Agent Based Simulation and MultiAgent Reinforcement Learning',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -20,6 +20,7 @@ setuptools.setup(
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     project_urls={
@@ -33,7 +34,7 @@ setuptools.setup(
         'matplotlib',
         'seaborn',
     ],
-    python_required='>=3.7',
+    python_requires='>=3.7, <3.9',
     entry_points={
         'console_scripts': [
             'abmarl=abmarl.scripts.scripts:cli'
