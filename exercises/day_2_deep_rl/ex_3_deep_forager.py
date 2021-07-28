@@ -43,25 +43,6 @@ plt.show()
 # Before closing the window, notice how the agent's observation coorelates to
 # nearby food in the grid.
 
-# Run the simulation
-# The agent will not move and will only attack. As you increaes with the forager's
-# attack_range, notice that it can harvest food further from itself. If the attack
-# range is less than agent_view, then the forager may be able to see food, but
-# not harvest it.
-fig = plt.figure()
-for i in range(5):
-    print(f"Episode {i}")
-    sim.reset()
-    sim.render(fig=fig)
-    for _ in range(ATTACK_RANGE):
-        action = {'forager': {'attack': True}}
-        obs, _, done, _ = sim.step(action)
-        print(); print(obs['forager']['position'])
-        sim.render(fig=fig)
-        plt.pause(2)
-        if done['__all__']:
-            break
-
 # TODO: Consider this
 # When the forager chooses to harvest, the simulation determines if there is nearby
 # food, and if so the foraging is successful. So the attack range does not change
