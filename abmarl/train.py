@@ -12,9 +12,9 @@ def run(full_config_path):
     import os
     import shutil
     import time
-    home = os.path.expanduser("~")
+    base = experiment_mod.params['ray_tune'].get('local_dir', os.path.expanduser("~"))
     output_dir = os.path.join(
-        home, 'abmarl_results/{}_{}'.format(
+        base, 'abmarl_results/{}_{}'.format(
             title, time.strftime('%Y-%m-%d_%H-%M')
         )
     )
