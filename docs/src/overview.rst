@@ -258,6 +258,13 @@ specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
 in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
 
+.. NOTE::
+
+   By default, the "base" of the output directory is the home directory, and Abmarl will
+   create the `abmarl_results` directory there. The base directory can by configured
+   in the `params` under `ray_tune` using the `local_dir` parameter. This value
+   should be a full path. For example, ``'local_dir': '/usr/local/scratch'``.
+
 
 Visualizing
 -----------
