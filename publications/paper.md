@@ -48,9 +48,9 @@ objectives [@hide-n-seek].
 
 To train agents with Multi-Agent Reinforcement Learning, one needs two components: simulation
 and algorithm (also commonly referred to as environment and agent). Much effort
-has been given to the development of RL algorithms, which has brought us exciting
+has been given to the development of MARL algorithms, which has brought us exciting
 breakthroughs and enhancements in the field of artificial intelligence. Our aim,
-however, focuses on the simulation component of Reinforcement Learning.
+however, focuses on the simulation component of MARL.
 
 Several projects have attempted to define a standard set
 of benchmark scenarios for Multi-Agent problems. In their groundbreaking work,
@@ -60,9 +60,9 @@ Environment (MPE) (now managed as a part of PettingZoo) as a benchmark suite tha
 includes continuous movement and communication features. @magent produced scalable
 grid-based simulations and demonstrated emergent behavior in multi-team games
 on the order of millions of agents. @smac and @marlo brought RL research closer to home,
-giving researchers access to dozens of multi-agent scenarios in the popular game
+giving researchers access to dozens of multi-agent scenarios in the popular games
 StarCraft and Minecraft, respectively. @neuralmmo also targeted video games by
-supporting multi-agent reinforcement learning in MMORPG-styled simulations with
+supporting MARL in MMORPG-styled simulations with
 persistent, open-ended tasks among multiple agents. @smarts brought us realistic
 traffic simulation scenarios to lead society towards autonomous driving.
 
@@ -85,7 +85,7 @@ development without worrying about the data exchange.
 We developed and tuned Abmarl's intuitive command-line interface through practical experience
 while working on [@hybrid]. Our interface gives researchers a running-start
 in MARL experimentation. We handle all the workflow elements needed to setup, run,
-and reproduce MARL experiments, providing direct abilities to train, visualize,
+and reproduce MARL experiments, providing direct access to train, visualize,
 and analyze experiments. We streamline the savvy-practitioner's experience and lower
 the barrier for new researchers to join the field. The analysis module sets Abmarl
 apart from others as it provides a simple command line interface to add
