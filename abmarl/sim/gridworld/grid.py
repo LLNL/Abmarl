@@ -23,7 +23,7 @@ class Grid:
         """
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
-                self[i,j] = {}
+                self._internal[i,j] = {}
 
     def query(self, agent, ndx):
         """
@@ -39,8 +39,8 @@ class Grid:
             True if the cell is available for this agent, otherwise False.
         """
         ndx = tuple(ndx)
-        return not self[ndx] or (
-            next(iter(self[ndx].values())).overlappable and agent.overlappable
+        return not self._internal[ndx] or (
+            next(iter(self._internal[ndx].values())).overlappable and agent.overlappable
         )
 
     def place(self, agent, ndx):
