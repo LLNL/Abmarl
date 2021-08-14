@@ -90,20 +90,9 @@ class Grid:
         if to_ndx == from_ndx:
             return True
         elif self.query(agent, to_ndx):
-            self.remove(agent, from_ndx)
+            del self._internal[from_ndx][agent.id]
             self._internal[to_ndx][agent.id] = agent
             agent.position = np.array(to_ndx)
             return True
         else:
             return False
-
-    def remove(self, agent, ndx):
-        """
-        Remove an agent from an index.
-
-        Args:
-            agent: The agent to remove
-            ndx: The old index for this agent
-        """
-        ndx = tuple(ndx)
-        del self[ndx][agent.id]
