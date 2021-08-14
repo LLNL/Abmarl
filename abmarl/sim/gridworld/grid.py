@@ -61,7 +61,7 @@ class Grid:
         """
         ndx = tuple(ndx)
         if self.query(agent, ndx):
-            self._place(agent, ndx)
+            self._internal[ndx][agent.id] = agent
             agent.position = np.array(ndx)
             return True
         else:
@@ -91,7 +91,7 @@ class Grid:
             return True
         elif self.query(agent, to_ndx):
             self.remove(agent, from_ndx)
-            self._place(agent, to_ndx)
+            self._internal[to_ndx][agent.id] = agent
             agent.position = np.array(to_ndx)
             return True
         else:
@@ -107,11 +107,3 @@ class Grid:
         """
         ndx = tuple(ndx)
         del self[ndx][agent.id]
-
-    @abstractmethod
-    def _place(self, agent, ndx):
-        """
-        Unprotected placement. Internal use only.
-        """
-        # Unprotected placement
-        self[ndx][agent.id] = agent
