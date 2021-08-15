@@ -5,6 +5,7 @@ import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent
+from abmarl.sim.gridworld.grid import Grid
 
 
 class GridWorldSimulation(AgentBasedSimulation, ABC):
@@ -95,10 +96,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
     @classmethod
     def _build_sim(cls, rows, cols, overlapping=False, **kwargs):
-        if overlapping:
-            grid = OverlappableGrid((rows, cols), dtype=object)
-        else:
-            grid = NonOverlappingGrid((rows, cols), dtype=object)
+        grid = Grid((rows, cols), dtype=object)
         kwargs['grid'] = grid
         return cls(**kwargs)
 
