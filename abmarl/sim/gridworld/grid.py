@@ -67,32 +67,13 @@ class Grid:
         else:
             return False
 
-    def move(self, agent, to_ndx):
+    def remove(self, agent, ndx):
         """
-        Move an agent from one index to another.
-
-        If the move is successful, the agent will be placed at that index in the
-        grid and the agent's position will be updated. The move is successful if
-        the new position is unoccupied or if the agent already occupying that position
-        is overlappable AND this agent is overlappable.
-
-        Note: the agent will be removed from its old position in the grid.
+        Remove an agent from an index.
 
         Args:
-            agent: The agent to move.
-            to_ndx: The new index for this agent.
-
-        Returns:
-            The successfulness of the move.
+            agent: The agent to remove
+            ndx: The old index for this agent
         """
-        from_ndx = tuple(agent.position)
-        to_ndx = tuple(to_ndx)
-        if to_ndx == from_ndx:
-            return True
-        elif self.query(agent, to_ndx):
-            del self._internal[from_ndx][agent.id]
-            self._internal[to_ndx][agent.id] = agent
-            agent.position = np.array(to_ndx)
-            return True
-        else:
-            return False
+        ndx = tuple(ndx)
+        del self._internal[ndx][agent.id]

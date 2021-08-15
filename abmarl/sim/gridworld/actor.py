@@ -81,19 +81,35 @@ class MoveActor(ActorBaseComponent):
         """
         The agent can move to nearby squares.
 
+        The agent's new position must be within the grid and the cell-occupation rules
+        must be met.
+
         Args:
             agent: Move the agent if it is a MovingAgent.
             action_dict: The action dictionary for this agent in this step. If
                 the agent is a MovingAgent, then the action dictionary will contain
                 the "move" entry.
+
+        Returns:
+            True if the move is successful, False otherwise.
         """
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
             new_position = agent.position + action
             if 0 <= new_position[0] < self.rows and \
                     0 <= new_position[1] < self.cols:
-                self.grid.move(agent, new_position)
-                # TODO: Not clear that the move processing should be handled by the grid.
+                from_ndx = tuple(agent.position)
+                to_ndx = tuple(new_position)
+                if to_ndx == from_ndx:
+                    return True
+                elif self.query(agent, to_ndx):
+                    self.grid.remove(agent, from_ndx)
+                    self.grid.place(agent, to_ndx)
+                    return True
+                else:
+                    return False
+            else:
+                return False
 
 
 class AttackActor(ActorBaseComponent):
