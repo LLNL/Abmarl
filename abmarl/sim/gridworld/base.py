@@ -95,7 +95,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
 
     @classmethod
-    def _build_sim(cls, rows, cols, overlapping=False, **kwargs):
+    def _build_sim(cls, rows, cols, **kwargs):
         grid = Grid((rows, cols), dtype=object)
         kwargs['grid'] = grid
         return cls(**kwargs)
