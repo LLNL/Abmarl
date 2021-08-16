@@ -1,7 +1,6 @@
 
 import numpy as np
 
-# TODO: Consider "is a" ndarray as a design choice.
 class Grid:
     """
     A Grid has a numpy array that stores the agents at indicies of the array.
@@ -15,16 +14,31 @@ class Grid:
         cols: The number of columns in the grid.
     """
     def __init__(self, rows, cols):
-        self._internal = np.empty((rows, cols), dtype=object)
+        self._internal = np.empty((self.rows, self.cols), dtype=object)
 
-    def __init__(self, array):
-        """
-        Create a grid from an already-created numpy array.
+    # def __init__(self, array):
+    #     """
+    #     Create a grid from an already-created numpy array.
 
-        Args:
-            array: Numpy array to be used as the internal.
+    #     Args:
+    #         array: Numpy array to be used as the internal.
+    #     """
+    #     assert isinstance(array, np.ndarray), "Array must be a numpy array"
+    #     self._internal = array
+
+    @property
+    def rows(self):
         """
-        self._internal = array
+        The number of rows in the grid.
+        """
+        return self._internal.shape[0]
+
+    @property
+    def cols(self):
+        """
+        The number of columns in the grid.
+        """
+        return self._internal.shape[1]
 
     def reset(self, **kwargs):
         """
@@ -87,15 +101,15 @@ class Grid:
         ndx = tuple(ndx)
         del self._internal[ndx][agent.id]
 
-    def __getitem__(self, subscript):
-        array = self._internal.__getitem__(subscript)
-        if type(array) is not np.ndarray: # It's a number retrieved from a single index
-            return array # Just return that number
-        else:
-            return Grid(array)
+    # def __getitem__(self, subscript):
+    #     array = self._internal.__getitem__(subscript)
+    #     if type(array) is not np.ndarray: # It's a number retrieved from a single index
+    #         return array # Just return that number
+    #     else:
+    #         return Grid(array)
 
-    def __setitem__(self, subscript, item):
-        raise RuntimeError("You should not be setting an item directly in the grid.")
+    # def __setitem__(self, subscript, item):
+    #     raise RuntimeError("You should not be setting an item directly in the grid.")
 
-    def __delitem__(self, subscript):
-        raise RuntimeError("You should not be deleting an item directly in the grid.")
+    # def __delitem__(self, subscript):
+    #     raise RuntimeError("You should not be deleting an item directly in the grid.")

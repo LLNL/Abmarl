@@ -110,22 +110,20 @@ class GridWorldBaseComponent(ABC):
     def __init__(self, agents=None, grid=None, **kwargs):
         self.agents = agents
         self.grid = grid
-        self._rows = self.grid.shape[0]
-        self._cols = self.grid.shape[1]
 
     @property
     def rows(self):
         """
         The number of rows in the grid.
         """
-        return self._rows
+        return self.grid.rows
 
     @property
     def cols(self):
         """
         The number of columns in the grid.
         """
-        return self._cols
+        return self.grid.cols
 
     @property
     def grid(self):
