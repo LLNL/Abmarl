@@ -14,7 +14,9 @@ class Grid:
         cols: The number of columns in the grid.
     """
     def __init__(self, rows, cols):
-        self._internal = np.empty((self.rows, self.cols), dtype=object)
+        assert type(rows) is int and rows > 0, "Rows must be a positive integer."
+        assert type(cols) is int and cols > 0, "Cols must be a positive integer."
+        self._internal = np.empty((rows, cols), dtype=object)
 
     @property
     def rows(self):
@@ -34,8 +36,8 @@ class Grid:
         """
         Reset the grid to an empty state.
         """
-        for i in range(self.shape[0]):
-            for j in range(self.shape[1]):
+        for i in range(self.rows):
+            for j in range(self.cols):
                 self._internal[i,j] = {}
 
     def query(self, agent, ndx):

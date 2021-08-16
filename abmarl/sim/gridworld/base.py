@@ -96,7 +96,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
     @classmethod
     def _build_sim(cls, rows, cols, **kwargs):
-        grid = Grid((rows, cols), dtype=object)
+        grid = Grid(rows, cols)
         kwargs['grid'] = grid
         return cls(**kwargs)
 
@@ -139,8 +139,6 @@ class GridWorldBaseComponent(ABC):
     @grid.setter
     def grid(self, value):
         assert isinstance(value, Grid), "The grid must be a Grid object."
-        assert len(value.shape) == 2, "The grid must be a 2-dimensional array."
-        assert value.dtype is np.dtype(object), "The grid must be a numpy array of objects."
         self._grid = value
 
     @property

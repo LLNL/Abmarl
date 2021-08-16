@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from abmarl.sim.gridworld.base import GridWorldBaseComponent, NonOverlappingGrid, OverlappableGrid
+from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import HealthAgent
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):

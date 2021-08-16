@@ -5,64 +5,43 @@ import numpy as np
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
     AttackingAgent, HealthAgent
-from abmarl.sim.gridworld.state import UniquePositionState, HealthState
+from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor
-from abmarl.sim.gridworld.observer import GridObserver
+from abmarl.sim.gridworld.observer import SingleGridObserver
 from abmarl.tools.matplotlib_utils import mscatter
 
 
 class WallAgent(GridWorldAgent):
     """
-    Wall agents, immobile and view blocking.
-
-    Args:
-        encoding: Default encoding is 1.
-        render_shape: Default render_shape set to 'X'.
+    Wall agents, immobile, and view blocking.
     """
-    def __init__(self, encoding=1, render_shape='X', **kwargs):
+    def __init__(self, **kwargs):
+        kwargs['view_blocking'] = True
         super().__init__(**kwargs)
-        self.encoding = encoding
-        self.render_shape = render_shape
 
 
 class FoodAgent(HealthAgent):
     """
     Food Agents do not move and can be attacked by Foraging Agents.
-    
-    Args:
-        encoding: Default encoding set to 2.
     """
-    def __init__(self, encoding=2, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.encoding = encoding
 
 
 class ForagingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
     """
     Foraging Agents can move, attack Food agents, and be attacked by Hunting agents.
-    
-    Args:
-        encoding: Default encoding set to 3.
-        render_shape: Default render_shape set to 'o'.
     """
-    def __init__(self, encoding=3, render_shape='o', **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.encoding = encoding
-        self.render_shape = render_shape
 
 
 class HuntingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
     """
     Hunting agents can move and attack Foraging agents.
-
-    Args:
-        encoding: Default encoding set to 4.
-        render_shape: Default render_shape set to 'D'.
     """
-    def __init__(self, encoding=4, render_shape='D', **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.encoding = encoding
-        self.render_shape = render_shape
 
 
 class GridSim(GridWorldSimulation):
@@ -70,7 +49,7 @@ class GridSim(GridWorldSimulation):
         self.agents = kwargs['agents']
 
         # State Components
-        self.position_state = UniquePositionState(**kwargs)
+        self.position_state = PositionState(**kwargs)
         self.health_state = HealthState(**kwargs)
 
         # Action Components
@@ -78,7 +57,7 @@ class GridSim(GridWorldSimulation):
         self.move_actor = MoveActor(position_state=self.position_state, **kwargs)
 
         # Observation Components
-        self.grid_observer = GridObserver(**kwargs)
+        self.grid_observer = SingleGridObserver(**kwargs)
 
         self.finalize()
 
@@ -149,21 +128,21 @@ if __name__ == "__main__":
 
     # Create agents
     walls = {
-        f'wall{i}': WallAgent(id=f'wall{i}', view_blocking=True) for i in range(7)
+        f'wall{i}': WallAgent(id=f'wall{i}', encoding=1, render_shape='X') for i in range(7)
     }
     food = {
-        f'food{i}': FoodAgent(id=f'food{i}', initial_health=1) for i in range(5)
+        f'food{i}': FoodAgent(id=f'food{i}', encoding=2, initial_health=1, render_shape='s') for i in range(5)
     }
     foragers = {
         f'forager{i}': ForagingAgent(
             id=f'forager{i}', initial_health=1, move_range=1, attack_range=1, attack_strength=1,
-            attack_accuracy=1, view_range=4
+            attack_accuracy=1, view_range=4, encoding=3, render_shape='o'
         ) for i in range(3)
     }
     hunters = {
         f'hunter{i}': HuntingAgent(
             id=f"hunter{i}", initial_health=1, move_range=1, attack_range=2, attack_strength=1,
-            attack_accuracy=1, view_range=3
+            attack_accuracy=1, view_range=3, encoding=4, render_shape='D'
         ) for i in range(1)
     }
     agents = {**walls, **food, **foragers, **hunters}
@@ -174,10 +153,14 @@ if __name__ == "__main__":
         4: [3]
     }
     sim = GridSim.build_sim(
-        rows=8, cols=12, agents=agents, attack_mapping=attack_mapping, overlapping=False
+        rows=8, cols=12, agents=agents, attack_mapping=attack_mapping
     )
     sim.reset()
     sim.render(fig=fig)
+
+    plt.show()
+
+    import sys; sys.exit()
 
     # Agents move around
     for _ in range(50):

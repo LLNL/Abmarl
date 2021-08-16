@@ -5,7 +5,7 @@ import numpy as np
 from gym.spaces import Box, Discrete
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.state import HealthState, UniquePositionState
+from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 
 
