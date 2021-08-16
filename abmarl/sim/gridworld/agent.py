@@ -9,7 +9,7 @@ class GridWorldAgent(PrincipleAgent):
     The base agent in the GridWorld.
     """
     def __init__(self, initial_position=None, view_blocking=False, overlappable=False,
-        encoding=None, render_shape='o', render_color='gray', **kwargs):
+            encoding=None, render_shape='o', render_color='gray', **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position

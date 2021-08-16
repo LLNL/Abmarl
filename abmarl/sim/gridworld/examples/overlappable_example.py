@@ -5,67 +5,37 @@ import numpy as np
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
     AttackingAgent, HealthAgent
-from abmarl.sim.gridworld.state import OverlappingPositionState, HealthState
+from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor
-from abmarl.sim.gridworld.observer import GridObserver
+from abmarl.sim.gridworld.observer import SingleGridObserver
 from abmarl.tools.matplotlib_utils import mscatter
 
 
 class WallAgent(GridWorldAgent):
     """
-    Wall agents, immobile and view blocking.
-
-    Args:
-        encoding: Default encoding is 1.
-        render_shape: Default render_shape set to 'X'.
+    Wall agents, immobile, and view blocking.
     """
-    def __init__(self, encoding=1, render_shape='X', **kwargs):
+    def __init__(self, **kwargs):
+        kwargs['view_blocking'] = True
         super().__init__(**kwargs)
-        self.encoding = encoding
-        self.render_shape = render_shape
 
 
-class FoodAgent(HealthAgent):
+class TreasureAgent(HealthAgent):
     """
     Food Agents do not move and can be attacked by Foraging Agents.
-    
-    Args:
-        encoding: Default encoding set to 2.
     """
-    def __init__(self, encoding=2, **kwargs):
+    def __init__(self, **kwargs):
         kwargs['overlappable'] = True
         super().__init__(**kwargs)
-        self.encoding = encoding
 
 
-class ForagingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
+class ExploringAgent(MovingAgent, GridObservingAgent):
     """
     Foraging Agents can move, attack Food agents, and be attacked by Hunting agents.
-    
-    Args:
-        encoding: Default encoding set to 3.
-        render_shape: Default render_shape set to 'o'.
     """
-    def __init__(self, encoding=3, render_shape='o', **kwargs):
+    def __init__(self, **kwargs):
         kwargs['overlappable'] = True
         super().__init__(**kwargs)
-        self.encoding = encoding
-        self.render_shape = render_shape
-
-
-class HuntingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
-    """
-    Hunting agents can move and attack Foraging agents.
-
-    Args:
-        encoding: Default encoding set to 4.
-        render_shape: Default render_shape set to 'D'.
-    """
-    def __init__(self, encoding=4, render_shape='D', **kwargs):
-        kwargs['overlappable'] = True
-        super().__init__(**kwargs)
-        self.encoding = encoding
-        self.render_shape = render_shape
 
 
 class GridSim(GridWorldSimulation):
@@ -73,15 +43,14 @@ class GridSim(GridWorldSimulation):
         self.agents = kwargs['agents']
 
         # State Components
-        self.position_state = OverlappingPositionState(**kwargs)
+        self.position_state = PositionState(**kwargs)
         self.health_state = HealthState(**kwargs)
 
         # Action Components
-        # self.attack_actor = AttackActor(health_state=self.health_state, **kwargs)
-        self.move_actor = MoveActor(**kwargs)
+        self.move_actor = MoveActor(position_state=self.position_state, **kwargs)
 
         # Observation Components
-        self.grid_observer = GridObserver(**kwargs)
+        self.grid_observer = SingleGridObserver(**kwargs)
 
         self.finalize()
 
@@ -90,12 +59,6 @@ class GridSim(GridWorldSimulation):
         self.health_state.reset(**kwargs)
 
     def step(self, action_dict, **kwargs):
-        # Process attacks:
-        # for agent_id, action in action_dict.items():
-        #     agent = self.agents[agent_id]
-        #     if agent.active:
-        #         self.attack_actor.process_action(agent, action, **kwargs)
-
         # Process moves
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
@@ -152,32 +115,21 @@ if __name__ == "__main__":
 
     # Create agents
     walls = {
-        f'wall{i}': WallAgent(id=f'wall{i}', view_blocking=True) for i in range(7)
+        f'wall{i}': WallAgent(id=f'wall{i}', encoding=1, render_shape='X') for i in range(7)
     }
-    food = {
-        f'food{i}': FoodAgent(id=f'food{i}', initial_health=1) for i in range(15)
+    treasure = {
+        f'treasure{i}': TreasureAgent(id=f'treasure{i}', encoding=2, initial_health=1, render_shape='s') for i in range(35)
     }
-    foragers = {
-        f'forager{i}': ForagingAgent(
-            id=f'forager{i}', initial_health=1, move_range=1, attack_range=1, attack_strength=1,
-            attack_accuracy=1, view_range=4
-        ) for i in range(7)
+    explorers = {
+        f'explorer{i}': ExploringAgent(
+            id=f'explorer{i}', initial_health=1, move_range=1, view_range=4, encoding=3, render_shape='o'
+        ) for i in range(3)
     }
-    hunters = {
-        f'hunter{i}': HuntingAgent(
-            id=f"hunter{i}", initial_health=1, move_range=1, attack_range=2, attack_strength=1,
-            attack_accuracy=1, view_range=3
-        ) for i in range(2)
-    }
-    agents = {**walls, **food, **foragers, **hunters}
+    agents = {**walls, **treasure, **explorers}
 
     # Create simulation
-    attack_mapping = {
-        3: [2],
-        4: [3]
-    }
     sim = GridSim.build_sim(
-        rows=8, cols=12, agents=agents, attack_mapping=attack_mapping, overlapping=True
+        rows=8, cols=12, agents=agents
     )
     sim.reset()
     sim.render(fig=fig)
@@ -190,3 +142,13 @@ if __name__ == "__main__":
         }
         sim.step(action)
         sim.render(fig=fig)
+
+    # Examine the agents' observations
+    from pprint import pprint
+    for agent in agents.values():
+        if isinstance(agent, ObservingAgent) and agent.active:
+            print(agent.position)
+            pprint(sim.get_obs(agent.id)['grid'])
+            print()
+
+    plt.show()
