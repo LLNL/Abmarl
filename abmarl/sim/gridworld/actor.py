@@ -208,7 +208,7 @@ class AttackActor(ActorBaseComponent):
             local_grid[
                 (r_lower+agent.attack_range-r):(r_upper+agent.attack_range-r),
                 (c_lower+agent.attack_range-c):(c_upper+agent.attack_range-c)
-            ] = self.grid._internal[r_lower:r_upper, c_lower:c_upper]
+            ] = self.grid[r_lower:r_upper, c_lower:c_upper]
 
             # Generate an attack mask. The agent's attack can be blocked
             # by other view-blocking agents, which hide the cells "behind" them. We
@@ -295,18 +295,20 @@ class AttackActor(ActorBaseComponent):
                 for c in range(2 * agent.attack_range + 1):
                     if mask[r, c]: # We can see this cell
                         candidate_agents = local_grid[r, c]
-                        for other in candidate_agents.values():
-                            if other.id == agent.id: # Cannot attack yourself
-                                continue
-                            elif not other.active: # Cannot attack inactive agents
-                                continue
-                            elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                # Cannot attack this type of agent
-                                continue
-                            elif np.random.uniform() > agent.attack_accuracy:
-                                continue
-                            else:
-                                attackable_agents.append(other)
+                        if candidate_agents is not None:
+                            for other in candidate_agents.values():
+                                if other.id == agent.id: # Cannot attack yourself
+                                    continue
+                                elif not other.active: # Cannot attack inactive agents
+                                    continue
+                                elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                    # Cannot attack this type of agent
+                                    continue
+                                elif np.random.uniform() > agent.attack_accuracy:
+                                    # Failed attack
+                                    continue
+                                else:
+                                    attackable_agents.append(other)
             return np.random.choice(attackable_agents)
 
         if isinstance(attacking_agent, self.supported_agent_type):

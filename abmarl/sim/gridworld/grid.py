@@ -16,16 +16,6 @@ class Grid:
     def __init__(self, rows, cols):
         self._internal = np.empty((self.rows, self.cols), dtype=object)
 
-    # def __init__(self, array):
-    #     """
-    #     Create a grid from an already-created numpy array.
-
-    #     Args:
-    #         array: Numpy array to be used as the internal.
-    #     """
-    #     assert isinstance(array, np.ndarray), "Array must be a numpy array"
-    #     self._internal = array
-
     @property
     def rows(self):
         """
@@ -101,15 +91,5 @@ class Grid:
         ndx = tuple(ndx)
         del self._internal[ndx][agent.id]
 
-    # def __getitem__(self, subscript):
-    #     array = self._internal.__getitem__(subscript)
-    #     if type(array) is not np.ndarray: # It's a number retrieved from a single index
-    #         return array # Just return that number
-    #     else:
-    #         return Grid(array)
-
-    # def __setitem__(self, subscript, item):
-    #     raise RuntimeError("You should not be setting an item directly in the grid.")
-
-    # def __delitem__(self, subscript):
-    #     raise RuntimeError("You should not be deleting an item directly in the grid.")
+    def __getitem__(self, subscript):
+        return self._internal.__getitem__(subscript)
