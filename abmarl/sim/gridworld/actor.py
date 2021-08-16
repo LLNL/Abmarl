@@ -102,7 +102,7 @@ class MoveActor(ActorBaseComponent):
                 to_ndx = tuple(new_position)
                 if to_ndx == from_ndx:
                     return True
-                elif self.query(agent, to_ndx):
+                elif self.grid.query(agent, to_ndx):
                     self.grid.remove(agent, from_ndx)
                     self.grid.place(agent, to_ndx)
                     return True
@@ -309,7 +309,7 @@ class AttackActor(ActorBaseComponent):
                                     continue
                                 else:
                                     attackable_agents.append(other)
-            return np.random.choice(attackable_agents)
+            return np.random.choice(attackable_agents) if attackable_agents else None
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]

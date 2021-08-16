@@ -158,10 +158,6 @@ if __name__ == "__main__":
     sim.reset()
     sim.render(fig=fig)
 
-    plt.show()
-
-    import sys; sys.exit()
-
     # Agents move around
     for _ in range(50):
         action = {
@@ -172,12 +168,12 @@ if __name__ == "__main__":
         sim.render(fig=fig)
 
     # Examine the agents' observations
-    # from pprint import pprint
-    # for agent in agents.values():
-    #     if isinstance(agent, ObservingAgent) and agent.active:
-    #         print(agent.position)
-    #         pprint(sim.get_obs(agent.id)['grid'])
-    #         print()
+    from pprint import pprint
+    for agent in agents.values():
+        if isinstance(agent, ObservingAgent) and agent.active:
+            print(agent.position)
+            pprint(sim.get_obs(agent.id)['grid'])
+            print()
 
     # plt.show()
 

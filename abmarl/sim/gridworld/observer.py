@@ -194,7 +194,7 @@ class SingleGridObserver(ObserverBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is None: # This cell is out of bounds
                         obs[r, c] = -1
-                    elif candidate_agents: # In bounds empty cell
+                    elif not candidate_agents: # In bounds empty cell
                         obs[r, c] = 0
                     else: # Observe one of the agents at this cell
                         obs[r, c] = np.random.choice(
