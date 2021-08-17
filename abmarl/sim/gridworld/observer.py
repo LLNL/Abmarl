@@ -55,13 +55,25 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
 class SingleGridObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's position.
+
+    The observation is centered around the observing agent's position. Each agent
+    in the "observation window" is recorded in the relative cell using its encoding.
+    For example, an agent might observe something like:
+        -1 -1 -1 -1 -1
+         0  2  0  0 -1
+        -2  1  3  0 -1
+         0  0  0  0 -1
+         0  2  2  0 -1
+    
+    If there are multiple agents on a single cell with different encodings, the
+    agent will observe only one of them chosen at random.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
-                    -np.inf, np.inf, (agent.view_range, agent.view_range), np.int
+                    -np.inf, np.inf, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), np.int
                 )
 
     @property
@@ -92,8 +104,6 @@ class SingleGridObserver(ObserverBaseComponent):
             return {}
 
         # Generate a completely empty grid
-        # Fill the grid with out-of-bounds values, which will then be replaced by
-        # objects and empty space below.
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
 
         # Copy the section of the grid around the agent's position
@@ -202,5 +212,192 @@ class SingleGridObserver(ObserverBaseComponent):
                         )
                 else: # Cell blocked by wall. Indicate invisible with -2
                     obs[r, c] = -2
+
+        return {self.key: obs}
+
+
+
+class MultiGridObserver(ObserverBaseComponent):
+    """
+    Observe a subset of the grid centered on the agent's position.
+
+    The observation is centered around the observing agent's position. The observing
+    agent sees a stack of observations, one for each positive encoding.
+    For example, an agent might observe something like:
+        Encoding 1:
+        -1 -1 -1 -1 -1
+         0  0  0  0 -1
+        -2  1  0  0 -1
+         0  0  0  0 -1
+         0  0  0  0 -1
+        Encoding 2:
+        -1 -1 -1 -1 -1
+         0  1  0  0 -1
+        -2  0  0  0 -1
+         0  0  0  0 -1
+         0  2  1  0 -1
+        Encoding 3:
+        -1 -1 -1 -1 -1
+         0  0  0  0 -1
+        -2  0  1  0 -1
+         0  0  0  0 -1
+         0  0  0  0 -1
+    where the number of agents of each encoding is given rather than the encoding
+    itself. Notice that out of bounds and masked indicators appear in every grid.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.number_of_encodings = 1
+        for agent in self.agents.values():
+            self.number_of_encodings = max(self.number_of_encodings, agent.encoding)
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.observation_space[self.key] = Box(
+                    -2,
+                    len(self.agents),
+                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
+                    np.int
+                )
+
+    @property
+    def key(self):
+        """
+        This Observer's key is "grid".
+        """
+        return 'grid'
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Observer works with GridObservingAgents.
+        """
+        return GridObservingAgent
+
+    def get_obs(self, agent, **kwargs):
+        """
+        The agent observes one or more sub-grids centered on its position.
+
+        The observation may include other agents, empty spaces, out of bounds, and
+        masked cells, which can be blocked from view by other view-blocking agents.
+        Each grid records the number of agents on a particular cell correlated
+        to a specific encoding.
+
+        Returns:
+            The observation as a dictionary.
+        """
+        if not isinstance(agent, self.supported_agent_type):
+            return {}
+
+        # Generate a completely empty grid
+        local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
+
+        # Copy the section of the grid around the agent's position
+        (r, c) = agent.position
+        r_lower = max([0, r - agent.view_range])
+        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
+        c_lower = max([0, c - agent.view_range])
+        c_upper = min([self.cols - 1, c + agent.view_range]) + 1
+        local_grid[
+            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
+            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
+        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
+
+        # Generate an observation mask. The agent's observation can be blocked
+        # by other view-blocking agents, which hide the cells "behind" them. We
+        # calculate the blocking by drawing rays from the center of the agent's
+        # position to the edges of the other agents' cell. All cells that are "behind"
+        # that cell and between the two rays are invisible to the observing agent.
+        # In the mask, 1 means that the cell is visibile, 0 means that it is
+        # invisible.
+        mask = np.ones((2 * agent.view_range + 1, 2 * agent.view_range + 1))
+        for other in self.agents.values():
+            if other.view_blocking:
+                r_diff, c_diff = other.position - agent.position
+                # Ensure the other agent within the view range
+                if -agent.view_range <= r_diff <= agent.view_range and \
+                        -agent.view_range <= c_diff <= agent.view_range:
+                    if c_diff > 0 and r_diff == 0: # Other is to the right of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                        for c in range(c_diff, agent.view_range+1):
+                            for r in range(-agent.view_range, agent.view_range+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff > 0 and r_diff > 0: # Other is below-right of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                        for c in range(c_diff, agent.view_range+1):
+                            for r in range(r_diff, agent.view_range+1):
+                                if c == c_diff and r == r_diff: continue # Don't mask the other
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff == 0 and r_diff > 0: # Other is below the agent
+                        left = lambda t: (c_diff - 0.5) / (r_diff - 0.5) * t
+                        right = lambda t: (c_diff + 0.5) / (r_diff - 0.5) * t
+                        for c in range(-agent.view_range, agent.view_range+1):
+                            for r in range(r_diff, agent.view_range+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if left(r) < c < right(r):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff < 0 and r_diff > 0: # Other is below-left of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                        for c in range(c_diff, -agent.view_range-1, -1):
+                            for r in range(r_diff, agent.view_range+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff < 0 and r_diff == 0: # Other is left of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                        for c in range(c_diff, -agent.view_range-1, -1):
+                            for r in range(-agent.view_range, agent.view_range+1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff < 0 and r_diff < 0: # Other is above-left of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
+                        for c in range(c_diff, -agent.view_range - 1, -1):
+                            for r in range(r_diff, -agent.view_range - 1, -1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff == 0 and r_diff < 0: # Other is above the agent
+                        left = lambda t: (c_diff - 0.5) / (r_diff + 0.5) * t
+                        right = lambda t: (c_diff + 0.5) / (r_diff + 0.5) * t
+                        for c in range(-agent.view_range, agent.view_range+1):
+                            for r in range(r_diff, -agent.view_range - 1, -1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if left(r) < c < right(r):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+                    elif c_diff > 0 and r_diff < 0: # Other is above-right of agent
+                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
+                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
+                        for c in range(c_diff, agent.view_range+1):
+                            for r in range(r_diff, -agent.view_range - 1, -1):
+                                if c == c_diff and r == r_diff: continue # don't mask the other
+                                if lower(c) < r < upper(c):
+                                    mask[r + agent.view_range, c + agent.view_range] = 0
+
+        # Convolve the grid observation with the mask.
+        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings), dtype=np.int)
+        for encoding in range(self.number_of_encodings):
+            for r in range(2 * agent.view_range + 1):
+                for c in range(2 * agent.view_range + 1):
+                    if mask[r, c]: # We can see this cell
+                        candidate_agents = local_grid[r, c]
+                        if candidate_agents is None: # This cell is out of bounds
+                            obs[r, c, encoding] = -1
+                        elif not candidate_agents: # In bounds empty cell
+                            obs[r, c, encoding] = 0
+                        else: # Observe the number of agents at this cell with this encoding
+                            obs[r, c, encoding] = sum([
+                                True if other.encoding == encoding + 1 else False
+                                for other in candidate_agents.values()
+                            ])
+                    else: # Cell blocked by wall. Indicate invisible with -2
+                        obs[r, c, encoding] = -2
 
         return {self.key: obs}
