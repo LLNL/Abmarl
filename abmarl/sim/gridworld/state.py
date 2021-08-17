@@ -20,48 +20,51 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
 
 class PositionState(StateBaseComponent):
     """
-    Manage the agent's positions in the grid.
-
-    Every agent occupies a unique cell.
+    Manage the agents' positions in the grid.
     """
     def reset(self, **kwargs):
         """
         Give agents their starting positions.
 
         We use the agent's initial position if it exists. Otherwise, we randomly
-        place the agent in the grid.
+        place the agents in the grid.
         """
-        # Grid lookup by position
-        self.grid.fill(None)
+        self.grid.reset()
         # Prioritize placing agents with initial positions. We must keep track
-        # of which positions have been taken so that the random placement below doesn't
-        # try to place an agent in an already-taken position.
-        ravelled_positions_taken = set()
+        # of which positions have been taken by non-overlappable agents so that
+        # the random placement below doesn't try to place an agent there.
+        ravelled_positions_available = set(i for i in range(self.rows * self.cols))
         for agent in self.agents.values():
             if agent.initial_position is not None:
                 r, c = agent.initial_position
-                assert self.grid[r, c] is None, f"{agent.id} has the same initial " + \
-                    f"position as {self.grid[r, c].id}. All initial positions must be unique."
-                agent.position = agent.initial_position
-                self.grid[r, c] = agent
-                ravelled_positions_taken.add(
-                    np.ravel_multi_index(agent.position, (self.rows, self.cols))
-                )
+                assert self.grid.place(agent, (r, c)), "All initial positions must " + \
+                    "be unique or agents with the same initial positions must be overlappable."
+                if not agent.overlappable:
+                    ravelled_positions_available.remove(
+                        np.ravel_multi_index(agent.position, (self.rows, self.cols))
+                    )
 
-        # Now randomly place any other agent who did not come with an initial position.
-        ravelled_positions_available = [
-            i for i in range(self.rows * self.cols) if i not in ravelled_positions_taken
-        ]
+        # Now place all the non-overlappable agents who did not have initial positions
+        # and block off those positions as well. We have to do this one agent at
+        # a time because the list of available positions is updated after each
+        # agent is placed.
+        for agent in self.agents.values():
+            if agent.initial_position is None and not agent.overlappable:
+                n = np.random.choice([*ravelled_positions_available], 1)
+                r, c = np.unravel_index(n.item(), shape=(self.rows, self.cols))
+                assert self.grid.place(agent, (r, c))
+                ravelled_positions_available.remove(n.item())
+
+        # Now place all remaining agents randomly in the available positions
         rs, cs = np.unravel_index(
-            np.random.choice(ravelled_positions_available, len(self.agents), False),
+            np.random.choice([*ravelled_positions_available], len(self.agents), True),
             shape=(self.rows, self.cols)
         )
         for ndx, agent in enumerate(self.agents.values()):
-            if agent.initial_position is None:
+            if agent.initial_position is None and agent.overlappable:
                 r = rs[ndx]
                 c = cs[ndx]
-                agent.position = np.array([r, c])
-                self.grid[r, c] = agent
+                assert self.grid.place(agent, (r, c))
 
 
 class HealthState(StateBaseComponent):

@@ -52,7 +52,7 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         pass
 
 
-class GridObserver(ObserverBaseComponent):
+class SingleGridObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's position.
     """
@@ -95,7 +95,6 @@ class GridObserver(ObserverBaseComponent):
         # Fill the grid with out-of-bounds values, which will then be replaced by
         # objects and empty space below.
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
-        local_grid.fill(-1)
 
         # Copy the section of the grid around the agent's position
         (r, c) = agent.position
@@ -191,14 +190,16 @@ class GridObserver(ObserverBaseComponent):
         obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
         for r in range(2 * agent.view_range + 1):
             for c in range(2 * agent.view_range + 1):
-                if mask[r, c]:
-                    obj = local_grid[r, c]
-                    if obj == -1: # Out of bounds
+                if mask[r, c]: # We can see this cell
+                    candidate_agents = local_grid[r, c]
+                    if candidate_agents is None: # This cell is out of bounds
                         obs[r, c] = -1
-                    elif obj is None: # Empty
+                    elif not candidate_agents: # In bounds empty cell
                         obs[r, c] = 0
-                    else: # Something there, so get its encoding
-                        obs[r, c] = obj.encoding
+                    else: # Observe one of the agents at this cell
+                        obs[r, c] = np.random.choice(
+                            [other.encoding for other in candidate_agents.values()]
+                        )
                 else: # Cell blocked by wall. Indicate invisible with -2
                     obs[r, c] = -2
 

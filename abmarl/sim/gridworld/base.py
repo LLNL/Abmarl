@@ -5,6 +5,7 @@ import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent
+from abmarl.sim.gridworld.grid import Grid
 
 
 class GridWorldSimulation(AgentBasedSimulation, ABC):
@@ -95,7 +96,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
     @classmethod
     def _build_sim(cls, rows, cols, **kwargs):
-        grid = np.empty((rows, cols), dtype=object)
+        grid = Grid(rows, cols)
         kwargs['grid'] = grid
         return cls(**kwargs)
 
@@ -109,22 +110,20 @@ class GridWorldBaseComponent(ABC):
     def __init__(self, agents=None, grid=None, **kwargs):
         self.agents = agents
         self.grid = grid
-        self._rows = self.grid.shape[0]
-        self._cols = self.grid.shape[1]
 
     @property
     def rows(self):
         """
         The number of rows in the grid.
         """
-        return self._rows
+        return self.grid.rows
 
     @property
     def cols(self):
         """
         The number of columns in the grid.
         """
-        return self._cols
+        return self.grid.cols
 
     @property
     def grid(self):
@@ -139,9 +138,7 @@ class GridWorldBaseComponent(ABC):
 
     @grid.setter
     def grid(self, value):
-        assert type(value) is np.ndarray, "The grid must be a numpy array."
-        assert len(value.shape) == 2, "The grid must be a 2-dimensional array."
-        assert value.dtype is np.dtype(object), "The grid must be a numpy array of objects."
+        assert isinstance(value, Grid), "The grid must be a Grid object."
         self._grid = value
 
     @property

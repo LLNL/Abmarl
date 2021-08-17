@@ -8,10 +8,33 @@ class GridWorldAgent(PrincipleAgent):
     """
     The base agent in the GridWorld.
     """
-    def __init__(self, initial_position=None, view_blocking=False, **kwargs):
+    def __init__(self, initial_position=None, view_blocking=False, overlappable=False,
+            encoding=None, render_shape='o', render_color='gray', **kwargs):
         super().__init__(**kwargs)
+        self.encoding = encoding
         self.initial_position = initial_position
         self.view_blocking = view_blocking
+        self.overlappable = overlappable
+        self.render_shape = render_shape
+        self.render_color = render_color
+
+    @property
+    def encoding(self):
+        """
+        The numerical value that identifies the type of agent.
+
+        The value does not necessarily identify the agent itself. For example,
+        other agents who observe this agent will see this value.
+        """
+        return self._encoding
+
+    @encoding.setter
+    def encoding(self, value):
+        assert type(value) is int, f"{self.id}'s encoding must be an integer."
+        assert value != -2, "-2 encoding reserved for masked observation."
+        assert value != -1, "-1 encoding reserved for out of bounds."
+        assert value != 0, "0 encoding reserved for empty cell."
+        self._encoding = value
 
     @property
     def initial_position(self):
@@ -40,32 +63,6 @@ class GridWorldAgent(PrincipleAgent):
         self._position = value
 
     @property
-    def encoding(self):
-        """
-        The numerical value given to other agents who observe this agent.
-        """
-        return self._encoding
-
-    @encoding.setter
-    def encoding(self, value):
-        assert type(value) is int, f"{self.id}'s encoding must be an integer."
-        assert value != -2, "-2 encoding reserved for masked observation."
-        assert value != -1, "-1 encoding reserved for out of bounds."
-        assert value != 0, "0 encoding reserved for empty cell."
-        self._encoding = value
-
-    @property
-    def render_shape(self):
-        """
-        The agent's shape in the rendered grid.
-        """
-        return getattr(self, '_render_shape', 's')
-
-    @render_shape.setter
-    def render_shape(self, value):
-        self._render_shape = value
-
-    @property
     def view_blocking(self):
         """
         Specify if this agent blocks other agent's observations.
@@ -78,8 +75,53 @@ class GridWorldAgent(PrincipleAgent):
         self._view_blocking = value
 
     @property
-    def confiured(self):
-        return super().configured and self.encoding is not None
+    def overlappable(self):
+        """
+        Agents may be able to overlap each other.
+
+        Overlappable agents can overlap other overlappable agents. This means that
+        multipe agents may be positioned on the same square at the same time.
+        Default is False.
+        """
+        return self._overlappable
+
+    @overlappable.setter
+    def overlappable(self, value):
+        assert type(value) is bool, "Overlappable must be a boolean."
+        self._overlappable = value
+
+    @property
+    def render_shape(self):
+        """
+        The agent's shape in the rendered grid.
+        """
+        return self._render_shape
+
+    @render_shape.setter
+    def render_shape(self, value):
+        assert value in [
+            'o', 'v', '^', '<', '>', '1', '2', '3', '4', '8', 's', 'p',
+            'P', '*', 'h', 'H', '+', 'x', 'X', 'D', 'd'
+        ], "Invalid render shape."
+        self._render_shape = value
+
+    @property
+    def render_color(self):
+        """
+        The agent's color in the rendered grid.
+        """
+        return self._render_color
+
+    @render_color.setter
+    def render_color(self, value):
+        self._render_color = value
+
+    @property
+    def configured(self):
+        return super().configured and self.encoding is not None and \
+            self.view_blocking is not None and self.overlappable is not None and \
+            self.render_shape is not None and self.render_color is not None
+
 
 class GridObservingAgent(ObservingAgent, GridWorldAgent):
     """

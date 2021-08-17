@@ -55,26 +55,13 @@ class MoveActor(ActorBaseComponent):
     """
     Agents can move to unoccupied nearby squares.
     """
-    def __init__(self, position_state=None, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.position_state = position_state
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Box(
                     -agent.move_range, agent.move_range, (2,), np.int
                 )
-
-    @property
-    def position_state(self):
-        """
-        PositionState component that manages the state of the agents' positions.
-        """
-        return self._position_state
-
-    @position_state.setter
-    def position_state(self, value):
-        assert isinstance(value, PositionState), "Position state must be a PositionState object."
-        self._position_state = value
 
     @property
     def key(self):
@@ -94,21 +81,35 @@ class MoveActor(ActorBaseComponent):
         """
         The agent can move to nearby squares.
 
+        The agent's new position must be within the grid and the cell-occupation rules
+        must be met.
+
         Args:
             agent: Move the agent if it is a MovingAgent.
             action_dict: The action dictionary for this agent in this step. If
                 the agent is a MovingAgent, then the action dictionary will contain
                 the "move" entry.
+
+        Returns:
+            True if the move is successful, False otherwise.
         """
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
             new_position = agent.position + action
             if 0 <= new_position[0] < self.rows and \
-                    0 <= new_position[1] < self.cols and \
-                    self.grid[new_position[0], new_position[1]] is None:
-                self.grid[agent.position[0], agent.position[1]] = None
-                agent.position = new_position
-                self.grid[agent.position[0], agent.position[1]] = agent
+                    0 <= new_position[1] < self.cols:
+                from_ndx = tuple(agent.position)
+                to_ndx = tuple(new_position)
+                if to_ndx == from_ndx:
+                    return True
+                elif self.grid.query(agent, to_ndx):
+                    self.grid.remove(agent, from_ndx)
+                    self.grid.place(agent, to_ndx)
+                    return True
+                else:
+                    return False
+            else:
+                return False
 
 
 class AttackActor(ActorBaseComponent):
@@ -289,34 +290,32 @@ class AttackActor(ActorBaseComponent):
                                         mask[r + agent.attack_range, c + agent.attack_range] = 0
 
             # Randomly scan the local grid for attackable agents.
-            local_grid_size = (2 * agent.attack_range + 1)
-            rs, cs = np.unravel_index(
-                np.random.choice(local_grid_size ** 2, local_grid_size ** 2, False),
-                shape=(local_grid_size, local_grid_size)
-            )
-            for r, c in zip(rs, cs):
-                if mask[r, c]:
-                    other = local_grid[r, c]
-                    if other is None: # No agent here
-                        continue
-                    if other.id == agent.id: # Cannot attack yourself
-                        continue
-                    elif not other.active: # Cannot attack inactive agents
-                        continue
-                    elif other.encoding not in self.attack_mapping[agent.encoding]:
-                        # Cannot attack this type of agent
-                        continue
-                    elif np.random.uniform() > agent.attack_accuracy:
-                        continue
-                    else:
-                        return other
+            attackable_agents = []
+            for r in range(2 * agent.attack_range + 1):
+                for c in range(2 * agent.attack_range + 1):
+                    if mask[r, c]: # We can see this cell
+                        candidate_agents = local_grid[r, c]
+                        if candidate_agents is not None:
+                            for other in candidate_agents.values():
+                                if other.id == agent.id: # Cannot attack yourself
+                                    continue
+                                elif not other.active: # Cannot attack inactive agents
+                                    continue
+                                elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                    # Cannot attack this type of agent
+                                    continue
+                                elif np.random.uniform() > agent.attack_accuracy:
+                                    # Failed attack
+                                    continue
+                                else:
+                                    attackable_agents.append(other)
+            return np.random.choice(attackable_agents) if attackable_agents else None
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
             if action: # Agent has chosen to attack
                 attacked_agent = determine_attack(attacking_agent)
-                if attacked_agent is not None and isinstance(attacked_agent, HealthAgent):
+                if attacked_agent is not None:
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
-                        self.grid[attacked_agent.position[0], attacked_agent.position[1]] = None
-                        attacked_agent.position = None
+                        self.grid.remove(attacked_agent, attacked_agent.position)
