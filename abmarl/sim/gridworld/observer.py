@@ -394,7 +394,7 @@ class MultiGridObserver(ObserverBaseComponent):
                             obs[r, c, encoding] = 0
                         else: # Observe the number of agents at this cell with this encoding
                             obs[r, c, encoding] = sum([
-                                True if other.encoding == encoding else False
+                                True if other.encoding == encoding + 1 else False
                                 for other in candidate_agents.values()
                             ])
                     else: # Cell blocked by wall. Indicate invisible with -2
