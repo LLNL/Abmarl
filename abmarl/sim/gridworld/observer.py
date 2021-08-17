@@ -104,8 +104,6 @@ class SingleGridObserver(ObserverBaseComponent):
             return {}
 
         # Generate a completely empty grid
-        # Fill the grid with out-of-bounds values, which will then be replaced by
-        # objects and empty space below.
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
 
         # Copy the section of the grid around the agent's position
@@ -249,15 +247,15 @@ class MultiGridObserver(ObserverBaseComponent):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        number_of_encodings = 1
+        self.number_of_encodings = 1
         for agent in self.agents.values():
-            number_of_encodings = max(number_of_encodings, agent.encoding)
+            self.number_of_encodings = max(self.number_of_encodings, agent.encoding)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
                     -2,
                     len(self.agents),
-                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1, number_of_encodings),
+                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
                     np.int
                 )
 
@@ -277,10 +275,12 @@ class MultiGridObserver(ObserverBaseComponent):
 
     def get_obs(self, agent, **kwargs):
         """
-        The agent observes a sub-grid centered on its position.
+        The agent observes one or more sub-grids centered on its position.
 
         The observation may include other agents, empty spaces, out of bounds, and
         masked cells, which can be blocked from view by other view-blocking agents.
+        Each grid records the number of agents on a particular cell correlated
+        to a specific encoding.
 
         Returns:
             The observation as a dictionary.
@@ -289,8 +289,6 @@ class MultiGridObserver(ObserverBaseComponent):
             return {}
 
         # Generate a completely empty grid
-        # Fill the grid with out-of-bounds values, which will then be replaced by
-        # objects and empty space below.
         local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
 
         # Copy the section of the grid around the agent's position
@@ -384,20 +382,22 @@ class MultiGridObserver(ObserverBaseComponent):
                                     mask[r + agent.view_range, c + agent.view_range] = 0
 
         # Convolve the grid observation with the mask.
-        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
-        for r in range(2 * agent.view_range + 1):
-            for c in range(2 * agent.view_range + 1):
-                if mask[r, c]: # We can see this cell
-                    candidate_agents = local_grid[r, c]
-                    if candidate_agents is None: # This cell is out of bounds
-                        obs[r, c] = -1
-                    elif not candidate_agents: # In bounds empty cell
-                        obs[r, c] = 0
-                    else: # Observe one of the agents at this cell
-                        obs[r, c] = np.random.choice(
-                            [other.encoding for other in candidate_agents.values()]
-                        )
-                else: # Cell blocked by wall. Indicate invisible with -2
-                    obs[r, c] = -2
+        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings), dtype=np.int)
+        for encoding in range(self.number_of_encodings):
+            for r in range(2 * agent.view_range + 1):
+                for c in range(2 * agent.view_range + 1):
+                    if mask[r, c]: # We can see this cell
+                        candidate_agents = local_grid[r, c]
+                        if candidate_agents is None: # This cell is out of bounds
+                            obs[r, c, encoding] = -1
+                        elif not candidate_agents: # In bounds empty cell
+                            obs[r, c, encoding] = 0
+                        else: # Observe the number of agents at this cell with this encoding
+                            obs[r, c, encoding] = sum([
+                                True if other.encoding == encoding else False
+                                for other in candidate_agents.values()
+                            ])
+                    else: # Cell blocked by wall. Indicate invisible with -2
+                        obs[r, c, encoding] = -2
 
         return {self.key: obs}
