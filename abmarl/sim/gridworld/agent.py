@@ -79,9 +79,9 @@ class GridWorldAgent(PrincipleAgent):
         """
         Agents may be able to overlap each other.
 
-        Overlappable agents can overlap other overlappable agents if the Simulation
-        is using a OverlappableGrid. This means that multipe agents may be positioned
-        on the same square at the same time. Default is False.
+        Overlappable agents can overlap other overlappable agents. This means that
+        multipe agents may be positioned on the same square at the same time.
+        Default is False.
         """
         return self._overlappable
 
@@ -117,8 +117,10 @@ class GridWorldAgent(PrincipleAgent):
         self._render_color = value
 
     @property
-    def confiugred(self):
-        return super().configured and self.encoding is not None
+    def configured(self):
+        return super().configured and self.encoding is not None and \
+            self.view_blocking is not None and self.overlappable is not None and \
+            self.render_shape is not None and self.render_color is not None
 
 
 class GridObservingAgent(ObservingAgent, GridWorldAgent):

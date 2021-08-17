@@ -16,8 +16,7 @@ class WallAgent(GridWorldAgent):
     Wall agents, immobile, and view blocking.
     """
     def __init__(self, **kwargs):
-        kwargs['view_blocking'] = True
-        super().__init__(**kwargs)
+        super().__init__(view_blocking=True, **kwargs)
 
 
 class FoodAgent(HealthAgent):

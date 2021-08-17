@@ -3,9 +3,9 @@ import numpy as np
 
 class Grid:
     """
-    A Grid has a numpy array that stores the agents at indicies of the array.
+    A Grid stores the agents at indices in a numpy array.
 
-    Components can interface with the internals of the Grid. Each index in the
+    Components can interface with the Grid. Each index in the
     grid is a dictionary that maps the agent id to the agent object itself. If agents
     can overlap, then there may be more than one agent per cell.
 
@@ -42,8 +42,9 @@ class Grid:
 
     def query(self, agent, ndx):
         """
-        Query a cell in the grid to see if is available to this agent. The cell
-        is available for the agent if it is empty or if both the occupying agent
+        Query a cell in the grid to see if is available to this agent.
+
+        The cell is available for the agent if it is empty or if both the occupying agent
         and the querying agent are overlappable.
 
         Args:
@@ -51,7 +52,7 @@ class Grid:
             ndx: The cell to query.
 
         Returns:
-            True if the cell is available for this agent, otherwise False.
+            The availability of this cell.
         """
         ndx = tuple(ndx)
         return not self._internal[ndx] or (
@@ -62,7 +63,7 @@ class Grid:
         """
         Place an agent at an index.
 
-        If the placement is successful, the agent will be placed at that index
+        If the cell is available, the agent will be placed at that index
         in the grid and the agent's position will be updated. The placement is
         successful if the new position is unoccupied or if the agent already occupying
         that position is overlappable AND this agent is overlappable.
