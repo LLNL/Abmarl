@@ -16,26 +16,21 @@ class WallAgent(GridWorldAgent):
     Wall agents, immobile, and view blocking.
     """
     def __init__(self, **kwargs):
-        kwargs['view_blocking'] = True
-        super().__init__(**kwargs)
+        super().__init__(view_blocking=True, **kwargs)
 
 
 class TreasureAgent(HealthAgent):
     """
     Food Agents do not move and can be attacked by Foraging Agents.
     """
-    def __init__(self, **kwargs):
-        kwargs['overlappable'] = True
-        super().__init__(**kwargs)
+    pass
 
 
 class ExploringAgent(MovingAgent, GridObservingAgent):
     """
     Foraging Agents can move, attack Food agents, and be attacked by Hunting agents.
     """
-    def __init__(self, **kwargs):
-        kwargs['overlappable'] = True
-        super().__init__(**kwargs)
+    pass
 
 
 class GridSim(GridWorldSimulation):
@@ -128,8 +123,12 @@ if __name__ == "__main__":
     agents = {**walls, **treasure, **explorers}
 
     # Create simulation
+    overlap_matrix = {
+        2: [3],
+        3: [2, 3],
+    }
     sim = GridSim.build_sim(
-        rows=8, cols=12, agents=agents
+        rows=8, cols=12, agents=agents, overlapping=overlap_matrix
     )
     sim.reset()
     sim.render(fig=fig)
