@@ -96,7 +96,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
     @classmethod
     def _build_sim(cls, rows, cols, **kwargs):
-        grid = Grid(rows, cols)
+        grid = Grid(rows, cols, **kwargs)
         kwargs['grid'] = grid
         return cls(**kwargs)
 

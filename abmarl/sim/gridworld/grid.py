@@ -13,7 +13,7 @@ class Grid:
         rows: The number of rows in the grid.
         cols: The number of columns in the grid.
     """
-    def __init__(self, rows, cols, overlapping=None):
+    def __init__(self, rows, cols, overlapping=None, **kwargs):
         assert type(rows) is int and rows > 0, "Rows must be a positive integer."
         assert type(cols) is int and cols > 0, "Cols must be a positive integer."
         self._internal = np.empty((rows, cols), dtype=object)
@@ -27,7 +27,9 @@ class Grid:
                 for i in v:
                     assert type(i) is int, \
                         "All elements in the attack mapping values must be integers."
-        self._overlapping = overlapping
+            self._overlapping = overlapping
+        else:
+            self._overlapping = {}
 
     @property
     def rows(self):
@@ -67,13 +69,13 @@ class Grid:
         """
         ndx = tuple(ndx)
         if self._internal[ndx]: # There are agents here
-            if self._overlapping is None:
-                return False
-            else:
+            try:
                 return all([
-                    True if other.encoding in self._overlapping[agent.enccoding] else False
+                    True if other.encoding in self._overlapping[agent.encoding] else False
                     for other in self._internal[ndx].values()
                 ])
+            except KeyError:
+                return False
         else:
             return True
 
