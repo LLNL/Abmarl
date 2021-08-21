@@ -13,10 +13,21 @@ class Grid:
         rows: The number of rows in the grid.
         cols: The number of columns in the grid.
     """
-    def __init__(self, rows, cols):
+    def __init__(self, rows, cols, overlapping=None):
         assert type(rows) is int and rows > 0, "Rows must be a positive integer."
         assert type(cols) is int and cols > 0, "Cols must be a positive integer."
         self._internal = np.empty((rows, cols), dtype=object)
+
+        # Overlapping matrix
+        if overlapping is not None:
+            assert type(overlapping) is dict, "Attack mapping must be dictionary."
+            for k, v in overlapping.items():
+                assert type(k) is int, "All keys in attack mapping must be integer."
+                assert type(v) is list, "All values in attack mapping must be list."
+                for i in v:
+                    assert type(i) is int, \
+                        "All elements in the attack mapping values must be integers."
+        self._overlapping = overlapping
 
     @property
     def rows(self):
@@ -55,9 +66,16 @@ class Grid:
             The availability of this cell.
         """
         ndx = tuple(ndx)
-        return not self._internal[ndx] or (
-            next(iter(self._internal[ndx].values())).overlappable and agent.overlappable
-        )
+        if self._internal[ndx]: # There are agents here
+            if self._overlapping is None:
+                return False
+            else:
+                return all([
+                    True if other.encoding in self._overlapping[agent.enccoding] else False
+                    for other in self._internal[ndx].values()
+                ])
+        else:
+            return True
 
     def place(self, agent, ndx):
         """

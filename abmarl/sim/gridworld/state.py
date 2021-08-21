@@ -31,7 +31,7 @@ class PositionState(StateBaseComponent):
         """
         self.grid.reset()
         # Prioritize placing agents with initial positions. We must keep track
-        # of which positions have been taken by non-overlappable agents so that
+        # of which positions have been taken so that
         # the random placement below doesn't try to place an agent there.
         ravelled_positions_available = set(i for i in range(self.rows * self.cols))
         for agent in self.agents.values():
@@ -39,32 +39,20 @@ class PositionState(StateBaseComponent):
                 r, c = agent.initial_position
                 assert self.grid.place(agent, (r, c)), "All initial positions must " + \
                     "be unique or agents with the same initial positions must be overlappable."
-                if not agent.overlappable:
-                    ravelled_positions_available.remove(
-                        np.ravel_multi_index(agent.position, (self.rows, self.cols))
-                    )
+                ravelled_positions_available.remove(
+                    np.ravel_multi_index(agent.position, (self.rows, self.cols))
+                )
 
-        # Now place all the non-overlappable agents who did not have initial positions
+        # Now place all the rest of the agents who did not have initial positions
         # and block off those positions as well. We have to do this one agent at
         # a time because the list of available positions is updated after each
         # agent is placed.
         for agent in self.agents.values():
-            if agent.initial_position is None and not agent.overlappable:
+            if agent.initial_position is None:
                 n = np.random.choice([*ravelled_positions_available], 1)
                 r, c = np.unravel_index(n.item(), shape=(self.rows, self.cols))
                 assert self.grid.place(agent, (r, c))
                 ravelled_positions_available.remove(n.item())
-
-        # Now place all remaining agents randomly in the available positions
-        rs, cs = np.unravel_index(
-            np.random.choice([*ravelled_positions_available], len(self.agents), True),
-            shape=(self.rows, self.cols)
-        )
-        for ndx, agent in enumerate(self.agents.values()):
-            if agent.initial_position is None and agent.overlappable:
-                r = rs[ndx]
-                c = cs[ndx]
-                assert self.grid.place(agent, (r, c))
 
 
 class HealthState(StateBaseComponent):
