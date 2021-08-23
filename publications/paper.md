@@ -35,7 +35,7 @@ for pre-existing projects to prototype Reinforcement Learning (RL) as a potentia
 
 # Statement of need
 
-In 2016, @gym published OpenAi Gym, an interface for single-agent simulations. This interface
+In 2016, @gym published OpenAI Gym, an interface for single-agent simulations. This interface
 quickly became one of the most popular connections between simulation and training
 in RL experimentation. It has been used by many simulation benchmarks
 for single-agent reinforcement learning, including the Arcade Learning Environment [@arcade].
