@@ -17,6 +17,20 @@ support custom simulations, algorithms, and policies. We enable researchers to
 rapidly prototype MARL experiments and simulation design and lower the barrier
 for pre-existing projects to prototype RL as a potential solution.
 
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents
+
+   overview
+   featured_usage
+   install
+   tutorials/tutorials
+   api
+
+
+Citation
+--------
+
 Abmarl has been `published in the Journal of Open Source Software <https://joss.theoj.org/papers/10.21105/joss.03424>`_.
 It can be cited using the following bibtex entry:
 
@@ -34,13 +48,3 @@ It can be cited using the following bibtex entry:
      title = {Abmarl: Connecting Agent-Based Simulations with Multi-Agent Reinforcement Learning},
      journal = {Journal of Open Source Software}
    }
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents
-
-   overview
-   featured_usage
-   install
-   tutorials/tutorials
-   api
