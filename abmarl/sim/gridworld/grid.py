@@ -20,13 +20,13 @@ class Grid:
 
         # Overlapping matrix
         if overlapping is not None:
-            assert type(overlapping) is dict, "Attack mapping must be dictionary."
+            assert type(overlapping) is dict, "Overlap mapping must be dictionary."
             for k, v in overlapping.items():
-                assert type(k) is int, "All keys in attack mapping must be integer."
-                assert type(v) is list, "All values in attack mapping must be list."
+                assert type(k) is int, "All keys in overlap mapping must be integer."
+                assert type(v) is list, "All values in overlap mapping must be list."
                 for i in v:
                     assert type(i) is int, \
-                        "All elements in the attack mapping values must be integers."
+                        "All elements in the overlap mapping values must be integers."
             self._overlapping = overlapping
         else:
             self._overlapping = {}
