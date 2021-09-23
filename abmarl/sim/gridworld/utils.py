@@ -1,9 +1,12 @@
 
 import numpy as np
 
-def create_mask(agent, mask_range, agents):
+def create_grid_and_mask(agent, grid, mask_range, agents):
     """
-    Generate a grid mask. 
+    Generate a local grid and a mask.
+
+    Create a local grid centered around the agents location and fill it will the
+    values from the grid.
     
     View-blocking agents can mask the grid from other agent's, restricting their
     ability to observe, attack, move, etc. We calculate the blocking by drawing
@@ -14,13 +17,30 @@ def create_mask(agent, mask_range, agents):
 
     Args:
         agent: The agent of interest.
+        grid: The grid.
         mask_range: The integer range from the agent of interest.
         agents: The dictionary of agents.
 
     Returns:
-        A grid of size (2 * range + 1) x (2 * range + 1) that shows which cells
-        are masked to the agent of interest.
+        Two matrices. The first is a local grid centered around the agent's location
+        with values from the actual grid. The second is a mask of size
+        (2 * range + 1) x (2 * range + 1) that shows which cells are masked to the
+        agent of interest.
     """
+    # Generate a completely empty grid
+    local_grid = np.empty((mask_range * 2 + 1, madk_range * 2 + 1), dtype=object)
+
+    # Copy the section of the grid around the agent's position
+    (r, c) = agent.position
+    r_lower = max([0, r - mask_range])
+    r_upper = min([grid.rows - 1, r + mask_range]) + 1
+    c_lower = max([0, c - mask_range])
+    c_upper = min([grid.cols - 1, c + mask_range]) + 1
+    local_grid[
+        (r_lower+mask_range-r):(r_upper+mask_range-r),
+        (c_lower+mask_range-c):(c_upper+mask_range-c)
+    ] = grid[r_lower:r_upper, c_lower:c_upper]
+
     mask = np.ones((2 * mask_range + 1, 2 * mask_range + 1))
     for other in agents.values():
         if other.view_blocking:
@@ -92,3 +112,5 @@ def create_mask(agent, mask_range, agents):
                             if c == c_diff and r == r_diff: continue # don't mask the other
                             if lower(c) < r < upper(c):
                                 mask[r + mask_range, c + mask_range] = 0
+
+    return local_grid, mask
