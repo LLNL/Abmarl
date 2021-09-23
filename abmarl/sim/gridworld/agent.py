@@ -8,13 +8,12 @@ class GridWorldAgent(PrincipleAgent):
     """
     The base agent in the GridWorld.
     """
-    def __init__(self, initial_position=None, view_blocking=False, overlappable=False,
-            encoding=None, render_shape='o', render_color='gray', **kwargs):
+    def __init__(self, initial_position=None, view_blocking=False, encoding=None,
+            render_shape='o', render_color='gray', **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position
         self.view_blocking = view_blocking
-        self.overlappable = overlappable
         self.render_shape = render_shape
         self.render_color = render_color
 
@@ -75,22 +74,6 @@ class GridWorldAgent(PrincipleAgent):
         self._view_blocking = value
 
     @property
-    def overlappable(self):
-        """
-        Agents may be able to overlap each other.
-
-        Overlappable agents can overlap other overlappable agents. This means that
-        multipe agents may be positioned on the same square at the same time.
-        Default is False.
-        """
-        return self._overlappable
-
-    @overlappable.setter
-    def overlappable(self, value):
-        assert type(value) is bool, "Overlappable must be a boolean."
-        self._overlappable = value
-
-    @property
     def render_shape(self):
         """
         The agent's shape in the rendered grid.
@@ -119,8 +102,8 @@ class GridWorldAgent(PrincipleAgent):
     @property
     def configured(self):
         return super().configured and self.encoding is not None and \
-            self.view_blocking is not None and self.overlappable is not None and \
-            self.render_shape is not None and self.render_color is not None
+            self.view_blocking is not None and self.render_shape is not None \
+                and self.render_color is not None
 
 
 class GridObservingAgent(ObservingAgent, GridWorldAgent):

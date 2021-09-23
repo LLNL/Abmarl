@@ -23,24 +23,21 @@ class FoodAgent(HealthAgent):
     """
     Food Agents do not move and can be attacked by Foraging Agents.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    pass
 
 
 class ForagingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
     """
     Foraging Agents can move, attack Food agents, and be attacked by Hunting agents.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    pass
 
 
 class HuntingAgent(HealthAgent, AttackingAgent, MovingAgent, GridObservingAgent):
     """
     Hunting agents can move and attack Foraging agents.
     """
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    pass
 
 
 class GridSim(GridWorldSimulation):

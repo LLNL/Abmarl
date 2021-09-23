@@ -4,7 +4,7 @@ import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
-    AttackingAgent, HealthAgent
+    HealthAgent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
@@ -16,26 +16,21 @@ class WallAgent(GridWorldAgent):
     Wall agents, immobile, and view blocking.
     """
     def __init__(self, **kwargs):
-        kwargs['view_blocking'] = True
-        super().__init__(**kwargs)
+        super().__init__(view_blocking=True, **kwargs)
 
 
 class TreasureAgent(HealthAgent):
     """
     Food Agents do not move and can be attacked by Foraging Agents.
     """
-    def __init__(self, **kwargs):
-        kwargs['overlappable'] = True
-        super().__init__(**kwargs)
+    pass
 
 
 class ExploringAgent(MovingAgent, GridObservingAgent):
     """
     Foraging Agents can move, attack Food agents, and be attacked by Hunting agents.
     """
-    def __init__(self, **kwargs):
-        kwargs['overlappable'] = True
-        super().__init__(**kwargs)
+    pass
 
 
 class GridSim(GridWorldSimulation):
@@ -118,7 +113,9 @@ if __name__ == "__main__":
         f'wall{i}': WallAgent(id=f'wall{i}', encoding=1, render_shape='X') for i in range(7)
     }
     treasure = {
-        f'treasure{i}': TreasureAgent(id=f'treasure{i}', encoding=2, initial_health=1, render_shape='s') for i in range(35)
+        f'treasure{i}': TreasureAgent(
+            id=f'treasure{i}', encoding=2, initial_health=1, render_shape='s'
+        ) for i in range(35)
     }
     explorers = {
         f'explorer{i}': ExploringAgent(
@@ -128,8 +125,12 @@ if __name__ == "__main__":
     agents = {**walls, **treasure, **explorers}
 
     # Create simulation
+    overlap_matrix = {
+        2: [3],
+        3: [2, 3],
+    }
     sim = GridSim.build_sim(
-        rows=8, cols=12, agents=agents
+        rows=8, cols=12, agents=agents, overlapping=overlap_matrix
     )
     sim.reset()
     sim.render(fig=fig)
