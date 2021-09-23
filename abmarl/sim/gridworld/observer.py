@@ -6,14 +6,13 @@ import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import GridObservingAgent
-from abmarl.sim.gridworld.state import PositionState
+import abmarl.sim.gridworld.utils as gu
 
 
 class ObserverBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract Observer Component base from which all observer components will inherit.
     """
-
     @property
     @abstractmethod
     def key(self):
@@ -103,99 +102,11 @@ class SingleGridObserver(ObserverBaseComponent):
         if not isinstance(agent, self.supported_agent_type):
             return {}
 
-        # Generate a completely empty grid
-        local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
-
-        # Copy the section of the grid around the agent's position
-        (r, c) = agent.position
-        r_lower = max([0, r - agent.view_range])
-        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
-        c_lower = max([0, c - agent.view_range])
-        c_upper = min([self.cols - 1, c + agent.view_range]) + 1
-        local_grid[
-            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
-            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
-        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
-
-        # Generate an observation mask. The agent's observation can be blocked
-        # by other view-blocking agents, which hide the cells "behind" them. We
-        # calculate the blocking by drawing rays from the center of the agent's
-        # position to the edges of the other agents' cell. All cells that are "behind"
-        # that cell and between the two rays are invisible to the observing agent.
-        # In the mask, 1 means that the cell is visibile, 0 means that it is
-        # invisible.
-        mask = np.ones((2 * agent.view_range + 1, 2 * agent.view_range + 1))
-        for other in self.agents.values():
-            if other.view_blocking:
-                r_diff, c_diff = other.position - agent.position
-                # Ensure the other agent within the view range
-                if -agent.view_range <= r_diff <= agent.view_range and \
-                        -agent.view_range <= c_diff <= agent.view_range:
-                    if c_diff > 0 and r_diff == 0: # Other is to the right of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, agent.view_range+1):
-                            for r in range(-agent.view_range, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff > 0 and r_diff > 0: # Other is below-right of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, agent.view_range+1):
-                            for r in range(r_diff, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # Don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff == 0 and r_diff > 0: # Other is below the agent
-                        left = lambda t: (c_diff - 0.5) / (r_diff - 0.5) * t
-                        right = lambda t: (c_diff + 0.5) / (r_diff - 0.5) * t
-                        for c in range(-agent.view_range, agent.view_range+1):
-                            for r in range(r_diff, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if left(r) < c < right(r):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff < 0 and r_diff > 0: # Other is below-left of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, -agent.view_range-1, -1):
-                            for r in range(r_diff, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff < 0 and r_diff == 0: # Other is left of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, -agent.view_range-1, -1):
-                            for r in range(-agent.view_range, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff < 0 and r_diff < 0: # Other is above-left of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, -agent.view_range - 1, -1):
-                            for r in range(r_diff, -agent.view_range - 1, -1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff == 0 and r_diff < 0: # Other is above the agent
-                        left = lambda t: (c_diff - 0.5) / (r_diff + 0.5) * t
-                        right = lambda t: (c_diff + 0.5) / (r_diff + 0.5) * t
-                        for c in range(-agent.view_range, agent.view_range+1):
-                            for r in range(r_diff, -agent.view_range - 1, -1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if left(r) < c < right(r):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff > 0 and r_diff < 0: # Other is above-right of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, agent.view_range+1):
-                            for r in range(r_diff, -agent.view_range - 1, -1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-
+        # Generate a local grid and an observation mask
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.view_range, self.agents
+        )
+        
         # Convolve the grid observation with the mask.
         obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
         for r in range(2 * agent.view_range + 1):
@@ -214,7 +125,6 @@ class SingleGridObserver(ObserverBaseComponent):
                     obs[r, c] = -2
 
         return {self.key: obs}
-
 
 
 class MultiGridObserver(ObserverBaseComponent):
@@ -288,98 +198,10 @@ class MultiGridObserver(ObserverBaseComponent):
         if not isinstance(agent, self.supported_agent_type):
             return {}
 
-        # Generate a completely empty grid
-        local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
-
-        # Copy the section of the grid around the agent's position
-        (r, c) = agent.position
-        r_lower = max([0, r - agent.view_range])
-        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
-        c_lower = max([0, c - agent.view_range])
-        c_upper = min([self.cols - 1, c + agent.view_range]) + 1
-        local_grid[
-            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
-            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
-        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
-
-        # Generate an observation mask. The agent's observation can be blocked
-        # by other view-blocking agents, which hide the cells "behind" them. We
-        # calculate the blocking by drawing rays from the center of the agent's
-        # position to the edges of the other agents' cell. All cells that are "behind"
-        # that cell and between the two rays are invisible to the observing agent.
-        # In the mask, 1 means that the cell is visibile, 0 means that it is
-        # invisible.
-        mask = np.ones((2 * agent.view_range + 1, 2 * agent.view_range + 1))
-        for other in self.agents.values():
-            if other.view_blocking:
-                r_diff, c_diff = other.position - agent.position
-                # Ensure the other agent within the view range
-                if -agent.view_range <= r_diff <= agent.view_range and \
-                        -agent.view_range <= c_diff <= agent.view_range:
-                    if c_diff > 0 and r_diff == 0: # Other is to the right of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, agent.view_range+1):
-                            for r in range(-agent.view_range, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff > 0 and r_diff > 0: # Other is below-right of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, agent.view_range+1):
-                            for r in range(r_diff, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # Don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff == 0 and r_diff > 0: # Other is below the agent
-                        left = lambda t: (c_diff - 0.5) / (r_diff - 0.5) * t
-                        right = lambda t: (c_diff + 0.5) / (r_diff - 0.5) * t
-                        for c in range(-agent.view_range, agent.view_range+1):
-                            for r in range(r_diff, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if left(r) < c < right(r):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff < 0 and r_diff > 0: # Other is below-left of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, -agent.view_range-1, -1):
-                            for r in range(r_diff, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff < 0 and r_diff == 0: # Other is left of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, -agent.view_range-1, -1):
-                            for r in range(-agent.view_range, agent.view_range+1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff < 0 and r_diff < 0: # Other is above-left of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff - 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff + 0.5) * t
-                        for c in range(c_diff, -agent.view_range - 1, -1):
-                            for r in range(r_diff, -agent.view_range - 1, -1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff == 0 and r_diff < 0: # Other is above the agent
-                        left = lambda t: (c_diff - 0.5) / (r_diff + 0.5) * t
-                        right = lambda t: (c_diff + 0.5) / (r_diff + 0.5) * t
-                        for c in range(-agent.view_range, agent.view_range+1):
-                            for r in range(r_diff, -agent.view_range - 1, -1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if left(r) < c < right(r):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
-                    elif c_diff > 0 and r_diff < 0: # Other is above-right of agent
-                        upper = lambda t: (r_diff + 0.5) / (c_diff + 0.5) * t
-                        lower = lambda t: (r_diff - 0.5) / (c_diff - 0.5) * t
-                        for c in range(c_diff, agent.view_range+1):
-                            for r in range(r_diff, -agent.view_range - 1, -1):
-                                if c == c_diff and r == r_diff: continue # don't mask the other
-                                if lower(c) < r < upper(c):
-                                    mask[r + agent.view_range, c + agent.view_range] = 0
+        # Generate a local grid and an observation mask.
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.view_range, self.agents
+        )
 
         # Convolve the grid observation with the mask.
         obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings), dtype=np.int)
