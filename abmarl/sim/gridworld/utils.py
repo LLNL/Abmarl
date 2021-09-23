@@ -28,7 +28,7 @@ def create_grid_and_mask(agent, grid, mask_range, agents):
         agent of interest.
     """
     # Generate a completely empty grid
-    local_grid = np.empty((mask_range * 2 + 1, madk_range * 2 + 1), dtype=object)
+    local_grid = np.empty((mask_range * 2 + 1, mask_range * 2 + 1), dtype=object)
 
     # Copy the section of the grid around the agent's position
     (r, c) = agent.position
