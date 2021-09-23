@@ -21,8 +21,6 @@ class StateBaseComponent(GridWorldBaseComponent, ABC):
 class PositionState(StateBaseComponent):
     """
     Manage the agents' positions in the grid.
-
-    TODO: Make it so that we don't have to place every agent on its own unique cell.
     """
     def reset(self, **kwargs):
         """
