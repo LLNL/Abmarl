@@ -181,24 +181,10 @@ class AttackActor(ActorBaseComponent):
         possibly resulting in its death.
         """
         def determine_attack(agent):
-            # Generate a completely empty grid
-            local_grid = np.empty(
-                (agent.attack_range * 2 + 1, agent.attack_range * 2 + 1), dtype=object
+            # Generate local grid and an attack mask.
+            local_grid, mask = gu.create_grid_and_mask(
+                agent, self.grid, agent.attack_range, self.agents
             )
-
-            # Copy the section of the grid around the agent's position
-            (r, c) = agent.position
-            r_lower = max([0, r - agent.attack_range])
-            r_upper = min([self.rows - 1, r + agent.attack_range]) + 1
-            c_lower = max([0, c - agent.attack_range])
-            c_upper = min([self.cols - 1, c + agent.attack_range]) + 1
-            local_grid[
-                (r_lower+agent.attack_range-r):(r_upper+agent.attack_range-r),
-                (c_lower+agent.attack_range-c):(c_upper+agent.attack_range-c)
-            ] = self.grid[r_lower:r_upper, c_lower:c_upper]
-
-            # Generate an attack mask. Cannot attack agents who you cannot see.
-            mask = gu.create_mask(agent, agent.attack_range, self.agents)
 
             # Randomly scan the local grid for attackable agents.
             attackable_agents = []

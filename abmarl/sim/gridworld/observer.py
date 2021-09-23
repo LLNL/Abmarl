@@ -102,22 +102,10 @@ class SingleGridObserver(ObserverBaseComponent):
         if not isinstance(agent, self.supported_agent_type):
             return {}
 
-        # Generate a completely empty grid
-        local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
-
-        # Copy the section of the grid around the agent's position
-        (r, c) = agent.position
-        r_lower = max([0, r - agent.view_range])
-        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
-        c_lower = max([0, c - agent.view_range])
-        c_upper = min([self.cols - 1, c + agent.view_range]) + 1
-        local_grid[
-            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
-            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
-        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
-
-        # Generate an observation mask
-        mask = gu.create_mask(agent, agent.view_range, self.agents)
+        # Generate a local grid and an observation mask
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.view_range, self.agents
+        )
         
         # Convolve the grid observation with the mask.
         obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
@@ -210,22 +198,10 @@ class MultiGridObserver(ObserverBaseComponent):
         if not isinstance(agent, self.supported_agent_type):
             return {}
 
-        # Generate a completely empty grid
-        local_grid = np.empty((agent.view_range * 2 + 1, agent.view_range * 2 + 1), dtype=object)
-
-        # Copy the section of the grid around the agent's position
-        (r, c) = agent.position
-        r_lower = max([0, r - agent.view_range])
-        r_upper = min([self.rows - 1, r + agent.view_range]) + 1
-        c_lower = max([0, c - agent.view_range])
-        c_upper = min([self.cols - 1, c + agent.view_range]) + 1
-        local_grid[
-            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
-            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
-        ] = self.grid[r_lower:r_upper, c_lower:c_upper]
-
-        # Generate an observation mask.
-        mask = gu.create_mask(agent, agent.view_range, self.agents)
+        # Generate a local grid and an observation mask.
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.view_range, self.agents
+        )
 
         # Convolve the grid observation with the mask.
         obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings), dtype=np.int)
