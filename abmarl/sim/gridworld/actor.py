@@ -5,8 +5,7 @@ import numpy as np
 from gym.spaces import Box, Discrete
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.state import HealthState, PositionState
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -117,25 +116,12 @@ class AttackActor(ActorBaseComponent):
     """
     Agents can attack other agents.
     """
-    def __init__(self, health_state=None, attack_mapping=None, **kwargs):
+    def __init__(self, attack_mapping=None, **kwargs):
         super().__init__(**kwargs)
-        self.health_state = health_state
         self.attack_mapping = attack_mapping
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Discrete(2)
-
-    @property
-    def health_state(self):
-        """
-        HealthState component that manages the state of the agents' healths.
-        """
-        return self._health_state
-
-    @health_state.setter
-    def health_state(self, value):
-        assert isinstance(value, HealthState), "Health state must be a HealthState object."
-        self._health_state = value
 
     @property
     def attack_mapping(self):
