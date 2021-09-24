@@ -17,6 +17,7 @@ def test_move_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     move_actor = MoveActor(grid=grid, agents=agents)
+    assert isinstance(move_actor, ActorBaseComponent)
 
     position_state.reset()
     action = {
@@ -101,6 +102,7 @@ def test_attack_actor():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     attack_actor = AttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+    assert isinstance(attack_actor, ActorBaseComponent)
 
     position_state.reset()
     health_state.reset()
