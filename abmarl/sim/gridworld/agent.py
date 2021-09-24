@@ -189,9 +189,12 @@ class HealthAgent(GridWorldAgent):
     
     @initial_health.setter
     def initial_health(self, value):
-        assert type(value) in [int, float], "Initial health must be a numeric value."
-        assert 0 < value <= 1, "Initial value must be between 0 and 1."
-        self._initial_health = value
+        if value is None:
+            self._initial_health = np.random.uniform(0, 1)
+        else:
+            assert type(value) in [int, float], "Initial health must be a numeric value."
+            assert 0 < value <= 1, "Initial value must be between 0 and 1."
+            self._initial_health = value
 
     @property
     def active(self):
