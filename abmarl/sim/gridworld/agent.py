@@ -127,7 +127,7 @@ class GridObservingAgent(ObservingAgent, GridWorldAgent):
         self._view_range = value
 
     @property
-    def confiured(self):
+    def configured(self):
         return super().configured and self.view_range is not None
 
 
@@ -152,7 +152,7 @@ class MovingAgent(ActingAgent, GridWorldAgent):
         self._move_range = value
 
     @property
-    def confiured(self):
+    def configured(self):
         return super().configured and self.move_range is not None
 
 
@@ -199,6 +199,10 @@ class HealthAgent(GridWorldAgent):
         The agent is active if its health is greater than 0.
         """
         return self.health > 0
+
+    @property
+    def configured(self):
+        return super().configured and self.initial_health is not None
 
 
 class AttackingAgent(ActingAgent, GridWorldAgent):
@@ -255,6 +259,6 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         self._attack_accuracy = value
     
     @property
-    def confiured(self):
+    def configured(self):
         return super().configured and self.attack_range is not None and \
             self.attack_strength is not None and self.attack_accuracy is not None
