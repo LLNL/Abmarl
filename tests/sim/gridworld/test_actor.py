@@ -3,7 +3,7 @@ import numpy as np
 
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor, ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState, HealthState
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
 
 def test_move_actor():
@@ -89,3 +89,31 @@ def test_move_actor_with_overlap():
     np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 3]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
 
+def test_attack_actor():
+    grid = Grid(5, 6)
+    agents = {
+        'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
+        'agent1': AttackingAgent(id='agent1', initial_position=np.array([2, 2]), encoding=1, attack_range=2, attack_strength=1, attack_accuracy=1),
+        'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
+        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = AttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+
+    position_state.reset()
+    health_state.reset()
+    attack_actor.process_action(agents['agent1'], {'attack': 1})
+    attack_actor.process_action(agents['agent1'], {'attack': 1})
+    assert not agents['agent0'].active
+    assert not agents['agent3'].active
+    assert agents['agent0'].health <= 0
+    assert agents['agent3'].health <= 0
+    assert not grid[4, 4]
+    assert not grid[3, 2]
+
+    attack_actor.process_action(agents['agent1'], {'attack': 1})
+    assert agents['agent2'].active
+    assert agents['agent2'].health > 0
+    assert grid[2, 3]
