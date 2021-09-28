@@ -20,6 +20,24 @@ The components are then fit together in the simulation's initialization...
 Agent
 `````
 
+Every entity in the GridWorld is a GridWorldAgent (e.g. walls, foragers, resources, fighters, etc.).
+GridWorldAgents are PrincipalAgents with specific parameters needed to be used in
+a GridWorld Simulation. In particular, agents must be given an encoding, which is
+an integer that defines the type of agent and simplifies the logic for many components
+of the framework. GridWorldAgents can also be configured with an initial position,
+the ability to block other agents' abilities, and rendering parameters such as shape
+and color.
+
+Following the dataclass model, additional agent classes can be defined that allow
+agents to work with various components. For example, ObservingAgents can work with
+Observers and MovingAgents can work with the MoveActor. Any new agent class should
+inhert from GridWorldAgent and possibly from ActingAgent or ObservingAgent as needed.
+
+.. WARNING::
+   Agents should follow the dataclass model, meaning that they should only be given
+   parameters. All functionality should be written in the Components that work with
+   the agents.
+
 Grid
 ````
 The Grid stores agents in a two-dimensional numpy array. The Grid is configured
