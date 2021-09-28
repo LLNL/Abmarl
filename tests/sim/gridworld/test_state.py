@@ -24,7 +24,6 @@ def test_position_state():
     assert grid[1, 2] == {'agent1': agents['agent1']}
     assert grid[2, 0] == {'agent2': agents['agent2']}
 
-
 def test_health_state():
     grid = Grid(3, 3)
     agents = {
@@ -38,8 +37,8 @@ def test_health_state():
     health_state.reset()
 
     assert agents['agent0'].health == 0.24
-    assert 0 < agents['agent1'].health <= 1
-    assert 0 < agents['agent2'].health <= 1
+    assert 0 <= agents['agent1'].health <= 1
+    assert 0 <= agents['agent2'].health <= 1
     assert agents['agent0'].active
     assert agents['agent1'].active
     assert agents['agent2'].active
