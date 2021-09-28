@@ -32,6 +32,14 @@ Following the dataclass model, additional agent classes can be defined that allo
 agents to work with various components. For example, ObservingAgents can work with
 Observers and MovingAgents can work with the MoveActor. Any new agent class should
 inhert from GridWorldAgent and possibly from ActingAgent or ObservingAgent as needed.
+For example, one can define a new type of agent like so:
+
+.. code-block:: python
+
+   class CommunicatingAgent(GridWorldAgent, ActingAgent):
+       def __init__(self, broadcast_range=None, **kwargs):
+           super().__init__(**kwargs)
+           self.broadcast_range = broadcast_range
 
 .. WARNING::
    Agents should follow the dataclass model, meaning that they should only be given
@@ -81,6 +89,9 @@ Components can ``remove`` agents from specific locations in the Grid.
 
 Base Component
 ``````````````
+
+Every component should be initialized with references to the dictionary of agents
+and the grid.
 
 State
 `````
