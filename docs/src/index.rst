@@ -22,6 +22,7 @@ for pre-existing projects to prototype RL as a potential solution.
    :caption: Contents
 
    overview
+   gridworld
    featured_usage
    install
    tutorials/tutorials
