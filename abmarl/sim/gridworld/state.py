@@ -39,9 +39,13 @@ class PositionState(StateBaseComponent):
                 r, c = agent.initial_position
                 assert self.grid.place(agent, (r, c)), "All initial positions must " + \
                     "be unique or agents with the same initial positions must be overlappable."
-                ravelled_positions_available.remove(
-                    np.ravel_multi_index(agent.position, (self.rows, self.cols))
-                )
+                try:
+                    ravelled_positions_available.remove(
+                        np.ravel_multi_index(agent.position, (self.rows, self.cols))
+                    )
+                except KeyError:
+                    continue
+
 
         # Now place all the rest of the agents who did not have initial positions
         # and block off those positions as well. We have to do this one agent at
