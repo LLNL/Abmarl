@@ -12,10 +12,43 @@ Framework Design
 
 The GridWorld Simulation Framework utilizes a modular design that allows developers
 to create new features and plug them in as components of the simulation. Every component
-inherits from the Component Base class and has a reference to the grid and the dictionary
+inherits from the GridWorldBaseComponent class and has a reference to the grid and the dictionary
 of agents.
 
-The components are then fit together in the simulation's initialization...
+A GridWorldSimulation is composed of a dictionary of Agents, a Grid, and various
+Components. It follows the AgentBasedSimulation interface and relies on the components
+themselves to implement the pieces of the interface. For example, a simulation might
+look something like
+
+.. code-block:: python
+
+   from abmarl.sim.gridworld.state import PositionState
+   from abmarl.sim.gridworld.actor import MoveActor
+   from abmarl.sim.gridworld.observer import SingleGridObserver
+   
+   class MyGridSim(GridWorldSimulation):
+       def __init__(self, **kwargs):
+           self.agents = kwargs['agents']
+           self.position_state = PositionState(**kwargs)
+           self.move_actor = MoveActor(**kwargs)
+           self.observer = SingleGridObserver(**kwargs)
+
+       def reset(self, **kwargs):
+           self.position_state.reset(**kwargs)
+       
+       def step(self, action_dict):
+           for agent_id, action in action_dict.items():
+               self.move_actor.process_action(self.agents[agent_id], action)
+    
+       def get_obs(self, agent_id, **kwargs):
+           return self.observer.get_obs(self.agents[agent_id])
+
+FIGURE ### shows a visual depiction of the framework being used to create a simulation.
+See THIS TUTORIAL for an indepth example.
+
+GridWorldSimulation also provides two builders: (1) build sim and (2) build sim
+from file. See THIS TUTORIAL for information on how to use these builders.
+
 
 Agent
 `````
