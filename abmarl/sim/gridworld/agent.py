@@ -127,7 +127,7 @@ class GridObservingAgent(ObservingAgent, GridWorldAgent):
         self._view_range = value
 
     @property
-    def confiured(self):
+    def configured(self):
         return super().configured and self.view_range is not None
 
 
@@ -152,7 +152,7 @@ class MovingAgent(ActingAgent, GridWorldAgent):
         self._move_range = value
 
     @property
-    def confiured(self):
+    def configured(self):
         return super().configured and self.move_range is not None
 
 
@@ -189,8 +189,9 @@ class HealthAgent(GridWorldAgent):
     
     @initial_health.setter
     def initial_health(self, value):
-        assert type(value) in [int, float], "Initial health must be a numeric value."
-        assert 0 < value <= 1, "Initial value must be between 0 and 1."
+        if value is not None:
+            assert type(value) in [int, float], "Initial health must be a numeric value."
+            assert 0 < value <= 1, "Initial value must be between 0 and 1."
         self._initial_health = value
 
     @property
@@ -255,6 +256,6 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         self._attack_accuracy = value
     
     @property
-    def confiured(self):
+    def configured(self):
         return super().configured and self.attack_range is not None and \
             self.attack_strength is not None and self.attack_accuracy is not None
