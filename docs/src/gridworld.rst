@@ -18,7 +18,7 @@ of agents.
 A GridWorldSimulation is composed of a dictionary of Agents, a Grid, and various
 Components. It follows the AgentBasedSimulation interface and relies on the components
 themselves to implement the pieces of the interface. For example, a simulation might
-look something like
+look something like this:
 
 .. code-block:: python
 
@@ -44,19 +44,16 @@ look something like
            return self.observer.get_obs(self.agents[agent_id])
 
 FIGURE ### shows a visual depiction of the framework being used to create a simulation.
-See THIS TUTORIAL for an indepth example.
-
-GridWorldSimulation also provides two builders: (1) build sim and (2) build sim
-from file. See THIS TUTORIAL for information on how to use these builders.
+See THIS TUTORIAL for an indepth example of using the GridWorld Simulation Framework.
 
 
 Agent
 `````
 
 Every entity in the GridWorld is a GridWorldAgent (e.g. walls, foragers, resources, fighters, etc.).
-GridWorldAgents are PrincipalAgents with specific parameters needed to be used in
+GridWorldAgents are PrincipalAgents with specific parameters that make them usable in
 a GridWorld Simulation. In particular, agents must be given an encoding, which is
-an integer that defines the type of agent and simplifies the logic for many components
+an integer that correlates to the type of agent and simplifies the logic for many components
 of the framework. GridWorldAgents can also be configured with an initial position,
 the ability to block other agents' abilities, and rendering parameters such as shape
 and color.
@@ -73,6 +70,7 @@ For example, one can define a new type of agent like so:
        def __init__(self, broadcast_range=None, **kwargs):
            super().__init__(**kwargs)
            self.broadcast_range = broadcast_range
+           ...
 
 .. WARNING::
    Agents should follow the dataclass model, meaning that they should only be given
@@ -83,7 +81,7 @@ Grid
 ````
 The Grid stores agents in a two-dimensional numpy array. The Grid is configured
 to be a certain size (rows and columns) and to allow types of agents to overlap
-(occupy the same cell). For example, you may want a Foraging Agent to be able to overlap
+(occupy the same cell). For example, you may want a ForagingAgent to be able to overlap
 with a ResourceAgent but not a WallAgent. The overlapping argument
 is a dictionary that maps the agent's encoding to a list of other agents' encodings
 with which it can overlap. For example,
@@ -113,12 +111,11 @@ are 2 or 3.
 Interaction between simulation components (see below) and the grid is
 `data open`, which means that we allow components to access the internals of the
 grid. Although this is possible and sometimes necessary, the Grid also provides
-an interface for safer interactions with components.
-
-Components can ``query`` the Grid to see if an agent can be placed at a specific location.
-Components can ``place`` agents at a specific location in the Grid, which will succeed
-if that cell is available to the agent as per the overlapping configuration. And
-Components can ``remove`` agents from specific locations in the Grid. 
+an interface for safer interactions with components. Components can ``query`` the
+Grid to see if an agent can be placed at a specific location. Components can ``place``
+agents at a specific location in the Grid, which will succeed if that cell is available
+to the agent as per the overlapping configuration. And Components can ``remove``
+agents from specific locations in the Grid. 
 
 
 State
@@ -133,7 +130,7 @@ Actor
 Actor Components are responsible for processing agent actions and producing changes
 to the state of the simulation. Actors assign supported agents with an appropriate
 action space and process agents' actions based on the Actor's key. For example, the
-MoveActor appends MovingAgents' action spaces with a 'move' channel and look for
+MoveActor appends MovingAgents' action spaces with a 'move' channel and looks for
 the 'move' key in the agent's incoming action.
 
 Observer
@@ -150,7 +147,8 @@ Done
 
 Done Components manage the "done state" of each agent and of the simulation as a
 whole via their ``get_done`` and ``get_all_done`` interface. Agents that are reported
-as done will cease sending actions to the simulation.
+as done will cease sending actions to the simulation, and when ``get_all_done``
+reports True, the episode ends.
 
 
 Features
@@ -179,7 +177,6 @@ Grid's overlapping configuration. For example, consider the following setup:
        id='agent1',
        encoding=1
    )
-   agents =
    position_state = PositionState(
        agents={'agent0': agent0, 'agent1': agent1},
        grid=Grid(4, 5)
@@ -217,7 +214,7 @@ cell as another agent if they are allowed to overlap. For example, in this setup
    move_actor.process_move(agents['agent1'], {'move': np.array([2, 1])})
 
 `agent0` starts at position (2, 2) and can move up to one square away. `agent1`
-start at (0, 2) and can move up to two squares away. The two agents can overlap
+starts at (0, 2) and can move up to two squares away. The two agents can overlap
 each other, so when the move actor processes their actions, both agents will be
 at position (2, 3).
 
@@ -225,9 +222,9 @@ Single Grid Observer
 ````````````````````
 
 GridObservingAgents can observe the state of the grid around them, namely which
-other agents are nearby, via the SingleGridObserver. The SingleGrid observer generates
+other agents are nearby, via the SingleGridObserver. The SingleGridObserver generates
 a two-dimensional numpy array sized by the agent's view range with the observing
-agent located a the center of array. All other agents within the view_range will
+agent located at the center of the array. All other agents within the view_range will
 appear in the observation, shown as their encoding. For example, the following setup
 
 .. code-block:: python
@@ -262,12 +259,12 @@ will output an observation for `agent0` like so:
 Since view_range is the number of cells away that can be observed, the grid is size
 (2 * view_range + 1) by (2 * view_range + 1). `agent0` is centered in the middle
 of this grid, shown by its encoding: 1. All other agents appear in the observation
-relative to its location and shown by their encoding. The agent observes some out
+relative to its location and shown by their encodings. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
 and the SingleGridObserver will randomly select between their encodings to display.
 
-Blocking
-~~~~~~~~
+View Blocking
+~~~~~~~~~~~~~
 
 Agents can block other agents from view, masking out parts of the grid. For example,
 if `agent4` is configured with `view_blocking=True`, then the observation would like
@@ -284,9 +281,8 @@ like this:
    [-1,  0,  0,  0,  0,  0, -2]
 
 The -2 indicates that the cell is masked, and the choice of displaying `agent3`
-over `agent4` is still a random choice.
-
-Which cells get masked by view_blocking agents is determined by drawing two lines
+over `agent4` is still a random choice. Which cells get masked by view_blocking
+agents is determined by drawing two lines
 from the center of the observing agent's cell to the corners of the blocking agent's
 cell. Any cell whose center falls between those two lines will be masked, as shown
 in Figure ###.
@@ -386,6 +382,8 @@ attack mapping. `agent1`'s health will be depleted by 1, and as a result its hea
 will fall to 0 and it will be marked as inactive. The second attack fails because,
 although `agent2` is within range, it is not a type that `agent0` can attack.
 
+.. NOTE::
 
-
-
+   Attacks can be blocked by view_blocking agents. If an attackable agent is
+   masked from an attacking agent, then it cannot be attacked by that agent. The
+   masking is determined the same way as the view blocking.
