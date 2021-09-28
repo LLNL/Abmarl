@@ -1,4 +1,5 @@
 
+from gym.spaces import Box
 import numpy as np
 
 from abmarl.sim.gridworld.observer import ObserverBaseComponent, SingleGridObserver, \
@@ -20,9 +21,20 @@ def test_single_grid_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = SingleGridObserver(agents=agents, grid=grid)
+    observer.key == 'grid'
+    observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
-    position_state.reset()
+    agents['agent0'].observation_space['grid'] == Box(
+        -np.inf, np.inf, (5, 5), np.int
+    )
+    agents['agent1'].observation_space['grid'] == Box(
+        -np.inf, np.inf, (3, 3), np.int
+    )
+    agents['agent2'].observation_space['grid'] == Box(
+        -np.inf, np.inf, (9, 9), np.int
+    )
 
+    position_state.reset()
     np.testing.assert_array_equal(
         observer.get_obs(agents['agent0'])['grid'],
         np.array([
@@ -123,7 +135,18 @@ def test_multi_grid_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = MultiGridObserver(agents=agents, grid=grid)
+    observer.key == 'grid'
+    observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
+    agents['agent0'].observation_space['grid'] == Box(
+        -2, 8, (5, 5, 6), np.int
+    )
+    agents['agent1'].observation_space['grid'] == Box(
+        -2, 8, (3, 3, 6), np.int
+    )
+    agents['agent2'].observation_space['grid'] == Box(
+        -2, 8, (9, 9, 6), np.int
+    )
     position_state.reset()
 
     np.testing.assert_array_equal(
