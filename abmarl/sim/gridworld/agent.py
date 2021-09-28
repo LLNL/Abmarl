@@ -201,10 +201,6 @@ class HealthAgent(GridWorldAgent):
         """
         return self.health > 0
 
-    @property
-    def configured(self):
-        return super().configured and self.initial_health is not None
-
 
 class AttackingAgent(ActingAgent, GridWorldAgent):
     """
