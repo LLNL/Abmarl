@@ -42,9 +42,18 @@ def test_grid_overlapping():
 def test_grid_reset():
     grid = Grid(3, 3)
     grid.reset()
+    for i in range(grid.rows):
+        for j in range(grid.cols):
+            assert grid[i, j] == {}
+
     agent = GridWorldAgent(id='agent0', encoding=1)
     assert grid.place(agent, (1, 0))
     assert grid[1, 0] == {'agent0': agent}
+    for i in range(grid.rows):
+        for j in range(grid.cols):
+            if i == 1 and j == 0:
+                continue
+            assert grid[i, j] == {}
     grid.reset()
     assert grid[1, 0] == {}
 
@@ -54,9 +63,17 @@ def test_grid_query():
     agent1 = GridWorldAgent(id='agent1', encoding=1)
     agent2 = GridWorldAgent(id='agent2', encoding=1)
     assert grid.place(agent1, (1, 0))
-    assert grid[1, 0] == {'agent1': agent1}
     assert not grid.query(agent2, (1, 0))
     assert grid.query(agent2, (0, 1))
+
+def test_grid_query_with_overlap():
+    grid = Grid(3, 3, overlapping={1: [1]})
+    grid.reset()
+    agent1 = GridWorldAgent(id='agent1', encoding=1)
+    agent2 = GridWorldAgent(id='agent2', encoding=1)
+    assert grid.place(agent1, (1, 0))
+    assert grid.query(agent2, (1, 0))
+    assert grid.query(agent1, (1, 0))
 
 def test_grid_place():
     grid = Grid(3, 3)
@@ -64,7 +81,6 @@ def test_grid_place():
     agent1 = GridWorldAgent(id='agent1', encoding=1)
     agent2 = GridWorldAgent(id='agent2', encoding=2)
     assert grid.place(agent1, (1, 0))
-    assert grid[1, 0] == {'agent1': agent1}
     assert not grid.place(agent2, (1, 0))
 
 def test_grid_place_with_overlap():
