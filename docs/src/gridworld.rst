@@ -87,23 +87,37 @@ Components can ``place`` agents at a specific location in the Grid, which will s
 if that cell is available to the agent as per the overlapping configuration. And
 Components can ``remove`` agents from specific locations in the Grid. 
 
-Base Component
-``````````````
-
-Every component should be initialized with references to the dictionary of agents
-and the grid.
 
 State
 `````
 
+State Components manage the state of the simulation alongside the Grid. Each State
+has a reset function that resets the simulation at the the start of each episode.
+
 Actor
 `````
+
+Actor Components are responsible for processing agent actions and producing changes
+to the state of the simulation. Actors assign supported agents with an appropriate
+action space and process agents' actions based on the Actor's key. For example, the
+MoveActor appends MovingAgents' action spaces with a 'move' channel and look for
+the 'move' key in the agent's incoming action.
 
 Observer
 ````````
 
+Similar to Actor Components, Observer Components are responsible for creating an
+agent's observation of the state of the simulation. Observers assign supported agents
+with an appropriate observation space and generate observations based on the
+Observer's key. For example, the SingleGridObserver generates an observation and
+stores it in the 'grid' channel of the agent's observation.
+
 Done
 ````
+
+Done Components manage the "done state" of each agent and of the simulation as a
+whole via their ``get_done`` and ``get_all_done`` interface. Agents that are reported
+as done will cease sending actions to the simulation.
 
 
 Features
