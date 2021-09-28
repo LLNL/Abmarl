@@ -1,4 +1,5 @@
 
+from gym.spaces import Box, Discrete
 import numpy as np
 import pytest
 
@@ -21,6 +22,10 @@ def test_move_actor():
     assert isinstance(move_actor, ActorBaseComponent)
     assert move_actor.key == 'move'
     assert move_actor.supported_agent_type == MovingAgent
+    assert agents['agent0'].action_space['move'] == Box(-1, 1, (2,), np.int)
+    assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), np.int)
+    assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), np.int)
+    assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), np.int)
 
     position_state.reset()
     action = {
@@ -108,6 +113,7 @@ def test_attack_actor():
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
+    assert agents['agent1'].action_space['attack'] == Discrete(2)
 
     position_state.reset()
     health_state.reset()
