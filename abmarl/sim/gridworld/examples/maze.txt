@@ -1,0 +1,8 @@
+0 0 0 0 W 0 W W 0 W W 0 0 W W 0 W 0
+W 0 W 0 N 0 0 0 0 0 W 0 W W 0 0 0 0
+W W W W 0 W W 0 W 0 0 0 0 W W 0 W W
+0 W 0 0 0 W W 0 W 0 W W 0 0 0 0 0 0
+0 0 0 W 0 0 W W W 0 W 0 0 W 0 W W 0
+W W W W 0 W W W W W W W 0 W 0 T W 0
+0 0 0 0 0 W 0 0 0 0 0 0 0 W 0 W W 0
+0 W 0 W 0 W W W 0 W W 0 W W 0 W 0 0
