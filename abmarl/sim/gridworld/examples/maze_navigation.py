@@ -4,13 +4,21 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldSimulation
-from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent, AttackingAgent
 from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
 from abmarl.tools.matplotlib_utils import mscatter
 
-class MazeNavigationAgent(GridObservingAgent, MovingAgent): pass
+class MazeNavigationAgent(GridObservingAgent, MovingAgent, AttackingAgent):
+    def __init__(self, **kwargs):
+        super().__init__(
+            move_range=1,
+            attack_range=0,
+            attack_strength=1,
+            attack_accuracy=1,
+            **kwargs
+        )
 
 class MazeNaviationSim(GridWorldSimulation):
     def __init__(self, **kwargs):
@@ -98,9 +106,8 @@ if __name__ == "__main__":
         'N': lambda n: MazeNavigationAgent(
             id=f'navigator{n}',
             encoding=1,
-            move_range=1,
-            view_range=3,
-            render_color='blue'
+            view_range=2,
+            render_color='blue',
         ),
         'T': lambda n: GridWorldAgent(
             id=f'target{n}',
@@ -119,7 +126,8 @@ if __name__ == "__main__":
     sim = MazeNaviationSim.build_sim_from_file(
         file_name,
         object_registry,
-        overlapping={1: [3], 3: [1]}
+        overlapping={1: [3], 3: [1]},
+        attack_mapping={1: [3]}
     )
     sim.reset()
     fig = plt.figure()
