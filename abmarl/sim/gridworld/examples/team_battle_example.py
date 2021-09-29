@@ -82,8 +82,8 @@ class TeamBattleSim(GridWorldSimulation):
             for agent in self.agents.values() if agent.active
         ]
         shape = [agent.render_shape for agent in self.agents.values() if agent.active]
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
-        # TODO: Color by team
+        color = [agent.render_color for agent in self.agents.values() if agent.active]
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
 
         plt.plot()
         plt.pause(1e-6)
