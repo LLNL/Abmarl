@@ -216,3 +216,4 @@ class AttackActor(ActorBaseComponent):
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
                         self.grid.remove(attacked_agent, attacked_agent.position)
+                return attacked_agent
