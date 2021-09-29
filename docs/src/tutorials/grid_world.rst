@@ -36,13 +36,21 @@ so we don't need to create anything new.
    from abmarl.tools.matplotlib_utils import mscatter # Needed for nice renderings
 
 Then, we define our agent types. This simulation will only have a single type:
-the BattleAgent. Furthermore, the agent will not be pre-configured with any parameters,
-so definiing the BattleAgent is just boilerplate.
+the BattleAgent. Most of the agent attributes will be the same, and we can preconfigure
+that in the class definition so we don't have to do it for every agent.
 
 .. code-block:: python
 
    class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
-       pass
+       def __init__(self, **kwargs):
+           super().__init__(
+               move_range=1,
+               attack_range=1,
+               attack_strength=1,
+               attack_accuracy=1,
+               view_range=3,
+               **kwargs
+           )
 
 Having defined the BattleAgent, we then put all the components together into a single
 simulation: TeamBattleSim.
@@ -169,7 +177,69 @@ Finally, in order to visualize our simulation, we define a render function.
                for agent in self.agents.values() if agent.active
            ]
            shape = [agent.render_shape for agent in self.agents.values() if agent.active]
-           mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
+           color = [agent.render_color for agent in self.agents.values() if agent.active]
+           mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
    
            plt.plot()
            plt.pause(1e-6)
+
+Now that we've defined our agents and simulations, let's create them and run the
+simulation. First, we'll create the agents. There will be 4 teams, so we want to
+color the agent by team and start them at different corners of the grid. Besides that,
+all agent attributes will be the same, and here we benefit from pre-configuring
+the attributes in the class definition.
+
+.. code-block:: python
+
+   colors = ['red', 'blue', 'green', 'gray'] # Team colors
+   positions = [np.array([1,1]), np.array([1,6]), np.array([6,1]), np.array([6,6])] # Grid corners
+   agents = {
+       f'agent{i}': BattleAgent(
+           id=f'agent{i}',
+           encoding=i%4+1,
+           render_color=colors[i%4],
+           initial_position=positions[i%4]
+       ) for i in range(24)
+   }
+
+Having created the agents, we can now build the simulation. We will allow agents
+from the same team to occupy the same cell and allow agents to attack other agents
+if they are on different teams.
+
+.. code-block:: python
+
+   overlap_map = {
+       1: [1],
+       2: [2],
+       3: [3],
+       4: [4]
+   }
+   attack_map = {
+       1: [2, 3, 4],
+       2: [1, 3, 4],
+       3: [1, 2, 4],
+       4: [1, 2, 3]
+   }
+   sim = TeamBattleSim.build_sim(
+       8, 8,
+       agents=agents,
+       overlapping=overlap_map,
+       attack_mapping=attack_map
+   )
+
+Finally, we can run the simulation with random actions and visualize it.
+
+.. code-block:: python
+
+   sim.reset()
+   fig = plt.figure()
+   sim.render(fig=fig)
+   
+   from pprint import pprint
+   for i in range(50):
+       action = {
+           agent.id: agent.action_space.sample() for agent in agents.values()
+       }
+       sim.step(action)
+       sim.render(fig=fig)
+   

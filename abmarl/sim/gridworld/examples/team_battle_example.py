@@ -11,7 +11,15 @@ from abmarl.sim.gridworld.done import OneTeamRemainingDone
 from abmarl.tools.matplotlib_utils import mscatter
 
 class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(
+            move_range=1,
+            attack_range=1,
+            attack_strength=1,
+            attack_accuracy=1,
+            view_range=3,
+            **kwargs
+        )
 
 class TeamBattleSim(GridWorldSimulation):
     def __init__(self, **kwargs):
@@ -107,3 +115,45 @@ class TeamBattleSim(GridWorldSimulation):
 
     def get_info(self, agent_id, **kwargs):
         return {}
+
+if __name__ == "__main__":
+    colors = ['red', 'blue', 'green', 'gray']
+    positions = [np.array([1,1]), np.array([1,6]), np.array([6,1]), np.array([6,6])]
+    agents = {
+        f'agent{i}': BattleAgent(
+            id=f'agent{i}',
+            encoding=i%4+1,
+            render_color=colors[i%4],
+            initial_position=positions[i%4]
+        ) for i in range(24)
+    }
+    overlap_map = {
+        1: [1],
+        2: [2],
+        3: [3],
+        4: [4]
+    }
+    attack_map = {
+        1: [2, 3, 4],
+        2: [1, 3, 4],
+        3: [1, 2, 4],
+        4: [1, 2, 3]
+    }
+    sim = TeamBattleSim.build_sim(
+        8, 8,
+        agents=agents,
+        overlapping=overlap_map,
+        attack_mapping=attack_map
+    )
+
+    sim.reset()
+    fig = plt.figure()
+    sim.render(fig=fig)
+    
+    from pprint import pprint
+    for i in range(50):
+        action = {
+            agent.id: agent.action_space.sample() for agent in agents.values()
+        }
+        sim.step(action)
+        sim.render(fig=fig)
