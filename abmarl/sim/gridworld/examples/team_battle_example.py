@@ -44,14 +44,24 @@ class TeamBattleSim(GridWorldSimulation):
         # Process attacks:
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            if agent.active:
-                self.attack_actor.process_action(agent, action, **kwargs)
+            attacked_agent = self.attack_actor.process_action(agent, action, **kwargs)
+            if attacked_agent is not None:
+                self.rewards[attacked_agent.id] -= 1
+                self.rewards[agent.id] += 1
+            else:
+                self.rewards[agent.id] -= 0.1
 
         # Process moves
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if agent.active:
-                self.move_actor.process_action(agent, action, **kwargs)
+                move_result = self.move_actor.process_action(agent, action, **kwargs)
+                if not move_result:
+                    self.rewards[agent.id] -= 0.1
+        
+        # Entropy penalty
+        for agent_id in action_dict:
+            self.rewards[agent_id] -= 0.01
 
     def render(self, fig=None, **kwargs):
         fig.clear()

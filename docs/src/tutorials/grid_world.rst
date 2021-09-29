@@ -85,7 +85,8 @@ to perform the reset. Note that we must track the rewards explicitly.
            self.rewards = {agent.id: 0 for agent in self.agents.values()}
 
 Then we define how the simulation will step forward, leaning on the Actors to process
-their part of the action.
+their part of the action. The Actors' results are used to determine the agents'
+rewards.
 
 .. code-block:: python
 
@@ -96,14 +97,24 @@ their part of the action.
            # Process attacks:
            for agent_id, action in action_dict.items():
                agent = self.agents[agent_id]
-               if agent.active:
-                   self.attack_actor.process_action(agent, action, **kwargs)
- 
+               attacked_agent = self.attack_actor.process_action(agent, action, **kwargs)
+               if attacked_agent is not None:
+                   self.rewards[attacked_agent.id] -= 1
+                   self.rewards[agent.id] += 1
+               else:
+                   self.rewards[agent.id] -= 0.1
+   
            # Process moves
            for agent_id, action in action_dict.items():
                agent = self.agents[agent_id]
                if agent.active:
-                   self.move_actor.process_action(agent, action, **kwargs)
+                   move_result = self.move_actor.process_action(agent, action, **kwargs)
+                   if not move_result:
+                       self.rewards[agent.id] -= 0.1
+           
+           # Entropy penalty
+           for agent_id in action_dict:
+               self.rewards[agent_id] -= 0.01
 
 Then we define each of the getters.
 
