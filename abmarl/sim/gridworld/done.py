@@ -52,3 +52,18 @@ class ActiveDone(DoneBaseComponent):
             if agent.active:
                 return False
         return True
+
+class OneTeamRemainingDone(ActiveDone):
+    """
+    Inactive agents are indicated as done.
+
+    If the only active agents are those who are all of the same encoding, then
+    the simulation ends.
+    """
+    def get_all_done(self, **kwargs):
+        """
+        Return true if all active agents have the same encoding. Otherwise,
+        return false.
+        """
+        encodings = [agent.encoding for agent in self.agents.values() if agent.active]
+        return len(encodings) == 1
