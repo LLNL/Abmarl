@@ -117,15 +117,13 @@ if __name__ == "__main__":
     sim = MazeNaviationSim.build_sim_from_file(
         file_name,
         object_registry,
-        overlapping={1: [3], 3: [1]},
-        attack_mapping={1: [3]}
+        overlapping={1: [3], 3: [1]}
     )
     sim.reset()
     fig = plt.figure()
     sim.render(fig=fig)
 
     
-    from pprint import pprint
     for i in range(100):
         action = {'navigator': sim.navigator.action_space.sample()}
         sim.step(action)
