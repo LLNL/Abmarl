@@ -150,7 +150,6 @@ if __name__ == "__main__":
     fig = plt.figure()
     sim.render(fig=fig)
     
-    from pprint import pprint
     for i in range(50):
         action = {
             agent.id: agent.action_space.sample() for agent in agents.values()

@@ -1,5 +1,5 @@
 
-from gym.spaces.discrete import Discrete, Dict, Box
+from gym.spaces import Discrete, Dict, Box
 import numpy as np
 from matplotlib import pyplot as plt
 from numpy.lib.function_base import average
@@ -294,18 +294,23 @@ class BroadcastSim(GridWorldSimulation):
 
         # Draw the agents
         agents_x = [
-            agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
+            agent.position[1] + 0.5 for agent in self.agents.values()
         ]
         agents_y = [
             self.position_state.rows - 0.5 - agent.position[0]
-            for agent in self.agents.values() if agent.active
+            for agent in self.agents.values()
         ]
-        shape = [agent.render_shape for agent in self.agents.values() if agent.active]
-        color = [agent.render_color for agent in self.agents.values() if agent.active]
+        shape = [agent.render_shape for agent in self.agents.values()]
+        color = [agent.render_color for agent in self.agents.values()]
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
 
         plt.plot()
         plt.pause(1e-6)
+
+        for agent in self.agents.values():
+            if isinstance(agent, BroadcastingAgent):
+                print(f"{agent.id}: {agent.message}")
+        print()
     
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
@@ -324,3 +329,31 @@ class BroadcastSim(GridWorldSimulation):
     
     def get_all_done(self, **kwargs):
         return self.get_all_done(**kwargs)
+    
+    def get_info(self, **kwargs):
+        return {}
+
+if __name__ == "__main__":
+    agents = {
+        'broadcaster0': BroadcastingAgent(id='broadcaster0', encoding=1, broadcast_range=6, render_color='green'),
+        'broadcaster1': BroadcastingAgent(id='broadcaster1', encoding=1, broadcast_range=6, render_color='green'),
+        'broadcaster2': BroadcastingAgent(id='broadcaster2', encoding=1, broadcast_range=6, render_color='green'),
+        'broadcaster3': BroadcastingAgent(id='broadcaster3', encoding=1, broadcast_range=6, render_color='green'),
+        'blocker0': BlockingAgent(id='blocker0', encoding=2, move_range=2, view_range=3, render_color='black'),
+        'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
+        'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
+    }
+    sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-2)
+    sim.reset()
+
+    fig = plt.figure()
+    sim.render(fig=fig)
+    
+    for i in range(50):
+        action = {
+            agent.id: agent.action_space.sample() for agent in agents.values()
+        }
+        sim.step(action)
+        sim.render(fig=fig)
+
+    plt.show()
