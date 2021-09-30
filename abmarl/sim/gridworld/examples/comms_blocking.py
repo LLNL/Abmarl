@@ -2,12 +2,15 @@
 from gym.spaces.discrete import Discrete, Dict, Box
 import numpy as np
 from matplotlib import pyplot as plt
+from numpy.lib.function_base import average
 
-from abmarl.sim import Agent, ActingAgent
+from abmarl.sim import Agent
 from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, GridWorldAgent
+from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.state import PositionState, StateBaseComponent
 from abmarl.sim.gridworld.actor import MoveActor, ActorBaseComponent
 from abmarl.sim.gridworld.observer import SingleGridObserver, ObserverBaseComponent
+from abmarl.sim.gridworld.done import DoneBaseComponent
 from abmarl.tools.matplotlib_utils import mscatter
 import abmarl.sim.gridworld.utils as gu
 
@@ -157,9 +160,6 @@ class BroadcastingState(StateBaseComponent):
     def update_receipients(self, from_agent, to_agents):
         for agent in to_agents:
             self.receiving_state[agent.id].append((from_agent.id, from_agent.message))
-    
-    def update_message(self, agent):
-        pass
 
     def update_message_and_reset_receiving(self, agent):
         receiving_from = self.receiving_state[agent.id]
@@ -206,5 +206,121 @@ class BroadcastObserver(ObserverBaseComponent):
             obs[agent_id] = message
         return obs
         
+class AverageMessageDone(DoneBaseComponent):
+    def __init__(self, done_tolerance=None, **kwargs):
+        super().__init__(**kwargs)
+        self.done_tolerance = done_tolerance
 
-        
+    @property
+    def done_tolerance(self):
+        return self._done_tolerance
+    
+    @done_tolerance.setter
+    def done_tolerance(self, value):
+        assert type(value) in [int, float], "Done tolerance must be a number."
+        assert value > 0, "Done tolerance must be positive."
+        self._done_tolerance = value
+
+    def get_done(self, agent, **kwargs):
+        if isinstance(agent, BroadcastingAgent):
+            average = np.average([
+                other.message for other in self.agents.values()
+                if isinstance(other, BroadcastingAgent)
+            ])
+            return np.abs(agent.message - average) <= self.done_tolerance
+        else:
+            return True
+    
+    def get_all_done(self, **kwargs):
+        for agent in self.agents.values():
+            if not self.get_done(agent):
+                return False
+        return True
+
+class BlockingAgent(MovingAgent, GridObservingAgent):
+    pass
+
+class BroadcastSim(GridWorldSimulation):
+    def __init__(self, **kwargs):
+        self.agents = kwargs['agents']
+
+        self.position_state = PositionState(**kwargs)
+        self.broadcasting_state = BroadcastingState(**kwargs)
+
+        self.move_actor = MoveActor(**kwargs)
+        self.broadcast_actor = BroadcastingActor(**kwargs)
+
+        self.grid_observer = SingleGridObserver(**kwargs)
+        self.broadcast_observer = BroadcastObserver(broadcasting_state=self.broadcasting_state, **kwargs)
+
+        self.done = AverageMessageDone(**kwargs)
+
+        self.finalize()
+
+    def reset(self, **kwargs):
+        self.position_state.reset(**kwargs)
+        self.broadcasting_state.reset(**kwargs)
+
+        self.rewards = {agent.id: 0 for agent in self.agents.values()}
+
+    def step(self, action_dict, **kwargs):
+        # process broadcasts
+        for agent_id, action in action_dict.items():
+            agent = self.agents[agent_id]
+            receiving_agents = self.broadcast_actor.process_action(agent, action, **kwargs)
+            if receiving_agents is not None:
+                self.broadcasting_state.update_receipients(agent, receiving_agents)
+
+        # process moves
+        for agent_id, action in action_dict.items():
+            agent = self.agents[agent_id]
+            move_result = self.move_actor.process_action(agent, action, **kwargs)
+            if not move_result:
+                self.rewards[agent.id] -= 0.1
+
+        # Entropy penalty
+        for agent_id in action_dict:
+            self.rewards[agent_id] -= 0.01
+    
+    def render(self, fig=None, **kwargs):
+        fig.clear()
+        ax = fig.gca()
+
+        # Draw the gridlines
+        ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
+        ax.set_xticks(np.arange(0, self.position_state.cols, 1))
+        ax.set_yticks(np.arange(0, self.position_state.rows, 1))
+        ax.grid()
+
+        # Draw the agents
+        agents_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
+        ]
+        agents_y = [
+            self.position_state.rows - 0.5 - agent.position[0]
+            for agent in self.agents.values() if agent.active
+        ]
+        shape = [agent.render_shape for agent in self.agents.values() if agent.active]
+        color = [agent.render_color for agent in self.agents.values() if agent.active]
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
+
+        plt.plot()
+        plt.pause(1e-6)
+    
+    def get_obs(self, agent_id, **kwargs):
+        agent = self.agents[agent_id]
+        return {
+            **self.grid_observer.get_obs(agent, **kwargs),
+            **self.broadcast_observer.get_obs(agent, **kwargs)
+        }
+    
+    def get_reward(self, agent_id, **kwargs):
+        reward = self.rewards[agent_id]
+        self.rewards[agent_id] = 0
+        return reward
+
+    def get_done(self, agent_id, **kwargs):
+        return self.done.get_done(agent_id, **kwargs)
+    
+    def get_all_done(self, **kwargs):
+        return self.get_all_done(**kwargs)
