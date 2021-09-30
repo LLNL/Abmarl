@@ -2,7 +2,6 @@
 from gym.spaces import Discrete, Dict, Box
 import numpy as np
 from matplotlib import pyplot as plt
-from numpy.lib.function_base import average
 
 from abmarl.sim import Agent
 from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, GridWorldAgent
@@ -169,8 +168,6 @@ class BroadcastingState(StateBaseComponent):
         agent.message = np.average(messages)
 
         return receiving_from
-        # TODO: Does this just return a bunch of empty lists because copy by reference
-        # instead of deep copy?
 
 class BroadcastObserver(ObserverBaseComponent):
     def __init__(self, broadcasting_state=None, **kwargs):
@@ -238,7 +235,8 @@ class AverageMessageDone(DoneBaseComponent):
         return True
 
 class BlockingAgent(MovingAgent, GridObservingAgent):
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(view_blocking=True, **kwargs)
 
 class BroadcastSim(GridWorldSimulation):
     def __init__(self, **kwargs):
@@ -339,9 +337,9 @@ if __name__ == "__main__":
         'broadcaster1': BroadcastingAgent(id='broadcaster1', encoding=1, broadcast_range=6, render_color='green'),
         'broadcaster2': BroadcastingAgent(id='broadcaster2', encoding=1, broadcast_range=6, render_color='green'),
         'broadcaster3': BroadcastingAgent(id='broadcaster3', encoding=1, broadcast_range=6, render_color='green'),
-        'blocker0': BlockingAgent(id='blocker0', encoding=2, view_blocking=True, move_range=2, view_range=3, render_color='black'),
-        'blocker1': BlockingAgent(id='blocker1', encoding=2, view_blocking=True, move_range=1, view_range=3, render_color='black'),
-        'blocker2': BlockingAgent(id='blocker2', encoding=2, view_blocking=True, move_range=1, view_range=3, render_color='black'),
+        'blocker0': BlockingAgent(id='blocker0', encoding=2, move_range=2, view_range=3, render_color='black'),
+        'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
+        'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
     }
     sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-2)
     sim.reset()
