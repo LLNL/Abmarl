@@ -45,7 +45,6 @@ class BroadcastingAgent(Agent, GridWorldAgent):
 
     @message.setter
     def message(self, value):
-        assert type(value) in [int, float], "Message must be a number."
         self._message = min(max(value, -1), 1)
 
     @property
@@ -200,10 +199,11 @@ class BroadcastObserver(ObserverBaseComponent):
         if not isinstance(agent, self.supported_agent_type):
             return {}
         
-        obs = {other.id: 0 for other in agent.observation_space[self.key]}
+        obs = {other: 0 for other in agent.observation_space[self.key]}
         receive_from = self._broadcasting_state.update_message_and_reset_receiving(agent)
         for agent_id, message in receive_from:
             obs[agent_id] = message
+        obs[agent.id] = agent.message
         return obs
         
 class AverageMessageDone(DoneBaseComponent):
@@ -339,9 +339,9 @@ if __name__ == "__main__":
         'broadcaster1': BroadcastingAgent(id='broadcaster1', encoding=1, broadcast_range=6, render_color='green'),
         'broadcaster2': BroadcastingAgent(id='broadcaster2', encoding=1, broadcast_range=6, render_color='green'),
         'broadcaster3': BroadcastingAgent(id='broadcaster3', encoding=1, broadcast_range=6, render_color='green'),
-        'blocker0': BlockingAgent(id='blocker0', encoding=2, move_range=2, view_range=3, render_color='black'),
-        'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
-        'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
+        'blocker0': BlockingAgent(id='blocker0', encoding=2, view_blocking=True, move_range=2, view_range=3, render_color='black'),
+        'blocker1': BlockingAgent(id='blocker1', encoding=2, view_blocking=True, move_range=1, view_range=3, render_color='black'),
+        'blocker2': BlockingAgent(id='blocker2', encoding=2, view_blocking=True, move_range=1, view_range=3, render_color='black'),
     }
     sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-2)
     sim.reset()
@@ -355,5 +355,7 @@ if __name__ == "__main__":
         }
         sim.step(action)
         sim.render(fig=fig)
+        for agent in agents:
+            obs = sim.get_obs(agent)
 
     plt.show()
