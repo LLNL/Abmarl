@@ -1,28 +1,23 @@
 
-from abmarl.sim.gridworld.grid import Grid
 from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldSimulation
-from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent, AttackingAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent
 from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
 from abmarl.tools.matplotlib_utils import mscatter
 
-class MazeNavigationAgent(GridObservingAgent, MovingAgent, AttackingAgent):
+class MazeNavigationAgent(GridObservingAgent, MovingAgent):
     def __init__(self, **kwargs):
-        super().__init__(
-            move_range=1,
-            attack_range=0,
-            attack_strength=1,
-            attack_accuracy=1,
-            **kwargs
-        )
+        super().__init__(move_range=1, **kwargs)
 
 class MazeNaviationSim(GridWorldSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
+        self.navigator = kwargs['agents']['navigator']
+        self.target = kwargs['agents']['target']
 
         # State Components
         self.position_state = PositionState(**kwargs)
@@ -39,22 +34,17 @@ class MazeNaviationSim(GridWorldSimulation):
         self.position_state.reset(**kwargs)
 
         # Track the rewards
-        self.rewards = {agent.id: 0 for agent in self.agents.values()}
+        self.reward = 0
     
-    def step(self, action_dict, **kwargs):
+    def step(self, action_dict, **kwargs):    
         # Process moves
-        for agent_id, action in action_dict.items():
-            agent = self.agents[agent_id]
-            move_result = self.move_actor.process_action(agent, action, **kwargs)
-            if not move_result:
-                self.rewards[agent.id] -= 0.1
+        action = action_dict['navigator']
+        move_result = self.move_actor.process_action(self.navigator, action, **kwargs)
+        if not move_result:
+            self.reward -= 0.1
         
         # Entropy penalty
-        for agent_id in action_dict:
-            self.rewards[agent_id] -= 0.01
-        
-        # Reached the target
-        # ...
+        self.reward -= 0.01
     
     def render(self, fig=None, **kwargs):
         fig.clear()
@@ -82,21 +72,22 @@ class MazeNaviationSim(GridWorldSimulation):
         plt.pause(1e-6)
 
     def get_obs(self, agent_id, **kwargs):
-        agent = self.agents[agent_id]
         return {
-            **self.grid_observer.get_obs(agent, **kwargs)
+            **self.grid_observer.get_obs(self.navigator, **kwargs)
         }
 
     def get_reward(self, agent_id, **kwargs):
-        reward = self.rewards[agent_id]
-        self.rewards[agent_id] = 0
+        if self.get_all_done():
+            self.reward = 1
+        reward = self.reward
+        self.reward = 0
         return reward
 
     def get_done(self, agent_id, **kwargs):
-        pass
+        return self.get_all_done()
 
     def get_all_done(self, **kwargs):
-        pass
+        return np.all(self.navigator.position == self.target.position)
 
     def get_info(self, agent_id, **kwargs):
         return {}
@@ -104,13 +95,13 @@ class MazeNaviationSim(GridWorldSimulation):
 if __name__ == "__main__":
     object_registry = {
         'N': lambda n: MazeNavigationAgent(
-            id=f'navigator{n}',
+            id=f'navigator',
             encoding=1,
             view_range=2,
             render_color='blue',
         ),
         'T': lambda n: GridWorldAgent(
-            id=f'target{n}',
+            id=f'target',
             encoding=3,
             render_color='green'
         ),
@@ -133,4 +124,13 @@ if __name__ == "__main__":
     fig = plt.figure()
     sim.render(fig=fig)
 
-    plt.show()
+    
+    from pprint import pprint
+    for i in range(100):
+        action = {'navigator': sim.navigator.action_space.sample()}
+        sim.step(action)
+        sim.render(fig=fig)
+        done = sim.get_all_done()
+        if done:
+            plt.pause(1)
+            break
