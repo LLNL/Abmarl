@@ -3,20 +3,20 @@
 GridWorld Simulation Framework
 ==============================
 
-Abmarl provides a GridWorld Simulation Framework for setting up varieties of 
+Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
-through Abmarl's AgentBasedSimulation interface.
+through Abmarl's :ref:`AgentBasedSimulation <abs>` interface.
 
 Framework Design
 ----------------
 
-The GridWorld Simulation Framework utilizes a modular design that allows developers
+The GridWorld Simulation Framework utilizes a modular design that allows users
 to create new features and plug them in as components of the simulation. Every component
 inherits from the GridWorldBaseComponent class and has a reference to the grid and the dictionary
 of agents.
 
 A GridWorldSimulation is composed of a dictionary of Agents, a Grid, and various
-Components. It follows the AgentBasedSimulation interface and relies on the components
+Components. It follows the :ref:`AgentBasedSimulation <abs>` interface and leverages the components
 themselves to implement the pieces of the interface. For example, a simulation might
 look something like this:
 
@@ -43,24 +43,32 @@ look something like this:
        def get_obs(self, agent_id, **kwargs):
            return self.observer.get_obs(self.agents[agent_id])
 
-FIGURE ### shows a visual depiction of the framework being used to create a simulation.
-See THIS TUTORIAL for an indepth example of using the GridWorld Simulation Framework.
+Below is a visual depiction of the GridWorld Simulation Framework. Check out
+the :ref:`GridWorld tutorials <tutorials_gridworld>` for in-depth examples on using
+this framework.
+
+.. figure:: .images/gridworld_framework.png
+   :width: 100 %
+   :alt: Gridworld Simulation Framework
+
+   Abmarl's GridWorld Simulation Framework. A simulation has a Grid, a dictionary
+   of agents, and various components that manage the various features of the simulation.
 
 
 Agent
 `````
 
 Every entity in the GridWorld is a GridWorldAgent (e.g. walls, foragers, resources, fighters, etc.).
-GridWorldAgents are PrincipalAgents with specific parameters that make them usable in
-a GridWorld Simulation. In particular, agents must be given an encoding, which is
-an integer that correlates to the type of agent and simplifies the logic for many components
-of the framework. GridWorldAgents can also be configured with an initial position,
-the ability to block other agents' abilities, and rendering parameters such as shape
-and color.
+GridWorldAgents are :ref:`PrincipleAgents <api_agent>` with specific parameters
+that work with their respective components. In particular, agents must be given
+an encoding, which is an integer that correlates to the type of agent and simplifies
+the logic for many components of the framework. GridWorldAgents can also be configured
+with an initial position, the ability to block other agents' abilities, and visualization
+parameters such as shape and color.
 
 Following the dataclass model, additional agent classes can be defined that allow
 agents to work with various components. For example, ObservingAgents can work with
-Observers and MovingAgents can work with the MoveActor. Any new agent class should
+Observers, and MovingAgents can work with the MoveActor. Any new agent class should
 inhert from GridWorldAgent and possibly from ActingAgent or ObservingAgent as needed.
 For example, one can define a new type of agent like so:
 
@@ -74,8 +82,8 @@ For example, one can define a new type of agent like so:
 
 .. WARNING::
    Agents should follow the dataclass model, meaning that they should only be given
-   parameters. All functionality should be written in the Components that work with
-   the agents.
+   parameters. All functionality should be written in the simulation components.
+
 
 Grid
 ````
@@ -96,9 +104,9 @@ with which it can overlap. For example,
    grid = Grid(5, 6, overlapping=overlapping)
 
 means that agents whose encoding is 1 can overlap with other agents whose encoding
-is 2; agents whose encoding is 2 can overlap with other agents whose encodings are
-1 or 3; and agents whose encoding is 3 can overlap with other agents whose encodings
-are 2 or 3.
+is 2; agents whose encoding is 2 can overlap with other agents whose encoding is
+1 or 3; and agents whose encoding is 3 can overlap with other agents whose encoding
+is 2 or 3.
 
 .. WARNING::
    To avoid undefined behavior, the overlapping should be symmetric, so that if
@@ -108,7 +116,7 @@ are 2 or 3.
    If overlapping is not provided, then no agents will be able to occupy the same
    cell in the Grid.
 
-Interaction between simulation components (see below) and the grid is
+Interaction between simulation components and the grid is
 `data open`, which means that we allow components to access the internals of the
 grid. Although this is possible and sometimes necessary, the Grid also provides
 an interface for safer interactions with components. Components can ``query`` the
