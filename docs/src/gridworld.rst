@@ -104,9 +104,9 @@ with which it can overlap. For example,
    grid = Grid(5, 6, overlapping=overlapping)
 
 means that agents whose encoding is 1 can overlap with other agents whose encoding
-is 2; agents whose encoding is 2 can overlap with other agents whose encodings are
-1 or 3; and agents whose encoding is 3 can overlap with other agents whose encodings
-are 2 or 3.
+is 2; agents whose encoding is 2 can overlap with other agents whose encoding is
+1 or 3; and agents whose encoding is 3 can overlap with other agents whose encoding
+is 2 or 3.
 
 .. WARNING::
    To avoid undefined behavior, the overlapping should be symmetric, so that if
@@ -116,7 +116,7 @@ are 2 or 3.
    If overlapping is not provided, then no agents will be able to occupy the same
    cell in the Grid.
 
-Interaction between simulation components (see below) and the grid is
+Interaction between simulation components and the grid is
 `data open`, which means that we allow components to access the internals of the
 grid. Although this is possible and sometimes necessary, the Grid also provides
 an interface for safer interactions with components. Components can ``query`` the
