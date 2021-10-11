@@ -3,20 +3,20 @@
 GridWorld Simulation Framework
 ==============================
 
-Abmarl provides a GridWorld Simulation Framework for setting up varieties of 
+Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
-through Abmarl's AgentBasedSimulation interface.
+through Abmarl's :ref:`AgentBasedSimulation <abs>` interface.
 
 Framework Design
 ----------------
 
-The GridWorld Simulation Framework utilizes a modular design that allows developers
+The GridWorld Simulation Framework utilizes a modular design that allows users
 to create new features and plug them in as components of the simulation. Every component
 inherits from the GridWorldBaseComponent class and has a reference to the grid and the dictionary
 of agents.
 
 A GridWorldSimulation is composed of a dictionary of Agents, a Grid, and various
-Components. It follows the AgentBasedSimulation interface and relies on the components
+Components. It follows the :ref:`AgentBasedSimulation <abs>` interface and leverages the components
 themselves to implement the pieces of the interface. For example, a simulation might
 look something like this:
 
@@ -43,8 +43,16 @@ look something like this:
        def get_obs(self, agent_id, **kwargs):
            return self.observer.get_obs(self.agents[agent_id])
 
-FIGURE ### shows a visual depiction of the framework being used to create a simulation.
-See THIS TUTORIAL for an indepth example of using the GridWorld Simulation Framework.
+Below is a visual depiction of the GridWorld Simulation Framework. Check out
+the :ref:`GridWorld tutorials <tutorials_gridworld>` for in-depth examples on using
+this framework.
+
+.. figure:: .images/gridworld_framework.png
+   :width: 100 %
+   :alt: Gridworld Simulation Framework
+
+   Abmarl's GridWorld Simulation Framework. A simulation has a Grid, a dictionary
+   of agents, and various components that manage the various features of the simulation.
 
 
 Agent

@@ -1,6 +1,8 @@
 
 .. Abmarl documentation GridWorld tutorial.
 
+.. _tutorials_gridworld:
+
 GridWorld
 =========
 
