@@ -4,6 +4,7 @@ Full Tutorials
 ==============
 
 We provide tutorials that demonstrate how to train, visualize, and analyze MARL policies.
+We also provide tutorials on the GridWorldSimulation framework.
 
 .. toctree::
    :maxdepth: 1
@@ -11,4 +12,5 @@ We provide tutorials that demonstrate how to train, visualize, and analyze MARL 
 
    multi_corridor
    predator_prey
+   gridworld/grid_world
    magpie
