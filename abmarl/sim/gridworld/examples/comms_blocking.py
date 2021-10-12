@@ -226,12 +226,13 @@ class AverageMessageDone(DoneBaseComponent):
             ])
             return np.abs(agent.message - average) <= self.done_tolerance
         else:
-            return True
+            return False
     
     def get_all_done(self, **kwargs):
         for agent in self.agents.values():
-            if not self.get_done(agent):
-                return False
+            if isinstance(agent, BroadcastingAgent):
+                if not self.get_done(agent):
+                    return False
         return True
 
 class BlockingAgent(MovingAgent, GridObservingAgent):
@@ -326,7 +327,7 @@ class BroadcastSim(GridWorldSimulation):
         return self.done.get_done(agent_id, **kwargs)
     
     def get_all_done(self, **kwargs):
-        return self.get_all_done(**kwargs)
+        return self.done.get_all_done(**kwargs)
     
     def get_info(self, **kwargs):
         return {}
@@ -341,19 +342,24 @@ if __name__ == "__main__":
         'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
         'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
     }
-    sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-2)
-    sim.reset()
+    sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-10)
 
+    sim.reset()
     fig = plt.figure()
     sim.render(fig=fig)
     
+    done_agents = set()
     for i in range(50):
         action = {
-            agent.id: agent.action_space.sample() for agent in agents.values()
+            agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
         }
         sim.step(action)
-        sim.render(fig=fig)
         for agent in agents:
-            obs = sim.get_obs(agent)
+            if agent not in done_agents:
+                obs = sim.get_obs(agent)
+            if sim.get_done(agent):
+                done_agents.add(agent)
 
-    plt.show()
+        sim.render(fig=fig)
+        if sim.get_all_done():
+            break
