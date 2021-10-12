@@ -5,9 +5,13 @@ GridWorld Simulation Framework
 
 Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
-through Abmarl's :ref:`AgentBasedSimulation <abs>` interface.
+through Abmarl's :ref:`AgentBasedSimulation <abs>` interface. The GridWorld
+Simulation Framework is a "grey box": we assume users have working knowledge of 
+Python and object-oriented programming. Using the ref:`built in features <>` requires
+minimal knowledge, but extending them and creating new features requires more knowledge.
+In addition to the design documentation below, see the :ref:`GridWorld tutorials <>`
+for in-depth examples on using and extending the GridWorld Simulation Framework.
 
-TODO: Talk about how the GSF requires knolwedge of python and oo programming.
 
 Framework Design
 ----------------
