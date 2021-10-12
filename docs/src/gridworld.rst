@@ -166,20 +166,22 @@ whole. Agents that are reported as done will cease sending actions to the simula
 and the episode will end when all the agents are done or when the simulation is done.
 
 
-Features
---------
+Built-in Features
+-----------------
 
 Below is a list of some features that are available to use out of the box. Rememeber,
-you can create your own features using the simulation framework. This list will
-be updated as more features are added to the simulation core.
+you can create your own features in the GridWorld Simulation Framework (see the
+:ref:`GridWorld Tutorials <_tutorials_gridworld>`).
+
 
 Position
 ````````
-Agents have positions in the grid that are managed by the PositionState. Agents
+:ref:`Agents <gridworld_agent>` have positions in the grid that are managed by the
+:ref:`PositionState <>`. Agents
 can be configured with an initial position, which is where they will start at the
 beginning of each episode. If they are not given an initial_position, then they
 will start at a random cell in the grid. Agents can overlap according to the
-Grid's overlapping configuration. For example, consider the following setup:
+:ref:`Grid's <>` overlapping configuration. For example, consider the following setup:
 
 .. code-block:: python
 
@@ -202,11 +204,12 @@ Grid's overlapping configuration. For example, consider the following setup:
 start of each episode, `agent0` will be placed at (2, 4) and `agent1` will be placed
 anywhere in the grid (except for (2,4) because they cannot overlap).
 
+
 Movement
 ````````
 
-MovingAgents can move around the Grid in conjunction with the MoveActor. MovingAgents
-require a `move_range` parameter, indicating how many spaces away they can move
+:ref:`MovingAgents <>` can move around the :ref:`Grid <>` in conjunction with the :ref:`MoveActor <>`. MovingAgents
+require a `move range` parameter, indicating how many spaces away they can move
 in a single step. Agents cannot move out of bounds and can only move to the same
 cell as another agent if they are allowed to overlap. For example, in this setup,
 
@@ -233,13 +236,14 @@ starts at (0, 2) and can move up to two squares away. The two agents can overlap
 each other, so when the move actor processes their actions, both agents will be
 at position (2, 3).
 
+
 Single Grid Observer
 ````````````````````
 
-GridObservingAgents can observe the state of the grid around them, namely which
-other agents are nearby, via the SingleGridObserver. The SingleGridObserver generates
-a two-dimensional numpy array sized by the agent's view range with the observing
-agent located at the center of the array. All other agents within the view_range will
+:ref:`GridObservingAgents <>` can observe the state of the :ref:`Grid <>` around them, namely which
+other agents are nearby, via the :ref:`SingleGridObserver <>`. The SingleGridObserver generates
+a two-dimensional numpy array sized by the agent's `view range` with the observing
+agent located at the center of the array. All other agents within the `view range` will
 appear in the observation, shown as their encoding. For example, the following setup
 
 .. code-block:: python
@@ -271,12 +275,12 @@ will output an observation for `agent0` like so:
    [-1,  0,  0,  0,  0, 4*,  0],
    [-1,  0,  0,  0,  0,  0,  6]
 
-Since view_range is the number of cells away that can be observed, the grid is size
-(2 * view_range + 1) by (2 * view_range + 1). `agent0` is centered in the middle
-of this grid, shown by its encoding: 1. All other agents appear in the observation
+Since `view range` is the number of cells away that can be observed, the observation size is
+(2 * `view range` + 1) by (2 * `view range` + 1). `agent0` is centered in the middle
+of this array, shown by its encoding: 1. All other agents appear in the observation
 relative to its location and shown by their encodings. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the SingleGridObserver will randomly select between their encodings to display.
+and the :ref:`SingleGridObserver <>` will randomly select between their encodings to display.
 
 View Blocking
 ~~~~~~~~~~~~~
@@ -299,14 +303,16 @@ The -2 indicates that the cell is masked, and the choice of displaying `agent3`
 over `agent4` is still a random choice. Which cells get masked by view_blocking
 agents is determined by drawing two lines
 from the center of the observing agent's cell to the corners of the blocking agent's
-cell. Any cell whose center falls between those two lines will be masked, as shown
-in Figure ###.
+cell. Any cell whose center falls between those two lines will be masked, as shown BELOW.
+
+TODO: Make a figure showing how view_blocking works.
+
 
 Multi Grid Observer
 ```````````````````
 
-Similar to the SingleGridObserver, the MultiGridObserver displays a separate grid
-for every encoding. Each grid shows the relative position of the agents and the
+Similar to the :ref:`SingleGridObserver <>`, the :ref:`MultiGridObserver <>` displays a separate array
+for every encoding. Each array shows the relative position of the agents and the
 number of those agents that occupy each cell. Out of bounds indicators (-1) and
 masked cells (-2) are present in every grid. For example, the above setup would
 show an observation like so:
@@ -332,16 +338,17 @@ show an observation like so:
    [-1,  0,  0,  0,  0,  0, -2]
    ...
 
-MultiGridObserver may be preferable to SingleGridObserver in simulations where
+:ref:`MultiGridObserver <>` may be preferable to :ref:`SingleGridObserver <>` in simulations where
 there are many overlapping agents.
 
 Health
 ``````
 
-HealthAgents track their health throughout the simulation. Health is always bounded
+:ref:`HealthAgents <>` track their health throughout the simulation. Health is always bounded
 between 0 and 1. Agents whose health falls to 0 are marked as inactive. They can be given an
 initial health, which they start with at the beginning of the episode. Otherwise,
-their health will be a random number between 0 and 1. Consider the following setup:
+their health will be a random number between 0 and 1, as managed by the :ref:`HealthState <>`.
+Consider the following setup:
 
 .. code-block:: python
 
@@ -353,18 +360,19 @@ their health will be a random number between 0 and 1. Consider the following set
 
 `agent0` will be assigned a random health value between 0 and 1.
 
+
 Attacking
 `````````
 
-Health becomes more interesting when we let agents attack one another. AttackingAgents
-work in conjunction with the AttackActor. They have an attack range, which dictates
-the range of their attack; an attack accuracy, which dictates the chances of the
-attack being successful; and an attack strength, which dictates how much health
+Health becomes more interesting when we let agents attack one another. :ref:`AttackingAgents <>`
+work in conjunction with the :ref:`AttackActor <>`. They have an `attack range`, which dictates
+the range of their attack; an `attack accuracy`, which dictates the chances of the
+attack being successful; and an `attack strength`, which dictates how much health
 is depleted from the attacked agent. An agent's choice to attack is a boolean--either
 attack or don't attack--and then the attack success is determined from the
 state of the simulation and the attributes of the AttackingAgent. The AttackActor
 requires an attack mapping dictionary which determines which encodings can attack
-other encodings, similar to the overlapping parameter for the Grid. Consider the
+other encodings, similar to the overlapping parameter for the :ref:`Grid <>`. Consider the
 following setup:
 
 .. code-block:: python
@@ -399,6 +407,6 @@ although `agent2` is within range, it is not a type that `agent0` can attack.
 
 .. NOTE::
 
-   Attacks can be blocked by view_blocking agents. If an attackable agent is
+   Attacks can be blocked by :ref:`view blocking <>` agents. If an attackable agent is
    masked from an attacking agent, then it cannot be attacked by that agent. The
    masking is determined the same way as the view blocking.
