@@ -218,7 +218,7 @@ anywhere in the grid (except for (2,4) because they cannot overlap).
 
 .. figure:: .images/gridworld_positioning.png
    :width: 100 %
-   :alt: Agents starting positions.
+   :alt: Agents starting positions
 
    agent0 in green starts at the same cell in every episode, and agent1 in blue
    starts at a random cell each time.
@@ -241,7 +241,7 @@ cell as another agent if they are allowed to overlap. For example, in this setup
            id='agent0', encoding=1, move_range=1, initial_position=np.array([2, 2])
        ),
        'agent1': MovingAgent(
-           id='agent'1, encoding=1, move_range=2, initial_position=np.array([0, 2])
+           id='agent1', encoding=1, move_range=2, initial_position=np.array([0, 2])
        )
    }
    grid = Grid(5, 5, overlapping={1: [1]})
@@ -249,13 +249,19 @@ cell as another agent if they are allowed to overlap. For example, in this setup
    move_actor = MoveActor(agents=agents, grid=grid)
 
    position_state.reset()
-   move_actor.process_move(agents['agent0'], {'move': np.array([0, 1])})
-   move_actor.process_move(agents['agent1'], {'move': np.array([2, 1])})
+   move_actor.process_action(agents['agent0'], {'move': np.array([0, 1])})
+   move_actor.process_action(agents['agent1'], {'move': np.array([2, 1])})
 
 `agent0` starts at position (2, 2) and can move up to one cell away. `agent1`
 starts at (0, 2) and can move up to two cells away. The two agents can overlap
 each other, so when the move actor processes their actions, both agents will be
 at position (2, 3).
+
+.. figure:: .images/gridworld_movement.png
+   :width: 100 %
+   :alt: Agents moving in the grid
+
+   agent0 and agent1 move to the same cell.
 
 
 .. _gridworld_single_observer:
