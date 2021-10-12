@@ -32,8 +32,6 @@ These components make up a :ref:`GridWorldSimulation <>`, which extends the
 :ref:`AgentBasedSimulation <abs>` interface. For example, a simulation might look
 something like this:
 
-TODO: Check that all this code works!
-
 .. code-block:: python
 
    from abmarl.sim.gridworld.base import GridWorldSimulation
@@ -81,6 +79,9 @@ For example, one can define a new type of agent like so:
 
 .. code-block:: python
 
+   from abmarl.sim.gridworld.base import GridWorldAgent
+   from abmarl.sim import ActingAgent
+
    class CommunicatingAgent(GridWorldAgent, ActingAgent):
        def __init__(self, broadcast_range=None, **kwargs):
            super().__init__(**kwargs)
@@ -104,6 +105,8 @@ is a dictionary that maps the Agent's `encoding` to a list of other Agents' `enc
 with which it can overlap. For example,
 
 .. code-block:: python
+
+   from abmarl.sim.gridworld.base import Grid
 
    overlapping = {
        1: [2],
@@ -176,8 +179,6 @@ and the episode will end when all the agents are done or when the simulation is 
 Built-in Features
 -----------------
 
-TODO: Add graphics showcasing the features
-
 Below is a list of some features that are available to use out of the box. Rememeber,
 you can :ref:`create your own features <>` in the GridWorld Simulation Framework
 and use many combinations of components together to make up a simulation.
@@ -196,6 +197,10 @@ will start at a random cell in the grid. Agents can overlap according to the
 :ref:`Grid's <gridworld_grid>` `overlapping` configuration. For example, consider the following setup:
 
 .. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.base import GridWorldAgent, Grid
+   from abmarl.sim.gridworld.state import PositionState
 
    agent0 = GridWorldAgent(
        id='agent0',
@@ -235,6 +240,12 @@ in a single step. Agents cannot move out of bounds and can only move to the same
 cell as another agent if they are allowed to overlap. For example, in this setup
 
 .. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import MovingAgent
+   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.state import PositionState
+   from abmarl.sim.gridworld.actor import MoveActor
 
    agents = {
        'agent0': MovingAgent(
@@ -276,6 +287,12 @@ agent located at the center of the array. All other agents within the `view rang
 appear in the observation, shown as their `encoding`. For example, the following setup
 
 .. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
+   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.state import PositionState
+   from abmarl.sim.gridworld.observer import SingleGridObserver
 
    agents = {
        'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=3),
@@ -400,6 +417,10 @@ Consider the following setup:
 
 .. code-block:: python
 
+   from abmarl.sim.gridworld.agent import HealthAgent
+   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.state import HealthState
+
    agent0 = HealthAgent(id='agent0', encoding=1)
    grid = Grid(3, 3)
    agents = {'agent0': agent0}
@@ -424,6 +445,12 @@ other `encodings`, similar to the `overlapping` parameter for the :ref:`Grid <gr
 following setup:
 
 .. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import AttackActor
 
    agents = {
        'agent0': AttackingAgent(
