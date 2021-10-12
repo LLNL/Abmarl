@@ -152,7 +152,7 @@ if __name__ == "__main__":
     
     for i in range(50):
         action = {
-            agent.id: agent.action_space.sample() for agent in agents.values()
+            agent.id: agent.action_space.sample() for agent in agents.values() if agent.active
         }
         sim.step(action)
         sim.render(fig=fig)
