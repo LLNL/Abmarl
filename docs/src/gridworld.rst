@@ -187,6 +187,7 @@ and use many combinations of components together to make up a simulation.
 
 Position
 ````````
+
 :ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>` that are managed by the
 :ref:`PositionState <>`. Agents
 can be configured with an `initial position`, which is where they will start at the
@@ -214,6 +215,13 @@ will start at a random cell in the grid. Agents can overlap according to the
 `agent0` is configured with an `initial position` and `agent1` is not. At the
 start of each episode, `agent0` will be placed at (2, 4) and `agent1` will be placed
 anywhere in the grid (except for (2,4) because they cannot overlap).
+
+.. figure:: .images/gridworld_positioning.png
+   :width: 100 %
+   :alt: Agents starting positions.
+
+   agent0 in green starts at the same cell in every episode, and agent1 in blue
+   starts at a random cell each time.
 
 
 .. _gridworld_movement:
