@@ -79,7 +79,7 @@ For example, one can define a new type of agent like so:
 
 .. code-block:: python
 
-   from abmarl.sim.gridworld.base import GridWorldAgent
+   from abmarl.sim.gridworld.agent import GridWorldAgent
    from abmarl.sim import ActingAgent
 
    class CommunicatingAgent(GridWorldAgent, ActingAgent):
@@ -106,7 +106,7 @@ with which it can overlap. For example,
 
 .. code-block:: python
 
-   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.grid import Grid
 
    overlapping = {
        1: [2],
@@ -199,7 +199,8 @@ will start at a random cell in the grid. Agents can overlap according to the
 .. code-block:: python
 
    import numpy as np
-   from abmarl.sim.gridworld.base import GridWorldAgent, Grid
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+   from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState
 
    agent0 = GridWorldAgent(
@@ -243,7 +244,7 @@ cell as another agent if they are allowed to overlap. For example, in this setup
 
    import numpy as np
    from abmarl.sim.gridworld.agent import MovingAgent
-   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
 
@@ -290,7 +291,7 @@ appear in the observation, shown as their `encoding`. For example, the following
 
    import numpy as np
    from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
-   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.observer import SingleGridObserver
 
@@ -418,7 +419,7 @@ Consider the following setup:
 .. code-block:: python
 
    from abmarl.sim.gridworld.agent import HealthAgent
-   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import HealthState
 
    agent0 = HealthAgent(id='agent0', encoding=1)
@@ -448,7 +449,7 @@ following setup:
 
    import numpy as np
    from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
-   from abmarl.sim.gridworld.base import Grid
+   from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState, HealthState
    from abmarl.sim.gridworld.actor import AttackActor
 
