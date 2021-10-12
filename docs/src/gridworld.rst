@@ -131,20 +131,24 @@ State
 
 State Components manage the state of the simulation alongside the Grid. Each State
 has a reset function that resets the simulation at the the start of each episode.
+States can also provide additional API as needed.
 
 Actor
 `````
 
 Actor Components are responsible for processing agent actions and producing changes
 to the state of the simulation. Actors assign supported agents with an appropriate
-action space and process agents' actions based on the Actor's key. For example, the
-MoveActor appends MovingAgents' action spaces with a 'move' channel and looks for
-the 'move' key in the agent's incoming action.
+action space and process agents' actions based on the Actor's key. The result of
+the action is a change in the simulation's state, and Actors should return that
+change in a reasonable form. For example, the MoveActor appends MovingAgents' action
+spaces with a 'move' channel and looks for the 'move' key in the agent's incoming
+action. After a move is processed, the MoveActor returns how much the agent actually
+moved.
 
 Observer
 ````````
 
-Similar to Actor Components, Observer Components are responsible for creating an
+Observer Components are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
 Observer's key. For example, the SingleGridObserver generates an observation and
@@ -154,7 +158,7 @@ Done
 ````
 
 Done Components manage the "done state" of each agent and of the simulation as a
-whole via their ``get_done`` and ``get_all_done`` interface. Agents that are reported
+whole via the ``get_done`` and ``get_all_done`` interface. Agents that are reported
 as done will cease sending actions to the simulation, and when ``get_all_done``
 reports True, the episode ends.
 
