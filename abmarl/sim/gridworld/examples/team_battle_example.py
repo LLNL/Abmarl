@@ -151,7 +151,7 @@ if __name__ == "__main__":
     sim.render(fig=fig)
     
     done_agents = set()
-    for i in range(500):
+    for i in range(50):
         action = {
             agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
         }

@@ -247,3 +247,6 @@ Finally, we can run the simulation with random actions and visualize it.
        for agent in agents:
            if sim.get_done(agent):
                done_agents.add(agent)
+
+# TODO: Add extra challenges. One of them will be considering the pros and cons
+of using single vs multi grid observer.

@@ -4,22 +4,27 @@
 Maze Navigation
 ---------------
 
-Using the same GridWorld components as the :ref:`team battle tutorial <gridworld_tutorial_team_battle>`,
-we can create a Maze Navigation simulation.
-The Maze Navigation Simulation will contain a single moving agent navigating a maze
-defined by wall agents in the grid. The moving agents goal is to reach a target
-agent. We will construct the Grid by reading a grid file.
+Using the same components as we did in the :ref:`Team Battle tutorial <gridworld_tutorial_team_battle>`,
+we can create a Maze Navigation Simulation that contains a single moving agent navigating a maze
+defined by wall agents in the grid. The moving agent's goal is to reach a target
+agent. We will construct the Grid by :ref:`reading a grid file <api_gridworld_sim>`.
+
+.. figure:: /.images/gridworld_tutorial_maze_navigation.*
+   :width: 75 %
+   :alt: Video showing agent navigating maze.
+
+   Agent (blue) navigating a maze to the target (green).
 
 .. NOTE::
 
-   This simulation is really a single-agent simulation. While we have multiple entities
+   While we have multiple entities
    like walls and a target agent, the only agent that is actually doing something
-   is the navigation agent. We will use some custom modifications to make the single
-   agent case easier, showing that we can use our components in a single agent
-   simulation with custom modifications.
+   is the navigation agent. We will use some custom modifications to make this
+   simulation easier, showing that we can easily use our components with custom
+   modifications.
 
 First we import the components that we need. Each feature is already in Abmarl, and
-they are the same features that we used in the previous tutorial.
+they are the same features that we used in the :ref:`Team Battle tutorial <gridworld_tutorial_team_battle>`.
 
 .. code-block:: python
 
@@ -36,7 +41,7 @@ they are the same features that we used in the previous tutorial.
 Then, we define our agent types. We need an MazeNavigationAgent, WallAgents to act
 as the barriers of the maze, and a TargetAgent to indicate the goal. Although we
 have these three types, we only need to define the MazeNavigationAgent because
-the WallAgent and the TargetAgent are the same as a generic GridWorldAgent.
+the WallAgent and the TargetAgent are the same as a generic :ref:`GridWorldAgent <api_gridworld_agent>`.
 
 .. code-block:: python
 
@@ -44,15 +49,14 @@ the WallAgent and the TargetAgent are the same as a generic GridWorldAgent.
        def __init__(self, **kwargs):
            super().__init__(move_range=1, **kwargs)
 
-Here we have pre-configured the agent with a move_range of 1 becuase that makes
-the most sense for navigating mazes, but we have not pre-configured the ``view_range``
+Here we have preconfigured the agent with a `move range` of 1 becuase that makes
+the most sense for navigating mazes, but we have not preconfigured the `view range`
 since that is a parameter we may want to adjust, and it is easier to adjust it
 at the agent's initialization.
 
-Then, we define the simulation using the GridWorld components and define all the
+Then, we define the simulation using the components and define all the
 necessary functions. We find it convient to explicitly store a reference to the
-navigation agent and the target agent. We've also taken several shortcuts because
-we are a single-agent simulation. Finally, rather than defining a new component
+navigation agent and the target agent. Rather than defining a new component
 for our very simply done condition, we just write the condition itself in the function.
 
 .. code-block:: python
@@ -145,7 +149,7 @@ for our very simply done condition, we just write the condition itself in the fu
 
 With everything defined, we're ready to create and run our simulation. We will
 create the simulation by reading a simulation file that shows the positions of
-each agent type in the grid. We will use <maze.txt>, which looks like this:
+each agent type in the grid. We will use `maze.txt`, which looks like this:
 
 .. code-block::
 
@@ -158,11 +162,10 @@ each agent type in the grid. We will use <maze.txt>, which looks like this:
    0 0 0 0 0 W 0 0 0 0 0 0 0 W 0 W W 0
    0 W 0 W 0 W W W 0 W W 0 W W 0 W 0 0
 
-In order to assign meaning to the values in the grid file, we must create an object
-registry that maps the values in the files to objects. We will use ``W`` for WallAgents,
+In order to assign meaning to the values in the grid file, we must create an `object
+registry` that maps the values in the files to objects. We will use ``W`` for WallAgents,
 ``N`` for the Navigation Agent, and ``T`` for the TargetAgent. The values of the
-object registry must be lambda functions that take in a value and produce an agent.
-See <> for more detail on the object_registry.
+`object registry` must be lambda functions that take in a value and produce an agent.
 
 .. code-block:: python
 
@@ -186,7 +189,7 @@ See <> for more detail on the object_registry.
        )
    }
 
-Now we can create the simulation from the maze file using the object registry.
+Now we can create the simulation from the maze file using the `object registry`.
 We must allow the navigation agent and the target agent to overlap since that is
 our done condition, and without it the simulation would never end.
 
@@ -212,11 +215,19 @@ our done condition, and without it the simulation would never end.
            break
 
 We can examine the observation to see how the view blocking walls effect what the
-navigation agent can observe. In the state shown in Figure ###, the observation
-is:
+navigation agent can observe. An example state and observation is given below.
+
+.. figure:: /.images/gridworld_tutorial_maze_navigation.png
+   :width: 75 %
+   :alt: Maze navigation state
 
 .. code-block::
 
-   GRID OBSERVATION SHOWING THE EFFECTS OF VIEW BLOCKING AGENTS.
+   -1 -2 -2 -2 -1
+    0  0  2  0  2
+    2  0  1  0  0
+   -2  2  0  2 -2
+   -2 -2  0 -2 -2
 
-# TODO: Put an observation showing in the above tutorial with the multiple teams.
+
+# TODO: add extra challenges
