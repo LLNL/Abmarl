@@ -12,16 +12,15 @@ Framework Design
 
 The GridWorld Simulation Framework utilizes a modular design that allows users
 to create new features and plug them in as components of the simulation. Every component
-inherits from the GridWorldBaseComponent class and has a reference to the grid and the dictionary
-of agents.
-
-A GridWorldSimulation is composed of a dictionary of Agents, a Grid, and various
-Components. It follows the :ref:`AgentBasedSimulation <abs>` interface and leverages the components
-themselves to implement the pieces of the interface. For example, a simulation might
-look something like this:
+inherits from the :ref:`GridWorldBaseComponent <>` class and has a reference to
+a :ref:`Grid <gridworld_grid>` and a dictionary of :ref:`Agents <gridworld_agent>`.
+A :ref:`GridWorldSimulation <>` has the same dictionary of :ref:`Agents <gridworld_agent>` and the :ref:`Grid <gridworld_grid>`,
+and it also has various :ref:`Components <gridworld_state>` that manage parts of the simulation. It extends the :ref:`AgentBasedSimulation <abs>` interface.
+For example, a simulation might look something like this:
 
 .. code-block:: python
 
+   from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
    from abmarl.sim.gridworld.observer import SingleGridObserver
@@ -54,6 +53,7 @@ this framework.
    Abmarl's GridWorld Simulation Framework. A simulation has a Grid, a dictionary
    of agents, and various components that manage the various features of the simulation.
 
+.. _gridworld_agent:
 
 Agent
 `````
@@ -84,6 +84,7 @@ For example, one can define a new type of agent like so:
    Agents should follow the dataclass model, meaning that they should only be given
    parameters. All functionality should be written in the simulation components.
 
+.. _gridworld_grid:
 
 Grid
 ````
@@ -125,6 +126,7 @@ agents at a specific location in the Grid, which will succeed if that cell is av
 to the agent as per the overlapping configuration. And Components can ``remove``
 agents from specific locations in the Grid. 
 
+.. _gridworld_state:
 
 State
 `````
