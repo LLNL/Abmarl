@@ -7,10 +7,10 @@ The goal of each team is to be the last team alive, at which point the simulatio
 Each agent can move around the grid and attack agents from other teams. Each agent
 can observe the grid around its position. We will reward each agent for successful
 kills and penalize them for bad moves. This simulation can be found in full
-`in our repo <>`_.
+`in our repo <https://github.com/LLNL/Abmarl/blob/abmarl-152-document-gridworld-framework/abmarl/sim/gridworld/examples/team_battle_example.py>`_.
 
-First, we import the pieces that we will need. Each feature is already in Abmarl,
-so we don't need to create anything new.
+First, we import the components that we will need. Each component is
+:ref:`already in Abmarl <gridworld_built_in_features>`, so we don't need to create anything new.
 
 .. code-block:: python
 
@@ -24,7 +24,7 @@ so we don't need to create anything new.
 
 Then, we define our agent types. This simulation will only have a single type:
 the BattleAgent. Most of the agent attributes will be the same, and we can preconfigure
-that in the class definition so we don't have to do it for every agent.
+the class definition so we don't have to do it for every agent.
 
 .. code-block:: python
 
@@ -64,8 +64,9 @@ simulation: TeamBattleSim.
            
            self.finalize()
 
-Next we define the start state of each simulation. We lean on the State Components
-to perform the reset. Note that we must track the rewards explicitly.
+Next we define the start state of each simulation. We lean on the
+:ref:`State Components <gridworld_state>` to perform the reset. Note that we
+must track the rewards explicitly.
 
 .. code-block:: python
 
@@ -79,8 +80,8 @@ to perform the reset. Note that we must track the rewards explicitly.
            # Track the rewards
            self.rewards = {agent.id: 0 for agent in self.agents.values()}
 
-Then we define how the simulation will step forward, leaning on the Actors to process
-their part of the action. The Actors' results are used to determine the agents'
+Then we define how the simulation will step forward, leaning on the :ref:`Actors <gridworld_actor>`
+to process their part of the action. The Actors' results are used to determine the agents'
 rewards.
 
 .. code-block:: python
@@ -111,7 +112,8 @@ rewards.
            for agent_id in action_dict:
                self.rewards[agent_id] -= 0.01
 
-Then we define each of the getters.
+Then we define each of the getters using the :ref:`Observers <gridworld_observer>`
+and :ref:`Done components <gridworld_done>`.
 
 .. code-block:: python
 
@@ -173,7 +175,7 @@ Finally, in order to visualize our simulation, we define a render function.
 Now that we've defined our agents and simulations, let's create them and run the
 simulation. First, we'll create the agents. There will be 4 teams, so we want to
 color the agent by team and start them at different corners of the grid. Besides that,
-all agent attributes will be the same, and here we benefit from pre-configuring
+all agent attributes will be the same, and here we benefit from preconfiguring
 the attributes in the class definition.
 
 .. code-block:: python
@@ -225,7 +227,7 @@ Finally, we can run the simulation with random actions and visualize it.
    from pprint import pprint
    for i in range(50):
        action = {
-           agent.id: agent.action_space.sample() for agent in agents.values()
+           agent.id: agent.action_space.sample() for agent in agents.values() if agent.active
        }
        sim.step(action)
        sim.render(fig=fig)

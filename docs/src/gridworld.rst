@@ -10,7 +10,7 @@ Simulation Framework is a `grey box`: we assume users have working knowledge of
 Python and object-oriented programming. Using the
 :ref:`built in features <gridworld_built_in_features>` requires minimal knowledge,
 but extending them and creating new features requires more knowledge.
-In addition to the design documentation below, see the :ref:`GridWorld tutorials <>`
+In addition to the design documentation below, see the :ref:`GridWorld tutorials <tutorials_gridworld>`
 for in-depth examples on using and extending the GridWorld Simulation Framework.
 
 
@@ -138,12 +138,17 @@ to the agent as per the `overlapping` configuration. And Components can `remove`
 agents from specific positions in the Grid. 
 
 
+.. _gridworld_state:
+
 State
 `````
 
 :ref:`State Components <api_gridworld_statebase>` manage the state of the simulation alongside the :ref:`Grid <gridworld_grid>`.
 At the bare minimum, each State resets the part of the simulation that it manages
 at the the start of each episode.
+
+
+.. _gridworld_actor:
 
 Actor
 `````
@@ -157,6 +162,9 @@ spaces with a 'move' channel and looks for the 'move' key in the agent's incomin
 action. After a move is processed, the MoveActor returns how much the agent actually
 moved.
 
+
+.. _gridworld_observer:
+
 Observer
 ````````
 
@@ -165,6 +173,9 @@ agent's observation of the state of the simulation. Observers assign supported a
 with an appropriate observation space and generate observations based on the
 Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>` generates an observation and
 stores it in the 'grid' channel of the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
+
+
+.. _gridworld_done:
 
 Done
 ````
@@ -180,8 +191,9 @@ Built-in Features
 -----------------
 
 Below is a list of some features that are available to use out of the box. Rememeber,
-you can :ref:`create your own features <>` in the GridWorld Simulation Framework
-and use many combinations of components together to make up a simulation.
+you can create your own features in
+the GridWorld Simulation Framework and use many combinations of components together
+to make up a simulation.
 
 
 .. _gridworld_position:
