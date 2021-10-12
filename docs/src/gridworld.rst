@@ -7,6 +7,7 @@ Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
 through Abmarl's :ref:`AgentBasedSimulation <abs>` interface.
 
+TODO: Talk about how the GSF requires knolwedge of python and oo programming.
 
 Framework Design
 ----------------
@@ -133,18 +134,17 @@ agents from specific locations in the Grid.
 State
 `````
 
-State Components manage the state of the simulation alongside the Grid. Each State
-has a reset function that resets the simulation at the the start of each episode.
-States can also provide additional API as needed.
+:ref:`State Components <>` manage the state of the simulation alongside the :ref:`Grid <gridworld_grid>`.
+Each State has a reset function that resets the simulation at the the start of each episode.
 
 Actor
 `````
 
-Actor Components are responsible for processing agent actions and producing changes
+:ref:`Actor Components <>` are responsible for processing agent actions and producing changes
 to the state of the simulation. Actors assign supported agents with an appropriate
 action space and process agents' actions based on the Actor's key. The result of
 the action is a change in the simulation's state, and Actors should return that
-change in a reasonable form. For example, the MoveActor appends MovingAgents' action
+change in a reasonable form. For example, the :ref:`MoveActor <>` appends :ref:`MovingAgents' <>` action
 spaces with a 'move' channel and looks for the 'move' key in the agent's incoming
 action. After a move is processed, the MoveActor returns how much the agent actually
 moved.
