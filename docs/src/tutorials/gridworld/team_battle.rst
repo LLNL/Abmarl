@@ -1,4 +1,8 @@
 
+.. Abmarl documentation GridWorld Team Battle tutorial.
+
+.. _gridworld_tutorial_team_battle:
+
 Team Battle
 -----------
 

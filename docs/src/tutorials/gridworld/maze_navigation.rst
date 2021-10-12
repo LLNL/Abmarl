@@ -1,8 +1,11 @@
 
+.. Abmarl documentation GridWorld Maze Navigation tutorial.
+
 Maze Navigation
 ---------------
 
-Using the same GridWorld modules as the :ref:`team battle tutorial <>`, we can create a Maze Navigation simulation.
+Using the same GridWorld components as the :ref:`team battle tutorial <gridworld_tutorial_team_battle>`,
+we can create a Maze Navigation simulation.
 The Maze Navigation Simulation will contain a single moving agent navigating a maze
 defined by wall agents in the grid. The moving agents goal is to reach a target
 agent. We will construct the Grid by reading a grid file.
