@@ -13,9 +13,13 @@ Abmarl Simulations
 	:members:
 	:undoc-members:
 
+.. _api_observing_agent:
+
 .. autoclass:: abmarl.sim.ObservingAgent
 	:members:
 	:undoc-members:
+
+.. _api_acting_agent:
 
 .. autoclass:: abmarl.sim.ActingAgent
 	:members:
