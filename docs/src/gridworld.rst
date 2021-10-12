@@ -69,7 +69,8 @@ Every entity in the simulation is a :ref:`GridWorldAgent <>`
 that work with their respective components. In particular, agents must be given
 an `encoding`, which is an integer that correlates to the type of agent and simplifies
 the logic for many components of the framework. GridWorldAgents can also be configured
-with an `initial position`, the ability to `block` other agents' abilities, and visualization
+with an :ref:`initial position <gridworld_position>`, the ability to
+:ref:`block <gridworld_blocking>` other agents' abilities, and visualization
 parameters such as `shape` and `color`.
 
 Following the dataclass model, additional agent classes can be defined that allow
@@ -127,10 +128,10 @@ is 2 or 3.
 Interaction between simulation components and the :ref:`Grid <>` is
 `data open`, which means that we allow components to access the internals of the
 Grid. Although this is possible and sometimes necessary, the Grid also provides
-an interface for safer interactions with components. Components can ``query`` the
-Grid to see if an agent can be placed at a specific position. Components can ``place``
+an interface for safer interactions with components. Components can `query` the
+Grid to see if an agent can be placed at a specific position. Components can `place`
 agents at a specific position in the Grid, which will succeed if that cell is available
-to the agent as per the `overlapping` configuration. And Components can ``remove``
+to the agent as per the `overlapping` configuration. And Components can `remove`
 agents from specific positions in the Grid. 
 
 
@@ -182,6 +183,8 @@ you can :ref:`create your own features <>` in the GridWorld Simulation Framework
 and use many combinations of components together to make up a simulation.
 
 
+.. _gridworld_position:
+
 Position
 ````````
 :ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>` that are managed by the
@@ -208,7 +211,7 @@ will start at a random cell in the grid. Agents can overlap according to the
    )
    position_state.reset()
 
-`agent0` is configured with an `initial position` and `agent1` and is not. At the
+`agent0` is configured with an `initial position` and `agent1` is not. At the
 start of each episode, `agent0` will be placed at (2, 4) and `agent1` will be placed
 anywhere in the grid (except for (2,4) because they cannot overlap).
 
@@ -288,7 +291,7 @@ will output an observation for `agent0` like so:
    [-1,  0,  0,  0,  0,  0,  6]
 
 Since `view range` is the number of cells away that can be observed, the observation size is
-``(2 * view_range + 1) by (2 * view_range + 1)``. `agent0` is centered in the middle
+``(2 * view_range + 1) x (2 * view_range + 1)``. `agent0` is centered in the middle
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to its position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
