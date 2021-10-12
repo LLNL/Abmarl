@@ -340,9 +340,16 @@ The -2 indicates that the cell is masked, and the choice of displaying `agent3`
 over `agent4` is still a random choice. Which cells get masked by blocking
 agents is determined by drawing two lines
 from the center of the observing agent's cell to the corners of the blocking agent's
-cell. Any cell whose center falls between those two lines will be masked, as shown BELOW.
+cell. Any cell whose center falls between those two lines will be masked, as shown below.
 
-TODO: Make a figure showing how view_blocking works.
+.. figure:: .images/gridworld_blocking.png
+   :width: 100 %
+   :alt: Masked cells from blocking agent
+
+   The black agent is a wall agent that masks part of the grid from the blue agent.
+   Cells whose centers fall betweent the lines are masked. Centers that fall directly
+   on the line or outside of the lines are not masked. Two setups are shown to 
+   demonstrate how the masking may change based on the agents' positions.
 
 
 Multi Grid Observer
