@@ -358,8 +358,11 @@ Multi Grid Observer
 Similar to the :ref:`SingleGridObserver <>`, the :ref:`MultiGridObserver <>` displays a separate array
 for every `encoding`. Each array shows the relative positions of the agents and the
 number of those agents that occupy each cell. Out of bounds indicators (-1) and
-masked cells (-2) are present in every grid. For example, the above setup would
+masked cells (-2) are present in every grid. For example, this setup would
 show an observation like so:
+
+.. figure:: .images/gridworld_observation.png
+   :width: 50 %
 
 .. code-block::
 
@@ -449,6 +452,13 @@ because `agent1` is within its `attack range` and is attackable according to the
 `attack mapping`. `agent1`'s `health` will be depleted by 1, and as a result its `health`
 will fall to 0 and it will be marked as `inactive`. The second attack fails because,
 although `agent2` is within range, it is not a type that `agent0` can attack.
+
+.. figure:: .images/gridworld_attacking.png
+   :width: 100 %
+   :alt: Agent attacking other agents
+
+   agent0 in blue performs two attacks. The first is successful, but the second is not.
+   agent1 in green is killed, but agent2 in red is still active.
 
 .. NOTE::
 
