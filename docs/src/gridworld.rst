@@ -282,7 +282,7 @@ appear in the observation, shown as their `encoding`. For example, the following
        'agent1': GridWorldAgent(id='agent1', encoding=2, initial_position=np.array([0, 1])),
        'agent2': GridWorldAgent(id='agent2', encoding=3, initial_position=np.array([1, 0])),
        'agent3': GridWorldAgent(id='agent3', encoding=4, initial_position=np.array([4, 4])),
-       'agent4': GridWorldAgent(id='agent4', encoding=5, initial_position=np.array([4, 4]))
+       'agent4': GridWorldAgent(id='agent4', encoding=5, initial_position=np.array([4, 4])),
        'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([5, 5]))
    }
    grid = Grid(6, 6, overlapping={4: [5], 5: [4]})
@@ -292,7 +292,10 @@ appear in the observation, shown as their `encoding`. For example, the following
    position_state.reset()
    observer.get_obs(agents['agent0'])
 
-will output an observation for `agent0` like so:
+will position agents as below and output an observation for `agent0` (blue) like so:
+
+.. figure:: .images/gridworld_observation.png
+   :width: 50 %
 
 .. code-block::
 
