@@ -26,9 +26,9 @@ Framework Design
 
 The GridWorld Simulation Framework utilizes a modular design that allows users
 to create new features and plug them in as components of the simulation. Every component
-inherits from the :ref:`GridWorldBaseComponent <>` class and has a reference to
+inherits from the :ref:`GridWorldBaseComponent <api_gridworld_base>` class and has a reference to
 a :ref:`Grid <gridworld_grid>` and a dictionary of :ref:`Agents <gridworld_agent>`.
-These components make up a :ref:`GridWorldSimulation <>`, which extends the
+These components make up a :ref:`GridWorldSimulation <api_gridworld_sim>`, which extends the
 :ref:`AgentBasedSimulation <abs>` interface. For example, a simulation might look
 something like this:
 
@@ -62,7 +62,7 @@ something like this:
 Agent
 `````
 
-Every entity in the simulation is a :ref:`GridWorldAgent <>`
+Every entity in the simulation is a :ref:`GridWorldAgent <api_gridworld_agent>`
 (e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_agent>` with specific parameters
 that work with their respective components. In particular, agents must be given
 an `encoding`, which is an integer that correlates to the type of agent and simplifies
@@ -74,7 +74,7 @@ parameters such as `shape` and `color`.
 Following the dataclass model, additional agent classes can be defined that allow
 them to work with various components. For example, :ref:`GridObservingAgents <gridworld_single_observer>` can work with
 :ref:`Observers <gridworld_single_observer>`, and :ref:`MovingAgents <gridworld_movement>` can work with the :ref:`MoveActor <gridworld_movement>`. Any new agent class should
-inhert from :ref:`GridWorldAgent <>` and possibly from :ref:`ActingAgent <api_acting_agent>` or :ref:`ObservingAgent <api_observing_agent>` as needed.
+inhert from :ref:`GridWorldAgent <api_gridworld_agent>` and possibly from :ref:`ActingAgent <api_acting_agent>` or :ref:`ObservingAgent <api_observing_agent>` as needed.
 For example, one can define a new type of agent like so:
 
 .. code-block:: python
@@ -97,7 +97,7 @@ For example, one can define a new type of agent like so:
 
 Grid
 ````
-The :ref:`Grid <>` stores :ref:`Agents <gridworld_agent>` in a two-dimensional numpy array. The Grid is configured
+The :ref:`Grid <api_gridworld_grid>` stores :ref:`Agents <gridworld_agent>` in a two-dimensional numpy array. The Grid is configured
 to be a certain size (rows and columns) and to allow types of Agents to overlap
 (occupy the same cell). For example, you may want a ForagingAgent to be able to overlap
 with a ResourceAgent but not a WallAgent. The `overlapping` parameter
@@ -128,7 +128,7 @@ is 2 or 3.
    If `overlapping` is not specified, then no agents will be able to occupy the same
    cell in the Grid.
 
-Interaction between simulation components and the :ref:`Grid <>` is
+Interaction between simulation components and the :ref:`Grid <api_gridworld_grid>` is
 `data open`, which means that we allow components to access the internals of the
 Grid. Although this is possible and sometimes necessary, the Grid also provides
 an interface for safer interactions with components. Components can `query` the
@@ -141,14 +141,14 @@ agents from specific positions in the Grid.
 State
 `````
 
-:ref:`State Components <>` manage the state of the simulation alongside the :ref:`Grid <gridworld_grid>`.
+:ref:`State Components <api_gridworld_statebase>` manage the state of the simulation alongside the :ref:`Grid <gridworld_grid>`.
 At the bare minimum, each State resets the part of the simulation that it manages
 at the the start of each episode.
 
 Actor
 `````
 
-:ref:`Actor Components <>` are responsible for processing agent actions and producing changes
+:ref:`Actor Components <api_gridworld_actor>` are responsible for processing agent actions and producing changes
 to the state of the simulation. Actors assign supported agents with an appropriate
 action space and process agents' actions based on the Actor's key. The result of
 the action is a change in the simulation's state, and Actors should return that
@@ -160,7 +160,7 @@ moved.
 Observer
 ````````
 
-:ref:`Observer Components <>` are responsible for creating an
+:ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
 Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>` generates an observation and
@@ -169,7 +169,7 @@ stores it in the 'grid' channel of the :ref:`ObservingAgent's <gridworld_single_
 Done
 ````
 
-:ref:`Done Components <>` manage the "done state" of each agent and of the simulation as a
+:ref:`Done Components <api_gridworld_done>` manage the "done state" of each agent and of the simulation as a
 whole. Agents that are reported as done will cease sending actions to the simulation, 
 and the episode will end when all the agents are done or when the simulation is done.
 
@@ -190,7 +190,7 @@ Position
 ````````
 
 :ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>` that are managed by the
-:ref:`PositionState <>`. Agents
+:ref:`PositionState <api_gridworld_state_position>`. Agents
 can be configured with an `initial position`, which is where they will start at the
 beginning of each episode. If they are not given an `initial position`, then they
 will start at a random cell in the grid. Agents can overlap according to the
@@ -235,7 +235,7 @@ anywhere in the grid (except for (2,4) because they cannot overlap).
 Movement
 ````````
 
-:ref:`MovingAgents <>` can move around the :ref:`Grid <gridworld_grid>` in conjunction with the :ref:`MoveActor <>`. MovingAgents
+:ref:`MovingAgents <api_gridworld_agent_moving>` can move around the :ref:`Grid <gridworld_grid>` in conjunction with the :ref:`MoveActor <api_gridworld_actor_move>`. MovingAgents
 require a `move range` parameter, indicating how many spaces away they can move
 in a single step. Agents cannot move out of bounds and can only move to the same
 cell as another agent if they are allowed to overlap. For example, in this setup
@@ -281,8 +281,8 @@ at position (2, 3).
 Single Grid Observer
 ````````````````````
 
-:ref:`GridObservingAgents <>` can observe the state of the :ref:`Grid <gridworld_grid>` around them, namely which
-other agents are nearby, via the :ref:`SingleGridObserver <>`. The SingleGridObserver generates
+:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state of the :ref:`Grid <gridworld_grid>` around them, namely which
+other agents are nearby, via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver generates
 a two-dimensional array sized by the agent's `view range` with the observing
 agent located at the center of the array. All other agents within the `view range` will
 appear in the observation, shown as their `encoding`. For example, the following setup
@@ -330,7 +330,7 @@ Since `view range` is the number of cells away that can be observed, the observa
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to its position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the :ref:`SingleGridObserver <>` will randomly select between their `encodings`
+and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly select between their `encodings`
 for the observation.
 
 
@@ -373,7 +373,7 @@ cell. Any cell whose center falls between those two lines will be masked, as sho
 Multi Grid Observer
 ```````````````````
 
-Similar to the :ref:`SingleGridObserver <>`, the :ref:`MultiGridObserver <>` displays a separate array
+Similar to the :ref:`SingleGridObserver <api_gridworld_observer_single>`, the :ref:`MultiGridObserver <api_gridworld_observer_multi>` displays a separate array
 for every `encoding`. Each array shows the relative positions of the agents and the
 number of those agents that occupy each cell. Out of bounds indicators (-1) and
 masked cells (-2) are present in every grid. For example, this setup would
@@ -403,17 +403,17 @@ show an observation like so:
    [-1,  0,  0,  0,  0,  0, -2]
    ...
 
-:ref:`MultiGridObserver <>` may be preferable to :ref:`SingleGridObserver <>` in simulations where
+:ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to :ref:`SingleGridObserver <api_gridworld_observer_single>` in simulations where
 there are many overlapping agents.
 
 
 Health
 ``````
 
-:ref:`HealthAgents <>` track their `health` throughout the simulation. `Health` is always bounded
+:ref:`HealthAgents <api_gridworld_agent_health>` track their `health` throughout the simulation. `Health` is always bounded
 between 0 and 1. Agents whose `health` falls to 0 are marked as `inactive`. They can be given an
 `initial health`, which they start with at the beginning of the episode. Otherwise,
-their `health` will be a random number between 0 and 1, as managed by the :ref:`HealthState <>`.
+their `health` will be a random number between 0 and 1, as managed by the :ref:`HealthState <api_gridworld_state_health>`.
 Consider the following setup:
 
 .. code-block:: python
@@ -434,8 +434,8 @@ Consider the following setup:
 Attacking
 `````````
 
-`Health` becomes more interesting when we let agents attack one another. :ref:`AttackingAgents <>`
-work in conjunction with the :ref:`AttackActor <>`. They have an `attack range`, which dictates
+`Health` becomes more interesting when we let agents attack one another. :ref:`AttackingAgents <api_gridworld_agent_attack>`
+work in conjunction with the :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
 attack being successful; and an `attack strength`, which dictates how much `health`
 is depleted from the attacked agent. An agent's choice to attack is a boolean--either
