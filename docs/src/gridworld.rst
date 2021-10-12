@@ -152,19 +152,18 @@ moved.
 Observer
 ````````
 
-Observer Components are responsible for creating an
+:ref:`Observer Components <>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
-Observer's key. For example, the SingleGridObserver generates an observation and
-stores it in the 'grid' channel of the agent's observation.
+Observer's key. For example, the :ref:`SingleGridObserver <>` generates an observation and
+stores it in the 'grid' channel of the :ref:`ObservingAgent's <>` observation.
 
 Done
 ````
 
-Done Components manage the "done state" of each agent and of the simulation as a
-whole via the ``get_done`` and ``get_all_done`` interface. Agents that are reported
-as done will cease sending actions to the simulation, and when ``get_all_done``
-reports True, the episode ends.
+:ref:`Done Components <>` manage the "done state" of each agent and of the simulation as a
+whole. Agents that are reported as done will cease sending actions to the simulation, 
+and the episode will end when all the agents are done or when the simulation is done.
 
 
 Features
