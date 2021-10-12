@@ -2,14 +2,20 @@
 Team Battle
 -----------
 
-The team battle scenario involves multiple teams fighting against each other.
+The Team Battle scenario involves multiple teams of agents fighting against each other.
 The goal of each team is to be the last team alive, at which point the simulation will end.
 Each agent can move around the grid and attack agents from other teams. Each agent
 can observe the grid around its position. We will reward each agent for successful
 kills and penalize them for bad moves. This simulation can be found in full
 `in our repo <https://github.com/LLNL/Abmarl/blob/abmarl-152-document-gridworld-framework/abmarl/sim/gridworld/examples/team_battle_example.py>`_.
 
-First, we import the components that we will need. Each component is
+.. figure:: /.images/gridworld_tutorial_team_battle.*
+   :width: 75 %
+   :alt: Video showing teams fighting.
+
+   Agents on four teams battling each other.
+
+First, we import the components that we need. Each component is
 :ref:`already in Abmarl <gridworld_built_in_features>`, so we don't need to create anything new.
 
 .. code-block:: python
@@ -23,8 +29,8 @@ First, we import the components that we will need. Each component is
    from abmarl.tools.matplotlib_utils import mscatter # Needed for nice renderings
 
 Then, we define our agent types. This simulation will only have a single type:
-the BattleAgent. Most of the agent attributes will be the same, and we can preconfigure
-the class definition so we don't have to do it for every agent.
+the BattleAgent. Most of the agents' attributes will be the same, and we can preconfigure
+the class definition to save us time when we create the agents.
 
 .. code-block:: python
 
@@ -223,11 +229,17 @@ Finally, we can run the simulation with random actions and visualize it.
    sim.reset()
    fig = plt.figure()
    sim.render(fig=fig)
-   
-   from pprint import pprint
-   for i in range(50):
+
+   done_agents = set()
+   for i in range(500):
        action = {
-           agent.id: agent.action_space.sample() for agent in agents.values() if agent.active
+           agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
        }
        sim.step(action)
        sim.render(fig=fig)
+   
+       if sim.get_all_done():
+           break
+       for agent in agents:
+           if sim.get_done(agent):
+               done_agents.add(agent)

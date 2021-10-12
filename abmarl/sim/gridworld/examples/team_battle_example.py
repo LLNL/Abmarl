@@ -150,9 +150,16 @@ if __name__ == "__main__":
     fig = plt.figure()
     sim.render(fig=fig)
     
-    for i in range(50):
+    done_agents = set()
+    for i in range(500):
         action = {
-            agent.id: agent.action_space.sample() for agent in agents.values() if agent.active
+            agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
         }
         sim.step(action)
         sim.render(fig=fig)
+
+        if sim.get_all_done():
+            break
+        for agent in agents:
+            if sim.get_done(agent):
+                done_agents.add(agent)
