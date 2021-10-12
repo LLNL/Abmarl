@@ -7,6 +7,7 @@ Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
 through Abmarl's :ref:`AgentBasedSimulation <abs>` interface.
 
+
 Framework Design
 ----------------
 
@@ -55,21 +56,23 @@ this framework.
 
 .. _gridworld_agent:
 
+
 Agent
 `````
 
-Every entity in the GridWorld is a GridWorldAgent (e.g. walls, foragers, resources, fighters, etc.).
-GridWorldAgents are :ref:`PrincipleAgents <api_agent>` with specific parameters
+Every entity in the simulation is a :ref:`GridWorldAgent <>`
+(e.g. walls, foragers, resources, fighters, etc.).
+:ref:`GridWorldAgents <>` are :ref:`PrincipleAgents <api_agent>` with specific parameters
 that work with their respective components. In particular, agents must be given
 an encoding, which is an integer that correlates to the type of agent and simplifies
-the logic for many components of the framework. GridWorldAgents can also be configured
+the logic for many components of the framework. :ref:`GridWorldAgents <>` can also be configured
 with an initial position, the ability to block other agents' abilities, and visualization
 parameters such as shape and color.
 
 Following the dataclass model, additional agent classes can be defined that allow
-agents to work with various components. For example, ObservingAgents can work with
-Observers, and MovingAgents can work with the MoveActor. Any new agent class should
-inhert from GridWorldAgent and possibly from ActingAgent or ObservingAgent as needed.
+agents to work with various components. For example, :ref:`ObservingAgents <>` can work with
+:ref:`Observers <>`, and :ref:`MovingAgents <>` can work with the :ref:`MoveActor <>`. Any new agent class should
+inhert from :ref:`GridWorldAgent <>` and possibly from :ref:`ActingAgent <>` or :ref:`ObservingAgent <>` as needed.
 For example, one can define a new type of agent like so:
 
 .. code-block:: python
@@ -85,6 +88,7 @@ For example, one can define a new type of agent like so:
    parameters. All functionality should be written in the simulation components.
 
 .. _gridworld_grid:
+
 
 Grid
 ````
