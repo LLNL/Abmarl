@@ -13,12 +13,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
     GridWorldSimulation interface.
 
     Extends the AgentBasedSimulation interface for the GridWorld. We provide builders
-    for streamlining the building process. The interface is meant to be used like
-    so:
-    MyCustomGridSim(GridWorldSimulation):
-        ... # define the simulation, don't overwrite the builders.
-
-    sim = MyCustomGridSim.build(parameters)
+    for streamlining the building process.
     """
     @classmethod
     def build_sim(cls, rows, cols, **kwargs):
@@ -53,22 +48,10 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                 cell should be a single alphanumeric character indicating which agent
                 will be at that position (from the perspective of looking down on the
                 grid). That agent will be given that initial position. 0's are reserved for empty
-                space. For example:
-                0 A W W W A 0
-                0 0 0 0 0 0 0
-                0 A W W W A 0
-                will create a 3-by-7 grid with some agents along the top and bottom
-                of the grid and another type of agent in the corners.
+                space.
             object_registry: A dictionary that maps characters from the file to a
                 function that generates the agent. This must be a function because
-                each agent must have unique id, which is generated here. For example,
-                using the grid above and some pre-created Agent classes:
-                {
-                    'A': lambda n: ExploringAgent(id=f'explorer{n}', view_range=3, move_range=1),
-                    'W': lambda n: WallAgent(id=f'wall{n}')
-                }
-                will create a grid with ExploringAgents in the corners and WallAgents
-                along the top and bottom rows.
+                each agent must have unique id, which is generated here.
 
         Returns:
             A GridSimulation built from the file.
@@ -131,7 +114,7 @@ class GridWorldBaseComponent(ABC):
         The grid indexes the agents by their position.
 
         For example, an agent whose position is (3, 2) can be accessed through
-        the grid with self.grid[3, 2]. Components are responsible for maintaining
+        the grid with ``self.grid[3, 2]``. Components are responsible for maintaining
         the connection between agent position and grid index.
         """
         return self._grid

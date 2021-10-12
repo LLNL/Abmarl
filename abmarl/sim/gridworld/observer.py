@@ -57,13 +57,6 @@ class SingleGridObserver(ObserverBaseComponent):
 
     The observation is centered around the observing agent's position. Each agent
     in the "observation window" is recorded in the relative cell using its encoding.
-    For example, an agent might observe something like:
-        -1 -1 -1 -1 -1
-         0  2  0  0 -1
-        -2  1  3  0 -1
-         0  0  0  0 -1
-         0  2  2  0 -1
-    
     If there are multiple agents on a single cell with different encodings, the
     agent will observe only one of them chosen at random.
     """
@@ -132,28 +125,9 @@ class MultiGridObserver(ObserverBaseComponent):
     Observe a subset of the grid centered on the agent's position.
 
     The observation is centered around the observing agent's position. The observing
-    agent sees a stack of observations, one for each positive encoding.
-    For example, an agent might observe something like:
-        Encoding 1:
-        -1 -1 -1 -1 -1
-         0  0  0  0 -1
-        -2  1  0  0 -1
-         0  0  0  0 -1
-         0  0  0  0 -1
-        Encoding 2:
-        -1 -1 -1 -1 -1
-         0  1  0  0 -1
-        -2  0  0  0 -1
-         0  0  0  0 -1
-         0  2  1  0 -1
-        Encoding 3:
-        -1 -1 -1 -1 -1
-         0  0  0  0 -1
-        -2  0  1  0 -1
-         0  0  0  0 -1
-         0  0  0  0 -1
-    where the number of agents of each encoding is given rather than the encoding
-    itself. Notice that out of bounds and masked indicators appear in every grid.
+    agent sees a stack of observations, one for each positive encoding, where the
+    number of agents of each encoding is given rather than the encoding
+    itself. Out of bounds and masked indicators appear in every grid.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

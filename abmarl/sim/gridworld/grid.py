@@ -13,16 +13,7 @@ class Grid:
         rows: The number of rows in the grid.
         cols: The number of columns in the grid.
         overlapping: Dictionary that maps the agents' encodings to a list of encodings
-            with which they can occupy the same cell. For example, the folowing overlapping:
-            {
-                1: [2],
-                2: [1, 3],
-                3: [2, 3]
-            }
-            means that agents whose encoding is 1 can overlap with other agents whose
-            encodings are 1; agents whose encoding is 2 can overlap with other agents
-            whose encodings are 1 or 2; and agents whose encoding is 3 can overlap with
-            other agents whose encodings are 2 or 3. To avoid undefined behavior, the
+            with which they can occupy the same cell. To avoid undefined behavior, the
             overlapping should be symmetric, so that if 2 can overlap with 3, then 3
             can also overlap with 2.
     """

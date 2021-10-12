@@ -129,14 +129,7 @@ class AttackActor(ActorBaseComponent):
         Dict that dictates which agents the attacking agent can attack.
 
         The dictionary maps the attacking agents' encodings to a list of encodings
-        that they can attack. For example, the folowing attack_mapping:
-        {
-            1: [3, 4, 5],
-            3: [2, 3],
-        }
-        means that agents whose encoding is 1 can attack other agents whose encodings
-        are 3, 4, or 5; and agents whose encoding is 3 can attack other agents whose
-        encodings are 2 or 3.
+        that they can attack.
         """
         return self._attack_mapping
 
@@ -171,6 +164,7 @@ class AttackActor(ActorBaseComponent):
 
         The processing goes through a series of checks. The attack is possible
         if there is an attacked agent such that:
+
         1. The attacked agent is active.
         2. The attacked agent is within range.
         3. The attacked agent is valid according to the attack_mapping.
