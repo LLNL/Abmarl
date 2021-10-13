@@ -1,17 +1,27 @@
 
-.. Abmarl documetnation GridWorld communication tutorial.
+.. Abmarl documentation GridWorld communication tutorial.
 
 .. _tutorials_gridworld_communication:
 
 Communication Blocking
 ----------------------
 
-Suppose we want to create a simulation in which some agents send messages to each
+Let us create a simulation in which some agents send messages to each
 other in an attempt to reach consensus while another group of agents attempts to
-block their messages. Abmarl's GridWorld Simulation Framework already contains the
-features for the blocking agents, but how can we add the communication features?
-In this tutorial, we will show just how easy it is to create new features that can
-plug into the simulation framework.
+block their these messages to impede consensus. Abmarl's GridWorld Simulation Framework
+already contains the features for the blocking agents; in this tutorial, we show
+how to create new components and connect them with the simulation framework.
+
+.. figure:: /.images/gridworld_tutorial_communications.*
+   :width: 75 %
+   :alt: Video showing agents attempting to block communication.
+
+   Blockers (black) move around the maze blocking communications between broadcasters (green).
+   The simulation ends when the broadcasters reach consensus.
+
+
+Using built-in features
+```````````````````````
 
 Let's start by laying the groundwork using components already in Abmarl.
 
@@ -97,15 +107,20 @@ Let's start by laying the groundwork using components already in Abmarl.
        def get_info(self, **kwargs):
            return {}
 
-Now we need to build the communication pieces ourselves. We know that the GridWorld
-Simulation Framework is made up of Agents, States, Actors, Observers, and Dones,
-so we expect that we'll need to create each of these for our new communication feature.
-Let's start with the agent.
+
+Creating our own communication components
+`````````````````````````````````````````
+
+Next we build the communication components ourselves. We know that the GridWorld
+Simulation Framework is made up of :ref:`Agents <gridworld_agent>`, :ref:`States <gridworld_state>`,
+:ref:`Actors <gridworld_actor>`, :ref:`Observers <gridworld_observer>`, and
+:ref:`Dones <gridworld_done>`, so we expect that we'll need to create each of these
+for our new communication feature. Let's start with the agent.
 
 The agent will communicate by broadcasting its message to other nearby agents.
-Thus, we create a new agent with a broadcast_range and an initial_message. The
-broadcast range will be used by the BroadcastActor to determine successful broadcasting,
-and the initial message, an optional parameter, will be used by the BroadcastState
+Thus, we create a new agent with a `broadcast range` and an `initial message`. The
+`broadcast range` will be used by the BroadcastActor to determine successful broadcasting,
+and the `initial message`, an optional parameter, will be used by the BroadcastState
 to set its message.
 
 .. code-block:: python
@@ -183,10 +198,10 @@ to each agent's message.
            return receiving_from
 
 Then we define the BroadcastActor. Similar to attacking, broadcasting will be a
-boolean action--either broadcast or don't broadcast. We provide a broadcast_mapping
-for determine to which encodings each agent can broadcast. The message will be
-successfully sent to every agent that (1) is within the broadcast range, (2) has
-a compatible encoding, and (3) is not blocked from view.
+boolean action--either broadcast or don't broadcast. We provide a `broadcast mapping`
+for determining to which encodings each agent can broadcast. The message will be
+successfully sent to every agent that (1) is within the `broadcast range`, (2) has
+a compatible encoding, and (3) is not blocked.
 
 .. code-block:: python
 
@@ -283,10 +298,10 @@ a compatible encoding, and (3) is not blocked from view.
                if action: # Agent has chosen to attack
                    return determine_broadcast(broadcasting_agent)
 
-Then we define the BroadcastObserver. The observer enables agents to see all received
+Now we define the BroadcastObserver. The observer enables agents to see all received
 messages, including their own current message. This observer is unique from all
 other components we have seen so far because it explicitly relies on the BroadcastingState
-component, which we must keep in mind during initialization.
+component, which will have a small impact in how we initialize the simulation.
 
 .. code-block:: python
 
@@ -329,6 +344,41 @@ finish when they've reached consensus; that is, when their internal message is w
 some tolerance of the average message.
 
 .. code-block:: python
+        
+   class AverageMessageDone(DoneBaseComponent):
+       def __init__(self, done_tolerance=None, **kwargs):
+           super().__init__(**kwargs)
+           self.done_tolerance = done_tolerance
+   
+       @property
+       def done_tolerance(self):
+           return self._done_tolerance
+       
+       @done_tolerance.setter
+       def done_tolerance(self, value):
+           assert type(value) in [int, float], "Done tolerance must be a number."
+           assert value > 0, "Done tolerance must be positive."
+           self._done_tolerance = value
+   
+       def get_done(self, agent, **kwargs):
+           if isinstance(agent, BroadcastingAgent):
+               average = np.average([
+                   other.message for other in self.agents.values()
+                   if isinstance(other, BroadcastingAgent)
+               ])
+               return np.abs(agent.message - average) <= self.done_tolerance
+           else:
+               return False
+       
+       def get_all_done(self, **kwargs):
+           for agent in self.agents.values():
+               if isinstance(agent, BroadcastingAgent):
+                   if not self.get_done(agent):
+                       return False
+           return True
 
+Building the simulation
+```````````````````````
 
+Now that all the components are in place.
 
