@@ -4,7 +4,7 @@
 .. _gridworld_tutorial_team_battle:
 
 Team Battle
------------
+===========
 
 The Team Battle scenario involves multiple teams of agents fighting against each other.
 The goal of each team is to be the last team alive, at which point the simulation will end.
@@ -251,5 +251,21 @@ Finally, we can run the simulation with random actions and visualize it.
            if sim.get_done(agent):
                done_agents.add(agent)
 
-# TODO: Add extra challenges. One of them will be considering the pros and cons
-of using single vs multi grid observer.
+Extra Challenges
+````````````````
+Having successfully created and run a TeamBattle simulation, we can further explore
+the GridWorldSimulation framework. Some ideas are:
+
+* Experiment with the number of agents and the impact that has on both the SingleGridObserver
+  and the MultiGridObserver.
+* Experiment with the number of agents per team as well as the capabilities of
+  those agents. You might find that a super capable agent is still effective against
+  a team of multiple agents.
+* Create a Hunter-Forager simulation, where one team of agents act as resources
+  that can be foraged by another team, which can be hunted by a third team. Do
+  this using the same components here. Hint: you may need to use a custom
+  :ref:`done condition <gridworld_done>`.
+* Connect this simulation with the Reinforcement Learning capabilities of Abmarl
+  via a :ref:`Simulation Manager<sim-man>`. What kind of behaviors do the agents
+  learn?
+* And much, much more!

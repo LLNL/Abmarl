@@ -2,7 +2,7 @@
 .. Abmarl documentation GridWorld Maze Navigation tutorial.
 
 Maze Navigation
----------------
+===============
 
 Using the same components as we did in the :ref:`Team Battle tutorial <gridworld_tutorial_team_battle>`,
 we can create a Maze Navigation Simulation that contains a single moving agent navigating a maze
@@ -231,4 +231,21 @@ navigation agent can observe. An example state and observation is given below.
    -2 -2  0 -2 -2
 
 
-# TODO: add extra challenges
+Extra Challenges
+````````````````
+We've created a starkly different simulation using many of the same components
+as we did in the :ref:`TeamBattle tutorial <_gridworld_tutorial_team_battle>`.
+We can further explore the capabilities of the GridWorld Simulation Framework,
+such as:
+
+* Introduce additional navigating agents and modify the simulation so that the
+  agents race to the target.
+* Recreate the pacman game.
+* Recreate the crossy road game.
+* Recreate some of your favorite games from the Arcade Learning Environment. Not
+  all games can be recreated with these components, and some cannot be recreated
+  with at all with GridWorld Simulation Framework (because they are not grid-based).
+* Connect this simulation with the Reinforcement Learning capabilities of Abmarl
+  via a :ref:`Simulation Manager<sim-man>`. Does the agent learng how to solve
+  mazes quickly?
+* And much, much more!

@@ -4,7 +4,7 @@
 .. _tutorials_gridworld_communication:
 
 Communication Blocking
-----------------------
+======================
 
 Consider a simulation in which some agents send messages to each
 other in an attempt to reach consensus while another group of agents attempts to
@@ -617,6 +617,10 @@ We can see the "path towards consensus" among the BroadcastingAgents in the outp
    broadcaster2: -0.12417528665811083
    broadcaster3: -0.12417528665811084
 
+Extra Challenges
+----------------
+Having successfully created new components and fit them into the GridWorld Simulation
+Framework, we can create a vast variety of different simulations, constrained primarily
+by our own imagination. We leave the extra challenges up to you and what you can
+think of.
 
-# TODO: Extra tasks: How should the blocking agents be rewarded in order  for them to learn
-# an effective blocking strategy
