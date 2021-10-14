@@ -8,8 +8,8 @@ def create_grid_and_mask(agent, grid, mask_range, agents):
     Create a local grid centered around the agents location and fill it will the
     values from the grid.
     
-    View-blocking agents can mask the grid from other agent's, restricting their
-    ability to observe, attack, move, etc. We calculate the blocking by drawing
+    Blocking agents can mask the grid from other agent's, restricting their
+    ability to observe, attack, move, etc. We calculate the masking by drawing
     rays from the center of the agent's position to the edges of the other agents'
     cell. All cells that are "behind" that cell and between the two rays are
     invisible to the observing agent. In the mask, 1 means that the cell is visibile,
@@ -43,7 +43,7 @@ def create_grid_and_mask(agent, grid, mask_range, agents):
 
     mask = np.ones((2 * mask_range + 1, 2 * mask_range + 1))
     for other in agents.values():
-        if other.view_blocking:
+        if other.blocking:
             r_diff, c_diff = other.position - agent.position
             # Ensure the other agent within the view range
             if -mask_range <= r_diff <= mask_range and \

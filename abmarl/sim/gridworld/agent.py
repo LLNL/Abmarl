@@ -8,12 +8,12 @@ class GridWorldAgent(PrincipleAgent):
     """
     The base agent in the GridWorld.
     """
-    def __init__(self, initial_position=None, view_blocking=False, encoding=None,
+    def __init__(self, initial_position=None, blocking=False, encoding=None,
             render_shape='o', render_color='gray', **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position
-        self.view_blocking = view_blocking
+        self.blocking = blocking
         self.render_shape = render_shape
         self.render_color = render_color
 
@@ -62,16 +62,16 @@ class GridWorldAgent(PrincipleAgent):
         self._position = value
 
     @property
-    def view_blocking(self):
+    def blocking(self):
         """
-        Specify if this agent blocks other agent's observations.
+        Specify if this agent blocks other agent's observations and actions.
         """
-        return self._view_blocking
+        return self._blocking
 
-    @view_blocking.setter
-    def view_blocking(self, value):
-        assert type(value) is bool, "View blocking must be either True or False."
-        self._view_blocking = value
+    @blocking.setter
+    def blocking(self, value):
+        assert type(value) is bool, "Blocking must be either True or False."
+        self._blocking = value
 
     @property
     def render_shape(self):
@@ -102,7 +102,7 @@ class GridWorldAgent(PrincipleAgent):
     @property
     def configured(self):
         return super().configured and self.encoding is not None and \
-            self.view_blocking is not None and self.render_shape is not None \
+            self.blocking is not None and self.render_shape is not None \
                 and self.render_color is not None
 
 
