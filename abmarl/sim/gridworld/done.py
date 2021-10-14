@@ -65,5 +65,5 @@ class OneTeamRemainingDone(ActiveDone):
         Return true if all active agents have the same encoding. Otherwise,
         return false.
         """
-        encodings = [agent.encoding for agent in self.agents.values() if agent.active]
-        return len(encodings) == 1
+        encodings = set(agent.encoding for agent in self.agents.values() if agent.active)
+        return len(encodings) <= 1
