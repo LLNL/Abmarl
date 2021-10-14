@@ -74,9 +74,9 @@ def test_single_grid_observer_blocking():
         'agent0': GridObservingAgent(id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])),
         'agent1': GridObservingAgent(id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])),
         'agent2': GridObservingAgent(id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])),
-        'agent3': GridWorldAgent(id='agent3', encoding=5, initial_position=np.array([3, 3]), view_blocking=True),
-        'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 1]), view_blocking=True),
-        'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([2, 1]), view_blocking=True),
+        'agent3': GridWorldAgent(id='agent3', encoding=5, initial_position=np.array([3, 3]), blocking=True),
+        'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 1]), blocking=True),
+        'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([2, 1]), blocking=True),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -353,10 +353,10 @@ def test_multi_grid_observer_blocking():
         'agent2': GridObservingAgent(id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])),
         'agent6': HackAgent(id='agent6', encoding=2, view_range=1, initial_position=np.array([4, 4]), move_range=1),
         'agent7': HackAgent(id='agent7', encoding=3, view_range=4, initial_position=np.array([0, 0]), move_range=1),
-        'agent3': GridWorldAgent(id='agent3', encoding=5, initial_position=np.array([3, 3]), view_blocking=True),
-        'agent8': MovingAgent(id='agent8', encoding=5, initial_position=np.array([3, 3]), move_range=1, view_blocking=True),
-        'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 1]), view_blocking=True),
-        'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([2, 1]), view_blocking=True),
+        'agent3': GridWorldAgent(id='agent3', encoding=5, initial_position=np.array([3, 3]), blocking=True),
+        'agent8': MovingAgent(id='agent8', encoding=5, initial_position=np.array([3, 3]), move_range=1, blocking=True),
+        'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 1]), blocking=True),
+        'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([2, 1]), blocking=True),
     }
     grid = Grid(5, 5, overlapping={2: [3], 3: [2], 5: [5]})
 
