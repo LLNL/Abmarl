@@ -39,7 +39,6 @@ create a simulation with :ref:`position <gridworld_position>`,
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
    from abmarl.sim.gridworld.observer import SingleGridObserver
-   from abmarl.tools.matplotlib_utils import mscatter
 
    class BlockingAgent(MovingAgent, GridObservingAgent):
        def __init__(self, **kwargs):
@@ -69,31 +68,6 @@ create a simulation with :ref:`position <gridworld_position>`,
            # Entropy penalty
            for agent_id in action_dict:
                self.rewards[agent_id] -= 0.01
-       
-       def render(self, fig=None, **kwargs):
-           fig.clear()
-           ax = fig.gca()
-   
-           # Draw the gridlines
-           ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
-           ax.set_xticks(np.arange(0, self.position_state.cols, 1))
-           ax.set_yticks(np.arange(0, self.position_state.rows, 1))
-           ax.grid()
-   
-           # Draw the agents
-           agents_x = [
-               agent.position[1] + 0.5 for agent in self.agents.values()
-           ]
-           agents_y = [
-               self.position_state.rows - 0.5 - agent.position[0]
-               for agent in self.agents.values()
-           ]
-           shape = [agent.render_shape for agent in self.agents.values()]
-           color = [agent.render_color for agent in self.agents.values()]
-           mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
-   
-           plt.plot()
-           plt.pause(1e-6)
        
        def get_obs(self, agent_id, **kwargs):
            agent = self.agents[agent_id]
@@ -464,31 +438,8 @@ Now that all the components have been created, we can create the full simulation
            for agent_id in action_dict:
                self.rewards[agent_id] -= 0.01
        
-       def render(self, fig=None, **kwargs):
-           fig.clear()
-           ax = fig.gca()
-   
-           # Draw the gridlines
-           ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
-           ax.set_xticks(np.arange(0, self.position_state.cols, 1))
-           ax.set_yticks(np.arange(0, self.position_state.rows, 1))
-           ax.grid()
-   
-           # Draw the agents
-           agents_x = [
-               agent.position[1] + 0.5 for agent in self.agents.values()
-           ]
-           agents_y = [
-               self.position_state.rows - 0.5 - agent.position[0]
-               for agent in self.agents.values()
-           ]
-           shape = [agent.render_shape for agent in self.agents.values()]
-           color = [agent.render_color for agent in self.agents.values()]
-           mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
-   
-           plt.plot()
-           plt.pause(1e-6)
-   
+       def render(self, **kwargs):
+           super().render(**kwargs)
            for agent in self.agents.values():
                if isinstance(agent, BroadcastingAgent):
                    print(f"{agent.id}: {agent.message}")
