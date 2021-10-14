@@ -1,5 +1,7 @@
 .. Abmarl gridworld documentation
 
+.. _gridworld:
+
 GridWorld Simulation Framework
 ==============================
 
@@ -23,6 +25,7 @@ Framework Design
 
    Abmarl's GridWorld Simulation Framework. A simulation has a Grid, a dictionary
    of agents, and various components that manage the various features of the simulation.
+   The componets shown in medium-blue are user-configurable and -creatable.
 
 The GridWorld Simulation Framework utilizes a modular design that allows users
 to create new features and plug them in as components of the simulation. Every component
@@ -55,7 +58,7 @@ something like this:
     
        def get_obs(self, agent_id, **kwargs):
            return self.observer.get_obs(self.agents[agent_id])
-
+       ...
 
 .. _gridworld_agent:
 
@@ -64,8 +67,8 @@ Agent
 
 Every entity in the simulation is a :ref:`GridWorldAgent <api_gridworld_agent>`
 (e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_agent>` with specific parameters
-that work with their respective components. In particular, agents must be given
-an `encoding`, which is an integer that correlates to the type of agent and simplifies
+that work with their respective components. Agents must be given
+an `encoding`, which is a positive integer that correlates to the type of agent and simplifies
 the logic for many components of the framework. GridWorldAgents can also be configured
 with an :ref:`initial position <gridworld_position>`, the ability to
 :ref:`block <gridworld_blocking>` other agents' abilities, and visualization
@@ -159,8 +162,7 @@ action space and process agents' actions based on the Actor's key. The result of
 the action is a change in the simulation's state, and Actors should return that
 change in a reasonable form. For example, the :ref:`MoveActor <gridworld_movement>` appends :ref:`MovingAgents' <gridworld_movement>` action
 spaces with a 'move' channel and looks for the 'move' key in the agent's incoming
-action. After a move is processed, the MoveActor returns how much the agent actually
-moved.
+action. After a move is processed, the MoveActor returns if the move was successful.
 
 
 .. _gridworld_observer:
@@ -171,7 +173,7 @@ Observer
 :ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
-Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>` generates an observation and
+Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>` generates an observation of the nearby grid and
 stores it in the 'grid' channel of the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
 
 
@@ -340,7 +342,7 @@ will position agents as below and output an observation for `agent0` (blue) like
 Since `view range` is the number of cells away that can be observed, the observation size is
 ``(2 * view_range + 1) x (2 * view_range + 1)``. `agent0` is centered in the middle
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
-relative to its position and shown by their `encodings`. The agent observes some out
+relative to `agent0's` position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
 and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly select between their `encodings`
 for the observation.
@@ -504,4 +506,4 @@ although `agent2` is within range, it is not a type that `agent0` can attack.
 
    Attacks can be blocked by :ref:`blocking <gridworld_blocking>` agents. If an attackable agent is
    masked from an attacking agent, then it cannot be attacked by that agent. The
-   masking is determined the same way as the view blocking above.
+   masking is determined the same way as view blocking described above.
