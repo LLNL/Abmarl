@@ -108,7 +108,7 @@ if __name__ == "__main__":
         'W': lambda n: GridWorldAgent(
             id=f'wall{n}',
             encoding=2,
-            view_blocking=True,
+            blocking=True,
             render_shape='s'
         )
     }

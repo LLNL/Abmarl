@@ -43,7 +43,7 @@ create a simulation with :ref:`position <gridworld_position>`,
 
    class BlockingAgent(MovingAgent, GridObservingAgent):
        def __init__(self, **kwargs):
-           super().__init__(view_blocking=True, **kwargs)
+           super().__init__(blocking=True, **kwargs)
 
    class BroadcastSim(GridWorldSimulation):
        def __init__(self, **kwargs):
@@ -243,7 +243,7 @@ a compatible encoding, and (3) is not blocked.
        Process sending and receiving messages between agents.
    
        BroadcastingAgents can broadcast to compatible agents within their range
-       according to the broadcast mapping and if the agent is not view_blocked.
+       according to the broadcast mapping and if the agent is not blocked.
        """
        def __init__(self, broadcast_mapping=None, **kwargs):
            super().__init__(**kwargs)

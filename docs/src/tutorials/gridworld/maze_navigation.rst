@@ -185,7 +185,7 @@ registry` that maps the values in the files to objects. We will use ``W`` for Wa
        'W': lambda n: GridWorldAgent(
            id=f'wall{n}',
            encoding=2,
-           view_blocking=True,
+           blocking=True,
            render_shape='s'
        )
    }
@@ -216,7 +216,7 @@ produces an animation like the one at the top of this page.
            plt.pause(1)
            break
 
-We can examine the observation to see how the view blocking walls effect what the
+We can examine the observation to see how the walls effect what the
 navigation agent can observe. An example state and observation is given below.
 
 .. figure:: /.images/gridworld_tutorial_maze_navigation.png

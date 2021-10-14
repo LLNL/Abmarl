@@ -55,7 +55,7 @@ class BroadcastingActor(ActorBaseComponent):
     Process sending and receiving messages between agents.
 
     Broadcasting Agents can broadcast to agents within their range according to
-    the broadcast mapping and if the agent is not view_blocked.
+    the broadcast mapping and if the agent is not blocked.
     """
     def __init__(self, broadcast_mapping=None, **kwargs):
         super().__init__(**kwargs)
@@ -237,7 +237,7 @@ class AverageMessageDone(DoneBaseComponent):
 
 class BlockingAgent(MovingAgent, GridObservingAgent):
     def __init__(self, **kwargs):
-        super().__init__(view_blocking=True, **kwargs)
+        super().__init__(blocking=True, **kwargs)
 
 class BroadcastSim(GridWorldSimulation):
     def __init__(self, **kwargs):
