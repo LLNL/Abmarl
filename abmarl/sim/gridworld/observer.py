@@ -87,7 +87,7 @@ class SingleGridObserver(ObserverBaseComponent):
         The agent observes a sub-grid centered on its position.
 
         The observation may include other agents, empty spaces, out of bounds, and
-        masked cells, which can be blocked from view by other view-blocking agents.
+        masked cells, which can be blocked from view by other blocking agents.
 
         Returns:
             The observation as a dictionary.
@@ -114,7 +114,7 @@ class SingleGridObserver(ObserverBaseComponent):
                         obs[r, c] = np.random.choice(
                             [other.encoding for other in candidate_agents.values()]
                         )
-                else: # Cell blocked by wall. Indicate invisible with -2
+                else: # Cell blocked by agent. Indicate invisible with -2
                     obs[r, c] = -2
 
         return {self.key: obs}
@@ -162,7 +162,7 @@ class MultiGridObserver(ObserverBaseComponent):
         The agent observes one or more sub-grids centered on its position.
 
         The observation may include other agents, empty spaces, out of bounds, and
-        masked cells, which can be blocked from view by other view-blocking agents.
+        masked cells, which can be blocked from view by other blocking agents.
         Each grid records the number of agents on a particular cell correlated
         to a specific encoding.
 
@@ -193,7 +193,7 @@ class MultiGridObserver(ObserverBaseComponent):
                                 True if other.encoding == encoding + 1 else False
                                 for other in candidate_agents.values()
                             ])
-                    else: # Cell blocked by wall. Indicate invisible with -2
+                    else: # Cell blocked by agent. Indicate invisible with -2
                         obs[r, c, encoding] = -2
 
         return {self.key: obs}

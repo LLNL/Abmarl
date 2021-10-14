@@ -10,13 +10,13 @@ def test_grid_world_agent():
     agent = GridWorldAgent(
         id='agent',
         initial_position=np.array([2, 2]),
-        view_blocking=True,
+        blocking=True,
         encoding=4
     )
     assert isinstance(agent, PrincipleAgent)
     assert agent.id == 'agent'
     np.testing.assert_array_equal(agent.initial_position, np.array([2, 2]))
-    assert agent.view_blocking
+    assert agent.blocking
     assert agent.encoding == 4
     assert agent.render_shape == 'o'
     assert agent.render_color == 'gray'
@@ -61,11 +61,11 @@ def test_grid_world_agent():
             initial_position=[0, 1, 2]
         )
 
-    # View blocking
+    # Blocking
     with pytest.raises(AssertionError):
         agent = GridWorldAgent(
             id='agent',
-            view_blocking=1
+            blocking=1
         )
 
     # Render shape

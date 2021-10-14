@@ -13,10 +13,10 @@ from abmarl.tools.matplotlib_utils import mscatter
 
 class WallAgent(GridWorldAgent):
     """
-    Wall agents, immobile, and view blocking.
+    Wall agents, immobile, and blocking.
     """
     def __init__(self, **kwargs):
-        super().__init__(view_blocking=True, **kwargs)
+        super().__init__(blocking=True, **kwargs)
 
 
 class TreasureAgent(HealthAgent):
