@@ -10,7 +10,7 @@ The Team Battle scenario involves multiple teams of agents fighting against each
 The goal of each team is to be the last team alive, at which point the simulation will end.
 Each agent can move around the grid and attack agents from other teams. Each agent
 can observe the grid around its position. We will reward each agent for successful
-kills and penalize them for bad moves. This simulation can be found in full
+kills and penalize them for bad moves. This tutorial can be found in full
 `in our repo <https://github.com/LLNL/Abmarl/blob/abmarl-152-document-gridworld-framework/abmarl/sim/gridworld/examples/team_battle_example.py>`_.
 
 .. figure:: /.images/gridworld_tutorial_team_battle.*

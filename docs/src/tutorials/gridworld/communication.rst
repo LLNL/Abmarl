@@ -10,7 +10,9 @@ Let us create a simulation in which some agents send messages to each
 other in an attempt to reach consensus while another group of agents attempts to
 block their these messages to impede consensus. Abmarl's GridWorld Simulation Framework
 already contains the features for the blocking agents; in this tutorial, we show
-how to create new components and connect them with the simulation framework.
+how to create new components for the communication feature and connect them with
+the simulation framework. The tutorial in full can be found
+`in our repo <https://github.com/LLNL/Abmarl/blob/abmarl-152-document-gridworld-framework/abmarl/sim/gridworld/examples/comms_blocking.py>`_.
 
 .. figure:: /.images/gridworld_tutorial_communications.*
    :width: 75 %
@@ -380,5 +382,197 @@ some tolerance of the average message.
 Building the simulation
 ```````````````````````
 
-Now that all the components are in place.
+Now that all the components have been created, we can setup the rest of the simulation:
 
+.. code-block:: python
+
+   class BroadcastSim(GridWorldSimulation):
+       def __init__(self, **kwargs):
+           self.agents = kwargs['agents']
+   
+           self.position_state = PositionState(**kwargs)
+           self.broadcasting_state = BroadcastingState(**kwargs)
+   
+           self.move_actor = MoveActor(**kwargs)
+           self.broadcast_actor = BroadcastingActor(**kwargs)
+   
+           self.grid_observer = SingleGridObserver(**kwargs)
+           self.broadcast_observer = BroadcastObserver(broadcasting_state=self.broadcasting_state, **kwargs)
+   
+           self.done = AverageMessageDone(**kwargs)
+   
+           self.finalize()
+   
+       def reset(self, **kwargs):
+           self.position_state.reset(**kwargs)
+           self.broadcasting_state.reset(**kwargs)
+   
+           self.rewards = {agent.id: 0 for agent in self.agents.values()}
+   
+       def step(self, action_dict, **kwargs):
+           # process broadcasts
+           for agent_id, action in action_dict.items():
+               agent = self.agents[agent_id]
+               receiving_agents = self.broadcast_actor.process_action(agent, action, **kwargs)
+               if receiving_agents is not None:
+                   self.broadcasting_state.update_receipients(agent, receiving_agents)
+   
+           # process moves
+           for agent_id, action in action_dict.items():
+               agent = self.agents[agent_id]
+               move_result = self.move_actor.process_action(agent, action, **kwargs)
+               if not move_result:
+                   self.rewards[agent.id] -= 0.1
+   
+           # Entropy penalty
+           for agent_id in action_dict:
+               self.rewards[agent_id] -= 0.01
+       
+       def render(self, fig=None, **kwargs):
+           fig.clear()
+           ax = fig.gca()
+   
+           # Draw the gridlines
+           ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
+           ax.set_xticks(np.arange(0, self.position_state.cols, 1))
+           ax.set_yticks(np.arange(0, self.position_state.rows, 1))
+           ax.grid()
+   
+           # Draw the agents
+           agents_x = [
+               agent.position[1] + 0.5 for agent in self.agents.values()
+           ]
+           agents_y = [
+               self.position_state.rows - 0.5 - agent.position[0]
+               for agent in self.agents.values()
+           ]
+           shape = [agent.render_shape for agent in self.agents.values()]
+           color = [agent.render_color for agent in self.agents.values()]
+           mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
+   
+           plt.plot()
+           plt.pause(1e-6)
+   
+           for agent in self.agents.values():
+               if isinstance(agent, BroadcastingAgent):
+                   print(f"{agent.id}: {agent.message}")
+           print()
+       
+       def get_obs(self, agent_id, **kwargs):
+           agent = self.agents[agent_id]
+           return {
+               **self.grid_observer.get_obs(agent, **kwargs),
+               **self.broadcast_observer.get_obs(agent, **kwargs)
+           }
+       
+       def get_reward(self, agent_id, **kwargs):
+           reward = self.rewards[agent_id]
+           self.rewards[agent_id] = 0
+           return reward
+   
+       def get_done(self, agent_id, **kwargs):
+           return self.done.get_done(agent_id, **kwargs)
+       
+       def get_all_done(self, **kwargs):
+           return self.done.get_all_done(**kwargs)
+       
+       def get_info(self, **kwargs):
+           return {}
+   
+Let's create some agents and run the simulation
+
+.. code-block:: python
+
+   agents = {
+       'broadcaster0': BroadcastingAgent(id='broadcaster0', encoding=1, broadcast_range=6, render_color='green'),
+       'broadcaster1': BroadcastingAgent(id='broadcaster1', encoding=1, broadcast_range=6, render_color='green'),
+       'broadcaster2': BroadcastingAgent(id='broadcaster2', encoding=1, broadcast_range=6, render_color='green'),
+       'broadcaster3': BroadcastingAgent(id='broadcaster3', encoding=1, broadcast_range=6, render_color='green'),
+       'blocker0': BlockingAgent(id='blocker0', encoding=2, move_range=2, view_range=3, render_color='black'),
+       'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
+       'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
+   }
+   sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-10)
+   
+   sim.reset()
+   fig = plt.figure()
+   sim.render(fig=fig)
+   
+   done_agents = set()
+   for i in range(50):
+       action = {
+           agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
+       }
+       sim.step(action)
+       for agent in agents:
+           if agent not in done_agents:
+               obs = sim.get_obs(agent)
+           if sim.get_done(agent):
+               done_agents.add(agent)
+   
+       sim.render(fig=fig)
+       if sim.get_all_done():
+           break
+
+We can see the "path towards consensus" in the output:
+
+.. code-block::
+
+   Step 1
+   broadcaster0: 0.5936447861764813
+   broadcaster1: -0.8344218389696239
+   broadcaster2: 0.09891331950679949
+   broadcaster3: 0.32590416873488093
+   
+   Step 2
+   broadcaster0: 0.028375705313912796
+   broadcaster1: -0.25425883511737146
+   broadcaster2: -0.13653478357598114
+   broadcaster3: -0.25425883511737146
+   
+   For steps 3-5, notice that Broadcaster3 is partially blocked. The other broadcasters
+   have reached a consensus, but the simulation does not end becaue they must all
+   agree.
+   
+   Step 3
+   broadcaster0: -0.12080597112647994
+   broadcaster1: -0.12080597112647994
+   broadcaster2: -0.12080597112647995
+   broadcaster3: -0.15416918712420283
+   
+   Step 4
+   broadcaster0: -0.12080597112647994
+   broadcaster1: -0.12080597112647994
+   broadcaster2: -0.12080597112647995
+   broadcaster3: -0.15416918712420283
+   
+   Step 5
+   broadcaster0: -0.12080597112647994
+   broadcaster1: -0.12080597112647994
+   broadcaster2: -0.12080597112647995
+   broadcaster3: -0.15416918712420283
+   
+   Broadcaster3 is no longer blocked
+   Step 6
+   broadcaster0: -0.12080597112647995
+   broadcaster1: -0.12080597112647995
+   broadcaster2: -0.12080597112647995
+   broadcaster3: -0.1319270431257209
+   
+   ...
+   
+   Step 16
+   broadcaster0: -0.1241744002450772
+   broadcaster1: -0.12417639653661512
+   broadcaster2: -0.12417523451616769
+   broadcaster3: -0.12417511533458334
+   
+   Step 17
+   broadcaster0: -0.12417528665811084
+   broadcaster1: -0.12417528665811083
+   broadcaster2: -0.12417528665811083
+   broadcaster3: -0.12417528665811084
+
+
+# TODO: Extra tasks: How should the blocking agents be rewarded in order  for them to learn
+# an effective blocking strategy
