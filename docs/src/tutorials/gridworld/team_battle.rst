@@ -37,7 +37,7 @@ First, we import the components that we need. Each component is
 
 Then, we define our agent types. This simulation will only have a single type:
 the BattleAgent. Most of the agents' attributes will be the same, and we can preconfigure
-the class definition to save us time when we create the agents.
+the class definition to save us time when we create the agents later on.
 
 .. code-block:: python
 
@@ -53,7 +53,7 @@ the class definition to save us time when we create the agents.
            )
 
 Having defined the BattleAgent, we then put all the components together into a single
-simulation: TeamBattleSim.
+simulation.
 
 .. code-block:: python
 
@@ -94,7 +94,7 @@ must track the rewards explicitly.
            self.rewards = {agent.id: 0 for agent in self.agents.values()}
 
 Then we define how the simulation will step forward, leaning on the :ref:`Actors <gridworld_actor>`
-to process their part of the action. The Actors' results are used to determine the agents'
+to process their part of the action. The Actors' result determine the agents'
 rewards.
 
 .. code-block:: python
@@ -185,11 +185,11 @@ Finally, in order to visualize our simulation, we define a render function.
            plt.plot()
            plt.pause(1e-6)
 
-Now that we've defined our agents and simulations, let's create them and run the
-simulation. First, we'll create the agents. There will be 4 teams, so we want to
+Now that we've defined our agents and simulation, let's create them and run it.
+First, we'll create the agents. There will be 4 teams, so we want to
 color the agent by team and start them at different corners of the grid. Besides that,
 all agent attributes will be the same, and here we benefit from preconfiguring
-the attributes in the class definition.
+the attributes in the class definition above.
 
 .. code-block:: python
 
@@ -229,7 +229,8 @@ if they are on different teams.
        attack_mapping=attack_map
    )
 
-Finally, we can run the simulation with random actions and visualize it.
+Finally, we can run the simulation with random actions and visualize it. The visualization
+produces an animation like the one at the top of this page.
 
 .. code-block:: python
 
@@ -261,9 +262,9 @@ the GridWorldSimulation framework. Some ideas are:
 * Experiment with the number of agents per team as well as the capabilities of
   those agents. You might find that a super capable agent is still effective against
   a team of multiple agents.
-* Create a Hunter-Forager simulation, where one team of agents act as resources
-  that can be foraged by another team, which can be hunted by a third team. Do
-  this using the same components here. Hint: you may need to use a custom
+* Create a Hunter-Forager simulation, where one team of agents act as immobile resources
+  that can be foraged by another team, which can be hunted by a third team. Try
+  using the same components here, although you may need to use a custom
   :ref:`done condition <gridworld_done>`.
 * Connect this simulation with the Reinforcement Learning capabilities of Abmarl
   via a :ref:`Simulation Manager<sim-man>`. What kind of behaviors do the agents

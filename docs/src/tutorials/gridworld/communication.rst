@@ -123,10 +123,10 @@ Next we build the communication components ourselves. We know that the GridWorld
 Simulation Framework is made up of :ref:`Agents <gridworld_agent>`, :ref:`States <gridworld_state>`,
 :ref:`Actors <gridworld_actor>`, :ref:`Observers <gridworld_observer>`, and
 :ref:`Dones <gridworld_done>`, so we expect that we'll need to create each of these
-for our new communication feature. Let's start with the Agent.
+for our new communication feature. Let's start with the Agent component.
 
-The Agent will communicate by broadcasting its message to other nearby agents.
-Thus, we create a new agent with a `broadcast range` and an `initial message`. The
+An agent communicates by broadcasting its message to other nearby agents.
+So we create a new agent with a `broadcast range` and an `initial message`. The
 `broadcast range` will be used by the BroadcastActor to determine successful broadcasting,
 and the `initial message`, an optional parameter, will be used by the BroadcastState
 to set its message.
@@ -558,7 +558,9 @@ are the BroadcastingAgents.
        if sim.get_all_done():
            break
 
-We can see the "path towards consensus" among the BroadcastingAgents in the output:
+The visualization produces an animation like the one at the top of this page.
+We can see the "path towards consensus" among the BroadcastingAgents in the output.
+Keep your eye open for the effects of blocking.
 
 .. code-block::
 

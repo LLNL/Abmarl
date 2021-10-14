@@ -55,10 +55,10 @@ the most sense for navigating mazes, but we have not preconfigured the `view ran
 since that is a parameter we may want to adjust, and it is easier to adjust it
 at the agent's initialization.
 
-Then, we define the simulation using the components and define all the
+Then we define the simulation using the components and define all the
 necessary functions. We find it convient to explicitly store a reference to the
 navigation agent and the target agent. Rather than defining a new component
-for our very simply done condition, we just write the condition itself in the function.
+for our simple done condition, we just write the condition itself in the function.
 
 .. code-block:: python
 
@@ -165,8 +165,8 @@ each agent type in the grid. We will use `maze.txt`, which looks like this:
 
 In order to assign meaning to the values in the grid file, we must create an `object
 registry` that maps the values in the files to objects. We will use ``W`` for WallAgents,
-``N`` for the Navigation Agent, and ``T`` for the TargetAgent. The values of the
-`object registry` must be lambda functions that take in a value and produce an agent.
+``N`` for the NavigationAgent, and ``T`` for the TargetAgent. The values of the
+`object registry` must be lambda functions that take one argument and produce an agent.
 
 .. code-block:: python
 
@@ -192,7 +192,8 @@ registry` that maps the values in the files to objects. We will use ``W`` for Wa
 
 Now we can create the simulation from the maze file using the `object registry`.
 We must allow the navigation agent and the target agent to overlap since that is
-our done condition, and without it the simulation would never end.
+our done condition, and without it the simulation would never end. The visualization
+produces an animation like the one at the top of this page.
 
 .. code-block:: python
 
@@ -234,17 +235,15 @@ navigation agent can observe. An example state and observation is given below.
 Extra Challenges
 ````````````````
 We've created a starkly different simulation using many of the same components
-as we did in the :ref:`TeamBattle tutorial <_gridworld_tutorial_team_battle>`.
+as we did in the :ref:`TeamBattle tutorial <gridworld_tutorial_team_battle>`.
 We can further explore the capabilities of the GridWorld Simulation Framework,
 such as:
 
 * Introduce additional navigating agents and modify the simulation so that the
   agents race to the target.
-* Recreate the pacman game.
-* Recreate the crossy road game.
-* Recreate some of your favorite games from the Arcade Learning Environment. Not
+* Recreate pacman, frogger, and some of your favorite games from the Arcade Learning Environment. Not
   all games can be recreated with these components, and some cannot be recreated
-  with at all with GridWorld Simulation Framework (because they are not grid-based).
+  at all with the GridWorld Simulation Framework (because they are not grid-based).
 * Connect this simulation with the Reinforcement Learning capabilities of Abmarl
   via a :ref:`Simulation Manager<sim-man>`. Does the agent learng how to solve
   mazes quickly?
