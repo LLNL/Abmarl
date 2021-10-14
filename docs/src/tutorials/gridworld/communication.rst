@@ -6,12 +6,12 @@
 Communication Blocking
 ----------------------
 
-Let us create a simulation in which some agents send messages to each
+Consider a simulation in which some agents send messages to each
 other in an attempt to reach consensus while another group of agents attempts to
-block their these messages to impede consensus. Abmarl's GridWorld Simulation Framework
+block these messages to impede consensus. Abmarl's GridWorld Simulation Framework
 already contains the features for the blocking agents; in this tutorial, we show
-how to create new components for the communication feature and connect them with
-the simulation framework. The tutorial in full can be found
+how to create *new* components for the communication feature and connect them with
+the simulation framework. The tutorial can be found in full
 `in our repo <https://github.com/LLNL/Abmarl/blob/abmarl-152-document-gridworld-framework/abmarl/sim/gridworld/examples/comms_blocking.py>`_.
 
 .. figure:: /.images/gridworld_tutorial_communications.*
@@ -25,7 +25,9 @@ the simulation framework. The tutorial in full can be found
 Using built-in features
 ```````````````````````
 
-Let's start by laying the groundwork using components already in Abmarl.
+Let's start by laying the groundwork using components already in Abmarl. We
+create a simulation with :ref:`position <gridworld_position>`,
+:ref:`movement <gridworld_movement>`, and :ref:`observations <gridworld_single_observer>`.
 
 .. code-block:: python
    
@@ -117,9 +119,9 @@ Next we build the communication components ourselves. We know that the GridWorld
 Simulation Framework is made up of :ref:`Agents <gridworld_agent>`, :ref:`States <gridworld_state>`,
 :ref:`Actors <gridworld_actor>`, :ref:`Observers <gridworld_observer>`, and
 :ref:`Dones <gridworld_done>`, so we expect that we'll need to create each of these
-for our new communication feature. Let's start with the agent.
+for our new communication feature. Let's start with the Agent.
 
-The agent will communicate by broadcasting its message to other nearby agents.
+The Agent will communicate by broadcasting its message to other nearby agents.
 Thus, we create a new agent with a `broadcast range` and an `initial message`. The
 `broadcast range` will be used by the BroadcastActor to determine successful broadcasting,
 and the `initial message`, an optional parameter, will be used by the BroadcastState
@@ -164,6 +166,13 @@ to set its message.
        def configured(self):
            return super().configured and self.broadcast_range is not None
 
+.. NOTE::
+
+   We could have split the BroadcastingAgent into two agents types: one type of agent that has an
+   internal message and another type that broadcasts. This is usually a better
+   approach because it allows you to separate features and use them in greater
+   combination with other features. We put them together in this tutorial for simplicity.
+
 Next, we create the BroadcastState. This component manages the part of the simulation
 state that tracks which messages have been sent among the agents. It will be used
 by the BroadcastObserver to create the agent's observations. It also manages updates
@@ -186,10 +195,19 @@ to each agent's message.
            }
        
        def update_receipients(self, from_agent, to_agents):
+           """
+           Update messages received from other agents.
+           """
            for agent in to_agents:
                self.receiving_state[agent.id].append((from_agent.id, from_agent.message))
    
        def update_message_and_reset_receiving(self, agent):
+           """
+           Update agent's internal message.
+
+           The agent averages all the messages that it has received from other
+           agents in this step.
+           """
            receiving_from = self.receiving_state[agent.id]
            self.receiving_state[agent.id] = []
    
@@ -213,7 +231,7 @@ a compatible encoding, and (3) is not blocked.
        """
        Process sending and receiving messages between agents.
    
-       Broadcasting Agents can broadcast to compatible agents within their range
+       BroadcastingAgents can broadcast to compatible agents within their range
        according to the broadcast mapping and if the agent is not view_blocked.
        """
        def __init__(self, broadcast_mapping=None, **kwargs):
@@ -379,10 +397,10 @@ some tolerance of the average message.
                        return False
            return True
 
-Building the simulation
-```````````````````````
+Building and running the simulation
+```````````````````````````````````
 
-Now that all the components have been created, we can setup the rest of the simulation:
+Now that all the components have been created, we can create the full simulation:
 
 .. code-block:: python
 
@@ -479,7 +497,10 @@ Now that all the components have been created, we can setup the rest of the simu
        def get_info(self, **kwargs):
            return {}
    
-Let's create some agents and run the simulation
+Let's initialize our simulation and run it. We initialize some BroadcastingAgents
+and some BlockingAgents. Then we initialize the simulation with a `broadcast mapping`
+that specifies that broadcasts can only be made amont agents with encoding 1, which
+are the BroadcastingAgents.
 
 .. code-block:: python
 
@@ -492,7 +513,12 @@ Let's create some agents and run the simulation
        'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
        'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
    }
-   sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-10)
+   sim = BroadcastSim.build_sim(
+       7, 7,
+       agents=agents,
+       broadcast_mapping={1: [1]},
+       done_tolerance=5e-10
+   )
    
    sim.reset()
    fig = plt.figure()
@@ -514,7 +540,7 @@ Let's create some agents and run the simulation
        if sim.get_all_done():
            break
 
-We can see the "path towards consensus" in the output:
+We can see the "path towards consensus" among the BroadcastingAgents in the output:
 
 .. code-block::
 
@@ -530,7 +556,7 @@ We can see the "path towards consensus" in the output:
    broadcaster2: -0.13653478357598114
    broadcaster3: -0.25425883511737146
    
-   For steps 3-5, notice that Broadcaster3 is partially blocked. The other broadcasters
+   For steps 3-5, notice that Broadcaster3 is blocked. The other broadcasters
    have reached a consensus, but the simulation does not end becaue they must all
    agree.
    
