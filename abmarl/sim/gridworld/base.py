@@ -1,11 +1,13 @@
 
 from abc import ABC
 
+from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.sim.gridworld.grid import Grid
+from abmarl.tools.matplotlib_utils import mscatter
 
 
 class GridWorldSimulation(AgentBasedSimulation, ABC):
@@ -82,6 +84,42 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         grid = Grid(rows, cols, **kwargs)
         kwargs['grid'] = grid
         return cls(**kwargs)
+
+    def render(self, fig=None, **kwargs):
+        """
+        Draw the grid and all active agents in the grid.
+
+        Agents are drawn at their location using their respective shape and color.
+
+        Args:
+            fig (pyplot figure): The figure on which to draw the grid. It's important
+            to provide this figure because the same figure must be used when drawing
+            each state of the simulation. Otherwise, a ton of figures will pop up,
+            which is very annoying.
+        """
+        fig.clear()
+        ax = fig.gca()
+
+        # Draw the gridlines
+        ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
+        ax.set_xticks(np.arange(0, self.position_state.cols, 1))
+        ax.set_yticks(np.arange(0, self.position_state.rows, 1))
+        ax.grid()
+
+        # Draw the agents
+        agents_x = [
+            agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
+        ]
+        agents_y = [
+            self.position_state.rows - 0.5 - agent.position[0]
+            for agent in self.agents.values() if agent.active
+        ]
+        shape = [agent.render_shape for agent in self.agents.values() if agent.active]
+        color = [agent.render_color for agent in self.agents.values() if agent.active]
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
+
+        plt.plot()
+        plt.pause(1e-6)
 
 
 class GridWorldBaseComponent(ABC):

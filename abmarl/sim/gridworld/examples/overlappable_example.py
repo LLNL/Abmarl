@@ -8,7 +8,6 @@ from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, Movin
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import MoveActor, AttackActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
-from abmarl.tools.matplotlib_utils import mscatter
 
 
 class WallAgent(GridWorldAgent):
@@ -59,30 +58,6 @@ class GridSim(GridWorldSimulation):
             agent = self.agents[agent_id]
             if agent.active:
                 self.move_actor.process_action(agent, action, **kwargs)
-
-    def render(self, fig=None, **kwargs):
-        fig.clear()
-        ax = fig.gca()
-
-        # Draw the gridlines
-        ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
-        ax.set_xticks(np.arange(0, self.position_state.cols, 1))
-        ax.set_yticks(np.arange(0, self.position_state.rows, 1))
-        ax.grid()
-
-        # Draw the agents
-        agents_x = [
-            agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
-        ]
-        agents_y = [
-            self.position_state.rows - 0.5 - agent.position[0]
-            for agent in self.agents.values() if agent.active
-        ]
-        shape = [agent.render_shape for agent in self.agents.values() if agent.active]
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, edgecolor='black', facecolor='gray')
-
-        plt.plot()
-        plt.pause(1e-6)
 
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
