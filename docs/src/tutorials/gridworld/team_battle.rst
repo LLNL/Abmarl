@@ -24,6 +24,9 @@ First, we import the components that we need. Each component is
 
 .. code-block:: python
 
+   from matplotlib import pyplot as plt
+   import numpy as np
+
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
    from abmarl.sim.gridworld.state import HealthState, PositionState
@@ -235,7 +238,7 @@ Finally, we can run the simulation with random actions and visualize it.
    sim.render(fig=fig)
 
    done_agents = set()
-   for i in range(500):
+   for i in range(50): # Run for at most 50 steps
        action = {
            agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
        }

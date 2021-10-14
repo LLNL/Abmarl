@@ -30,12 +30,16 @@ create a simulation with :ref:`position <gridworld_position>`,
 :ref:`movement <gridworld_movement>`, and :ref:`observations <gridworld_single_observer>`.
 
 .. code-block:: python
+
+   from matplotlib import pyplot as plt
+   import numpy as np
    
    from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
    from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.tools.matplotlib_utils import mscatter
 
    class BlockingAgent(MovingAgent, GridObservingAgent):
        def __init__(self, **kwargs):
@@ -129,6 +133,9 @@ to set its message.
 
 .. code-block:: python
 
+   from abmarl.sim import Agent
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
    class BroadcastingAgent(Agent, GridWorldAgent):
        def __init__(self, broadcast_range=None, initial_message=None, **kwargs):
            super().__init__(**kwargs)
@@ -180,6 +187,8 @@ to each agent's message.
 
 .. code-block:: python
 
+   from abmarl.sim.gridworld.state import StateBaseComponent
+
    class BroadcastingState(StateBaseComponent):
        def reset(self, **kwargs):
            for agent in self.agents.values():
@@ -225,6 +234,8 @@ a compatible encoding, and (3) is not blocked.
 
 .. code-block:: python
 
+   from gym.spaces import Discrete
+   from abmarl.sim.gridworld.actor import ActorBaseComponent
    import abmarl.sim.gridworld.utils as gu
    
    class BroadcastingActor(ActorBaseComponent):
@@ -325,6 +336,9 @@ component, which will have a small impact in how we initialize the simulation.
 
 .. code-block:: python
 
+   from gym.spaces import Dict, Box
+   from abmarl.sim.gridworld.observer import ObserverBaseComponent
+
    class BroadcastObserver(ObserverBaseComponent):
        def __init__(self, broadcasting_state=None, **kwargs):
            super().__init__(**kwargs)
@@ -364,7 +378,9 @@ finish when they've reached consensus; that is, when their internal message is w
 some tolerance of the average message.
 
 .. code-block:: python
-        
+
+   from abmarl.sim.gridworld.done import DoneBaseComponent
+
    class AverageMessageDone(DoneBaseComponent):
        def __init__(self, done_tolerance=None, **kwargs):
            super().__init__(**kwargs)
@@ -403,6 +419,8 @@ Building and running the simulation
 Now that all the components have been created, we can create the full simulation:
 
 .. code-block:: python
+
+   from abmarl.sim.gridworld.base import GridWorldSimulation
 
    class BroadcastSim(GridWorldSimulation):
        def __init__(self, **kwargs):
