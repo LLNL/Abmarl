@@ -11,6 +11,5 @@ We also provide tutorials on the GridWorldSimulation framework.
    :caption: Contents:
 
    multi_corridor
-   predator_prey
    gridworld/grid_world
    magpie
