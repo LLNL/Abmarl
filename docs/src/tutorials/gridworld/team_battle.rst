@@ -33,7 +33,6 @@ First, we import the components that we need. Each component is
    from abmarl.sim.gridworld.actor import MoveActor, AttackActor
    from abmarl.sim.gridworld.observer import SingleGridObserver
    from abmarl.sim.gridworld.done import OneTeamRemainingDone
-   from abmarl.tools.matplotlib_utils import mscatter # Needed for nice renderings
 
 Then, we define our agent types. This simulation will only have a single type:
 the BattleAgent. Most of the agents' attributes will be the same, and we can preconfigure
@@ -125,7 +124,7 @@ rewards.
            for agent_id in action_dict:
                self.rewards[agent_id] -= 0.01
 
-Then we define each of the getters using the :ref:`Observers <gridworld_observer>`
+Finally, we define each of the getters using the :ref:`Observers <gridworld_observer>`
 and :ref:`Done components <gridworld_done>`.
 
 .. code-block:: python
@@ -152,38 +151,6 @@ and :ref:`Done components <gridworld_done>`.
    
        def get_info(self, agent_id, **kwargs):
            return {}
-
-Finally, in order to visualize our simulation, we define a render function.
-
-.. code-block:: python
-
-   class TeamBattleSim(GridWorldSimulation):
-       ...
-
-       def render(self, fig=None, **kwargs):
-           fig.clear()
-           ax = fig.gca()
-   
-           # Draw the gridlines
-           ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
-           ax.set_xticks(np.arange(0, self.position_state.cols, 1))
-           ax.set_yticks(np.arange(0, self.position_state.rows, 1))
-           ax.grid()
-   
-           # Draw the agents
-           agents_x = [
-               agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
-           ]
-           agents_y = [
-               self.position_state.rows - 0.5 - agent.position[0]
-               for agent in self.agents.values() if agent.active
-           ]
-           shape = [agent.render_shape for agent in self.agents.values() if agent.active]
-           color = [agent.render_color for agent in self.agents.values() if agent.active]
-           mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
-   
-           plt.plot()
-           plt.pause(1e-6)
 
 Now that we've defined our agents and simulation, let's create them and run it.
 First, we'll create the agents. There will be 4 teams, so we want to
