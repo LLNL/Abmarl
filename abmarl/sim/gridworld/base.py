@@ -89,13 +89,13 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         """
         Draw the grid and all active agents in the grid.
 
-        Agents are drawn at their location using their respective shape and color.
+        Agents are drawn at their positions using their respective shape and color.
 
         Args:
-            fig (pyplot figure): The figure on which to draw the grid. It's important
-            to provide this figure because the same figure must be used when drawing
-            each state of the simulation. Otherwise, a ton of figures will pop up,
-            which is very annoying.
+            fig: The figure on which to draw the grid. It's important
+                to provide this figure because the same figure must be used when drawing
+                each state of the simulation. Otherwise, a ton of figures will pop up,
+                which is very annoying.
         """
         fig.clear()
         ax = fig.gca()
