@@ -17,7 +17,7 @@ You can install abmarl via `pip`:
 Developer Installation
 ----------------------
 To install Abmarl for development, first clone the repository and then install
-via pip's development mode. Note: Abmarl requires `python3.7+`.
+via pip's development mode.
 
 .. code-block::
 

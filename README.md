@@ -25,7 +25,7 @@ projects to prototype RL as a potential solution.
 To use Abmarl, install via pip: `pip install abmarl`
 
 To develop Abmarl, clone the repository and install via pip's development mode.
-Note: Abmarl requires `python3.7+`.
+Note: Abmarl requires `python3.7` or `python3.8`.
 
 ```
 git clone git@github.com:LLNL/Abmarl.git
@@ -49,13 +49,35 @@ virtual environment.
 
 ## Documentation
 
-You can find the latest Abmarl documentation, on
+You can find the latest Abmarl documentation on
 [our ReadTheDocs page](https://abmarl.readthedocs.io/en/latest/index.html).
 
 [![Documentation Status](https://readthedocs.org/projects/abmarl/badge/?version=latest)](https://abmarl.readthedocs.io/en/latest/?badge=latest)
 
 
 ## Community
+
+### Citation
+
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.03424/status.svg)](https://doi.org/10.21105/joss.03424)
+
+Abmarl has been published to the Journal of Open Source Software (JOSS). It can
+be cited using the following bibtex entry:
+
+```
+@article{Rusu2021,
+  doi = {10.21105/joss.03424},
+  url = {https://doi.org/10.21105/joss.03424},
+  year = {2021},
+  publisher = {The Open Journal},
+  volume = {6},
+  number = {64},
+  pages = {3424},
+  author = {Edward Rusu and Ruben Glatt},
+  title = {Abmarl: Connecting Agent-Based Simulations with Multi-Agent Reinforcement Learning},
+  journal = {Journal of Open Source Software}
+}
+```
 
 ### Reporting Issues
 
@@ -71,11 +93,6 @@ bug reports tend to have:
 Please submit contributions via pull requests from a forked repository. Find out
 more about this process [here](https://guides.github.com/introduction/flow/index.html).
 All contributions are under the BSD 3 License that covers the project.
-
-### Additional support
-
-* Edward Rusu, rusu1@llnl.gov
-* Ruben Glatt, glatt1@llnl.gov
 
 ## Release
 
