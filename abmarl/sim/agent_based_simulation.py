@@ -13,6 +13,7 @@ class PrincipleAgent:
 
     @property
     def id(self):
+        """The agent's unique identifier."""
         return self._id
 
     @id.setter
