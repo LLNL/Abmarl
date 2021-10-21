@@ -6,7 +6,9 @@ interface for engaging with the full workflow of MARL experimentation: training,
 visualizing, and analyzing agent behavior. We define an Agent-Based
 Simulation Interface and Simulation Manager, which control which agents interact
 with the simulation at each step. We support integration with popular reinforcement
-learning simulation interfaces, including gym.Env and MultiAgentEnv.
+learning simulation interfaces, including gym.Env and MultiAgentEnv. We define
+our own GridWorld Simulation Framework for creating custom grid-based Agent Based
+Simulations.
 
 Abmarl leverages RLlib’s framework for reinforcement learning and extends it to
 more easily support custom simulations, algorithms, and policies. We enable researchers to rapidly
