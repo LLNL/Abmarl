@@ -12,25 +12,26 @@ from abmarl.sim.gridworld.observer import SingleGridObserver, ObserverBaseCompon
 from abmarl.sim.gridworld.done import DoneBaseComponent
 import abmarl.sim.gridworld.utils as gu
 
+
 class BroadcastingAgent(Agent, GridWorldAgent):
     def __init__(self, broadcast_range=None, initial_message=None, **kwargs):
         super().__init__(**kwargs)
         self.broadcast_range = broadcast_range
         self.initial_message = initial_message
-    
+
     @property
     def broadcast_range(self):
         return self._broadcast_range
-    
+
     @broadcast_range.setter
     def broadcast_range(self, value):
         assert type(value) is int and value >= 0, "Broadcast Range must be a nonnegative integer."
         self._broadcast_range = value
-    
+
     @property
     def initial_message(self):
         return self._initial_message
-    
+
     @initial_message.setter
     def initial_message(self, value):
         if value is not None:
@@ -49,6 +50,7 @@ class BroadcastingAgent(Agent, GridWorldAgent):
     def configured(self):
         return super().configured and self.broadcast_range is not None
 
+
 class BroadcastingActor(ActorBaseComponent):
     """
     Process sending and receiving messages between agents.
@@ -62,11 +64,11 @@ class BroadcastingActor(ActorBaseComponent):
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Discrete(2)
-    
+
     @property
     def key(self):
         return 'broadcast'
-    
+
     @property
     def supported_agent_type(self):
         return BroadcastingAgent
@@ -108,7 +110,7 @@ class BroadcastingActor(ActorBaseComponent):
         1. The receiving agent is within range.
         2. The receiving agent is valid according to the broadcast_mapping.
         3. The receiving agent is observable by the broadcasting agent.
-        
+
         If the broadcast is successful, then the receiving agent receives the message
         in its observation.
         """
@@ -140,6 +142,7 @@ class BroadcastingActor(ActorBaseComponent):
             if action: # Agent has chosen to attack
                 return determine_broadcast(broadcasting_agent)
 
+
 class BroadcastingState(StateBaseComponent):
     def reset(self, **kwargs):
         for agent in self.agents.values():
@@ -153,7 +156,7 @@ class BroadcastingState(StateBaseComponent):
         self.receiving_state = {
             agent.id: [] for agent in self.agents.values() if isinstance(agent, BroadcastingAgent)
         }
-    
+
     def update_receipients(self, from_agent, to_agents):
         for agent in to_agents:
             self.receiving_state[agent.id].append((from_agent.id, from_agent.message))
@@ -168,6 +171,7 @@ class BroadcastingState(StateBaseComponent):
 
         return receiving_from
 
+
 class BroadcastObserver(ObserverBaseComponent):
     def __init__(self, broadcasting_state=None, **kwargs):
         super().__init__(**kwargs)
@@ -180,28 +184,30 @@ class BroadcastObserver(ObserverBaseComponent):
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Dict({
                     other.id: Box(-1, 1, (1,))
-                    for other in self.agents.values() if isinstance(other, self.supported_agent_type)
+                    for other in self.agents.values()
+                    if isinstance(other, self.supported_agent_type)
                 })
-    
+
     @property
     def key(self):
         return 'message'
-    
+
     @property
     def supported_agent_type(self):
         return BroadcastingAgent
-    
+
     def get_obs(self, agent, **kwargs):
         if not isinstance(agent, self.supported_agent_type):
             return {}
-        
+
         obs = {other: 0 for other in agent.observation_space[self.key]}
         receive_from = self._broadcasting_state.update_message_and_reset_receiving(agent)
         for agent_id, message in receive_from:
             obs[agent_id] = message
         obs[agent.id] = agent.message
         return obs
-        
+
+
 class AverageMessageDone(DoneBaseComponent):
     def __init__(self, done_tolerance=None, **kwargs):
         super().__init__(**kwargs)
@@ -210,7 +216,7 @@ class AverageMessageDone(DoneBaseComponent):
     @property
     def done_tolerance(self):
         return self._done_tolerance
-    
+
     @done_tolerance.setter
     def done_tolerance(self, value):
         assert type(value) in [int, float], "Done tolerance must be a number."
@@ -226,7 +232,7 @@ class AverageMessageDone(DoneBaseComponent):
             return np.abs(agent.message - average) <= self.done_tolerance
         else:
             return False
-    
+
     def get_all_done(self, **kwargs):
         for agent in self.agents.values():
             if isinstance(agent, BroadcastingAgent):
@@ -234,9 +240,11 @@ class AverageMessageDone(DoneBaseComponent):
                     return False
         return True
 
+
 class BlockingAgent(MovingAgent, GridObservingAgent):
     def __init__(self, **kwargs):
         super().__init__(blocking=True, **kwargs)
+
 
 class BroadcastSim(GridWorldSimulation):
     def __init__(self, **kwargs):
@@ -249,7 +257,9 @@ class BroadcastSim(GridWorldSimulation):
         self.broadcast_actor = BroadcastingActor(**kwargs)
 
         self.grid_observer = SingleGridObserver(**kwargs)
-        self.broadcast_observer = BroadcastObserver(broadcasting_state=self.broadcasting_state, **kwargs)
+        self.broadcast_observer = BroadcastObserver(
+            broadcasting_state=self.broadcasting_state, **kwargs
+        )
 
         self.done = AverageMessageDone(**kwargs)
 
@@ -279,21 +289,21 @@ class BroadcastSim(GridWorldSimulation):
         # Entropy penalty
         for agent_id in action_dict:
             self.rewards[agent_id] -= 0.01
-    
+
     def render(self, **kwargs):
         super().render(**kwargs)
         for agent in self.agents.values():
             if isinstance(agent, BroadcastingAgent):
                 print(f"{agent.id}: {agent.message}")
         print()
-    
+
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         return {
             **self.grid_observer.get_obs(agent, **kwargs),
             **self.broadcast_observer.get_obs(agent, **kwargs)
         }
-    
+
     def get_reward(self, agent_id, **kwargs):
         reward = self.rewards[agent_id]
         self.rewards[agent_id] = 0
@@ -301,33 +311,51 @@ class BroadcastSim(GridWorldSimulation):
 
     def get_done(self, agent_id, **kwargs):
         return self.done.get_done(agent_id, **kwargs)
-    
+
     def get_all_done(self, **kwargs):
         return self.done.get_all_done(**kwargs)
-    
+
     def get_info(self, **kwargs):
         return {}
 
+
 if __name__ == "__main__":
     agents = {
-        'broadcaster0': BroadcastingAgent(id='broadcaster0', encoding=1, broadcast_range=6, render_color='green'),
-        'broadcaster1': BroadcastingAgent(id='broadcaster1', encoding=1, broadcast_range=6, render_color='green'),
-        'broadcaster2': BroadcastingAgent(id='broadcaster2', encoding=1, broadcast_range=6, render_color='green'),
-        'broadcaster3': BroadcastingAgent(id='broadcaster3', encoding=1, broadcast_range=6, render_color='green'),
-        'blocker0': BlockingAgent(id='blocker0', encoding=2, move_range=2, view_range=3, render_color='black'),
-        'blocker1': BlockingAgent(id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'),
-        'blocker2': BlockingAgent(id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'),
+        'broadcaster0': BroadcastingAgent(
+            id='broadcaster0', encoding=1, broadcast_range=6, render_color='green'
+        ),
+        'broadcaster1': BroadcastingAgent(
+            id='broadcaster1', encoding=1, broadcast_range=6, render_color='green'
+        ),
+        'broadcaster2': BroadcastingAgent(
+            id='broadcaster2', encoding=1, broadcast_range=6, render_color='green'
+        ),
+        'broadcaster3': BroadcastingAgent(
+            id='broadcaster3', encoding=1, broadcast_range=6, render_color='green'
+        ),
+        'blocker0': BlockingAgent(
+            id='blocker0', encoding=2, move_range=2, view_range=3, render_color='black'
+        ),
+        'blocker1': BlockingAgent(
+            id='blocker1', encoding=2, move_range=1, view_range=3, render_color='black'
+        ),
+        'blocker2': BlockingAgent(
+            id='blocker2', encoding=2, move_range=1, view_range=3, render_color='black'
+        ),
     }
-    sim = BroadcastSim.build_sim(7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-10)
+    sim = BroadcastSim.build_sim(
+        7, 7, agents=agents, broadcast_mapping={1: [1]}, done_tolerance=5e-10
+    )
 
     sim.reset()
     fig = plt.figure()
     sim.render(fig=fig)
-    
+
     done_agents = set()
     for i in range(50):
         action = {
-            agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
+            agent.id: agent.action_space.sample()
+            for agent in agents.values() if agent.id not in done_agents
         }
         sim.step(action)
         for agent in agents:

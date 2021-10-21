@@ -8,8 +8,8 @@ class GridWorldAgent(PrincipleAgent):
     """
     The base agent in the GridWorld.
     """
-    def __init__(self, initial_position=None, blocking=False, encoding=None,
-            render_shape='o', render_color='gray', **kwargs):
+    def __init__(self, initial_position=None, blocking=False, encoding=None, render_shape='o',
+                 render_color='gray', **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position
@@ -102,8 +102,8 @@ class GridWorldAgent(PrincipleAgent):
     @property
     def configured(self):
         return super().configured and self.encoding is not None and \
-            self.blocking is not None and self.render_shape is not None \
-                and self.render_color is not None
+            self.blocking is not None and self.render_shape is not None and \
+            self.render_color is not None
 
 
 class GridObservingAgent(ObservingAgent, GridWorldAgent):
@@ -113,7 +113,7 @@ class GridObservingAgent(ObservingAgent, GridWorldAgent):
     def __init__(self, view_range=None, **kwargs):
         super().__init__(**kwargs)
         self.view_range = view_range
-    
+
     @property
     def view_range(self):
         """
@@ -138,7 +138,7 @@ class MovingAgent(ActingAgent, GridWorldAgent):
     def __init__(self, move_range=None, **kwargs):
         super().__init__(**kwargs)
         self.move_range = move_range
-    
+
     @property
     def move_range(self):
         """
@@ -179,14 +179,14 @@ class HealthAgent(GridWorldAgent):
     def health(self, value):
         assert type(value) in [int, float], "Health must be a numeric value."
         self._health = min(max(value, 0), 1)
-    
+
     @property
     def initial_health(self):
         """
         The agent's initial health between 0 and 1.
         """
         return self._initial_health
-    
+
     @initial_health.setter
     def initial_health(self, value):
         if value is not None:
@@ -206,8 +206,7 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     """
     Agents that can attack other agents.
     """
-    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, 
-            **kwargs):
+    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
@@ -244,7 +243,7 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     def attack_accuracy(self):
         """
         The effective accuracy of the agent's attack.
-        
+
         Should be between 0 and 1. To make deterministic attacks, use 1.
         """
         return self._attack_accuracy
@@ -254,7 +253,7 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         assert type(value) in [int, float], "Attack accuracy must be a numeric value."
         assert 0 <= value <= 1, "Attack accuracy must be between 0 and 1."
         self._attack_accuracy = value
-    
+
     @property
     def configured(self):
         return super().configured and self.attack_range is not None and \

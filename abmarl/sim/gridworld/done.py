@@ -1,9 +1,8 @@
 
 from abc import ABC, abstractmethod
 
-import numpy as np
-
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
+
 
 class DoneBaseComponent(GridWorldBaseComponent, ABC):
     """
@@ -16,7 +15,7 @@ class DoneBaseComponent(GridWorldBaseComponent, ABC):
 
         Args:
             agent: The agent we are querying.
-        
+
         Returns:
             True if the agent is done, otherwise False.
         """
@@ -52,6 +51,7 @@ class ActiveDone(DoneBaseComponent):
             if agent.active:
                 return False
         return True
+
 
 class OneTeamRemainingDone(ActiveDone):
     """

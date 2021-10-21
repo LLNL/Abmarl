@@ -1,13 +1,14 @@
 
 import numpy as np
 
+
 def create_grid_and_mask(agent, grid, mask_range, agents):
     """
     Generate a local grid and a mask.
 
     Create a local grid centered around the agents location and fill it will the
     values from the grid.
-    
+
     Blocking agents can mask the grid from other agent's, restricting their
     ability to observe, attack, move, etc. We calculate the masking by drawing
     rays from the center of the agent's position to the edges of the other agents'

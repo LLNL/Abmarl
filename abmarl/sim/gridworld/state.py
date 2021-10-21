@@ -6,6 +6,7 @@ import numpy as np
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import HealthAgent
 
+
 class StateBaseComponent(GridWorldBaseComponent, ABC):
     """
     Abstract State Component base from which all state components will inherit.
@@ -45,7 +46,6 @@ class PositionState(StateBaseComponent):
                     )
                 except KeyError:
                     continue
-
 
         # Now place all the rest of the agents who did not have initial positions
         # and block off those positions as well. We have to do this one agent at

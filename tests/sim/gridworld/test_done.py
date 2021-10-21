@@ -4,6 +4,7 @@ from abmarl.sim.gridworld.state import HealthState
 from abmarl.sim.gridworld.done import ActiveDone, DoneBaseComponent
 from abmarl.sim.gridworld.grid import Grid
 
+
 def test_active_done():
     grid = Grid(2, 3)
     agents = {

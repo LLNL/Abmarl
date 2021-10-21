@@ -5,12 +5,14 @@ import pytest
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.agent import GridWorldAgent
 
+
 def test_grid_rows():
     grid = Grid(2, 6)
     assert grid.rows == 2
 
     with pytest.raises(AssertionError):
         Grid(-1, 3)
+
 
 def test_grid_cols():
     grid = Grid(2, 6)
@@ -19,9 +21,11 @@ def test_grid_cols():
     with pytest.raises(AssertionError):
         Grid(1, 5.0)
 
+
 def test_grid_internal():
     grid = Grid(2, 6)
     np.testing.assert_equal(grid._internal, np.empty((2, 6), dtype=object))
+
 
 def test_grid_overlapping():
     grid = Grid(3, 3, overlapping={1: [2], 2: [1], 3: [1, 2]})
@@ -38,6 +42,7 @@ def test_grid_overlapping():
 
     with pytest.raises(AssertionError):
         Grid(2, 2, overlapping={1: ['2', 3], 2: [2, 3]})
+
 
 def test_grid_reset():
     grid = Grid(3, 3)
@@ -57,6 +62,7 @@ def test_grid_reset():
     grid.reset()
     assert grid[1, 0] == {}
 
+
 def test_grid_query():
     grid = Grid(3, 3)
     grid.reset()
@@ -65,6 +71,7 @@ def test_grid_query():
     assert grid.place(agent1, (1, 0))
     assert not grid.query(agent2, (1, 0))
     assert grid.query(agent2, (0, 1))
+
 
 def test_grid_query_with_overlap():
     grid = Grid(3, 3, overlapping={1: [1]})
@@ -75,6 +82,7 @@ def test_grid_query_with_overlap():
     assert grid.query(agent2, (1, 0))
     assert grid.query(agent1, (1, 0))
 
+
 def test_grid_place():
     grid = Grid(3, 3)
     grid.reset()
@@ -82,6 +90,7 @@ def test_grid_place():
     agent2 = GridWorldAgent(id='agent2', encoding=2)
     assert grid.place(agent1, (1, 0))
     assert not grid.place(agent2, (1, 0))
+
 
 def test_grid_place_with_overlap():
     grid = Grid(3, 3, overlapping={1: [2], 2: [1]})
@@ -91,6 +100,7 @@ def test_grid_place_with_overlap():
     assert grid.place(agent1, (1, 0))
     assert grid.place(agent2, (1, 0))
     assert grid[1, 0] == {'agent1': agent1, 'agent2': agent2}
+
 
 def test_grid_remove():
     grid = Grid(3, 3, overlapping={1: [2], 2: [1]})

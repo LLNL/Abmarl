@@ -6,6 +6,7 @@ from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, Movin
     HealthAgent, AttackingAgent
 from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
+
 def test_grid_world_agent():
     agent = GridWorldAgent(
         id='agent',
@@ -75,6 +76,7 @@ def test_grid_world_agent():
             render_shape='circle'
         )
 
+
 def test_grid_observing_agent():
     agent = GridObservingAgent(
         id='agent',
@@ -93,6 +95,7 @@ def test_grid_observing_agent():
             view_range=-1
         )
 
+
 def test_moving_agent():
     agent = MovingAgent(
         id='agent',
@@ -110,6 +113,7 @@ def test_moving_agent():
             move_range='1'
         )
 
+
 def test_health_agent():
     agent = HealthAgent(
         id='agent',
@@ -126,6 +130,7 @@ def test_health_agent():
             encoding=1,
             initial_health=2
         )
+
 
 def test_attacking_agent():
     agent = AttackingAgent(

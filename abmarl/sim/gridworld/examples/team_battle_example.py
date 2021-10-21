@@ -9,6 +9,7 @@ from abmarl.sim.gridworld.actor import MoveActor, AttackActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
 from abmarl.sim.gridworld.done import OneTeamRemainingDone
 
+
 class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
     def __init__(self, **kwargs):
         super().__init__(
@@ -19,6 +20,7 @@ class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
             view_range=3,
             **kwargs
         )
+
 
 class TeamBattleSim(GridWorldSimulation):
     def __init__(self, **kwargs):
@@ -37,9 +39,9 @@ class TeamBattleSim(GridWorldSimulation):
 
         # Done Compoennts
         self.done = OneTeamRemainingDone(**kwargs)
-        
+
         self.finalize()
-    
+
     def reset(self, **kwargs):
         self.position_state.reset(**kwargs)
         self.health_state.reset(**kwargs)
@@ -65,7 +67,7 @@ class TeamBattleSim(GridWorldSimulation):
                 move_result = self.move_actor.process_action(agent, action, **kwargs)
                 if not move_result:
                     self.rewards[agent.id] -= 0.1
-        
+
         # Entropy penalty
         for agent_id in action_dict:
             self.rewards[agent_id] -= 0.01
@@ -90,15 +92,16 @@ class TeamBattleSim(GridWorldSimulation):
     def get_info(self, agent_id, **kwargs):
         return {}
 
+
 if __name__ == "__main__":
     colors = ['red', 'blue', 'green', 'gray']
-    positions = [np.array([1,1]), np.array([1,6]), np.array([6,1]), np.array([6,6])]
+    positions = [np.array([1, 1]), np.array([1, 6]), np.array([6, 1]), np.array([6, 6])]
     agents = {
         f'agent{i}': BattleAgent(
             id=f'agent{i}',
-            encoding=i%4+1,
-            render_color=colors[i%4],
-            initial_position=positions[i%4]
+            encoding=i % 4 + 1,
+            render_color=colors[i % 4],
+            initial_position=positions[i % 4]
         ) for i in range(24)
     }
     overlap_map = {
@@ -123,11 +126,12 @@ if __name__ == "__main__":
     sim.reset()
     fig = plt.figure()
     sim.render(fig=fig)
-    
+
     done_agents = set()
     for i in range(50):
         action = {
-            agent.id: agent.action_space.sample() for agent in agents.values() if agent.id not in done_agents
+            agent.id: agent.action_space.sample()
+            for agent in agents.values() if agent.id not in done_agents
         }
         sim.step(action)
         sim.render(fig=fig)

@@ -8,9 +8,11 @@ from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
 
+
 class MazeNavigationAgent(GridObservingAgent, MovingAgent):
     def __init__(self, **kwargs):
         super().__init__(move_range=1, **kwargs)
+
 
 class MazeNaviationSim(GridWorldSimulation):
     def __init__(self, **kwargs):
@@ -28,20 +30,20 @@ class MazeNaviationSim(GridWorldSimulation):
         self.grid_observer = SingleGridObserver(**kwargs)
 
         self.finalize()
-    
+
     def reset(self, **kwargs):
         self.position_state.reset(**kwargs)
 
         # Track the rewards
         self.reward = 0
-    
-    def step(self, action_dict, **kwargs):    
+
+    def step(self, action_dict, **kwargs):
         # Process moves
         action = action_dict['navigator']
         move_result = self.move_actor.process_action(self.navigator, action, **kwargs)
         if not move_result:
             self.reward -= 0.1
-        
+
         # Entropy penalty
         self.reward -= 0.01
 
@@ -66,16 +68,17 @@ class MazeNaviationSim(GridWorldSimulation):
     def get_info(self, agent_id, **kwargs):
         return {}
 
+
 if __name__ == "__main__":
     object_registry = {
         'N': lambda n: MazeNavigationAgent(
-            id=f'navigator',
+            id='navigator',
             encoding=1,
             view_range=2,
             render_color='blue',
         ),
         'T': lambda n: GridWorldAgent(
-            id=f'target',
+            id='target',
             encoding=3,
             render_color='green'
         ),
@@ -97,7 +100,6 @@ if __name__ == "__main__":
     fig = plt.figure()
     sim.render(fig=fig)
 
-    
     for i in range(100):
         action = {'navigator': sim.navigator.action_space.sample()}
         sim.step(action)

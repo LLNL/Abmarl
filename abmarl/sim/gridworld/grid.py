@@ -1,6 +1,7 @@
 
 import numpy as np
 
+
 class Grid:
     """
     A Grid stores the agents at indices in a numpy array.
@@ -55,7 +56,7 @@ class Grid:
         """
         for i in range(self.rows):
             for j in range(self.cols):
-                self._internal[i,j] = {}
+                self._internal[i, j] = {}
 
     def query(self, agent, ndx):
         """

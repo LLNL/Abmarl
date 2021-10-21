@@ -30,7 +30,7 @@ class PrincipleAgent:
     def seed(self, value):
         assert value is None or type(value) is int, "Seed must be an integer."
         self._seed = value
-    
+
     @property
     def active(self):
         """

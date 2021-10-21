@@ -168,7 +168,7 @@ class AttackActor(ActorBaseComponent):
         1. The attacked agent is active.
         2. The attacked agent is within range.
         3. The attacked agent is valid according to the attack_mapping.
-        
+
         If the attack is possible, then we determine the success of the attack
         based on the attacking agent's accuracy. If the attack is successful, then
         the attacked agent's health is depleted by the attacking agent's strength,

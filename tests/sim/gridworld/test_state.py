@@ -5,6 +5,7 @@ from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.state import PositionState, HealthState, StateBaseComponent
 from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent
 
+
 def test_position_state():
     grid = Grid(3, 3)
     agents = {
@@ -23,6 +24,7 @@ def test_position_state():
     assert grid[0, 1] == {'agent0': agents['agent0']}
     assert grid[1, 2] == {'agent1': agents['agent1']}
     assert grid[2, 0] == {'agent2': agents['agent2']}
+
 
 def test_health_state():
     grid = Grid(3, 3)

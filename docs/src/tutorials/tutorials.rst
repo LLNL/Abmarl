@@ -12,4 +12,3 @@ We also provide tutorials on the GridWorldSimulation framework.
 
    multi_corridor
    gridworld/grid_world
-   magpie

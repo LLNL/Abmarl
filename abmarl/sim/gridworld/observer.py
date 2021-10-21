@@ -99,7 +99,7 @@ class SingleGridObserver(ObserverBaseComponent):
         local_grid, mask = gu.create_grid_and_mask(
             agent, self.grid, agent.view_range, self.agents
         )
-        
+
         # Convolve the grid observation with the mask.
         obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
         for r in range(2 * agent.view_range + 1):
@@ -178,7 +178,10 @@ class MultiGridObserver(ObserverBaseComponent):
         )
 
         # Convolve the grid observation with the mask.
-        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings), dtype=np.int)
+        obs = np.zeros(
+            (2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings),
+            dtype=np.int
+        )
         for encoding in range(self.number_of_encodings):
             for r in range(2 * agent.view_range + 1):
                 for c in range(2 * agent.view_range + 1):
