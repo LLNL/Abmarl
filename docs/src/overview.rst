@@ -328,18 +328,3 @@ Analysis can then be performed using the command line interface:
 .. code-block::
 
    abmarl analyze ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
-
-See the :ref:`Predator Prey tutorial <tutorial_predator_prey>` for an example of
-analyzing trained agent behavior.
-
-Running at scale with HPC
--------------------------
-
-Abmarl also supports some functionality for training at scale. See the
-:ref:`magpie tutorial <tutorial_magpie>`, which provides a walkthrough
-for launching a training experiment on multiple compute nodes with slurm.
-
-
-
-
-
