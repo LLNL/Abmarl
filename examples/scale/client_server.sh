@@ -38,10 +38,11 @@ port=6379
 ip_head=$head_node_ip:$port
 export ip_head
 echo "IP Head: $ip_head"
+# TODO: Just give the head node ip without the port
 
 echo "Starting HEAD at $head_node"
 srun --nodes=1 --ntasks=1 -w "$head_node" --output="slurm-%j-HEAD.out" \
-  python3 -u ./server.py --env CppCorridor --ip-head $ip_head &
+  python3 -u ./server.py --ip-head $ip_head &
 
 # Give the computer time to launch the server node before launching the clients.
 sleep 180

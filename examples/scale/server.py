@@ -3,16 +3,11 @@ import argparse
 
 import ray
 from ray import tune
-from ray.rllib.agents.dqn import DQNTrainer
-from ray.rllib.agents.ppo import PPOTrainer
 from ray.rllib.env.policy_server_input import PolicyServerInput
 from ray.rllib.examples.custom_metrics_and_callbacks import MyCallbacks
 from ray.tune.logger import pretty_print
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--env", type=str, default='CartPole-v0', help="The environment on which to train.",
-    choices=["CartPole-v0", "PyCorridor", "CppCorridor"])
 parser.add_argument(
     "--run",
     default="DQN",
@@ -76,20 +71,11 @@ if __name__ == "__main__":
     server_address = args.ip_head.split(':')[0]
     server_port = 9900
     print(f'server {server_address}:{server_port}')
+    # TODO: Process head node ip without splitting out the port.
 
     # simulation environment
-    if args.env == "PyCorridor":
-        from sim.simple_corridor import SimpleCorridor
-        env = SimpleCorridor()
-    elif args.env == "CppCorridor":
-        from gym.spaces import Discrete, Box
-        import numpy as np
-        from build.simple_corridor import SimpleCorridor
-        from sim.cpp_wrapper import CppWrapper
-        env = CppWrapper(SimpleCorridor(), Discrete(2), Box(0.0, 5, shape=(1, ), dtype=np.float32))
-    else:
-        import gym
-        env = gym.make(args.env)
+    from abmarl.sim.corridor import MultiCorridor
+    env = MultiCorridor()
 
     ray.init()
 
@@ -102,7 +88,7 @@ if __name__ == "__main__":
         # Give the observation and action space directly
         "env": None,
         "observation_space": env.observation_space,
-        "action_space": env.action_space,
+        "action_space": env.action_space, # TODO: How to do this for multiagents?
         # Use a single worker process to run the server.
         "num_workers": 0,
         # Disable OPE, since the rollouts are coming from online clients.
