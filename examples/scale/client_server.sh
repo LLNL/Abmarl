@@ -1,8 +1,8 @@
 #!/bin/bash
-#SBATCH --job-name=test-ray
-#SBATCH --nodes=2
+#SBATCH --job-name=multi-corridor-train
+#SBATCH --nodes=5
 #SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=1
 #SBATCH --time=00:30:00
 #SBATCH --partition=pvis
 #SBATCH --exclusive
@@ -10,11 +10,10 @@
 #SBATCH --output="slurm-%j.out"
 #SBATCH --ip-isolate yes
 
-
 # Run with sbatch client_server.sh
 
+# Source the virtual environment
 source /usr/WS1/rusu1/decision_superiority/v_pybind/bin/activate
-# source /usr/WS1/rusu1/abmarl_scale_test/v_ray_test_tf/bin/activate
 
 # Getting the node names
 nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
@@ -42,9 +41,9 @@ echo "IP Head: $ip_head"
 
 echo "Starting HEAD at $head_node"
 srun --nodes=1 --ntasks=1 -w "$head_node" --output="slurm-%j-HEAD.out" \
-  python3 -u ./corridor_server.py --env CppCorridor --ip-head $ip_head &
+  python3 -u ./server.py --env CppCorridor --ip-head $ip_head &
 
-# optional, though may be useful in certain versions of Ray < 1.0.
+# Give the computer time to launch the server node before launching the clients.
 sleep 180
 
 # number of nodes other than the head node
@@ -55,7 +54,7 @@ for ((i = 1; i <= worker_num; i++)); do
     node_i=${nodes_array[$i]}
     echo "Starting WORKER $i at $node_i"
     srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
-      python3 -u ./corridor_client.py --env CppCorridor --ip-head $ip_head &
+      python3 -u ./client.py --env CppCorridor --ip-head $ip_head &
     sleep 5
 done
 
