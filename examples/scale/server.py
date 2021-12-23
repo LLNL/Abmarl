@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # NOTE: This ^ is a temporary work around until rllib can get the spaces
     # from the client.
     policies = {
-        agent.id: (None, agent.observation_space, agent.action_space, {}),
+        agent.id: (None, agent.observation_space, agent.action_space, {})
         for agent in agents.values()
     }
     policy_mapping_fn = lambda agent_id: agent_id
