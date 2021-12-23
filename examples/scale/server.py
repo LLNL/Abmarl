@@ -4,7 +4,6 @@ import argparse
 import ray
 from ray import tune
 from ray.rllib.env.policy_server_input import PolicyServerInput
-from ray.tune.logger import pretty_print
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -22,9 +21,16 @@ if __name__ == "__main__":
     server_port = 9900
     print(f'server {args.ip_head}:{server_port}')
 
-    # simulation environment
+    # Policies
     from abmarl.sim.corridor import MultiCorridor
-    env = MultiCorridor()
+    agents = MultiCorridor().agents
+    # NOTE: This ^ is a temporary work around until rllib can get the spaces
+    # from the client.
+    policies = {
+        agent.id: (None, agent.observation_space, agent.action_space, {}),
+        for agent in agents.values()
+    }
+    policy_mapping_fn = lambda agent_id: agent_id
 
     ray.init()
 
@@ -36,8 +42,10 @@ if __name__ == "__main__":
         ),
         # Give the observation and action space directly
         "env": None,
-        "observation_space": env.observation_space,
-        "action_space": env.action_space, # TODO: How to do this for multiagents?
+        "multiagent": {
+            "policies": policies,
+            "policy_mapping_fn": policy_mapping_fn,
+        },
         # Use a single worker process to run the server.
         "num_workers": 0,
         # Disable OPE, since the rollouts are coming from online clients.
