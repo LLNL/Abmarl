@@ -10,18 +10,17 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     '--ip-head',
     type=str,
-    default='localhost:9900',
-    help='The ip address and port of the remote server.'
+    default='localhost',
+    help='The ip address of the remote server.'
 )
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
     # server's address
-    server_address = args.ip_head.split(':')[0]
+    server_address = args.ip_head
     server_port = 9900
-    print(f'server {server_address}:{server_port}')
-    # TODO: Process head node ip without splitting out the port.
+    print(f'server {args.ip_head}:{server_port}')
 
     # simulation environment
     from abmarl.sim.corridor import MultiCorridor

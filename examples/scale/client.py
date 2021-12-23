@@ -9,20 +9,17 @@ parser.add_argument(
 parser.add_argument(
     "--ip-head",
     type=str,
-    default='localhost:9900',
-    help="The ip address and port to connect to on the server. This should match the ip_head " \
-        "given to the server node, and the port can be incremented if there are multiple " \
-        "workers listening on the server."
+    default='localhost',
+    help="The ip address of the remote server."
 )
 
 if __name__ == "__main__":
     args = parser.parse_args()
 
     # server's address
-    address, port = args.ip_head.split(':')
+    address = args.ip_head
     port = 9900
     ip_head = 'http://' + address + ":" + str(port)
-    # TODO: Process head node ip without splitting the port
 
     # simulation environment
     from abmarl.sim.corridor import MultiCorridor

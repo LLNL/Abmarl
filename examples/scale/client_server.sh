@@ -36,13 +36,12 @@ fi
 
 port=6379
 ip_head=$head_node_ip:$port
-export ip_head
+export ip_head # TODO: Is this needed?
 echo "IP Head: $ip_head"
-# TODO: Just give the head node ip without the port
 
 echo "Starting HEAD at $head_node"
 srun --nodes=1 --ntasks=1 -w "$head_node" --output="slurm-%j-HEAD.out" \
-  python3 -u ./server.py --ip-head $ip_head &
+  python3 -u ./server.py --ip-head $head_node_ip &
 
 # Give the computer time to launch the server node before launching the clients.
 sleep 180
@@ -55,7 +54,7 @@ for ((i = 1; i <= worker_num; i++)); do
     node_i=${nodes_array[$i]}
     echo "Starting WORKER $i at $node_i"
     srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
-      python3 -u ./client.py --ip-head $ip_head &
+      python3 -u ./client.py --ip-head $head_node_ip &
     sleep 5
 done
 
