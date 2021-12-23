@@ -10,8 +10,7 @@ from ray.tune.logger import pretty_print
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--run",
-    default="DQN",
-    choices=["DQN", "PPO"],
+    default="A2C",
     help="The RLlib-registered algorithm to use.")
 parser.add_argument(
     "--stop-iters",
@@ -97,42 +96,6 @@ if __name__ == "__main__":
         "framework": args.framework,
         "log_level": "INFO",
     }
-
-    # Extra config per algorithm
-    if args.run == "DQN":
-        # Example of using DQN (supports off-policy actions).
-        config.update({
-            "learning_starts": 100,
-            "timesteps_per_iteration": 200,
-            "n_step": 3,
-        })
-        config["model"] = {
-            "fcnet_hiddens": [64],
-            "fcnet_activation": "linear",
-        }
-    else:
-        # Example of using PPO (does NOT support off-policy actions).
-        config.update({
-            "rollout_fragment_length": 1000,
-            "train_batch_size": 4000,
-        })
-
-
-    # Manual training loop (no Ray tune).
-    if args.no_tune:
-        if args.run == "DQN":
-            trainer = DQNTrainer(config=config)
-        else:
-            trainer = PPOTrainer(config=config)
-
-        # Serving and training loop.
-        ts = 0
-        for _ in range(args.stop_iters):
-            results = trainer.train()
-            print(pretty_print(results))
-            if results["episode_reward_mean"] >= args.stop_reward or ts >= args.stop_timesteps:
-                break
-            ts += results["timesteps_total"]
 
     # Run with Tune for auto env and trainer creation and TensorBoard.
     else:
