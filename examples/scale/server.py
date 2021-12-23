@@ -4,64 +4,15 @@ import argparse
 import ray
 from ray import tune
 from ray.rllib.env.policy_server_input import PolicyServerInput
-from ray.rllib.examples.custom_metrics_and_callbacks import MyCallbacks
 from ray.tune.logger import pretty_print
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--run",
-    default="A2C",
-    help="The RLlib-registered algorithm to use.")
-parser.add_argument(
-    "--stop-iters",
-    type=int,
-    default=200,
-    help="Number of iterations to train.")
-parser.add_argument(
-    "--stop-timesteps",
-    type=int,
-    default=500_000,
-    help="Number of timesteps to train.")
-parser.add_argument(
-    "--stop-reward",
-    type=float,
-    default=80.0,
-    help="Reward at which we stop training.")
-parser.add_argument(
-    "--framework",
-    choices=["tf", "torch"],
-    default="tf",
-    help="The DL framework specifier."
-)
 parser.add_argument(
     '--ip-head',
     type=str,
     default='localhost:9900',
     help='The ip address and port of the remote server.'
 )
-parser.add_argument(
-    "--callbacks-verbose",
-    action="store_true",
-    help="Activates info-messages for different events on "
-    "server/client (episode steps, postprocessing, etc..).")
-parser.add_argument(
-    "--no-tune",
-    action="store_true",
-    help="Run without Tune using a manual train loop instead. Here,"
-    "there is no TensorBoard support.")
-
-# Add this support later
-# parser.add_argument(
-#     "--no-restore",
-#     action="store_true",
-#     help="Do not restore from a previously saved checkpoint (location of "
-#     "which is saved in `last_checkpoint_[algo-name].out`).")
-# parser.add_argument(
-#     "--num-workers",
-#     type=int,
-#     default=2,
-#     help="The number of workers to use. Each worker will create "
-#     "its own listening socket for incoming experiences.")
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -92,22 +43,14 @@ if __name__ == "__main__":
         "num_workers": 0,
         # Disable OPE, since the rollouts are coming from online clients.
         "input_evaluation": [],
-        "callbacks": MyCallbacks if args.callbacks_verbose else None,
-        "framework": args.framework,
-        "log_level": "INFO",
     }
 
     # Run with Tune for auto env and trainer creation and TensorBoard.
-    else:
-        stop = {
-            "training_iteration": args.stop_iters,
-            "timesteps_total": args.stop_timesteps,
-            "episode_reward_mean": args.stop_reward,
-        }
-
-        tune.run(
-            args.run,
-            config=config,
-            stop=stop,
-            verbose=2
-        )
+    tune.run(
+        "A2C",
+        config=config,
+        stop={
+            'episodes_total': 2000,
+        },
+        verbose=2
+    )

@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=multi-corridor-train
-#SBATCH --nodes=5
+#SBATCH --nodes=2
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --time=00:30:00
