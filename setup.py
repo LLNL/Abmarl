@@ -30,7 +30,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'tensorflow',
-        'ray[rllib]==1.4.0',
+        'ray[rllib]>=1.8.0',
         'matplotlib',
         'seaborn',
     ],
