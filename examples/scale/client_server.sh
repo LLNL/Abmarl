@@ -55,7 +55,7 @@ for ((i = 1; i <= worker_num; i++)); do
     node_i=${nodes_array[$i]}
     echo "Starting WORKER $i at $node_i"
     srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
-      python3 -u ./client.py --env CppCorridor --ip-head $ip_head &
+      python3 -u ./client.py --ip-head $ip_head &
     sleep 5
 done
 
