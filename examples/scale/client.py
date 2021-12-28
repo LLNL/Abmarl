@@ -33,11 +33,17 @@ if __name__ == "__main__":
     # Start data generation
     obs = env.reset()
     eid = client.start_episode(training_enabled=True)
+    done = {agent: False for agent in obs}
     while True:
-        action = client.get_action(eid, obs)
-        obs, reward, done, info = env.step(action)
+        action_t = client.get_action(eid, obs)
+        action_dict = {
+            agent_id: action
+            for agent_id, action in action_t.items() if not done[agent_id]
+        }
+        obs, reward, done, info = env.step(action_dict)
         client.log_returns(eid, reward, info=info)
         if done['__all__']:
             client.end_episode(eid, obs)
             obs = env.reset()
+            done = {agent: False for agent in obs}
             eid = client.start_episode(training_enabled=True)
