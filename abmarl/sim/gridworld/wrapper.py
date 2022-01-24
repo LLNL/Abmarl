@@ -4,27 +4,30 @@ from abc import abstractmethod
 from abmarl.sim.gridworld.actor import ActorBaseComponent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 
-# TODO: Should this be a GridWorldBaseComponent?
-# The ActorWrapper is already a GridWorldBaseComponent, so we are getting
-# the interface. This raises a bigger question about the design because the
-# Wrapper doesn't necessarily see the agents and the grid. It should just use
-# that from the component that it wraps. So we need a way to specify that the
-# wrapper does implement the api of the component, but that it doesn't receive
-# its own reference to the grid or the agent.
-# Instead of the super().__init__(), we can specify to only call the wrapper parent
-# chain instead of the component's init.
-class ComponentWrapper:
+class ComponentWrapper(GridWorldBaseComponent):
     """
     Wraps GridWorldBaseComponent.
 
     Every wrapper must be able to wrap and unwrap the respective space and points
-    to and from that space.
+    to and from that space. Agents and Grid are referenced directly from the wrapped
+    component rather than received as initialization parameters.
     """
     def __init__(self, component, **kwargs):
-        super().__init__(**kwargs)
         assert isinstance(component, GridWorldBaseComponent), \
             "Wrapped component must be a GridWorldBaseComponent."
         self._wrapped_component = component
+        # NOTE: Unlike every other class in our package, here we do not 
+        # call super().__init__. This is because we want to say that a wrapper
+        # implements the GridWorldBaseComponent interface but does not call
+        # its init. The same is true for child classes. For example, the Actor
+        # wrapper implements the ActorBaseComponent interface, but it should
+        # only call ComponentWrapper's init, not ActorBaseComponent's init. We
+        # don't expect this it interfere with the users' experience because this
+        # is just a design choice at the abstract level. Users who create component
+        # wrappers will singly-inherit from these abstract wrappers.
+        # TODO: Alternative Design is for the child classes to not call super at
+        # all since they can just set the wrapped object themselves. Make the
+        # wrapped_component property abstract.
 
     @property
     def wrapped_component(self):
@@ -42,6 +45,20 @@ class ComponentWrapper:
             return self.wrapped_component.unwrapped
         except AttributeError:
             return self.wrapped_component
+
+    @property
+    def agents(self):
+        """
+        The agent dictionary is directly taken from the wrapped component.
+        """
+        return self.wrapped_component.agents
+
+    @property
+    def grid(self):
+        """
+        The grid dictionary is directly taken from the wrapped component.
+        """
+        return self.wrapped_component.key
 
     @abstractmethod
     def check_space(self, space):
@@ -92,7 +109,8 @@ class ComponentWrapper:
         """
         pass
 
-class ActorWrapper(ActorBaseComponent, ComponentWrapper):
+# NOTE: This must have ComponentWrapper first for the MRO to work as we desire.
+class ActorWrapper(ComponentWrapper, ActorBaseComponent):
     """
     Wraps an ActorComponent.
 
@@ -101,10 +119,10 @@ class ActorWrapper(ActorBaseComponent, ComponentWrapper):
     We unwrap them and send them to the actor.
     """
     def __init__(self, component, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(component, **kwargs)
         assert isinstance(component, ActorBaseComponent), \
             "Wrapped component must be an ActorBaseComponent."
-        for agent in self.agents.values(): # TODO: Want self.agents for wrapper without explicitly giving it.
+        for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
