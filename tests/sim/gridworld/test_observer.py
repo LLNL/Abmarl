@@ -28,16 +28,16 @@ def test_single_grid_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = SingleGridObserver(agents=agents, grid=grid)
-    observer.key == 'grid'
-    observer.supported_agent_type == GridObservingAgent
+    assert observer.key == 'grid'
+    assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
-    agents['agent0'].observation_space['grid'] == Box(
+    assert agents['agent0'].observation_space['grid'] == Box(
         -np.inf, np.inf, (5, 5), np.int
     )
-    agents['agent1'].observation_space['grid'] == Box(
+    assert agents['agent1'].observation_space['grid'] == Box(
         -np.inf, np.inf, (3, 3), np.int
     )
-    agents['agent2'].observation_space['grid'] == Box(
+    assert agents['agent2'].observation_space['grid'] == Box(
         -np.inf, np.inf, (9, 9), np.int
     )
 
@@ -174,17 +174,18 @@ def test_multi_grid_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = MultiGridObserver(agents=agents, grid=grid)
-    observer.key == 'grid'
-    observer.supported_agent_type == GridObservingAgent
+    assert observer.key == 'grid'
+    assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
-    agents['agent0'].observation_space['grid'] == Box(
-        -2, 8, (5, 5, 6), np.int
+    assert observer.number_of_encodings == 6
+    assert agents['agent0'].observation_space['grid'] == Box(
+        -2, 9, (5, 5, 6), np.int
     )
-    agents['agent1'].observation_space['grid'] == Box(
-        -2, 8, (3, 3, 6), np.int
+    assert agents['agent1'].observation_space['grid'] == Box(
+        -2, 9, (3, 3, 6), np.int
     )
-    agents['agent2'].observation_space['grid'] == Box(
-        -2, 8, (9, 9, 6), np.int
+    assert agents['agent2'].observation_space['grid'] == Box(
+        -2, 9, (9, 9, 6), np.int
     )
     position_state.reset()
 
