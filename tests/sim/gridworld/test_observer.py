@@ -32,13 +32,13 @@ def test_single_grid_observer():
     assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
     assert agents['agent0'].observation_space['grid'] == Box(
-        -np.inf, np.inf, (5, 5), np.int
+        -2, 6, (5, 5), np.int
     )
     assert agents['agent1'].observation_space['grid'] == Box(
-        -np.inf, np.inf, (3, 3), np.int
+        -2, 6, (3, 3), np.int
     )
     assert agents['agent2'].observation_space['grid'] == Box(
-        -np.inf, np.inf, (9, 9), np.int
+        -2, 6, (9, 9), np.int
     )
 
     position_state.reset()
