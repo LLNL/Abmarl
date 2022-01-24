@@ -16,6 +16,9 @@ from abmarl.sim.gridworld.base import GridWorldBaseComponent
 class ComponentWrapper:
     """
     Wraps GridWorldBaseComponent.
+
+    Every wrapper must be able to wrap and unwrap the respective space and points
+    to and from that space.
     """
     def __init__(self, component, **kwargs):
         super().__init__(**kwargs)
@@ -90,11 +93,18 @@ class ComponentWrapper:
         pass
 
 class ActorWrapper(ActorBaseComponent, ComponentWrapper):
+    """
+    Wraps an ActorComponent.
+
+    Modify the action space of the agents involved with the Actor, namely the specific
+    actor's channel. The actions recieved from the agents are the wrapped space.
+    We unwrap them and send them to the actor.
+    """
     def __init__(self, component, **kwargs):
         super().__init__(**kwargs)
         assert isinstance(component, ActorBaseComponent), \
             "Wrapped component must be an ActorBaseComponent."
-        for agent in self.agents.values():
+        for agent in self.agents.values(): # TODO: Want self.agents for wrapper without explicitly giving it.
             if isinstance(agent, self.supported_agent_type):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
@@ -102,13 +112,27 @@ class ActorWrapper(ActorBaseComponent, ComponentWrapper):
 
     @property
     def key(self):
+        """
+        The key is the same as the wrapped actor's key.
+        """
         return self._wrapped_component.key
 
     @property
     def supported_agent_type(self):
+        """
+        The supported agent type is the same as the wrapped actor's supported agent type.
+        """
         return self._wrapped_component.supported_agent_type
 
     def process_action(self, agent, action_dict, **kwargs):
+        """
+        Unwrap the action and pass it to the wrapped actor to process.
+
+        Args:
+            agent: The acting agent.
+            action_dict: The action dictionary for this agent in this step. The
+                action in this channel comes in the wrapped space.
+        """
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
             wrapped_action = self.wrap_point(agent.action_space[self.key], action)
