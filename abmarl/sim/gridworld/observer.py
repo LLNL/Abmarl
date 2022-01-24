@@ -62,10 +62,11 @@ class SingleGridObserver(ObserverBaseComponent):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        max_encoding = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
-                    -np.inf, np.inf, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), np.int
+                    -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), np.int
                 )
 
     @property
@@ -131,9 +132,7 @@ class MultiGridObserver(ObserverBaseComponent):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.number_of_encodings = 1
-        for agent in self.agents.values():
-            self.number_of_encodings = max(self.number_of_encodings, agent.encoding)
+        self.number_of_encodings = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
