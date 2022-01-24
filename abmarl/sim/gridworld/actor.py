@@ -112,6 +112,34 @@ class MoveActor(ActorBaseComponent):
                 return False
 
 
+class DiscreteMoveActor(ActorBaseComponent): # Also a component wrapper
+    def __init__(self, wrapped_component, **kwargs):
+        super().__init__(**kwargs)
+        assert isinstance(wrapped_component, ActorBaseComponent), \
+            "Wrapped component must be an ActorBaseComponent."
+        self._wrapped_component = wrapped_component
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.action_space[self.key] = Discrete(9) # Ravel the space
+
+    @property
+    def key(self):
+        return self._wrapped_component.key
+
+    @property
+    def supported_agent_type(self):
+        return self._wrapped_component.supported_agent_type
+
+    def process_action(self, agent, action_dict, **kwargs):
+        if isinstance(agent, self.supported_agent_type):
+            action = action_dict[self.key]
+            unwrapped_action = np.unravel_index(action, agent.action_space) # Unravel the point in the space
+            return self._wrapped_component.process_action(
+                agent,
+                {self.key: unwrapped_action}
+            )
+
+
 class AttackActor(ActorBaseComponent):
     """
     Agents can attack other agents.
