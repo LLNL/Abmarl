@@ -2,6 +2,7 @@
 from abc import abstractmethod
 
 from abmarl.sim.gridworld.actor import ActorBaseComponent
+from abmarl.sim.gridworld.observer import ObserverBaseComponent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 
 class ComponentWrapper(GridWorldBaseComponent):
@@ -149,3 +150,10 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                 {self.key: wrapped_action},
                 **kwargs
             )
+
+# TODO: Fill out the details of the observer wrapper.
+class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
+    pass
+
+
+
