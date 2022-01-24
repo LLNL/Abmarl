@@ -1,10 +1,22 @@
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 from abmarl.sim.gridworld.actor import ActorBaseComponent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 
-class ComponentWrapper(ABC):
+# TODO: Should this be a GridWorldBaseComponent?
+# The ActorWrapper is already a GridWorldBaseComponent, so we are getting
+# the interface. This raises a bigger question about the design because the
+# Wrapper doesn't necessarily see the agents and the grid. It should just use
+# that from the component that it wraps. So we need a way to specify that the
+# wrapper does implement the api of the component, but that it doesn't receive
+# its own reference to the grid or the agent.
+# Instead of the super().__init__(), we can specify to only call the wrapper parent
+# chain instead of the component's init.
+class ComponentWrapper:
+    """
+    Wraps GridWorldBaseComponent.
+    """
     def __init__(self, component, **kwargs):
         super().__init__(**kwargs)
         assert isinstance(component, GridWorldBaseComponent), \
@@ -30,22 +42,51 @@ class ComponentWrapper(ABC):
 
     @abstractmethod
     def check_space(self, space):
+        """
+        Verify that the space can be wrapped.
+        """
         pass
 
     @abstractmethod
     def wrap_space(self, space):
+        """
+        Wrap the space.
+
+        Args:
+            space: The space to wrap.
+        """
         pass
 
     @abstractmethod
     def unwrap_space(self, space):
+        """
+        Unwrap the space.
+
+        Args:
+            space: The space to unwrap.
+        """
         pass
 
     @abstractmethod
     def wrap_point(self, space, point):
+        """
+        Wrap a point to the space.
+
+        Args:
+            space: The space into which to wrap the point.
+            point: The point to wrap.
+        """
         pass
     
     @abstractmethod
     def unwrap_point(self, space, point):
+        """
+        Unwrap a point to the space.
+
+        Args:
+            space: The space into which to unwrap the point.
+            point: The point to unwrap.
+        """
         pass
 
 class ActorWrapper(ActorBaseComponent, ComponentWrapper):
