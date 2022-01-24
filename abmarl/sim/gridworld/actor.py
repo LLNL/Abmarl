@@ -112,6 +112,11 @@ class MoveActor(ActorBaseComponent):
                 return False
 
 
+# TODO: None of this is particular to a move actor. This is just particular to an
+# ActorBaseComponent. This would be different from an ObserverBaseComponent only
+# in that it uses the observation_space instead of the action_space. All that to
+# say, I think we can create a generic ravel action wrapper and a generic ravel
+# observer wrapper, which can then be used in the simulation construction.
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, unravel
 # TODO: Should the wrapper inherit the component it is wrapping?
 class DiscreteMoveActor(ActorBaseComponent): # TODO: Also a component wrapper
