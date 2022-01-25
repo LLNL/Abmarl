@@ -112,46 +112,6 @@ class MoveActor(ActorBaseComponent):
                 return False
 
 
-# TODO: None of this is particular to a move actor. This is just particular to an
-# ActorBaseComponent. This would be different from an ObserverBaseComponent only
-# in that it uses the observation_space instead of the action_space. All that to
-# say, I think we can create a generic ravel action wrapper and a generic ravel
-# observer wrapper, which can then be used in the simulation construction.
-from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, unravel
-# TODO: Should the wrapper inherit the component it is wrapping?
-class DiscreteMoveActor(ActorBaseComponent): # TODO: Also a component wrapper
-    def __init__(self, wrapped_component, **kwargs):
-        super().__init__(**kwargs)
-        # TODO: Component wrapper parent
-        assert isinstance(wrapped_component, ActorBaseComponent), \
-            "Wrapped component must be an ActorBaseComponent."
-        self._wrapped_component = wrapped_component
-        for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
-                unwrapped_space = agent.action_space[self.key]
-                wrapped_space = ravel_space(unwrapped_space)
-                agent.action_space[self.key] = wrapped_space
-
-    # TODO: Component wrapper parent
-    @property
-    def key(self):
-        return self._wrapped_component.key
-
-    # TODO: Component wrapper parent
-    @property
-    def supported_agent_type(self):
-        return self._wrapped_component.supported_agent_type
-
-    def process_action(self, agent, action_dict, **kwargs):
-        if isinstance(agent, self.supported_agent_type):
-            action = action_dict[self.key] # Action in the ravelled space
-            unwrapped_action = unravel(agent.action_space[self.key], action)
-            return self._wrapped_component.process_action(
-                agent,
-                {self.key: unwrapped_action}
-            )
-
-
 class AttackActor(ActorBaseComponent):
     """
     Agents can attack other agents.
