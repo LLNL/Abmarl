@@ -4,6 +4,7 @@ from abc import abstractmethod
 from abmarl.sim.gridworld.actor import ActorBaseComponent
 from abmarl.sim.gridworld.observer import ObserverBaseComponent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
+from abmarl.sim.wrappers import ravel_discrete_wrapper as rdw
 
 class ComponentWrapper(GridWorldBaseComponent):
     """
@@ -63,16 +64,6 @@ class ComponentWrapper(GridWorldBaseComponent):
         pass
 
     @abstractmethod
-    def unwrap_space(self, space):
-        """
-        Unwrap the space.
-
-        Args:
-            space: The space to unwrap.
-        """
-        pass
-
-    @abstractmethod
     def wrap_point(self, space, point):
         """
         Wrap a point to the space.
@@ -82,35 +73,34 @@ class ComponentWrapper(GridWorldBaseComponent):
             point: The point to wrap.
         """
         pass
-    
-    @abstractmethod
-    def unwrap_point(self, space, point):
-        """
-        Unwrap a point to the space.
-
-        Args:
-            space: The space into which to unwrap the point.
-            point: The point to unwrap.
-        """
-        pass
 
 class ActorWrapper(ComponentWrapper, ActorBaseComponent):
     """
     Wraps an ActorComponent.
 
     Modify the action space of the agents involved with the Actor, namely the specific
-    actor's channel. The actions recieved from the agents are the wrapped space.
-    We unwrap them and send them to the actor.
+    actor's channel. The actions recieved from the trainer are the wrapped space,
+    so we need unwrap them to send them to the actor. This is the opposite from
+    how we wrap and unwrap observations.
     """
     def __init__(self, component):
         assert isinstance(component, ActorBaseComponent), \
             "Wrapped component must be an ActorBaseComponent."
         self._actor = component
+        # Need to record the pre-wrapped space for the wrapping functions.
+        self.from_space = {
+            agent.id: agent.action_space[self.key]
+            for agent in self.agents.values()
+            if isinstance(agent, self.supported_agent_type)
+        }
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
                 agent.action_space[self.key] = self.wrap_space(agent.action_space[self.key])
+        # TODO: Confirm that from_space is not just a reference to the space object
+        # but is a unique copy of it, otherwise it would have been transformed
+        # and is meaningless to have.
 
     @property
     def wrapped_component(self):
@@ -144,7 +134,7 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
         """
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
-            wrapped_action = self.wrap_point(agent.action_space[self.key], action)
+            wrapped_action = self.wrap_point(self.from_space[agent.id], action)
             return self.wrapped_component.process_action(
                 agent,
                 {self.key: wrapped_action},
@@ -156,4 +146,25 @@ class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
 
 
+class RavelActionWrapper(ActorWrapper):
+    def check_space(self, space):
+        """
+        Ensure that the space is of type that can be ravelled to discrete value.
+        """
+        return rdw.check_space(space)
+
+    def wrap_space(self, space):
+        """
+        Convert the space into a Discrete space.
+        """
+        return rdw.ravel_space(space)
+
+    def wrap_point(self, space, point):
+        """
+        Unravel a single discrete point to a value in the space.
+
+        Recall that the action from the trainer arrives in the wrapped discrete
+        space, so we need to unravle it so that it is in the unwrapped space.
+        """
+        return rdw.unravel(space, point)
 
