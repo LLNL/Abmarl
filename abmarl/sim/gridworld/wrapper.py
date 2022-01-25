@@ -14,8 +14,8 @@ class ComponentWrapper(GridWorldBaseComponent):
     to and from that space. Agents and Grid are referenced directly from the wrapped
     component rather than received as initialization parameters.
     """
-    @abstractmethod
     @property
+    @abstractmethod
     def wrapped_component(self):
         """
         Get the first-level wrapped component.
@@ -153,6 +153,7 @@ class RavelActionWrapper(ActorWrapper):
         """
         return rdw.check_space(space)
 
+    # TODO: Input should be agent, not space.
     def wrap_space(self, space):
         """
         Convert the space into a Discrete space.
