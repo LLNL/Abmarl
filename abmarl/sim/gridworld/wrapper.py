@@ -114,14 +114,14 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
         """
         The key is the same as the wrapped actor's key.
         """
-        return self._wrapped_component.key
+        return self.wrapped_component.key
 
     @property
     def supported_agent_type(self):
         """
         The supported agent type is the same as the wrapped actor's supported agent type.
         """
-        return self._wrapped_component.supported_agent_type
+        return self.wrapped_component.supported_agent_type
 
     def process_action(self, agent, action_dict, **kwargs):
         """
