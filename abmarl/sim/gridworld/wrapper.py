@@ -6,6 +6,7 @@ from abmarl.sim.gridworld.observer import ObserverBaseComponent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.wrappers import ravel_discrete_wrapper as rdw
 
+
 class ComponentWrapper(GridWorldBaseComponent):
     """
     Wraps GridWorldBaseComponent.
@@ -74,6 +75,7 @@ class ComponentWrapper(GridWorldBaseComponent):
         """
         pass
 
+
 class ActorWrapper(ComponentWrapper, ActorBaseComponent):
     """
     Wraps an ActorComponent.
@@ -138,6 +140,7 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                 **kwargs
             )
 
+
 # TODO: Fill out the details of the abstract observer wrapper.
 class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
@@ -164,4 +167,3 @@ class RavelActionWrapper(ActorWrapper):
         space, so we need to unravle it so that it is in the unwrapped space.
         """
         return rdw.unravel(space, point)
-
