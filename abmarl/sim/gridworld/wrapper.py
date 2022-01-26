@@ -44,7 +44,7 @@ class ComponentWrapper(GridWorldBaseComponent):
         """
         The grid dictionary is directly taken from the wrapped component.
         """
-        return self.wrapped_component.key
+        return self.wrapped_component.grid
 
     @abstractmethod
     def check_space(self, space):

@@ -8,6 +8,8 @@ from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
 
+from .helpers import grid, moving_agents
+
 
 def test_move_actor():
     grid = Grid(5, 6)
