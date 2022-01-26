@@ -1,26 +1,29 @@
 
-from os import access
 from gym.spaces import Discrete, Box
 import numpy as np
 
-from abmarl.sim.gridworld.actor import MoveActor
+from abmarl.sim.gridworld.actor import MoveActor, ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState
-from abmarl.sim.gridworld.wrapper import RavelActionWrapper, ActorWrapper, ComponentWrapper
-from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel
+from abmarl.sim.gridworld.wrapper import RavelActionWrapper, ActorWrapper
 
 from .helpers import grid, moving_agents as agents
+
 
 position_state = PositionState(grid=grid, agents=agents)
 move_actor = MoveActor(grid=grid, agents=agents)
 ravel_action_wrapper = RavelActionWrapper(move_actor)
 
+
 def test_ravel_action_wrapper_properties():
+    assert isinstance(ravel_action_wrapper, ActorWrapper)
+    assert isinstance(ravel_action_wrapper, ActorBaseComponent)
     assert ravel_action_wrapper.wrapped_component == move_actor
     assert ravel_action_wrapper.unwrapped == move_actor
     assert ravel_action_wrapper.agents == move_actor.agents
     assert ravel_action_wrapper.grid == move_actor.grid
     assert ravel_action_wrapper.key == move_actor.key
     assert ravel_action_wrapper.supported_agent_type == move_actor.supported_agent_type
+
 
 def test_ravel_action_wrapper_agent_spaces():
     assert ravel_action_wrapper.from_space['agent0'] == Box(-1, 1, (2,), np.int)
@@ -31,6 +34,7 @@ def test_ravel_action_wrapper_agent_spaces():
     assert ravel_action_wrapper.agents['agent2'].action_space['move'] == Discrete(9)
     assert ravel_action_wrapper.from_space['agent3'] == Box(-3, 3, (2,), np.int)
     assert ravel_action_wrapper.agents['agent3'].action_space['move'] == Discrete(49)
+
 
 def test_ravel_action_wrapper_process_action():
     action_sample = {
