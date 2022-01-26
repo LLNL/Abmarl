@@ -98,9 +98,6 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
                 agent.action_space[self.key] = self.wrap_space(agent.action_space[self.key])
-        # TODO: Confirm that from_space is not just a reference to the space object
-        # but is a unique copy of it, otherwise it would have been transformed
-        # and is meaningless to have.
 
     @property
     def wrapped_component(self):
@@ -141,7 +138,7 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                 **kwargs
             )
 
-# TODO: Fill out the details of the observer wrapper.
+# TODO: Fill out the details of the abstract observer wrapper.
 class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
 
@@ -153,7 +150,6 @@ class RavelActionWrapper(ActorWrapper):
         """
         return rdw.check_space(space)
 
-    # TODO: Input should be agent, not space.
     def wrap_space(self, space):
         """
         Convert the space into a Discrete space.
