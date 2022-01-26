@@ -11,8 +11,8 @@ class ComponentWrapper(GridWorldBaseComponent):
     """
     Wraps GridWorldBaseComponent.
 
-    Every wrapper must be able to wrap and unwrap the respective space and points
-    to and from that space. Agents and Grid are referenced directly from the wrapped
+    Every wrapper must be able to wrap the respective space and points
+    to/from that space. Agents and Grid are referenced directly from the wrapped
     component rather than received as initialization parameters.
     """
     @property
@@ -43,7 +43,7 @@ class ComponentWrapper(GridWorldBaseComponent):
     @property
     def grid(self):
         """
-        The grid dictionary is directly taken from the wrapped component.
+        The grid is directly taken from the wrapped component.
         """
         return self.wrapped_component.grid
 
@@ -133,20 +133,23 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
         """
         if isinstance(agent, self.supported_agent_type):
             action = action_dict[self.key]
-            wrapped_action = self.wrap_point(self.from_space[agent.id], action)
+            unwrapped_action = self.wrap_point(self.from_space[agent.id], action)
             return self.wrapped_component.process_action(
                 agent,
-                {self.key: wrapped_action},
+                {self.key: unwrapped_action},
                 **kwargs
             )
 
 
-# TODO: Fill out the details of the abstract observer wrapper.
+# TODO Abmarl-202: Fill out the details of the abstract observer wrapper.
 class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
 
 
 class RavelActionWrapper(ActorWrapper):
+    """
+    Use numpy's ravel capabilities to convert space and points to Discrete.
+    """
     def check_space(self, space):
         """
         Ensure that the space is of type that can be ravelled to discrete value.
@@ -164,6 +167,7 @@ class RavelActionWrapper(ActorWrapper):
         Unravel a single discrete point to a value in the space.
 
         Recall that the action from the trainer arrives in the wrapped discrete
-        space, so we need to unravle it so that it is in the unwrapped space.
+        space, so we need to unravle it so that it is in the unwrapped space before
+        giving it to the actor.
         """
         return rdw.unravel(space, point)
