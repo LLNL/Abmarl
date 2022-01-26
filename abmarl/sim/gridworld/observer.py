@@ -60,8 +60,9 @@ class SingleGridObserver(ObserverBaseComponent):
     If there are multiple agents on a single cell with different encodings, the
     agent will observe only one of them chosen at random.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, observe_self=True, **kwargs):
         super().__init__(**kwargs)
+        self.observe_self = observe_self
         max_encoding = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
@@ -82,6 +83,20 @@ class SingleGridObserver(ObserverBaseComponent):
         This Observer works with GridObservingAgents.
         """
         return GridObservingAgent
+
+    @property
+    def observe_self(self):
+        """
+        Agents can observe themselves, which may hide important information if
+        overlapping is important. This can be turned off by setting observe_self
+        to False.
+        """
+        return self._observe_self
+
+    @observe_self.setter
+    def observe_self(self, value):
+        assert type(value) is bool, "Observe self must be a boolean."
+        self._observe_self = value
 
     def get_obs(self, agent, **kwargs):
         """
@@ -112,9 +127,20 @@ class SingleGridObserver(ObserverBaseComponent):
                     elif not candidate_agents: # In bounds empty cell
                         obs[r, c] = 0
                     else: # Observe one of the agents at this cell
-                        obs[r, c] = np.random.choice(
-                            [other.encoding for other in candidate_agents.values()]
-                        )
+                        if self.observe_self:
+                            obs[r, c] = np.random.choice([
+                                other.encoding for other in candidate_agents.values()
+                            ])
+                        else:
+                            choices = [
+                                other.encoding
+                                for other in candidate_agents.values()
+                                if other.id != agent.id
+                            ]
+                            # It may be that the observing agent is the only agent
+                            # at this location but it cannot observe itself, which
+                            # makes choices an empty list.
+                            obs[r, c] = np.random.choice(choices) if choices else 0
                 else: # Cell blocked by agent. Indicate invisible with -2
                     obs[r, c] = -2
 

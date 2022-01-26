@@ -618,3 +618,63 @@ def test_multi_grid_observer_blocking():
             [-1, -1, -1, -1, -1, -1, -1, -1, -1]
         ])
     )
+
+
+def test_observe_self():
+    np.random.seed(24)
+    class HackAgent(GridObservingAgent, MovingAgent): pass
+
+    agents = {
+        'agent0': GridObservingAgent(
+            id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
+        ),
+        'agent1': GridObservingAgent(
+            id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
+        ),
+        'agent2': HackAgent(
+            id='agent2', encoding=2, view_range=1, initial_position=np.array([2, 2]), move_range=1
+        ),
+    }
+    grid = Grid(5, 5, overlapping={1: [2], 2: [1]})
+
+    position_state = PositionState(grid=grid, agents=agents)
+    position_state.reset()
+    self_observer = SingleGridObserver(agents=agents, grid=grid)
+    no_self_observer = SingleGridObserver(agents=agents, grid=grid, observe_self=False)
+
+    np.testing.assert_array_equal(
+        self_observer.get_obs(agents['agent0'])['grid'],
+        np.array([
+            [2, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 1, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    )
+    np.testing.assert_array_equal(
+        no_self_observer.get_obs(agents['agent0'])['grid'],
+        np.array([
+            [2, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 2, 0, 0],
+            [0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0]
+        ])
+    )
+    np.testing.assert_array_equal(
+        self_observer.get_obs(agents['agent1'])['grid'],
+        np.array([
+            [-1, -1, -1],
+            [-1,  2,  0],
+            [-1,  0,  0]
+        ])
+    )
+    np.testing.assert_array_equal(
+        no_self_observer.get_obs(agents['agent1'])['grid'],
+        np.array([
+            [-1, -1, -1],
+            [-1,  0,  0],
+            [-1,  0,  0]
+        ])
+    )
