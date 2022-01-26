@@ -98,7 +98,6 @@ class SingleGridObserver(ObserverBaseComponent):
         assert type(value) is bool, "Observe self must be a boolean."
         self._observe_self = value
 
-
     def get_obs(self, agent, **kwargs):
         """
         The agent observes a sub-grid centered on its position.

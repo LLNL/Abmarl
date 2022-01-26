@@ -619,6 +619,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
 
+
 def test_observe_self():
     np.random.seed(24)
     class HackAgent(GridObservingAgent, MovingAgent): pass
