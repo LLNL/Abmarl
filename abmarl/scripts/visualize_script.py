@@ -11,6 +11,10 @@ def create_parser(subparsers):
         '-n', '--episodes', type=int, default=1, help='The number of episodes to run. Default 1.'
     )
     visualize_parser.add_argument(
+        '-s', '--steps-per-episode', type=int, default=200,
+        help='The maximum number of steps to take per epsiode. Default 200.'
+    )
+    visualize_parser.add_argument(
         '--record', action='store_true',
         help='Record a video of the agent(s) interacting in the simulation.'
     )

@@ -127,7 +127,7 @@ def run_visualize(full_trained_directory, parameters):
                 obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
             )
             obs, _, done, _ = sim.step(action)
-            if _get_done(done):
+            if _get_done(done, i) or i >= parameters.steps_per_episode:
                 nonlocal all_done
                 all_done = True
                 sim.render(fig=fig)
