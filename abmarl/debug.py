@@ -23,7 +23,7 @@ def run(full_config_path, parameters):
         os.makedirs(output_dir)
     shutil.copy(full_config_path, output_dir)
 
-    # Debug loop
+    # Simulation loop
     from pprint import pprint
     from matplotlib import pyplot as plt
     sim = experiment_mod.params['experiment']['sim_creator'](
@@ -31,28 +31,32 @@ def run(full_config_path, parameters):
     )
     agents = sim.unwrapped.agents # TODO: Should MultiAgentWrapper expose the agents?
     for i in range(parameters.episodes):
-        if parameters.render:
-            fig = plt.figure()
-        obs = sim.reset()
-        done = {agent: False for agent in obs}
-        if parameters.render:
-            sim.render(fig=fig)
-            plt.pause(1e-16)
-        pprint(obs)
-        for j in range(parameters.steps_per_episode): # Data generation
-            action = {
-                agent_id: agents[agent_id].action_space.sample()
-                for agent_id in obs if not done[agent_id]
-            }
-            obs, reward, done, info = sim.step(action)
+        # Setup dump files
+        with open(os.path.join(output_dir, f"Episode_{i}.txt"), 'w') as debug_dump:
+            if parameters.render:
+                fig = plt.figure()
+            obs = sim.reset()
+            done = {agent: False for agent in obs}
             if parameters.render:
                 sim.render(fig=fig)
                 plt.pause(1e-16)
-            pprint(action)
-            pprint(obs)
-            print(reward)
-            print(done)
-            if done['__all__']:
-                break
-        if parameters.render:
-            plt.close(fig)
+            debug_dump.write("Reset:\n")
+            pprint(obs, stream=debug_dump)
+            for j in range(parameters.steps_per_episode): # Data generation
+                action = {
+                    agent_id: agents[agent_id].action_space.sample()
+                    for agent_id in obs if not done[agent_id]
+                }
+                obs, reward, done, info = sim.step(action)
+                if parameters.render:
+                    sim.render(fig=fig)
+                    plt.pause(1e-16)
+                debug_dump.write(f"\nStep {j}:\n")
+                pprint(action, stream=debug_dump)
+                pprint(obs, stream=debug_dump)
+                pprint(reward, stream=debug_dump)
+                pprint(done, stream=debug_dump)
+                if done['__all__']:
+                    break
+            if parameters.render:
+                plt.close(fig)
