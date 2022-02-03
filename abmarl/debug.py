@@ -25,11 +25,12 @@ def run(full_config_path, parameters):
 
     # Simulation loop
     from pprint import pprint
-    from matplotlib import pyplot as plt
+    if parameters.render:
+        from matplotlib import pyplot as plt
     sim = experiment_mod.params['experiment']['sim_creator'](
         experiment_mod.params['ray_tune']['config']['env_config']
     )
-    agents = sim.unwrapped.agents # TODO: Should MultiAgentWrapper expose the agents?
+    agents = sim.unwrapped.agents
     for i in range(parameters.episodes):
         # Setup dump files
         with open(os.path.join(output_dir, f"Episode_{i}.txt"), 'w') as debug_dump:
