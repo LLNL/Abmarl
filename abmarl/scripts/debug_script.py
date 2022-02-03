@@ -7,7 +7,7 @@ def create_parser(subparsers):
     """
     debug_parser = subparsers.add_parser(
         'debug',
-        help="Run the SimulationManager in the configruation file with random " + \
+        help="Run the SimulationManager from the configruation file with random " + \
             "actions, rendering each step and outputting observations and actions. " + \
             "This is useful to ensure that you've setup the simulation correctly."
     )

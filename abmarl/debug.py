@@ -6,7 +6,7 @@ def run(full_config_path, parameters):
 
     # Load the experiment as a module
     experiment_mod = adu.custom_import_module(full_config_path)
-    title = experiment_mod.params['experiment']['title']
+    title = "DEBUG_" + experiment_mod.params['experiment']['title']
 
     # Copy the configuration module to the output directory
     import os
@@ -31,7 +31,7 @@ def run(full_config_path, parameters):
     )
     agents = sim.unwrapped.agents # TODO: Should MultiAgentWrapper expose the agents?
     for i in range(parameters.episodes):
-        if paraemters.render:
+        if parameters.render:
             fig = plt.figure()
         obs = sim.reset()
         done = {agent: False for agent in obs}
@@ -39,7 +39,7 @@ def run(full_config_path, parameters):
             sim.render(fig=fig)
             plt.pause(1e-16)
         pprint(obs)
-        for j in range(parameters.steps_per_epsiode): # Data generation
+        for j in range(parameters.steps_per_episode): # Data generation
             action = {
                 agent_id: agents[agent_id].action_space.sample()
                 for agent_id in obs if not done[agent_id]
