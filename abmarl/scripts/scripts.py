@@ -6,6 +6,7 @@ import os
 from abmarl.scripts import train_script as train
 from abmarl.scripts import analyze_script as analyze
 from abmarl.scripts import visualize_script as visualize
+from abmarl.scripts import debug_script as debug
 from abmarl.scripts import make_runnable_script as runnable
 
 EXAMPLE_USAGE = """
@@ -17,6 +18,9 @@ Example usage for analysis:
 
 Example usage for visualizing:
     abmarl visualize my_experiment_directory/ --some-args
+
+Example usage for debugging simulation:
+    abmarl debug my_experiment.py --some-args
 
 Example usage for converting to runnable script:
     abmarl make-runnable my_experiment.py --some-args
@@ -35,6 +39,7 @@ def cli():
     train.create_parser(subparsers)
     analyze.create_parser(subparsers)
     visualize.create_parser(subparsers)
+    debug.create_parser(subparsers)
     runnable.create_parser(subparsers)
     parameters = parser.parse_args()
     path_config = os.path.join(os.getcwd(), parameters.configuration)
@@ -46,6 +51,8 @@ def cli():
         analyze.run(path_config, full_path_subscript, parameters)
     elif parameters.command == 'visualize':
         visualize.run(path_config, parameters)
+    elif parameters.command == 'debug':
+        debug.run(path_config, parameters)
     elif parameters.command == 'make-runnable':
         runnable.run(path_config, parameters)
     else:
