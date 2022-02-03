@@ -7,9 +7,9 @@ def create_parser(subparsers):
     """
     debug_parser = subparsers.add_parser(
         'debug',
-        help="Run the SimulationManager from the configruation file with random " + \
-            "actions, rendering each step and outputting observations and actions. " + \
-            "This is useful to ensure that you've setup the simulation correctly."
+        help="Run the SimulationManager from the configruation file with random "
+             "actions, rendering each step and outputting observations and actions. "
+             "This is useful to ensure that you've setup the simulation correctly."
     )
     debug_parser.add_argument(
         'configuration', type=str, help='Path to python config file. Include the .py extension.'
