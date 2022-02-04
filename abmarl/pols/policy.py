@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from gym import spaces
+from gym.spaces import Space
 import numpy as np
 
 
@@ -24,7 +24,7 @@ class Policy(ABC):
 
     @action_space.setter
     def action_space(self, value):
-        assert value in spaces
+        assert isinstance(value, Space), "Action space must be a gym space."
         self._action_space = value
 
     @property
@@ -36,9 +36,8 @@ class Policy(ABC):
 
     @observation_space.setter
     def observation_space(self, value):
-        assert value in spaces
+        assert isinstance(value, Space), "Observation space must be a gym space."
         self._observation_space = value
-
 
     @abstractmethod
     def compute_action(self, obs, **kwargs):
