@@ -37,24 +37,40 @@ class MulitAgentTrainer(ABC):
     def policy_mapping_fn(self, value):
         self._policy_mapping_fn = value
 
-    def compute_actions(self, obs):
+    def compute_actions(self, obs, done):
         """
-        Compute actions for agents in the observation.
+        Compute actions for agents in the observation that are not done.
 
         Forwards the observations to the respective policy for each agent.
 
         Args:
-            obs: an observation dictionary, where the keys are the agents for which
-                you want to generate actions and the values are the observations.
+            obs: an observation dictionary, where the keys are the agents reporting
+                from the sim and the values are the observations.
+            done: a done dictionary, where the keys are the agents reporting from
+                the sim and the values are the done condition of each agent.
 
         Returns:
-            An action dictionary where the keys are the agent ids from the obs
-                and the values are the actions generated from that agent's policy.
+            An action dictionary where the keys are the agent ids from the observation
+                that are not done and the values are the actions generated from
+                each agent's policy.
         """
         return {
             agent_id: self.policies[self.policy_mapping_fn[agent_id]].compute_action(obs[agent_id])
-            for agent_id in obs
+            for agent_id in obs if not done[agent_id]
         }
+
+    # TODO: Upgrade to generate_batch
+    def generate_episode(self, steps_per_episode=200):
+        """
+        Generate an episode of data.
+        """
+        obs = self.sim.reset()
+        done = {agent: False for agent in obs}
+        for j in range(steps_per_episode): # Data generation
+            action = self.compute_actions(obs, done)
+            obs, reward, done, _ = self.sim.step(action)
+            if done['__all__']:
+                break
 
     @abstractmethod
     def train(self):
