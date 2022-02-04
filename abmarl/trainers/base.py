@@ -1,6 +1,7 @@
 
 from abc import ABC, abstractmethod
 
+from abmarl.pols.policy import Policy
 from abmarl.managers import SimulationManager
 
 class MultiAgentTrainer(ABC):
@@ -30,6 +31,12 @@ class MultiAgentTrainer(ABC):
 
     @policies.setter
     def policies(self, value):
+        assert type(value) is dict, "Policies must be a dict"
+        for k, v in value.items():
+            assert type(k) is str, \
+                "The keys in the policies dictionary must be the policy names as strings."
+            assert isinstance(v, Policy), \
+                "The values in the policies dictionary must by Policy objects."
         self._policies = value
 
     @property
@@ -41,6 +48,7 @@ class MultiAgentTrainer(ABC):
 
     @policy_mapping_fn.setter
     def policy_mapping_fn(self, value):
+        assert callable(value), "Policy Mapping Function must be a function."
         self._policy_mapping_fn = value
 
     def compute_actions(self, obs):
