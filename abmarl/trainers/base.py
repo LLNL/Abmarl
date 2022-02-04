@@ -131,12 +131,14 @@ class MultiAgentTrainer(ABC):
                 except KeyError:
                     actions[agent_id] = [agent_action]
 
+            # Exit if we're done
+            if done['__all__']:
+                break
+
             # We should not request actions for any more done agents.
             for agent_id, agent_done in done.items():
                 if agent_done:
                     del obs[agent_id]
-            if done['__all__']:
-                break
 
         return observations, actions, rewards
 
