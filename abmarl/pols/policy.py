@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from gym import spaces
 import numpy as np
 
 
@@ -10,6 +11,35 @@ class Policy(ABC):
     The underlying mapping function can take many forms. It can be Q-table, a non
     linear function, a neural network, etc.
     """
+    def __init__(self, action_space=None, observation_space=None, **kwargs):
+        self.action_spae = action_space
+        self.observation_space = observation_space
+
+    @property
+    def action_space(self):
+        """
+        The space of possible output actions for this policy.
+        """
+        return self._action_space
+
+    @action_space.setter
+    def action_space(self, value):
+        assert value in spaces
+        self._action_space = value
+
+    @property
+    def observation_space(self):
+        """
+        The space of possible input observations for this policy.
+        """
+        return self._observation_space
+
+    @observation_space.setter
+    def observation_space(self, value):
+        assert value in spaces
+        self._observation_space = value
+
+
     @abstractmethod
     def compute_action(self, obs, **kwargs):
         """
