@@ -64,6 +64,24 @@ class Policy(ABC):
         pass
 
 
+class RandomPolicy(Policy):
+    """
+    Generate random actions.
+    """
+    def compute_action(self, obs, **kwargs):
+        """
+        Check that the observation is in the space, then return a random action.
+
+        Args:
+            obs: The input observation.
+
+        Returns:
+            A random action from the action space.
+        """
+        assert obs in self.observation_space
+        return self.action_space.samples()
+
+
 class QPolicy(ABC):
     """
     A policy maps a observation to an action. The relationship between the observations and the
