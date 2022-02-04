@@ -1,6 +1,8 @@
 
 from abc import ABC, abstractmethod
 
+from abmarl.managers import SimulationManager
+
 class MultiAgentTrainer(ABC):
     def __init__(self, sim=None, policies=None, policy_mapping_fn=None, **kwargs):
         self.sim = sim
@@ -16,6 +18,7 @@ class MultiAgentTrainer(ABC):
 
     @sim.setter
     def sim(self, value):
+        assert isinstance(value, SimulationManager), "sim must be a Simulation Manager."
         self._sim = value
 
     @property
@@ -55,7 +58,7 @@ class MultiAgentTrainer(ABC):
                 and the values are the actions generated from each agent's policy.
         """
         return {
-            agent_id: self.policies[self.policy_mapping_fn[agent_id]].compute_action(obs[agent_id])
+            agent_id: self.policies[self.policy_mapping_fn(agent_id)].compute_action(obs[agent_id])
             for agent_id in obs
         }
 
