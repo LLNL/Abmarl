@@ -12,7 +12,7 @@ class Policy(ABC):
     linear function, a neural network, etc.
     """
     def __init__(self, action_space=None, observation_space=None, **kwargs):
-        self.action_spae = action_space
+        self.action_space = action_space
         self.observation_space = observation_space
 
     @property
@@ -78,7 +78,7 @@ class RandomPolicy(Policy):
             A random action from the action space.
         """
         assert obs in self.observation_space
-        return self.action_space.samples()
+        return self.action_space.sample()
 
 
 class QPolicy(ABC):
