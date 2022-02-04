@@ -37,40 +37,94 @@ class MulitAgentTrainer(ABC):
     def policy_mapping_fn(self, value):
         self._policy_mapping_fn = value
 
-    def compute_actions(self, obs, done):
+    def compute_actions(self, obs):
         """
-        Compute actions for agents in the observation that are not done.
+        Compute actions for agents in the observation.
 
         Forwards the observations to the respective policy for each agent.
 
         Args:
             obs: an observation dictionary, where the keys are the agents reporting
                 from the sim and the values are the observations.
-            done: a done dictionary, where the keys are the agents reporting from
-                the sim and the values are the done condition of each agent.
 
         Returns:
-            An action dictionary where the keys are the agent ids from the observation
-                that are not done and the values are the actions generated from
-                each agent's policy.
+            An action dictionary where the keys are the agents from the observation
+                and the values are the actions generated from each agent's policy.
         """
         return {
             agent_id: self.policies[self.policy_mapping_fn[agent_id]].compute_action(obs[agent_id])
-            for agent_id in obs if not done[agent_id]
+            for agent_id in obs
         }
 
     # TODO: Upgrade to generate_batch
-    def generate_episode(self, steps_per_episode=200):
+    def generate_episode(self, horizon=200):
         """
         Generate an episode of data.
+
+        The fundamental data object is a SAR--a (state, action, reward) tuple.
+        We restart the sim, generating initial observations (states) for agents
+        reporting from the sim. Then we use the compute_action function to generate
+        actions for those reporting agents. Those actions are given to the sim,
+        which steps forward and generates rewards and new observations for reporting
+        agents. This loop continues until the simulation is done or we hit the
+        horizon.
+
+        Args:
+            horizon: The maximum number of steps per epsidoe. They episode may
+                finish early, but it will not progress further than this number
+                of steps.
+
+        Returns:
+            Three dictionaries, one for observations, another for actions, and
+            another for rewards, thus making up the SAR sequences. The data is
+            organized by agent_id, so you would call
+                {observations, actions, rewards}[agent_id][i]
+            in order to extract the ith SAR for an agent.
+            NOTE: In multiagent simulations, the number of SARs may differ for
+            each agent.
+            
         """
+        # Reset the simulation and policies
         obs = self.sim.reset()
         done = {agent: False for agent in obs}
-        for j in range(steps_per_episode): # Data generation
-            action = self.compute_actions(obs, done)
+        for policy in self.policies.values():
+            policy.reset()
+
+        # Data collection
+        observations, actions, rewards = {}, {}, {}
+        for agent_id, agent_obs in obs.items():
+            observations[agent_id] = [agent_obs]
+
+        # Generate episode of data
+        for j in range(horizon):
+            action = self.compute_actions(obs)
             obs, reward, done, _ = self.sim.step(action)
+
+            # Store the data
+            for agent_id, agent_obs in obs.items():
+                try:
+                    observations[agent_id].append(agent_obs)
+                except KeyError:
+                    observations[agent_id] = [agent_obs]
+            for agent_id, agent_reward in reward.items():
+                try:
+                    rewards[agent_id].append(agent_reward)
+                except KeyError:
+                    rewards[agent_id] = [agent_reward]
+            for agent_id, agent_action in action.items():
+                try:
+                    actions[agent_id].append(agent_action)
+                except KeyError:
+                    actions[agent_id] = [agent_action]
+
+            # We should not request actions for any more done agents.
+            for agent_id, agent_done in done.items():
+                if agent_done:
+                    del obs[agent_id]
             if done['__all__']:
                 break
+
+        return observations, actions, rewards
 
     @abstractmethod
     def train(self):
