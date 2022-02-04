@@ -9,6 +9,9 @@ class MulitAgentTrainer(ABC):
 
     @property
     def sim(self):
+        """
+        The SimulationManager.
+        """
         return self._sim
 
     @sim.setter
@@ -127,5 +130,14 @@ class MulitAgentTrainer(ABC):
         return observations, actions, rewards
 
     @abstractmethod
-    def train(self):
+    def train(self, iterations=10_000, **kwargs):
+        """
+        Train the policy objects using generated data.
+
+        This function is abstract and should be implemented by the algorithm.
+
+        Args:
+            iterations: The number of training iterations.
+            **kwargs: Any additional parameter your algorithm may need.
+        """
         pass
