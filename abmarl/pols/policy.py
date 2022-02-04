@@ -5,6 +5,37 @@ import numpy as np
 
 class Policy(ABC):
     """
+    A policy maps an observation to an action.
+
+    The underlying mapping function can take many forms. It can be Q-table, a non
+    linear function, a neural network, etc.
+    """
+    @abstractmethod
+    def compute_action(self, obs, **kwargs):
+        """
+        Generate an action from the given observation.
+
+        Args:
+            obs: The input observation.
+
+        Returns:
+            An action computed by feeding the observation forward through the underlying
+            policy.
+        """
+        pass
+
+    def reset(self):
+        """
+        Reset the policy at the beginning of an episode.
+
+        Some policies behave differently at the beginning of an episode or as an episode
+        progresses. The reset function allows them to reset their parameters accordingly.
+        """
+        pass
+
+
+class QPolicy(ABC):
+    """
     A policy maps a observation to an action. The relationship between the observations and the
     available actions is stored in a q_table. The act function chooses an action given a state.
     The probability function returns the probability of choosing an action given a state.
@@ -31,7 +62,7 @@ class Policy(ABC):
         pass
 
 
-class GreedyPolicy(Policy):
+class GreedyPolicy(QPolicy):
     """
     The GreedyPolicy will always choose the optimal action.
     """
