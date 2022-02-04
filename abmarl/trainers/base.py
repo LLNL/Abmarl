@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 
-class MulitAgentTrainer(ABC):
+class MultiAgentTrainer(ABC):
     def __init__(self, sim=None, policies=None, policy_mapping_fn=None, **kwargs):
         self.sim = sim
         self.policies = policies

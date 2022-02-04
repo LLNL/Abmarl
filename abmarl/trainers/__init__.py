@@ -1,1 +1,1 @@
-from .base import MulitAgentTrainer
+from .base import MultiAgentTrainer
