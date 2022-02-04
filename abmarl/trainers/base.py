@@ -135,6 +135,10 @@ class MulitAgentTrainer(ABC):
         Train the policy objects using generated data.
 
         This function is abstract and should be implemented by the algorithm.
+        The implementation should look something like this:
+        for iter in range(iterations):
+            observations, actions, rewards = self.generate_episode()
+            # Implementation: update the policy with the generated data.
 
         Args:
             iterations: The number of training iterations.
