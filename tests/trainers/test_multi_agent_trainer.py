@@ -227,3 +227,49 @@ def test_trainer_generate_episode_check_lengths():
         reward = rewards[agent_id]
         assert len(obs) == len(action) + 1
         assert len(action) == len(reward)
+
+
+def test_policy_action_space_mismatch():
+    policies = {
+        'random0': RandomPolicy(
+            action_space=sim.agents['agent0'].action_space,
+            observation_space=sim.agents['agent0'].observation_space,
+        ),
+        'random1': RandomPolicy(
+            action_space=sim.agents['agent0'].action_space,
+            observation_space=sim.agents['agent1'].observation_space,
+        ),
+        'random2': RandomPolicy(
+            action_space=sim.agents['agent2'].action_space,
+            observation_space=sim.agents['agent2'].observation_space,
+        ),
+        'random3': RandomPolicy(
+            action_space=sim.agents['agent3'].action_space,
+            observation_space=sim.agents['agent3'].observation_space,
+        ),
+    }
+    with pytest.raises(AssertionError):
+        NoTrainer(sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn)
+
+
+def test_policy_observation_space_mismatch():
+    policies = {
+        'random0': RandomPolicy(
+            action_space=sim.agents['agent0'].action_space,
+            observation_space=sim.agents['agent0'].observation_space,
+        ),
+        'random1': RandomPolicy(
+            action_space=sim.agents['agent1'].action_space,
+            observation_space=sim.agents['agent1'].observation_space,
+        ),
+        'random2': RandomPolicy(
+            action_space=sim.agents['agent2'].action_space,
+            observation_space=sim.agents['agent2'].observation_space,
+        ),
+        'random3': RandomPolicy(
+            action_space=sim.agents['agent3'].action_space,
+            observation_space=sim.agents['agent0'].observation_space,
+        ),
+    }
+    with pytest.raises(AssertionError):
+        NoTrainer(sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn)
