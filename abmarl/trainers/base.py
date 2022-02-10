@@ -76,7 +76,7 @@ class MultiPolicyTrainer(ABC):
         }
 
     # TODO: Upgrade to generate_batch
-    def generate_episode(self, horizon=200):
+    def generate_episode(self, horizon=200, **kwargs):
         """
         Generate an episode of data.
 
@@ -101,7 +101,6 @@ class MultiPolicyTrainer(ABC):
             in order to extract the ith SAR for an agent.
             NOTE: In multiagent simulations, the number of SARs may differ for
             each agent.
-            
         """
         # Reset the simulation and policies
         obs = self.sim.reset()
