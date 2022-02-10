@@ -3,7 +3,7 @@ from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
 import numpy as np
 import pytest
 
-from abmarl.sim.agent_based_simulation import ActingAgent, AgentBasedSimulation, Agent, PrincipleAgent
+from abmarl.sim.agent_based_simulation import AgentBasedSimulation, Agent, PrincipleAgent
 
 from abmarl.trainers import MultiAgentTrainer
 from abmarl.pols.policy import RandomPolicy
