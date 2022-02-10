@@ -211,6 +211,6 @@ class SingleAgentTrainer(MultiAgentTrainer):
     @property
     def policy_mapping_fn(self):
         """
-        Always returns "policy", which is the name we give the policy.
+        Return function always returns "policy", which is the name we give the policy.
         """
-        return 'policy'
+        return lambda agent_id: 'policy'
