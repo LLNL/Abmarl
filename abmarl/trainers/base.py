@@ -193,7 +193,7 @@ class SingleAgentTrainer(MultiAgentTrainer):
     """
     def __init__(self, sim=None, policy=None, **kwargs):
         self.sim = sim
-        self.policy = policy
+        self.policies = policy
         self._check_agent_policy_alignment()
 
     @property
