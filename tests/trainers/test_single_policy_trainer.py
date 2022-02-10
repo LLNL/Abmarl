@@ -5,7 +5,7 @@ import pytest
 
 from abmarl.sim.agent_based_simulation import AgentBasedSimulation, Agent, PrincipleAgent
 
-from abmarl.trainers import SingleAgentTrainer
+from abmarl.trainers import SinglePolicyTrainer
 from abmarl.pols.policy import RandomPolicy
 from abmarl.managers import AllStepManager, TurnBasedManager
 
@@ -89,7 +89,7 @@ class SimTest(AgentBasedSimulation):
     def get_info(self, agent_id, **kwargs):
         return self.action[agent_id]
 
-class NoTrainer(SingleAgentTrainer):
+class NoTrainer(SinglePolicyTrainer):
     def train(self, **kwargs):
         return self.generate_episode(horizon=20)
 

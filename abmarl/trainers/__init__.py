@@ -1,1 +1,1 @@
-from .base import MultiAgentTrainer, SingleAgentTrainer
+from .base import MultiPolicyTrainer, SinglePolicyTrainer
