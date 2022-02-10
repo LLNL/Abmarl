@@ -3,7 +3,7 @@ from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
 import numpy as np
 import pytest
 
-from abmarl.sim.agent_based_simulation import AgentBasedSimulation, Agent
+from abmarl.sim.agent_based_simulation import ActingAgent, AgentBasedSimulation, Agent, PrincipleAgent
 
 from abmarl.trainers import MultiAgentTrainer
 from abmarl.pols.policy import RandomPolicy
@@ -44,6 +44,9 @@ class SimTest(AgentBasedSimulation):
                     'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
                 }),
                 action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
+            ),
+            'agent4': PrincipleAgent(
+                id='agent4'
             )
         }
 
@@ -76,8 +79,9 @@ class SimTest(AgentBasedSimulation):
         return self.step_count >= self.dones[int(agent_id[-1])]
 
     def get_all_done(self, **kwargs):
-        for agent in self.agents:
-            if not self.get_done(agent):
+        for agent in self.agents.values():
+            if not isinstance(agent, Agent): continue
+            if not self.get_done(agent.id):
                 return False
         return True
 
@@ -107,6 +111,7 @@ policies = {
         observation_space=sim.agents['agent3'].observation_space,
     ),
 }
+
 
 def policy_mapping_fn(agent_id):
     return 'random' + agent_id[-1]
@@ -172,7 +177,7 @@ def test_trainer_compute_actions():
         assert observation in policy.observation_space
     action = trainer.compute_actions(obs)
     assert len(action) == 4
-    for agent in sim.agents:
+    for agent in obs:
         assert agent in action
     for agent, act in action.items():
         policy = trainer.policies[trainer.policy_mapping_fn(agent)]
@@ -221,7 +226,8 @@ def test_trainer_generate_episode_check_lengths():
         sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn
     )
     observations, actions, rewards = trainer.generate_episode(horizon=20)
-    for agent_id in sim.agents:
+    for agent_id, agent in sim.agents.items():
+        if not isinstance(agent, Agent): continue
         obs = observations[agent_id]
         action = actions[agent_id]
         reward = rewards[agent_id]
