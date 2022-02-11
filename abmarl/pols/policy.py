@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from gym.spaces import Space
+from gym.spaces import Space, Discrete
 import numpy as np
 
 
@@ -63,6 +63,27 @@ class Policy(ABC):
         pass
 
 
+class QTablePolicy(Policy, ABC):
+    """
+    A policy that explicity stores and updates a Q-table.
+
+    This requires Discrete observation space and action space.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.q_table = np.random.normal(0, 1, size=(self.observation_space.n, self.action_space.n))
+
+    @action_space.setter
+    def action_space(self, value):
+        assert isinstance(value, Discrete), "Action space must be Discrete."
+        self._action_space = value
+
+    @observation_space.setter
+    def observation_space(self, value):
+        assert isinstance(value, Discrete), "Observation space must be Discrete."
+        self._observation_space = value
+
+
 class RandomPolicy(Policy):
     """
     Generate random actions.
@@ -81,7 +102,7 @@ class RandomPolicy(Policy):
         return self.action_space.sample()
 
 
-class QPolicy(ABC):
+class _QPolicy(ABC):
     """
     A policy maps a observation to an action. The relationship between the observations and the
     available actions is stored in a q_table. The act function chooses an action given a state.
@@ -109,7 +130,7 @@ class QPolicy(ABC):
         pass
 
 
-class GreedyPolicy(QPolicy):
+class _GreedyPolicy(_QPolicy):
     """
     The GreedyPolicy will always choose the optimal action.
     """
@@ -120,7 +141,7 @@ class GreedyPolicy(QPolicy):
         return 1 if action == np.argmax(self.q_table[state]) else 0
 
 
-class EpsilonSoftPolicy(GreedyPolicy):
+class EpsilonSoftPolicy(_GreedyPolicy):
     """
     The EpsilonSoftPolicy will sample a uniform distribution between 0 and 1. If the sampled
     value is less than epsilon, then the policy will randomly choose an action. Otherwise, it
@@ -144,7 +165,7 @@ class EpsilonSoftPolicy(GreedyPolicy):
             return self.epsilon / self.q_table[state].size
 
 
-class RandomFirstActionPolicy(GreedyPolicy):
+class RandomFirstActionPolicy(_GreedyPolicy):
     """
     The RandomFirstActionPolicy will choose a random action at the beginning of the episode.
     Afterwards, it will behave like a GreedyPolicy. Make sure you call the reset function at the
