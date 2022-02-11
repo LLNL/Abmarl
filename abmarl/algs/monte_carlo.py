@@ -4,7 +4,7 @@ import numpy as np
 
 from abmarl.managers import SimulationManager
 from abmarl.external import GymWrapper
-from abmarl.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
+from abmarl.pols.policy import _GreedyPolicy, _EpsilonSoftPolicy, _RandomFirstActionPolicy
 from abmarl.tools import numpy_utils as npu
 
 from .generate_episode import generate_episode
@@ -31,7 +31,7 @@ def exploring_starts(sim, iteration=10_000, gamma=0.9, horizon=200):
     assert isinstance(sim.observation_space, Discrete)
     assert isinstance(sim.action_space, Discrete)
     q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
-    policy = RandomFirstActionPolicy(q_table)
+    policy = _RandomFirstActionPolicy(q_table)
     state_action_returns = {}
 
     for i in range(iteration):
@@ -75,7 +75,7 @@ def epsilon_soft(sim, iteration=10_000, gamma=0.9, epsilon=0.1, horizon=200):
     assert isinstance(sim.observation_space, Discrete)
     assert isinstance(sim.action_space, Discrete)
     q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
-    policy = EpsilonSoftPolicy(q_table, epsilon=epsilon)
+    policy = _EpsilonSoftPolicy(q_table, epsilon=epsilon)
     state_action_returns = {}
 
     for i in range(iteration):
@@ -119,9 +119,9 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
     assert isinstance(sim.action_space, Discrete)
     q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
     c_table = 0 * q_table
-    policy = GreedyPolicy(q_table)
+    policy = _GreedyPolicy(q_table)
     for i in range(iteration):
-        behavior_policy = EpsilonSoftPolicy(q_table)
+        behavior_policy = _EpsilonSoftPolicy(q_table)
         states, actions, rewards, = generate_episode(sim, behavior_policy, horizon)
         G = 0
         W = 1

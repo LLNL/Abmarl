@@ -17,7 +17,7 @@ def test_exploring_starts_corridor():
 
     assert q_table.shape == (sim.observation_space.n, sim.action_space.n)
     assert isinstance(policy, RandomFirstActionPolicy)
-
+    
 
 def test_epsilon_soft():
     sim = AllStepManager(RavelDiscreteWrapper(Corridor(num_agents=1)))

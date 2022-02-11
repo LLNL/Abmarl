@@ -1,5 +1,4 @@
 
-from gym.spaces import Discrete
 import numpy as np
 
 from abmarl.trainers import SinglePolicyTrainer
@@ -11,8 +10,12 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
 
         for i in range(iterations):
             states, actions, rewards = self.generate_episode(**kwargs)
-            states = np.stack(states)
-            actions = np.stack(actions)
+            # TODO: Here we assume that there is not only a single policy but that
+            # there is also a single agent. We do this because we need to figure
+            # out how to concatenate the data from multiple agents training the
+            # same policy. Until then, we'll just use the first agent's experiences.
+            states = np.stack(next(iter(states)))
+            actions = np.stack(next(iter(actions)))
             G = 0
             for i in reversed(range(len(states))):
                 state, action, reward = states[i], actions[i], rewards[i]

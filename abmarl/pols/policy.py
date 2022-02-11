@@ -75,10 +75,28 @@ class QTablePolicy(Policy, ABC):
         super().__init__(**kwargs)
         self.q_table = np.random.normal(0, 1, size=(self.observation_space.n, self.action_space.n))
 
+    @property
+    def action_space(self):
+        """
+        The space of possible output actions for this policy.
+
+        Must be Discrete.
+        """
+        return self._action_space
+
     @action_space.setter
     def action_space(self, value):
         assert isinstance(value, Discrete), "Action space must be Discrete."
         self._action_space = value
+
+    @property
+    def observation_space(self):
+        """
+        The space of possible input observations for this policy.
+
+        Must be Discrete.
+        """
+        return self._observation_space
 
     @observation_space.setter
     def observation_space(self, value):
