@@ -16,7 +16,16 @@ def test_exploring_starts_corridor():
         observation_space=ref_agent.observation_space
     )
     trainer = OnPolicyMonteCarloTrainer(sim=sim, policy=policy)
-    trainer.train(iterations=1)
+    trainer.train(iterations=1000, horizon=20)
+
+    obs = sim.reset()
+    for _ in range(10):
+        actions = trainer.compute_actions(obs)
+        obs, reward, done, info = sim.step(actions)
+        if done['__all__']:
+            break
+    assert done['__all__']
+
     # sim, q_table, policy = trainer.train(iterations=1)
 
     # assert isinstance(sim.sim, AllStepManager)
