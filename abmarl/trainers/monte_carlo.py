@@ -7,15 +7,6 @@ from abmarl.tools import numpy_utils as npu
 
 class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
     def train(self, iterations=10_000, gamma=0.9, **kwargs):
-        # TODO: The creation of the q-table should happen with the policy, not
-        # here in train.
-        obs_space = self.policies['policy'].observation_space
-        act_space = self.policies['policy'].action_space
-        assert isinstance(obs_space, Discrete)
-        assert isinstance(act_space, Discrete)
-        q_table = np.random.normal(0, 1, size=(obs_space.n, act_space.n))
-        policy = RandomFirstActionPolicy(q_table)
-        # END todo.
         state_action_returns = {}
 
         for i in range(iterations):
@@ -32,7 +23,12 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
                         state_action_returns[(state, action)] = [G]
                     else:
                         state_action_returns[(state, action)].append(G)
-                    q_table[state, action] = np.mean(state_action_returns[(state, action)])
+                    # TODO: It is very dumb that access the the policy must be
+                    # through policies (or through _policy). We should modify
+                    # the single agent trainer to also allow access through policy.
+                    self.policies['policy'].q_table[state, action] = np.mean(state_action_returns[(state, action)])
+                    # TODO: This assumes that the policy is a QTablePolicy, injecting
+                    # unnecessary dependency. We need to change the policy interface
+                    # to create an "update" function.
 
-        return self.sim, q_table, policy
-
+        return self.sim, self.policies['policy'].q_table, self.policies['policy']
