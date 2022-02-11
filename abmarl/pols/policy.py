@@ -85,6 +85,7 @@ class QTablePolicy(Policy, ABC):
         assert isinstance(value, Discrete), "Observation space must be Discrete."
         self._observation_space = value
 
+
 class GreedyPolicy(QTablePolicy):
     """
     The GreedyPolicy will always choose the optimal action.
@@ -122,6 +123,29 @@ class EpsilonSoftPolicy(GreedyPolicy):
             return np.random.randint(0, self.q_table[obs].size)
         else:
             return super().compute_action(obs, **kwargs)
+
+
+class RandomFirstActionPolicy(GreedyPolicy):
+    """
+    First action is random, all other actions are greedy.
+
+    The RandomFirstActionPolicy will choose a random action at the beginning of the episode.
+    Afterwards, it will behave like a GreedyPolicy.
+    """
+    def reset(self):
+        """
+        Set take_random_action to True so that the policy takes a random action at the beginning
+        of an episode.
+        """
+        self._take_random_action = True
+
+    def act(self, state):
+        if self._take_random_action:
+            action = np.random.randint(0, self.q_table[state].size)
+        else:
+            action = super().act(state)
+        self._take_random_action = False
+        return action
 
 
 class RandomPolicy(Policy):
@@ -205,7 +229,7 @@ class _EpsilonSoftPolicy(_GreedyPolicy):
             return self.epsilon / self.q_table[state].size
 
 
-class RandomFirstActionPolicy(_GreedyPolicy):
+class _RandomFirstActionPolicy(_GreedyPolicy):
     """
     The RandomFirstActionPolicy will choose a random action at the beginning of the episode.
     Afterwards, it will behave like a GreedyPolicy. Make sure you call the reset function at the
