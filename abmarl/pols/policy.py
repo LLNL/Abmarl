@@ -63,6 +63,8 @@ class Policy(ABC):
         pass
 
 
+# TODO: Remove this class and let the subclasses, like greedy policy, work with
+# different implementations of the Q insead of forcing it to be a table.
 class QTablePolicy(Policy, ABC):
     """
     A policy that explicity stores and updates a Q-table.
@@ -82,6 +84,13 @@ class QTablePolicy(Policy, ABC):
     def observation_space(self, value):
         assert isinstance(value, Discrete), "Observation space must be Discrete."
         self._observation_space = value
+
+class GreedyPolicy(QTablePolicy):
+    """
+    The GreedyPolicy will always choose the optimal action.
+    """
+    def compute_action(self, obs, **kwargs):
+        return np.argmax(self.q_table[obs])
 
 
 class RandomPolicy(Policy):
