@@ -157,11 +157,11 @@ class RandomFirstActionPolicy(GreedyPolicy):
         """
         self._take_random_action = True
 
-    def act(self, state):
+    def compute_action(self, obs, **kwargs):
         if self._take_random_action:
-            action = np.random.randint(0, self.q_table[state].size)
+            action = np.random.randint(0, self.q_table[obs].size)
         else:
-            action = super().act(state)
+            action = super().compute_action(obs, **kwargs)
         self._take_random_action = False
         return action
 
