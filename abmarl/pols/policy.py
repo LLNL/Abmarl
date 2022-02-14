@@ -67,13 +67,29 @@ class Policy(ABC):
 # different implementations of the Q insead of forcing it to be a table.
 class QTablePolicy(Policy, ABC):
     """
-    A policy that explicity stores and updates a Q-table.
+    A policy that explicitly stores and updates a Q-table.
 
     This requires Discrete observation space and action space.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.q_table = np.random.normal(0, 1, size=(self.observation_space.n, self.action_space.n))
+
+    @property
+    def q_table(self):
+        """
+        The Q-table stores the value of each state-action pair.
+
+        The rows of the table should be the observations and the columns should
+        be actions.
+        """
+        return self._q_table
+
+    @q_table.setter
+    def q_table(self, value):
+        assert isinstance(value, np.ndarray), "Q-Table must be a numpy array."
+        assert len(value.shape) == 2, "Q-Table must have two dimensions."
+        self._q_table = value
 
     @property
     def action_space(self):
