@@ -126,9 +126,9 @@ class QTablePolicy(Policy, ABC):
         self._observation_space = value
 
     @classmethod
-    def copy(cls, policy_or_table):
+    def build(cls, policy_or_table, **kwargs):
         """
-        Create a copy of this policy.
+        Build a policy from another policy or q_table.
 
         Args:
             policy_or_table: We can create a policy using another policy, in which
@@ -144,7 +144,8 @@ class QTablePolicy(Policy, ABC):
             q_table = policy_or_table
         new_policy = cls(
             observation_space=Discrete(q_table.shape[0]),
-            action_spce=Discrete(q_table.shape[1])
+            action_spce=Discrete(q_table.shape[1],
+            **kwargs)
         )
         new_policy.q_table = q_table
         return new_policy
