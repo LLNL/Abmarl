@@ -31,12 +31,10 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
                         state_action_returns[(state, action)] = [G]
                     else:
                         state_action_returns[(state, action)].append(G)
-                    # TODO: It is very dumb that access the the policy must be
-                    # through policies (or through _policy). We should modify
-                    # the single agent trainer to also allow access through policy.
-                    self.policies['policy'].q_table[state, action] = np.mean(state_action_returns[(state, action)])
+                    self.policy.q_table[state, action] = np.mean(state_action_returns[(state, action)])
                     # TODO: This assumes that the policy is a QTablePolicy, injecting
                     # unnecessary dependency. We need to change the policy interface
                     # to create an "update" function.
 
-        return self.sim, self.policies['policy'].q_table, self.policies['policy']
+        return self.sim, self.policy.q_table, self.policy
+        # TODO: Why return these?
