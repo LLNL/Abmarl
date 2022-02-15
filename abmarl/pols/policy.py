@@ -89,6 +89,12 @@ class QTablePolicy(Policy, ABC):
     def q_table(self, value):
         assert isinstance(value, np.ndarray), "Q-Table must be a numpy array."
         assert len(value.shape) == 2, "Q-Table must have two dimensions."
+        assert value.shape[0] == self.observation_space.n, \
+            "The number of rows in the q table must be the same as the size of " + \
+            "the observation space."
+        assert value.shape[1] == self.action_space.n, \
+            "The number of columns in the q table must be the same as the size of " + \
+            "the action space."
         self._q_table = value
 
     @property
