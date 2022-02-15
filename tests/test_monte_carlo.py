@@ -3,7 +3,7 @@ from abmarl.sim.corridor import MultiCorridor as Corridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.external import GymWrapper
-from abmarl.pols.q_table_policy import GreedyPolicy
+from abmarl.policies.q_table_policy import GreedyPolicy
 
 
 def test_off_policy():

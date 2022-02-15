@@ -3,7 +3,7 @@ from random import Random
 from abmarl.sim.corridor import MultiCorridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper
-from abmarl.pols.q_table_policy import RandomFirstActionPolicy, EpsilonSoftPolicy
+from abmarl.policies.q_table_policy import RandomFirstActionPolicy, EpsilonSoftPolicy
 from abmarl.trainers.monte_carlo import OnPolicyMonteCarloTrainer
 
 

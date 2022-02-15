@@ -1,7 +1,7 @@
 
 from abc import ABC, abstractmethod
 
-from abmarl.pols.policy import Policy
+from abmarl.policies.policy import Policy
 from abmarl.managers import SimulationManager
 from abmarl.sim.agent_based_simulation import Agent
 

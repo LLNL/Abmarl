@@ -6,7 +6,7 @@ import pytest
 from abmarl.sim.agent_based_simulation import AgentBasedSimulation, Agent, PrincipleAgent
 
 from abmarl.trainers import MultiPolicyTrainer
-from abmarl.pols.policy import RandomPolicy
+from abmarl.policies.policy import RandomPolicy
 from abmarl.managers import AllStepManager, TurnBasedManager
 
 class SimTest(AgentBasedSimulation):

@@ -3,7 +3,7 @@ from random import Random
 from gym.spaces import Discrete
 import pytest
 
-from abmarl.pols.policy import RandomPolicy
+from abmarl.policies.policy import RandomPolicy
 
 def test_policy_action_space():
     with pytest.raises(AssertionError):
