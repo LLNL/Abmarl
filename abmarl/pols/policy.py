@@ -125,6 +125,29 @@ class QTablePolicy(Policy, ABC):
         assert isinstance(value, Discrete), "Observation space must be Discrete."
         self._observation_space = value
 
+    @classmethod
+    def copy(cls, policy_or_table):
+        """
+        Create a copy of this policy.
+
+        Args:
+            policy_or_table: We can create a policy using another policy, in which
+                case we look at the policy's q_table. Or we can create a policy
+                from the q_table directly.
+
+        Returns:
+            A new policy with the q_table.
+        """
+        if isinstance(policy_or_table, QTablePolicy):
+            q_table = policy_or_table.q_table
+        else:
+            q_table = policy_or_table
+        new_policy = cls(
+            observation_space=Discrete(q_table.shape[0]),
+            action_spce=Discrete(q_table.shape[1])
+        )
+        new_policy.q_table = q_table
+        return new_policy
 
 class GreedyPolicy(QTablePolicy):
     """
