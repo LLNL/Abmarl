@@ -4,7 +4,7 @@ import numpy as np
 
 from abmarl.managers import SimulationManager
 from abmarl.external import GymWrapper
-from abmarl.pols.policy import GreedyPolicy, EpsilonSoftPolicy
+from abmarl.pols.q_table_policy import GreedyPolicy, EpsilonSoftPolicy
 
 
 def generate_episode(sim, policy, horizon=200):
