@@ -1,2 +1,2 @@
-from .abstract_policy import HeuristicPolicy
-from .random_policy import RandomAction
+from .rllib_policy import HeuristicPolicy
+from .rllib_policy import RandomAction
