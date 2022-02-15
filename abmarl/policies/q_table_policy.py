@@ -87,8 +87,8 @@ class QTablePolicy(Policy, ABC):
             q_table = policy_or_table
         new_policy = cls(
             observation_space=Discrete(q_table.shape[0]),
-            action_space=Discrete(q_table.shape[1],
-            **kwargs)
+            action_space=Discrete(q_table.shape[1]),
+            **kwargs
         )
         new_policy.q_table = q_table
         return new_policy
@@ -171,7 +171,7 @@ class RandomFirstActionPolicy(GreedyPolicy):
         return action
 
     def probability(self, obs, action, **kwargs):
-        if self.take_random_action:
+        if self._take_random_action:
             return 1. / self.q_table[obs].size
         else:
             return super().probability(obs, action, **kwargs)
