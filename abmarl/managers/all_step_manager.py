@@ -58,8 +58,6 @@ class AllStepManager(SimulationManager):
                 self.done_agents.add(agent)
 
         # if all agents are done or the simulation is done, then return done
-        # TODO: If all ActingAgents are done, then we should return done. The
-        # check for all agents is too strict because some agents are just PrincipleAgents.
         if self.sim.get_all_done() or not (self.agents.keys() - self.done_agents):
             dones['__all__'] = True
         else:
