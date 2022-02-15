@@ -43,7 +43,7 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
             c_table[state, action] += W
             q_table[state, action] = q_table[state, action] + W/(c_table[state, action]) * \
                 (G - q_table[state, action])
-            if action != policy.act(state): # Nonoptimal action
+            if action != policy.compute_action(state): # Nonoptimal action
                 break
             W /= behavior_policy.probability(state, action)
 

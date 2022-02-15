@@ -241,7 +241,7 @@ class _QPolicy(ABC):
         self.q_table = q_table
 
     @abstractmethod
-    def act(self, state, *args, **kwargs):
+    def compute_action(self, state, *args, **kwargs):
         """Choose an action given a state."""
         pass
 
@@ -262,7 +262,7 @@ class _GreedyPolicy(_QPolicy):
     """
     The GreedyPolicy will always choose the optimal action.
     """
-    def act(self, state):
+    def compute_action(self, state):
         return np.argmax(self.q_table[state])
 
     def probability(self, state, action):
@@ -280,45 +280,14 @@ class _EpsilonSoftPolicy(_GreedyPolicy):
         assert 0 <= epsilon <= 1.0
         self.epsilon = epsilon
 
-    def act(self, state):
+    def compute_action(self, state):
         if np.random.uniform(0, 1) < self.epsilon:
             return np.random.randint(0, self.q_table[state].size)
         else:
-            return super().act(state)
+            return super().compute_action(state)
 
     def probability(self, state, action):
         if action == np.argmax(self.q_table[state]): # Optimal action
             return 1 - self.epsilon + self.epsilon / self.q_table[state].size
         else: # Nonoptimal action
             return self.epsilon / self.q_table[state].size
-
-
-class _RandomFirstActionPolicy(_GreedyPolicy):
-    """
-    The RandomFirstActionPolicy will choose a random action at the beginning of the episode.
-    Afterwards, it will behave like a GreedyPolicy. Make sure you call the reset function at the
-    beginning of every episode so that the policy knows to reset its parameters.
-    """
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def reset(self):
-        """
-        Set take_random_action to True so that the policy takes a random action at the beginning
-        of an episode.
-        """
-        self.take_random_action = True
-
-    def act(self, state):
-        if self.take_random_action:
-            action = np.random.randint(0, self.q_table[state].size)
-        else:
-            action = super().act(state)
-        self.take_random_action = False
-        return action
-
-    def probability(self, state, action):
-        if self.take_random_action:
-            return 1. / self.q_table[state].size
-        else:
-            return super().probability(state, action)

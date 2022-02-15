@@ -20,7 +20,7 @@ def test_off_policy():
 
     obs = sim.reset()
     for _ in range(10):
-        action = policy.act(obs)
+        action = policy.compute_action(obs)
         obs, reward, done, info = sim.step(action)
         if done:
             break

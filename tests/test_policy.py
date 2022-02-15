@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from abmarl.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
+from abmarl.pols.policy import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
 
 
 def test_abstract_policy():

@@ -12,7 +12,7 @@ def generate_episode(sim, policy, horizon=200):
     states, actions, rewards = [], [], []
     states.append(obs)
     for _ in range(horizon):
-        action = policy.act(obs)
+        action = policy.compute_action(obs)
         obs, reward, done, _ = sim.step(action)
         states.append(obs)
         actions.append(action)
