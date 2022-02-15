@@ -144,11 +144,18 @@ class QTablePolicy(Policy, ABC):
             q_table = policy_or_table
         new_policy = cls(
             observation_space=Discrete(q_table.shape[0]),
-            action_spce=Discrete(q_table.shape[1],
+            action_space=Discrete(q_table.shape[1],
             **kwargs)
         )
         new_policy.q_table = q_table
         return new_policy
+
+    @abstractmethod
+    def probability(self, obs, action, **kwargs):
+        """
+        Calculate the probability of choosing this action given this observation.
+        """
+        pass
 
 class GreedyPolicy(QTablePolicy):
     """
@@ -156,6 +163,9 @@ class GreedyPolicy(QTablePolicy):
     """
     def compute_action(self, obs, **kwargs):
         return np.argmax(self.q_table[obs])
+
+    def probability(self, obs, action, **kwargs):
+        return 1 if action == np.argmax(self.q_table[obs]) else 0
 
 
 class EpsilonSoftPolicy(GreedyPolicy):
@@ -188,6 +198,12 @@ class EpsilonSoftPolicy(GreedyPolicy):
         else:
             return super().compute_action(obs, **kwargs)
 
+    def probability(self, obs, action, **kwargs):
+        if action == np.argmax(self.q_table[obs]): # Optimal action
+            return 1 - self.epsilon + self.epsilon / self.q_table[obs].size
+        else: # Nonoptimal action
+            return self.epsilon / self.q_table[obs].size
+
 
 class RandomFirstActionPolicy(GreedyPolicy):
     """
@@ -211,6 +227,12 @@ class RandomFirstActionPolicy(GreedyPolicy):
         self._take_random_action = False
         return action
 
+    def probability(self, obs, action, **kwargs):
+        if self.take_random_action:
+            return 1. / self.q_table[obs].size
+        else:
+            return super().probability(obs, action, **kwargs)
+
 
 class RandomPolicy(Policy):
     """
@@ -228,66 +250,3 @@ class RandomPolicy(Policy):
         """
         assert obs in self.observation_space
         return self.action_space.sample()
-
-
-class _QPolicy(ABC):
-    """
-    A policy maps a observation to an action. The relationship between the observations and the
-    available actions is stored in a q_table. The act function chooses an action given a state.
-    The probability function returns the probability of choosing an action given a state.
-    """
-    def __init__(self, q_table):
-        """Store a q_table, which maps (state, action) to a value."""
-        self.q_table = q_table
-
-    @abstractmethod
-    def compute_action(self, state, *args, **kwargs):
-        """Choose an action given a state."""
-        pass
-
-    @abstractmethod
-    def probability(self, state, action):
-        """Calculate the probability of choosing this action given this state."""
-        pass
-
-    def reset(self):
-        """
-        Some policies behave differently at the beginning of an episode or as an episode
-        progresses. The reset function allows them to reset their parameters accordingly.
-        """
-        pass
-
-
-class _GreedyPolicy(_QPolicy):
-    """
-    The GreedyPolicy will always choose the optimal action.
-    """
-    def compute_action(self, state):
-        return np.argmax(self.q_table[state])
-
-    def probability(self, state, action):
-        return 1 if action == np.argmax(self.q_table[state]) else 0
-
-
-class _EpsilonSoftPolicy(_GreedyPolicy):
-    """
-    The EpsilonSoftPolicy will sample a uniform distribution between 0 and 1. If the sampled
-    value is less than epsilon, then the policy will randomly choose an action. Otherwise, it
-    will return the optimal action.
-    """
-    def __init__(self, *args, epsilon=0.1):
-        super().__init__(*args)
-        assert 0 <= epsilon <= 1.0
-        self.epsilon = epsilon
-
-    def compute_action(self, state):
-        if np.random.uniform(0, 1) < self.epsilon:
-            return np.random.randint(0, self.q_table[state].size)
-        else:
-            return super().compute_action(state)
-
-    def probability(self, state, action):
-        if action == np.argmax(self.q_table[state]): # Optimal action
-            return 1 - self.epsilon + self.epsilon / self.q_table[state].size
-        else: # Nonoptimal action
-            return self.epsilon / self.q_table[state].size

@@ -3,7 +3,7 @@ from abmarl.sim.corridor import MultiCorridor as Corridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.external import GymWrapper
-from abmarl.pols.policy import _GreedyPolicy
+from abmarl.pols.policy import GreedyPolicy
 
 
 def test_off_policy():
@@ -16,7 +16,7 @@ def test_off_policy():
     assert isinstance(sim.sim.sim.sim, Corridor)
 
     assert q_table.shape == (sim.observation_space.n, sim.action_space.n)
-    assert isinstance(policy, _GreedyPolicy)
+    assert isinstance(policy, GreedyPolicy)
 
     obs = sim.reset()
     for _ in range(10):
