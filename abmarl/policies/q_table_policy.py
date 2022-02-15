@@ -146,32 +146,3 @@ class EpsilonSoftPolicy(GreedyPolicy):
             return 1 - self.epsilon + self.epsilon / self.q_table[obs].size
         else: # Nonoptimal action
             return self.epsilon / self.q_table[obs].size
-
-
-class RandomFirstActionPolicy(GreedyPolicy):
-    """
-    First action is random, all other actions are greedy.
-
-    The RandomFirstActionPolicy will choose a random action at the beginning of the episode.
-    Afterwards, it will behave like a GreedyPolicy.
-    """
-    def reset(self):
-        """
-        Set take_random_action to True so that the policy takes a random action at the beginning
-        of an episode.
-        """
-        self._take_random_action = True
-
-    def compute_action(self, obs, **kwargs):
-        if self._take_random_action:
-            action = np.random.randint(0, self.q_table[obs].size)
-        else:
-            action = super().compute_action(obs, **kwargs)
-        self._take_random_action = False
-        return action
-
-    def probability(self, obs, action, **kwargs):
-        if self._take_random_action:
-            return 1. / self.q_table[obs].size
-        else:
-            return super().probability(obs, action, **kwargs)
