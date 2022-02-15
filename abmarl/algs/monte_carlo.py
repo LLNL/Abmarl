@@ -6,7 +6,28 @@ from abmarl.managers import SimulationManager
 from abmarl.external import GymWrapper
 from abmarl.pols.policy import GreedyPolicy, EpsilonSoftPolicy
 
-from .generate_episode import generate_episode
+
+def generate_episode(sim, policy, horizon=200):
+    """
+    Generate an episode from a policy acting on an simulation.
+
+    Returns: sequence of state, action, reward.
+    """
+    obs = sim.reset()
+    policy.reset() # Reset the policy too so that it knows its the beginning of the episode.
+    states, actions, rewards = [], [], []
+    states.append(obs)
+    for _ in range(horizon):
+        action = policy.compute_action(obs)
+        obs, reward, done, _ = sim.step(action)
+        states.append(obs)
+        actions.append(action)
+        rewards.append(reward)
+        if done:
+            break
+
+    states.pop() # Pop off the terminating state
+    return states, actions, rewards
 
 
 def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
