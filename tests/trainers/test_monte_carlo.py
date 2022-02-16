@@ -14,7 +14,7 @@ def test_epsilon_soft():
         observation_space=ref_agent.observation_space
     )
     trainer = OnPolicyMonteCarloTrainer(sim=sim, policy=policy)
-    trainer.train(iterations=1000, horizon=20)
+    trainer.train(iterations=2000, horizon=20)
 
     obs = sim.reset()
     for _ in range(20):
