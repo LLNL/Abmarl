@@ -18,6 +18,7 @@ def test_epsilon_soft():
 
     obs = sim.reset()
     for _ in range(20):
+        # TODO: Enable no-explore mode for testing performance of policy.
         actions = trainer.compute_actions(obs)
         obs, reward, done, info = sim.step(actions)
         if done['__all__']:
