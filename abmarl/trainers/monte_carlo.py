@@ -35,6 +35,3 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
                     # TODO: This assumes that the policy is a QTablePolicy, injecting
                     # unnecessary dependency. We need to change the policy interface
                     # to create an "update" function.
-
-        return self.sim, self.policy.q_table, self.policy
-        # TODO: Why return these?
