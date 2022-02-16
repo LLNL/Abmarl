@@ -19,7 +19,7 @@ class QPolicyTester(QTablePolicy):
 
 def test_q_policy_init_and_properties():
     with pytest.raises(AssertionError):
-        QPolicyTester(observation_space = Discrete(3), action_space=MultiBinary(4))
+        QPolicyTester(observation_space=Discrete(3), action_space=MultiBinary(4))
     with pytest.raises(AssertionError):
         QPolicyTester(observation_space=MultiBinary(2), action_space=Discrete(10))
     policy = QPolicyTester(observation_space=Discrete(3), action_space=(Discrete(10)))

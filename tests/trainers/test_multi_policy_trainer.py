@@ -9,6 +9,7 @@ from abmarl.trainers import MultiPolicyTrainer
 from abmarl.policies.policy import RandomPolicy
 from abmarl.managers import AllStepManager, TurnBasedManager
 
+
 class SimTest(AgentBasedSimulation):
     def __init__(self):
         self.rewards = [0, 1, 2, 3, 4, 5, 6]
@@ -88,9 +89,11 @@ class SimTest(AgentBasedSimulation):
     def get_info(self, agent_id, **kwargs):
         return self.action[agent_id]
 
+
 class NoTrainer(MultiPolicyTrainer):
     def train(self, **kwargs):
         return self.generate_episode(horizon=20)
+
 
 sim = AllStepManager(SimTest())
 policies = {
@@ -127,7 +130,7 @@ def test_trainer_sim():
 
     with pytest.raises(AssertionError):
         trainer.sim = SimTest()
-        
+
     trainer.sim = TurnBasedManager(SimTest())
 
 

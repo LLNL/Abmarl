@@ -1,5 +1,4 @@
 
-from random import Random
 from abmarl.sim.corridor import MultiCorridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper

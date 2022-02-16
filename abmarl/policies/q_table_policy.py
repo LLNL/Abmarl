@@ -6,6 +6,7 @@ import numpy as np
 
 from .policy import Policy
 
+
 # TODO: Remove this class and let the subclasses, like greedy policy, work with
 # different implementations of the Q insead of forcing it to be a table.
 class QTablePolicy(Policy, ABC):
