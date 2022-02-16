@@ -47,6 +47,28 @@ def test_q_policy_build():
     assert policy2.observation_space == Discrete(14)
     assert policy2.action_space == Discrete(4)
 
+
+def test_q_policy_update():
+    q = np.array([
+        [ 0,  1,  2],
+        [-1,  1, -2],
+        [ 0,  1,  0],
+        [ 2, -2, -2]])
+    policy = QPolicyTester.build(q)
+    policy.update(0, 1, 3)
+    policy.update(2, 2, -1)
+    policy.update(3, 0, -2)
+    np.testing.assert_array_equal(
+        policy.q_table,
+        np.array([
+            [ 0,  3,  2],
+            [-1,  1, -2],
+            [ 0,  1, -1],
+            [-2, -2, -2]
+        ])
+    )
+
+
 def test_greedy_policy():
     q = np.array([
         [ 0,  1,  2],

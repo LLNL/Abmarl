@@ -52,6 +52,18 @@ class Policy(ABC):
         """
         pass
 
+    @abstractmethod
+    def update(self, obs, action, value, **kwargs):
+        """
+        Update the policy with the data in obs, action, and value.
+
+        Args:
+            obs: The observation involved in the update.
+            action: The action involved in the update.
+            value: The value to use for the update.
+        """
+        pass
+
     def reset(self):
         """
         Reset the policy at the beginning of an episode.
@@ -78,3 +90,9 @@ class RandomPolicy(Policy):
         """
         assert obs in self.observation_space
         return self.action_space.sample()
+
+    def update(self, *args, **kwargs):
+        """
+        RandomPolicy does not chagne, so update does nothing.
+        """
+        pass

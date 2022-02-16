@@ -100,6 +100,13 @@ class QTablePolicy(Policy, ABC):
         """
         pass
 
+    def update(self, obs, action, value, **kwargs):
+        """
+        Set the q_table at (obs, action) to the value.
+        """
+        self.q_table[obs, action] = value
+
+
 class GreedyPolicy(QTablePolicy):
     """
     The GreedyPolicy will always choose the optimal action.

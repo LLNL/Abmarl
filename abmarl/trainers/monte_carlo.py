@@ -31,7 +31,4 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
                         state_action_returns[(state, action)] = [G]
                     else:
                         state_action_returns[(state, action)].append(G)
-                    self.policy.q_table[state, action] = np.mean(state_action_returns[(state, action)])
-                    # TODO: This assumes that the policy is a QTablePolicy, injecting
-                    # unnecessary dependency. We need to change the policy interface
-                    # to create an "update" function.
+                    self.policy.update(state, action, np.mean(state_action_returns[(state, action)]))
