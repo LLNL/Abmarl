@@ -4,7 +4,7 @@ import numpy as np
 
 from abmarl.managers import SimulationManager
 from abmarl.external import GymWrapper
-from abmarl.policies.q_table_policy import GreedyPolicy, EpsilonSoftPolicy
+from abmarl.policies.q_table_policy import EpsilonSoftPolicy
 
 
 def generate_episode(sim, policy, horizon=200):
@@ -52,7 +52,7 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
     assert isinstance(sim.action_space, Discrete)
     q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
     c_table = 0 * q_table
-    policy = GreedyPolicy.build(q_table)
+    policy = EpsilonSoftPolicy.build(q_table, epsilon=0)
     for i in range(iteration):
         behavior_policy = EpsilonSoftPolicy.build(q_table)
         states, actions, rewards, = generate_episode(sim, behavior_policy, horizon)

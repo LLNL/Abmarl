@@ -3,7 +3,7 @@ from gym.spaces import Discrete, MultiBinary
 import numpy as np
 import pytest
 
-from abmarl.policies.q_table_policy import QTablePolicy, GreedyPolicy, EpsilonSoftPolicy
+from abmarl.policies.q_table_policy import QTablePolicy, EpsilonSoftPolicy
 
 
 class QPolicyTester(QTablePolicy):
@@ -75,7 +75,7 @@ def test_greedy_policy():
         [-1,  1, -2],
         [ 0,  1,  0],
         [ 2, -2, -2]])
-    policy = GreedyPolicy.build(q)
+    policy = EpsilonSoftPolicy.build(q, epsilon=0)
     assert policy.compute_action(0) == 2
     assert policy.probability(0, 0) == 0
     assert policy.probability(0, 1) == 0

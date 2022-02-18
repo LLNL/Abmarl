@@ -108,20 +108,9 @@ class QTablePolicy(Policy, ABC):
         self.q_table[obs, action] = value
 
 
-class GreedyPolicy(QTablePolicy):
+class EpsilonSoftPolicy(QTablePolicy):
     """
-    The GreedyPolicy will always choose the optimal action.
-    """
-    def compute_action(self, obs, **kwargs):
-        return np.argmax(self.q_table[obs])
-
-    def probability(self, obs, action, **kwargs):
-        return 1 if action == np.argmax(self.q_table[obs]) else 0
-
-
-class EpsilonSoftPolicy(GreedyPolicy):
-    """
-    Choose random action with some probability.
+    Choose random action with some probability epsilon, otherwise choose optimal action.
 
     The EpsilonSoftPolicy will sample a uniform distribution between 0 and 1. If the sampled
     value is less than epsilon, then the policy will randomly choose an action. Otherwise, it
@@ -147,7 +136,7 @@ class EpsilonSoftPolicy(GreedyPolicy):
         if np.random.uniform(0, 1) < self.epsilon:
             return np.random.randint(0, self.q_table[obs].size)
         else:
-            return super().compute_action(obs, **kwargs)
+            return np.argmax(self.q_table[obs])
 
     def probability(self, obs, action, **kwargs):
         if action == np.argmax(self.q_table[obs]): # Optimal action
