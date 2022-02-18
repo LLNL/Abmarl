@@ -48,7 +48,7 @@ class Policy(ABC):
 
         Returns:
             An action computed by feeding the observation forward through the underlying
-            policy.
+            mapping.
         """
         pass
 

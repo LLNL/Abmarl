@@ -42,7 +42,7 @@ class MultiPolicyTrainer(ABC):
             assert type(k) is str, \
                 "The keys in the policies dictionary must be the policy names as strings."
             assert isinstance(v, Policy), \
-                "The values in the policies dictionary must by Policy objects."
+                "The values in the policies dictionary must be Policy objects."
         self._policies = value
 
     @property
@@ -61,7 +61,8 @@ class MultiPolicyTrainer(ABC):
         """
         Compute actions for agents in the observation.
 
-        Forwards the observations to the respective policy for each agent.
+        Forwards the observations to the respective policy for each agent that
+        reports an observation.
 
         Args:
             obs: an observation dictionary, where the keys are the agents reporting
@@ -84,18 +85,18 @@ class MultiPolicyTrainer(ABC):
         The fundamental data object is a SAR--a (state, action, reward) tuple.
         We restart the sim, generating initial observations (states) for agents
         reporting from the sim. Then we use the compute_action function to generate
-        actions for those reporting agents. Those actions are given to the sim,
+        actions for agents who report an observation. Those actions are given to the sim,
         which steps forward and generates rewards and new observations for reporting
         agents. This loop continues until the simulation is done or we hit the
         horizon.
 
         Args:
-            horizon: The maximum number of steps per epsidoe. They episode may
+            horizon: The maximum number of steps per epsidoe. The episode may
                 finish early, but it will not progress further than this number
                 of steps.
 
         Returns:
-            Three dictionaries, one for observations, another for actions, and
+            Three dictionaries: one for observations, another for actions, and
             another for rewards, thus making up the SAR sequences. The data is
             organized by agent_id, so you would call
                 {observations, actions, rewards}[agent_id][i]
@@ -143,6 +144,7 @@ class MultiPolicyTrainer(ABC):
             # We should not request actions for any more done agents.
             for agent_id, agent_done in done.items():
                 if agent_done:
+                    # This is okay to delete because it has already been stored in observations
                     del obs[agent_id]
 
         return observations, actions, rewards
