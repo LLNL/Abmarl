@@ -1,4 +1,6 @@
 
+import numpy as np
+
 from abmarl.sim.corridor import MultiCorridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper
@@ -7,6 +9,7 @@ from abmarl.trainers.monte_carlo import OnPolicyMonteCarloTrainer
 
 
 def test_epsilon_soft():
+    np.random.seed(24)
     sim = AllStepManager(RavelDiscreteWrapper(MultiCorridor(num_agents=1)))
     ref_agent = sim.agents['agent0']
     policy = EpsilonSoftPolicy(
@@ -14,7 +17,7 @@ def test_epsilon_soft():
         observation_space=ref_agent.observation_space
     )
     trainer = OnPolicyMonteCarloTrainer(sim=sim, policy=policy)
-    trainer.train(iterations=10_000, horizon=20)
+    trainer.train(iterations=20_000, horizon=20)
 
     policy.epsilon = 0
     obs = sim.reset()
