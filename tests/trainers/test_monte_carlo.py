@@ -14,8 +14,9 @@ def test_epsilon_soft():
         observation_space=ref_agent.observation_space
     )
     trainer = OnPolicyMonteCarloTrainer(sim=sim, policy=policy)
-    trainer.train(iterations=2000, horizon=20)
+    trainer.train(iterations=10_000, horizon=20)
 
+    policy.epsilon = 0
     obs = sim.reset()
     for _ in range(20):
         # TODO: Enable no-explore mode for testing performance of policy.
