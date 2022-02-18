@@ -1,3 +1,6 @@
+
+import numpy as np
+
 from abmarl.algs.monte_carlo import off_policy
 from abmarl.sim.corridor import MultiCorridor as Corridor
 from abmarl.managers import AllStepManager
@@ -7,8 +10,9 @@ from abmarl.policies.q_table_policy import EpsilonSoftPolicy
 
 
 def test_off_policy():
+    np.random.seed(24)
     sim = AllStepManager(RavelDiscreteWrapper(Corridor(num_agents=1)))
-    sim, q_table, policy = off_policy(sim, iteration=100, horizon=10)
+    sim, q_table, policy = off_policy(sim, iteration=1000, horizon=10)
 
     assert isinstance(sim, GymWrapper)
     assert isinstance(sim.sim, AllStepManager)
@@ -18,6 +22,7 @@ def test_off_policy():
     assert q_table.shape == (sim.observation_space.n, sim.action_space.n)
     assert isinstance(policy, EpsilonSoftPolicy)
 
+    policy.epsilon = 0
     obs = sim.reset()
     for _ in range(10):
         action = policy.compute_action(obs)
