@@ -4,7 +4,6 @@ import numpy as np
 import pytest
 
 from abmarl.policies.q_table_policy import QTablePolicy, EpsilonSoftPolicy
-from abmarl.sim.agent_based_simulation import ObservingAgent
 
 
 class QPolicyTester(QTablePolicy):
