@@ -77,7 +77,6 @@ class MultiPolicyTrainer(ABC):
             for agent_id in obs
         }
 
-    # TODO: Upgrade to generate_batch
     def generate_episode(self, horizon=200, **kwargs):
         """
         Generate an episode of data.
