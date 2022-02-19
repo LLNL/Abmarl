@@ -2,7 +2,6 @@ from abmarl.sim import AgentBasedSimulation
 from abmarl.sim import Agent
 
 from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
-import numpy as np
 
 
 class FillInHelper(AgentBasedSimulation):

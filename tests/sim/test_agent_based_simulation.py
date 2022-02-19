@@ -1,5 +1,4 @@
 
-import numpy as np
 import pytest
 
 from abmarl.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
