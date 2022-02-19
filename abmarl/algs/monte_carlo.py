@@ -52,9 +52,17 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
     assert isinstance(sim.action_space, Discrete)
     q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
     c_table = 0 * q_table
-    policy = EpsilonSoftPolicy.build(q_table, epsilon=0)
+    policy = EpsilonSoftPolicy(
+        observation_space=sim.observation_space,
+        action_space=sim.action_space,
+        q_table=q_table
+    )
     for i in range(iteration):
-        behavior_policy = EpsilonSoftPolicy.build(q_table)
+        behavior_policy = EpsilonSoftPolicy(
+            observation_space=policy.observation_space,
+            action_space=policy.action_space,
+            q_table=policy.q_table
+        )
         states, actions, rewards, = generate_episode(sim, behavior_policy, horizon)
         G = 0
         W = 1

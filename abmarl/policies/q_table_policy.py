@@ -15,9 +15,12 @@ class QTablePolicy(Policy, ABC):
 
     This requires Discrete observation space and action space.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, q_table=None, **kwargs):
         super().__init__(**kwargs)
-        self.q_table = np.random.normal(0, 1, size=(self.observation_space.n, self.action_space.n))
+        if q_table is None:
+            self._q_table = np.random.normal(0, 1, (self.observation_space.n, self.action_space.n))
+        else:
+            self.q_table = q_table
 
     @property
     def q_table(self):
@@ -68,31 +71,6 @@ class QTablePolicy(Policy, ABC):
     def observation_space(self, value):
         assert isinstance(value, Discrete), "Observation space must be Discrete."
         self._observation_space = value
-
-    @classmethod
-    def build(cls, policy_or_table, **kwargs):
-        """
-        Build a policy from another policy or q_table.
-
-        Args:
-            policy_or_table: We can create a policy using another policy, in which
-                case we look at the policy's q_table. Or we can create a policy
-                from the q_table directly.
-
-        Returns:
-            A new policy with the q_table.
-        """
-        if isinstance(policy_or_table, QTablePolicy):
-            q_table = policy_or_table.q_table
-        else:
-            q_table = policy_or_table
-        new_policy = cls(
-            observation_space=Discrete(q_table.shape[0]),
-            action_space=Discrete(q_table.shape[1]),
-            **kwargs
-        )
-        new_policy.q_table = q_table
-        return new_policy
 
     @abstractmethod
     def probability(self, obs, action, **kwargs):
