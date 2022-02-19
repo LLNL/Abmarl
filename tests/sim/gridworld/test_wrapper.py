@@ -26,13 +26,13 @@ def test_ravel_action_wrapper_properties():
 
 
 def test_ravel_action_wrapper_agent_spaces():
-    assert ravel_action_wrapper.from_space['agent0'] == Box(-1, 1, (2,), np.int)
+    assert ravel_action_wrapper.from_space['agent0'] == Box(-1, 1, (2,), int)
     assert ravel_action_wrapper.agents['agent0'].action_space['move'] == Discrete(9)
-    assert ravel_action_wrapper.from_space['agent1'] == Box(-2, 2, (2,), np.int)
+    assert ravel_action_wrapper.from_space['agent1'] == Box(-2, 2, (2,), int)
     assert ravel_action_wrapper.agents['agent1'].action_space['move'] == Discrete(25)
-    assert ravel_action_wrapper.from_space['agent2'] == Box(-1, 1, (2,), np.int)
+    assert ravel_action_wrapper.from_space['agent2'] == Box(-1, 1, (2,), int)
     assert ravel_action_wrapper.agents['agent2'].action_space['move'] == Discrete(9)
-    assert ravel_action_wrapper.from_space['agent3'] == Box(-3, 3, (2,), np.int)
+    assert ravel_action_wrapper.from_space['agent3'] == Box(-3, 3, (2,), int)
     assert ravel_action_wrapper.agents['agent3'].action_space['move'] == Discrete(49)
 
 
@@ -44,19 +44,19 @@ def test_ravel_action_wrapper_process_action():
         'agent3': {'move': 34},
     }
     np.testing.assert_array_equal(
-        ravel_action_wrapper.wrap_point(Box(-1, 1, (2,), np.int), 7),
+        ravel_action_wrapper.wrap_point(Box(-1, 1, (2,), int), 7),
         np.array([1, 0])
     )
     np.testing.assert_array_equal(
-        ravel_action_wrapper.wrap_point(Box(-2, 2, (2,), np.int), 3),
+        ravel_action_wrapper.wrap_point(Box(-2, 2, (2,), int), 3),
         np.array([-2, 1])
     )
     np.testing.assert_array_equal(
-        ravel_action_wrapper.wrap_point(Box(-1, 1, (2,), np.int), 4),
+        ravel_action_wrapper.wrap_point(Box(-1, 1, (2,), int), 4),
         np.array([0, 0])
     )
     np.testing.assert_array_equal(
-        ravel_action_wrapper.wrap_point(Box(-3, 3, (2,), np.int), 34),
+        ravel_action_wrapper.wrap_point(Box(-3, 3, (2,), int), 34),
         np.array([1, 3])
     )
 

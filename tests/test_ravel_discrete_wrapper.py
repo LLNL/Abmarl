@@ -5,17 +5,125 @@ from abmarl.sim import Agent
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np
 import pytest
-from .helpers import FillInHelper, MultiAgentGymSpacesSim
+# from .helpers import FillInHelper, MultiAgentGymSpacesSim
+from abmarl.sim.agent_based_simulation import AgentBasedSimulation
+
+class FillInHelper(AgentBasedSimulation):
+    def reset(self):
+        pass
+
+    def step(self, action):
+        pass
+
+    def render(self):
+        pass
+
+    def get_obs(self, agent_id, **kwargs):
+        pass
+
+    def get_reward(self, agent_id, **kwargs):
+        pass
+
+    def get_done(self, agent_id, **kwargs):
+        pass
+
+    def get_all_done(self, **kwargs):
+        pass
+
+    def get_info(self, agent_id, **kwargs):
+        pass
+
+class MultiAgentSim(FillInHelper):
+    def __init__(self, num_agents=3):
+        self.agents = {
+            'agent' + str(i): Agent(
+                id='agent'+str(i), observation_space=Discrete(2), action_space=Discrete(2)
+            ) for i in range(num_agents)
+        }
+
+    def reset(self):
+        self.action = {agent.id: None for agent in self.agents.values()}
+
+    def step(self, action_dict):
+        for agent_id, action in action_dict.items():
+            self.action[agent_id] = action
+
+    def get_obs(self, agent_id, **kwargs):
+        return "Obs from " + agent_id
+
+    def get_reward(self, agent_id, **kwargs):
+        return "Reward from " + agent_id
+
+    def get_done(self, agent_id, **kwargs):
+        return "Done from " + agent_id
+
+    def get_all_done(self, **kwargs):
+        return "Done from all agents and/or simulation."
+
+    def get_info(self, agent_id, **kwargs):
+        return {'Action from ' + agent_id: self.action[agent_id]}
+
+
+class MultiAgentGymSpacesSim(MultiAgentSim):
+    def __init__(self):
+        self.params = {'params': "there are none"}
+        self.agents = {
+            'agent0': Agent(
+                id='agent0',
+                observation_space=MultiBinary(4),
+                action_space=Tuple((
+                    Dict({
+                        'first': Discrete(4),
+                        'second': Box(low=-1, high=3, shape=(2,), dtype=int)
+                    }),
+                    MultiBinary(3)
+                ))
+            ),
+            'agent1': Agent(
+                id='agent1',
+                observation_space=Box(low=0, high=1, shape=(1,), dtype=int),
+                action_space=MultiDiscrete([4, 6, 2])
+            ),
+            'agent2': Agent(
+                id='agent2',
+                observation_space=MultiDiscrete([2, 2]),
+                action_space=Dict({'alpha': MultiBinary(3)})
+            ),
+            'agent3': Agent(
+                id='agent3',
+                observation_space=Dict({
+                    'first': Discrete(4),
+                    'second': Box(low=-1, high=3, shape=(2,), dtype=int)
+                }),
+                action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
+            )
+        }
+
+
+    def get_obs(self, agent_id, **kwargs):
+        if agent_id == 'agent0':
+            return [0, 0, 0, 1]
+        elif agent_id == 'agent1':
+            return 0
+        elif agent_id == 'agent2':
+            return [1, 0]
+        elif agent_id == 'agent3':
+            return {'first': 1, 'second': [3, 1]}
+
+
+    def get_info(self, agent_id, **kwargs):
+        return self.action[agent_id]
+
 
 
 def test_ravel():
     my_space = Dict({
         'a': MultiDiscrete([5, 3]),
         'b': MultiBinary(4),
-        'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=np.int),
+        'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
         'd': Dict({
             1: Discrete(3),
-            2: Box(1, 3, (2,), np.int)
+            2: Box(1, 3, (2,), int)
         }),
         'e': Tuple((
             MultiDiscrete([4, 1, 5]),
@@ -63,7 +171,7 @@ class UnboundedBelowObservation(FillInHelper):
             id='agent0', observation_space=Box(
                 np.array([0, 13, -3, -np.inf]),
                 np.array([0, 20, 0, 0]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(3)
         )}
@@ -75,7 +183,7 @@ class UnboundedAboveObservation(FillInHelper):
             id='agent0', observation_space=Box(
                 np.array([0, 12, 20, 0]),
                 np.array([np.inf, 20, 24, np.inf]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(2)
         )}
@@ -96,7 +204,7 @@ class UnboundedBelowAction(FillInHelper):
             observation_space=Box(
                 np.array([0, 13, -3, -np.inf]),
                 np.array([0, 20, 0, 0]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(3)
         )}
@@ -109,7 +217,7 @@ class UnboundedAboveAction(FillInHelper):
             observation_space=Box(
                 np.array([0, 12, 20, 0]),
                 np.array([np.inf, 20, 24, np.inf]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(2)
         )}
@@ -128,7 +236,6 @@ def test_exceptions():
         RavelDiscreteWrapper(UnboundedBelowAction())
     with pytest.raises(AssertionError):
         RavelDiscreteWrapper(UnboundedAboveAction())
-
 
 def test_ravel_wrapper():
     sim = MultiAgentGymSpacesSim()

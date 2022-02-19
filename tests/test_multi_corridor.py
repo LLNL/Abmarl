@@ -18,35 +18,35 @@ def test_corridor_init():
         'agent0': Agent(
             id='agent0',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int),
+                'position': Box(0,9,(1,),int),
                 'left': MultiBinary(1),
                 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
         'agent1': Agent(
             id='agent1',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int),
+                'position': Box(0,9,(1,),int),
                 'left': MultiBinary(1),
                 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
         'agent2': Agent(
             id='agent2',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int),
+                'position': Box(0,9,(1,),int),
                 'left': MultiBinary(1),
                 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
         'agent3': Agent(
             id='agent3',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int),
+                'position': Box(0,9,(1,),int),
                 'left': MultiBinary(1),
                 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
         'agent4': Agent(
             id='agent4',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int),
+                'position': Box(0,9,(1,),int),
                 'left': MultiBinary(1),
                 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
@@ -57,7 +57,7 @@ def test_corridor_init_end():
     sim = Corridor(end=7)
     assert sim.end == 7
     for agent in sim.agents.values():
-        assert agent.observation_space['position'] == Box(0, 6, (1,), np.int)
+        assert agent.observation_space['position'] == Box(0, 6, (1,), int)
 
 
 def test_corridor_init_num_agents():
@@ -66,12 +66,12 @@ def test_corridor_init_num_agents():
         'agent0': Agent(
             id='agent0',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)
+                'position': Box(0,9,(1,),int), 'left': MultiBinary(1), 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
         'agent1': Agent(
             id='agent1',
             observation_space=Dict({
-                'position': Box(0,9,(1,),np.int), 'left': MultiBinary(1), 'right': MultiBinary(1)
+                'position': Box(0,9,(1,),int), 'left': MultiBinary(1), 'right': MultiBinary(1)
             }), action_space=Discrete(3)),
     }
 

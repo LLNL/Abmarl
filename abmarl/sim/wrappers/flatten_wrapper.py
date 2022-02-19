@@ -41,7 +41,7 @@ def flatten(space, x):
     if isinstance(space, Box):
         return np.asarray(x, dtype=space.dtype).flatten()
     elif isinstance(space, Discrete):
-        onehot = np.zeros(space.n, dtype=np.int)
+        onehot = np.zeros(space.n, dtype=int)
         onehot[x] = 1
         return onehot
     elif isinstance(space, Tuple):
@@ -50,9 +50,9 @@ def flatten(space, x):
         return np.concatenate(
             [flatten(s, x[key]) for key, s in space.spaces.items()])
     elif isinstance(space, MultiBinary):
-        return np.asarray(x, dtype=np.int).flatten()
+        return np.asarray(x, dtype=int).flatten()
     elif isinstance(space, MultiDiscrete):
-        return np.asarray(x, dtype=np.int).flatten()
+        return np.asarray(x, dtype=int).flatten()
     else:
         raise TypeError('space must be instance of gym.spaces')
 
@@ -90,9 +90,9 @@ def unflatten(space, x):
         from collections import OrderedDict
         return OrderedDict(list_unflattened)
     elif isinstance(space, MultiBinary):
-        return np.asarray(x, dtype=np.int).reshape(space.shape)
+        return np.asarray(x, dtype=int).reshape(space.shape)
     elif isinstance(space, MultiDiscrete):
-        return np.asarray(x, dtype=np.int).reshape(space.shape)
+        return np.asarray(x, dtype=int).reshape(space.shape)
     else:
         raise TypeError
 
@@ -137,12 +137,12 @@ def flatten_space(space):
     if isinstance(space, Box):
         return Box(space.low.flatten(), space.high.flatten(), dtype=space.dtype)
     if isinstance(space, Discrete):
-        return Box(low=0, high=1, shape=(space.n, ), dtype=np.int)
+        return Box(low=0, high=1, shape=(space.n, ), dtype=int)
     if isinstance(space, Tuple):
         space = [flatten_space(s) for s in space.spaces]
-        encapsulating_type = np.int \
-            if all([this_space.dtype == np.int for this_space in space]) \
-            else np.float
+        encapsulating_type = int \
+            if all([this_space.dtype == int for this_space in space]) \
+            else float
         return Box(
             low=np.concatenate([s.low for s in space]),
             high=np.concatenate([s.high for s in space]),
@@ -150,21 +150,21 @@ def flatten_space(space):
         )
     if isinstance(space, Dict):
         space = [flatten_space(s) for s in space.spaces.values()]
-        encapsulating_type = np.int \
-            if all([this_space.dtype == np.int for this_space in space]) \
-            else np.float
+        encapsulating_type = int \
+            if all([this_space.dtype == int for this_space in space]) \
+            else float
         return Box(
             low=np.concatenate([s.low for s in space]),
             high=np.concatenate([s.high for s in space]),
             dtype=encapsulating_type
         )
     if isinstance(space, MultiBinary):
-        return Box(low=0, high=1, shape=(space.n, ), dtype=np.int)
+        return Box(low=0, high=1, shape=(space.n, ), dtype=int)
     if isinstance(space, MultiDiscrete):
         return Box(
             low=np.zeros_like(space.nvec),
             high=space.nvec,
-            dtype=np.int
+            dtype=int
         )
     raise TypeError
 

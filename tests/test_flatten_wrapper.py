@@ -8,7 +8,7 @@ from .helpers import MultiAgentSim
 
 # --- Test flatten helper commands --- #
 
-box = Box(2, 16, (3,4), np.int)
+box = Box(2, 16, (3,4), int)
 box2 = Box(2.4, 16.1, (3,4))
 discrete = Discrete(11)
 multi_binary = MultiBinary(7)
@@ -137,16 +137,16 @@ def test_flatten_and_unflatten():
 
 def test_flatten_space():
     flattened_box_space = flatten_space(box)
-    assert flattened_box_space == Box(2, 16, (12,), np.int)
+    assert flattened_box_space == Box(2, 16, (12,), int)
     flattened_box2_space = flatten_space(box2)
     assert flattened_box2_space == Box(2.4, 16.1, (12,))
     flattened_discrete_space = flatten_space(discrete)
-    assert flattened_discrete_space == Box(0, 1, (11,), np.int)
+    assert flattened_discrete_space == Box(0, 1, (11,), int)
     flattened_multi_binary_space = flatten_space(multi_binary)
-    assert flattened_multi_binary_space == Box(0, 1, (7,), np.int)
+    assert flattened_multi_binary_space == Box(0, 1, (7,), int)
     flattened_multi_discrete_space = flatten_space(multi_discrete)
     assert flattened_multi_discrete_space == Box(
-        np.array([0, 0, 0]), np.array([2, 6, 4]), (3,), np.int
+        np.array([0, 0, 0]), np.array([2, 6, 4]), (3,), int
     )
     flattened_d_space = flatten_space(d)
     assert flattened_d_space == Box(
@@ -182,7 +182,7 @@ def test_flatten_space():
             16,  1,  1,  1,  1,  1,  1,  1
         ]),
         (30,),
-        np.int
+        int
     )
 
 
@@ -213,7 +213,7 @@ class MultiAgentContinuousGymSpaceSim(MultiAgentSim):
                 id='agent3',
                 observation_space=Dict({
                     'first': Discrete(4),
-                    'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
+                    'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                 }),
                 action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
             )

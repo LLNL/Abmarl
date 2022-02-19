@@ -47,7 +47,7 @@ class GridWorldAgent(PrincipleAgent):
         if value is not None:
             assert type(value) is np.ndarray, "Initial position must be a numpy array."
             assert value.shape == (2,), "Initial position must be a 2-element array."
-            assert value.dtype in [np.int, np.float], "Initial position must be numerical."
+            assert value.dtype in [int, float], "Initial position must be numerical."
         self._initial_position = value
 
     @property

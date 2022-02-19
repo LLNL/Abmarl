@@ -23,7 +23,7 @@ class SimTest(AgentBasedSimulation):
                 action_space=Tuple((
                     Dict({
                         'first': Discrete(4),
-                        'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
+                        'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                     }),
                     MultiBinary(3)
                 ))
@@ -37,7 +37,7 @@ class SimTest(AgentBasedSimulation):
                 action_space=Tuple((
                     Dict({
                         'first': Discrete(4),
-                        'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
+                        'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                     }),
                     MultiBinary(3)
                 ))
@@ -210,7 +210,7 @@ def test_policy_observation_space_mismatch():
         action_space=Tuple((
             Dict({
                 'first': Discrete(4),
-                'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
+                'second': Box(low=-1, high=3, shape=(2,), dtype=int)
             }),
             MultiBinary(3)
         )),
