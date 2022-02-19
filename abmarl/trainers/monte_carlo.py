@@ -28,10 +28,10 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
                 G = gamma * G + reward
                 if not npu.array_in_array(state, states[:i]):
                     if not (npu.array_in_array(action, actions[:i])):
-                        if (state, action) not in state_action_returns:
-                            state_action_returns[(state, action)] = [G]
-                        else:
+                        try:
                             state_action_returns[(state, action)].append(G)
+                        except KeyError:
+                            state_action_returns[(state, action)] = [G]
                         self.policy.update(
                             state, action, np.mean(state_action_returns[(state, action)])
                         )
