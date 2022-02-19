@@ -121,7 +121,14 @@ def test_trainer_policy():
             sim=sim,
             policy={'policy': policy}
         )
-    NoTrainer(sim=sim, policy=policy)
+    trainer = NoTrainer(sim=sim, policy=policy)
+    assert trainer.policy == policy
+    assert trainer.policies == {'policy': policy}
+
+
+def test_trainer_policy_mapping_function():
+    trainer = NoTrainer(sim=sim, policy=policy)
+    assert trainer.policy_mapping_fn('agent0') == 'policy'
 
 
 def test_trainer_compute_actions():
