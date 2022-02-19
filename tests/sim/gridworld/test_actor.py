@@ -32,10 +32,10 @@ def test_move_actor():
     assert isinstance(move_actor, ActorBaseComponent)
     assert move_actor.key == 'move'
     assert move_actor.supported_agent_type == MovingAgent
-    assert agents['agent0'].action_space['move'] == Box(-1, 1, (2,), np.int)
-    assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), np.int)
-    assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), np.int)
-    assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), np.int)
+    assert agents['agent0'].action_space['move'] == Box(-1, 1, (2,), int)
+    assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), int)
+    assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), int)
+    assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), int)
 
     position_state.reset()
     action = {

@@ -67,7 +67,7 @@ class SingleGridObserver(ObserverBaseComponent):
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
-                    -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), np.int
+                    -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), int
                 )
 
     @property
@@ -117,7 +117,7 @@ class SingleGridObserver(ObserverBaseComponent):
         )
 
         # Convolve the grid observation with the mask.
-        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
+        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=int)
         for r in range(2 * agent.view_range + 1):
             for c in range(2 * agent.view_range + 1):
                 if mask[r, c]: # We can see this cell
@@ -165,7 +165,7 @@ class MultiGridObserver(ObserverBaseComponent):
                     -2,
                     len(self.agents),
                     (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
-                    np.int
+                    int
                 )
 
     @property
@@ -205,7 +205,7 @@ class MultiGridObserver(ObserverBaseComponent):
         # Convolve the grid observation with the mask.
         obs = np.zeros(
             (2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings),
-            dtype=np.int
+            dtype=int
         )
         for encoding in range(self.number_of_encodings):
             for r in range(2 * agent.view_range + 1):

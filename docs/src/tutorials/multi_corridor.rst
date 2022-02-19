@@ -65,7 +65,7 @@ Simulation itself, like so:
                    id=f'agent{i}',
                    action_space=Discrete(3), # Move left, stay still, or move right
                    observation_space={
-                       'position': Box(0, self.end-1, (1,), np.int), # Observe your own position
+                       'position': Box(0, self.end-1, (1,), int), # Observe your own position
                        'left': MultiBinary(1), # Observe if the left square is occupied
                        'right': MultiBinary(1) # Observe if the right square is occupied
                    }

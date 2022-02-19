@@ -60,7 +60,7 @@ class MoveActor(ActorBaseComponent):
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Box(
-                    -agent.move_range, agent.move_range, (2,), np.int
+                    -agent.move_range, agent.move_range, (2,), int
                 )
 
     @property
