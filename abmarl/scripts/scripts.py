@@ -2,6 +2,7 @@
 
 import argparse
 import os
+import sys
 
 from abmarl.scripts import train_script as train
 from abmarl.scripts import analyze_script as analyze
@@ -41,6 +42,11 @@ def cli():
     visualize.create_parser(subparsers)
     debug.create_parser(subparsers)
     runnable.create_parser(subparsers)
+
+    if len(sys.argv)==1: # Print out the help message if no arguments are given.
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+
     parameters = parser.parse_args()
     path_config = os.path.join(os.getcwd(), parameters.configuration)
 
