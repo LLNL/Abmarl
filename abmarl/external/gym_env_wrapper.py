@@ -1,4 +1,5 @@
 from gym import Env as GymEnv
+from gym.spaces import Space
 
 
 class GymWrapper(GymEnv):
@@ -12,9 +13,21 @@ class GymWrapper(GymEnv):
         assert isinstance(sim, SimulationManager)
         assert len(sim.agents) == 1 # Can only work with single agents
         self.sim = sim
-        self.agent_id, agent = next(iter(sim.agents.items()))
-        self.observation_space = agent.observation_space
-        self.action_space = agent.action_space
+        self.agent_id, self.agent = next(iter(sim.agents.items()))
+
+    @property
+    def action_space(self):
+        """
+        The agent's action space is the environment's action space.
+        """
+        return self.agent.action_space
+
+    @property
+    def observation_space(self):
+        """
+        The agent's observation space is the environment's observation space.
+        """
+        return self.agent.observation_space
 
     def reset(self, **kwargs):
         """
