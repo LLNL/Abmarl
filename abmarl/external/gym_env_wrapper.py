@@ -1,5 +1,4 @@
 from gym import Env as GymEnv
-from gym.spaces import Space
 
 
 class GymWrapper(GymEnv):
