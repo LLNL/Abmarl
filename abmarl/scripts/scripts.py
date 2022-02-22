@@ -43,7 +43,7 @@ def cli():
     debug.create_parser(subparsers)
     runnable.create_parser(subparsers)
 
-    if len(sys.argv)==1: # Print out the help message if no arguments are given.
+    if len(sys.argv) == 1: # Print out the help message if no arguments are given.
         parser.print_help(sys.stderr)
         sys.exit(1)
 
