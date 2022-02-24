@@ -60,12 +60,14 @@ class SingleGridObserver(ObserverBaseComponent):
     If there are multiple agents on a single cell with different encodings, the
     agent will observe only one of them chosen at random.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, observe_self=True, **kwargs):
         super().__init__(**kwargs)
+        self.observe_self = observe_self
+        max_encoding = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
-                    -np.inf, np.inf, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), np.int
+                    -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), int
                 )
 
     @property
@@ -81,6 +83,20 @@ class SingleGridObserver(ObserverBaseComponent):
         This Observer works with GridObservingAgents.
         """
         return GridObservingAgent
+
+    @property
+    def observe_self(self):
+        """
+        Agents can observe themselves, which may hide important information if
+        overlapping is important. This can be turned off by setting observe_self
+        to False.
+        """
+        return self._observe_self
+
+    @observe_self.setter
+    def observe_self(self, value):
+        assert type(value) is bool, "Observe self must be a boolean."
+        self._observe_self = value
 
     def get_obs(self, agent, **kwargs):
         """
@@ -101,7 +117,7 @@ class SingleGridObserver(ObserverBaseComponent):
         )
 
         # Convolve the grid observation with the mask.
-        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=np.int)
+        obs = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=int)
         for r in range(2 * agent.view_range + 1):
             for c in range(2 * agent.view_range + 1):
                 if mask[r, c]: # We can see this cell
@@ -111,9 +127,20 @@ class SingleGridObserver(ObserverBaseComponent):
                     elif not candidate_agents: # In bounds empty cell
                         obs[r, c] = 0
                     else: # Observe one of the agents at this cell
-                        obs[r, c] = np.random.choice(
-                            [other.encoding for other in candidate_agents.values()]
-                        )
+                        if self.observe_self:
+                            obs[r, c] = np.random.choice([
+                                other.encoding for other in candidate_agents.values()
+                            ])
+                        else:
+                            choices = [
+                                other.encoding
+                                for other in candidate_agents.values()
+                                if other.id != agent.id
+                            ]
+                            # It may be that the observing agent is the only agent
+                            # at this location but it cannot observe itself, which
+                            # makes choices an empty list.
+                            obs[r, c] = np.random.choice(choices) if choices else 0
                 else: # Cell blocked by agent. Indicate invisible with -2
                     obs[r, c] = -2
 
@@ -131,16 +158,14 @@ class MultiGridObserver(ObserverBaseComponent):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.number_of_encodings = 1
-        for agent in self.agents.values():
-            self.number_of_encodings = max(self.number_of_encodings, agent.encoding)
+        self.number_of_encodings = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
                     -2,
                     len(self.agents),
                     (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
-                    np.int
+                    int
                 )
 
     @property
@@ -180,7 +205,7 @@ class MultiGridObserver(ObserverBaseComponent):
         # Convolve the grid observation with the mask.
         obs = np.zeros(
             (2 * agent.view_range + 1, 2 * agent.view_range + 1, self.number_of_encodings),
-            dtype=np.int
+            dtype=int
         )
         for encoding in range(self.number_of_encodings):
             for r in range(2 * agent.view_range + 1):

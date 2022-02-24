@@ -12,10 +12,10 @@ def test_ravel():
     my_space = Dict({
         'a': MultiDiscrete([5, 3]),
         'b': MultiBinary(4),
-        'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=np.int),
+        'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
         'd': Dict({
             1: Discrete(3),
-            2: Box(1, 3, (2,), np.int)
+            2: Box(1, 3, (2,), int)
         }),
         'e': Tuple((
             MultiDiscrete([4, 1, 5]),
@@ -63,7 +63,7 @@ class UnboundedBelowObservation(FillInHelper):
             id='agent0', observation_space=Box(
                 np.array([0, 13, -3, -np.inf]),
                 np.array([0, 20, 0, 0]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(3)
         )}
@@ -75,7 +75,7 @@ class UnboundedAboveObservation(FillInHelper):
             id='agent0', observation_space=Box(
                 np.array([0, 12, 20, 0]),
                 np.array([np.inf, 20, 24, np.inf]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(2)
         )}
@@ -96,7 +96,7 @@ class UnboundedBelowAction(FillInHelper):
             observation_space=Box(
                 np.array([0, 13, -3, -np.inf]),
                 np.array([0, 20, 0, 0]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(3)
         )}
@@ -109,7 +109,7 @@ class UnboundedAboveAction(FillInHelper):
             observation_space=Box(
                 np.array([0, 12, 20, 0]),
                 np.array([np.inf, 20, 24, np.inf]),
-                dtype=np.int
+                dtype=int
             ),
             action_space=Discrete(2)
         )}

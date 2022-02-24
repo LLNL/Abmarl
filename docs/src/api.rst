@@ -66,13 +66,11 @@ Abmarl External Integration
 
 .. autoclass:: abmarl.external.GymWrapper
 	:members:
-	:undoc-members:
 
 .. _api_ma_wrapper:
 
 .. autoclass:: abmarl.external.MultiAgentWrapper
 	:members:
-	:undoc-members:
 
 
 

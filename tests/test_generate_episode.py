@@ -1,4 +1,4 @@
-from abmarl.algs.generate_episode import generate_episode
+from abmarl.algs.monte_carlo import generate_episode
 
 
 class Sim:
@@ -16,7 +16,7 @@ class Policy:
     def reset(self):
         self.first_guess = True
 
-    def act(self, obs):
+    def compute_action(self, obs):
         action = obs + 1 if self.first_guess else -2 * obs
         self.first_guess = False
         return action

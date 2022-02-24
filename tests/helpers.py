@@ -2,7 +2,6 @@ from abmarl.sim import AgentBasedSimulation
 from abmarl.sim import Agent
 
 from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
-import numpy as np
 
 
 class FillInHelper(AgentBasedSimulation):
@@ -72,14 +71,14 @@ class MultiAgentGymSpacesSim(MultiAgentSim):
                 action_space=Tuple((
                     Dict({
                         'first': Discrete(4),
-                        'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
+                        'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                     }),
                     MultiBinary(3)
                 ))
             ),
             'agent1': Agent(
                 id='agent1',
-                observation_space=Box(low=0, high=1, shape=(1,), dtype=np.int),
+                observation_space=Box(low=0, high=1, shape=(1,), dtype=int),
                 action_space=MultiDiscrete([4, 6, 2])
             ),
             'agent2': Agent(
@@ -91,7 +90,7 @@ class MultiAgentGymSpacesSim(MultiAgentSim):
                 id='agent3',
                 observation_space=Dict({
                     'first': Discrete(4),
-                    'second': Box(low=-1, high=3, shape=(2,), dtype=np.int)
+                    'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                 }),
                 action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
             )

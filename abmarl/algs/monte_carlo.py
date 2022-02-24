@@ -4,97 +4,30 @@ import numpy as np
 
 from abmarl.managers import SimulationManager
 from abmarl.external import GymWrapper
-from abmarl.pols import GreedyPolicy, EpsilonSoftPolicy, RandomFirstActionPolicy
-from abmarl.tools import numpy_utils as npu
-
-from .generate_episode import generate_episode
+from abmarl.policies.q_table_policy import EpsilonSoftPolicy
 
 
-def exploring_starts(sim, iteration=10_000, gamma=0.9, horizon=200):
+def generate_episode(sim, policy, horizon=200):
     """
-    Estimate an optimal policy over an simulation using monte carlo policy estimation.
+    Generate an episode from a policy acting on an simulation.
 
-    Args:
-        sim: The simulation, obviously.
-        iteration: The number of times to iterate the learning algorithm.
-        gamma: The discount factor
-        horizon: the time horizon for the trajectory.
-
-    Returns:
-        sim: The simulation. Algorithms may wrap simulations before training in them, so this
-            simulation may be wrapped.
-        q_table: The Q values
-        policy: The policy that is learned.
+    Returns: sequence of state, action, reward.
     """
-    assert isinstance(sim, SimulationManager)
-    sim = GymWrapper(sim)
-    assert isinstance(sim.observation_space, Discrete)
-    assert isinstance(sim.action_space, Discrete)
-    q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
-    policy = RandomFirstActionPolicy(q_table)
-    state_action_returns = {}
+    obs = sim.reset()
+    policy.reset() # Reset the policy too so that it knows its the beginning of the episode.
+    states, actions, rewards = [], [], []
+    states.append(obs)
+    for _ in range(horizon):
+        action = policy.compute_action(obs)
+        obs, reward, done, _ = sim.step(action)
+        states.append(obs)
+        actions.append(action)
+        rewards.append(reward)
+        if done:
+            break
 
-    for i in range(iteration):
-        states, actions, rewards = generate_episode(sim, policy, horizon)
-        states = np.stack(states)
-        actions = np.stack(actions)
-        G = 0
-        for i in reversed(range(len(states))):
-            state, action, reward = states[i], actions[i], rewards[i]
-            G = gamma * G + reward
-            if not (npu.array_in_array(state, states[:i]) and
-                    npu.array_in_array(action, actions[:i])):
-                if (state, action) not in state_action_returns:
-                    state_action_returns[(state, action)] = [G]
-                else:
-                    state_action_returns[(state, action)].append(G)
-                q_table[state, action] = np.mean(state_action_returns[(state, action)])
-
-    return sim, q_table, policy
-
-
-def epsilon_soft(sim, iteration=10_000, gamma=0.9, epsilon=0.1, horizon=200):
-    """
-    Estimate an optimal policy over a simulation using monte carlo policy estimation. The policy
-    is technically non-optimal because it is epsilon-soft.
-
-    Args:
-        sim: The simulation, obviously.
-        iteration: The number of times to iterate the learning algorithm.
-        gamme: The discount factor
-        epsilon: The exploration probability.
-
-    Returns:
-        sim: The simulation. Algorithms may wrap simulations before training in them, so this
-            simulation may be wrapped.
-        q_table: The Q values
-        policy: The policy that is learned.
-    """
-    assert isinstance(sim, SimulationManager)
-    sim = GymWrapper(sim)
-    assert isinstance(sim.observation_space, Discrete)
-    assert isinstance(sim.action_space, Discrete)
-    q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
-    policy = EpsilonSoftPolicy(q_table, epsilon=epsilon)
-    state_action_returns = {}
-
-    for i in range(iteration):
-        states, actions, rewards = generate_episode(sim, policy, horizon)
-        states = np.stack(states)
-        actions = np.stack(actions)
-        G = 0
-        for i in reversed(range(len(states))):
-            state, action, reward = states[i], actions[i], rewards[i]
-            G = gamma * G + reward
-            if not (npu.array_in_array(state, states[:i]) and
-                    npu.array_in_array(action, actions[:i])):
-                if (state, action) not in state_action_returns:
-                    state_action_returns[(state, action)] = [G]
-                else:
-                    state_action_returns[(state, action)].append(G)
-                q_table[state, action] = np.mean(state_action_returns[(state, action)])
-
-    return sim, q_table, policy
+    states.pop() # Pop off the terminating state
+    return states, actions, rewards
 
 
 def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
@@ -119,9 +52,17 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
     assert isinstance(sim.action_space, Discrete)
     q_table = np.random.normal(0, 1, size=(sim.observation_space.n, sim.action_space.n))
     c_table = 0 * q_table
-    policy = GreedyPolicy(q_table)
+    policy = EpsilonSoftPolicy(
+        observation_space=sim.observation_space,
+        action_space=sim.action_space,
+        q_table=q_table
+    )
     for i in range(iteration):
-        behavior_policy = EpsilonSoftPolicy(q_table)
+        behavior_policy = EpsilonSoftPolicy(
+            observation_space=policy.observation_space,
+            action_space=policy.action_space,
+            q_table=policy.q_table
+        )
         states, actions, rewards, = generate_episode(sim, behavior_policy, horizon)
         G = 0
         W = 1
@@ -131,7 +72,7 @@ def off_policy(sim, iteration=10_000, gamma=0.9, horizon=200):
             c_table[state, action] += W
             q_table[state, action] = q_table[state, action] + W/(c_table[state, action]) * \
                 (G - q_table[state, action])
-            if action != policy.act(state): # Nonoptimal action
+            if action != policy.compute_action(state): # Nonoptimal action
                 break
             W /= behavior_policy.probability(state, action)
 

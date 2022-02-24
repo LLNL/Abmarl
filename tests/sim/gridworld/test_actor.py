@@ -8,9 +8,10 @@ from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
 
+from .helpers import grid
+
 
 def test_move_actor():
-    grid = Grid(5, 6)
     agents = {
         'agent0': MovingAgent(
             id='agent0', initial_position=np.array([3, 4]), encoding=1, move_range=1
@@ -31,10 +32,10 @@ def test_move_actor():
     assert isinstance(move_actor, ActorBaseComponent)
     assert move_actor.key == 'move'
     assert move_actor.supported_agent_type == MovingAgent
-    assert agents['agent0'].action_space['move'] == Box(-1, 1, (2,), np.int)
-    assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), np.int)
-    assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), np.int)
-    assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), np.int)
+    assert agents['agent0'].action_space['move'] == Box(-1, 1, (2,), int)
+    assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), int)
+    assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), int)
+    assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), int)
 
     position_state.reset()
     action = {
@@ -118,7 +119,6 @@ def test_move_actor_with_overlap():
 
 
 def test_attack_actor():
-    grid = Grid(5, 6)
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(
@@ -159,7 +159,6 @@ def test_attack_actor():
 
 
 def test_attack_actor_attack_mapping():
-    grid = Grid(5, 6)
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(

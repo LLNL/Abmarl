@@ -19,7 +19,7 @@ register_env(sim_name, sim_creator)
 # --- Setup the policies --- #
 # -------------------------- #
 
-from abmarl.pols import HeuristicPolicy
+from abmarl.policies import HeuristicPolicy
 
 
 class CustomHeuristicPolicy(HeuristicPolicy):
