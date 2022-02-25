@@ -281,6 +281,11 @@ title from the configuration file appended with a timestamp) and display an anim
 of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
 the training directory.
 
+By default, each episode has a `horizon` of 200 steps (i.e. it will run for up to
+200 steps). It may end earlier depending on the `done` condition from the simulation.
+You can control the `horizon` with ``-s`` or ``--steps-per-episode`` when running
+the visualize command.
+
 
 
 Analyzing
