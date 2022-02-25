@@ -347,6 +347,9 @@ of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell
 and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly select between their `encodings`
 for the observation.
 
+By setting `observe_self` to False, the :ref:`SingleGridObserver <api_gridworld_observer_single>`
+can be configured so that an agent doesn't observe itself and only observes
+other agents, which may be helpful if overlapping is an important part of the simulation.
 
 .. _gridworld_blocking:
 
