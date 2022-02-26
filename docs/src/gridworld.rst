@@ -187,6 +187,42 @@ whole. Agents that are reported as done will cease sending actions to the simula
 and the episode will end when all the agents are done or when the simulation is done.
 
 
+.. _gridworld_wrappers:
+
+Component Wrappers
+``````````````````
+
+The GridWorld Simulation Framework also supports
+:ref:`Component Wrappers <api_gridworld_wrappers>`. Wrapping a component
+can be useful when you don't want to add a completely new component and
+only need to make a modification to the way a component already works. A component
+wrapper is itself a component, and so it must implement the same interface as the
+wrapped class to ensure that it works within the framework. They also define additional
+functions for wrapping spaces and data to and from those spaces: `check_space`
+for ensuring the space can be transformed, `wrap_space` to perform the transformation,
+and `wrap_point` the map data to the transformed space.
+
+As their name suggests, :ref:`Component Wrappers <api_gridworld_wrappers>` stand
+between the underlying component and other
+objects with which it exchanges data. As such, a wrapper typically modifies
+the incoming/outgoing data in some way before leveraging the underlying component for
+the actual processing of the data. The main difference among wrapper types is in
+the direction of data flow, which we detail below.
+
+Actor Wrappers
+~~~~~~~~~~~~~~
+
+An :ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receives actions in the
+`wrapped_space` through the ``process_action``
+function. It can modify that data before sending it to the underlying Actor to
+process. Actor Wrappers may need to modify the action spaces of corresponding agents
+to ensure that the action arrives in the correct format. For example, the
+:ref:`RavelActionWrapper <gridworld_ravel_action_wrapper>` applied to the
+:ref:`MoveActor <gridworld_movement>` converts the move action space from ``gym.spaces.Box``
+to ``gym.spaces.Discrete``. It also handles the transformation of data to and from
+that space.
+
+
 .. _gridworld_built_in_features:
 
 Built-in Features
