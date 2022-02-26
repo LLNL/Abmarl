@@ -81,8 +81,8 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
     Wraps an ActorComponent.
 
     Modify the action space of the agents involved with the Actor, namely the specific
-    actor's channel. The actions recieved from the trainer are the wrapped space,
-    so we need unwrap them to send them to the actor. This is the opposite from
+    actor's channel. The actions recieved from the trainer are in the wrapped space,
+    so we need to unwrap them to send them to the actor. This is the opposite from
     how we wrap and unwrap observations.
     """
     def __init__(self, component):
@@ -144,6 +144,17 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
 # TODO Abmarl-202: Fill out the details of the abstract observer wrapper.
 class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
+# Docs for ObserverWrapper:
+"""
+Observer Wrappers
+~~~~~~~~~~~~~~~~~
+
+An Observer Wrapper uses the ``get_obs`` function, at which point
+it can request an observation by passing the request to the underlying Observer
+and then modify the data from the observer before sending it out. Observer Wrappers
+may need to modifiy the observation spaces of corresponding agents to ensure that
+the Trainer is expecting the correct format.
+"""
 
 
 class RavelActionWrapper(ActorWrapper):

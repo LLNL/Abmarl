@@ -214,13 +214,9 @@ Actor Wrappers
 
 An :ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receives actions in the
 `wrapped_space` through the ``process_action``
-function. It can modify that data before sending it to the underlying Actor to
+function. It can modify the data before sending it to the underlying Actor to
 process. Actor Wrappers may need to modify the action spaces of corresponding agents
-to ensure that the action arrives in the correct format. For example, the
-:ref:`RavelActionWrapper <gridworld_ravel_action_wrapper>` applied to the
-:ref:`MoveActor <gridworld_movement>` converts the move action space from ``gym.spaces.Box``
-to ``gym.spaces.Discrete``. It also handles the transformation of data to and from
-that space.
+to ensure that the action arrives in the correct format. 
 
 
 .. _gridworld_built_in_features:
@@ -546,3 +542,52 @@ although `agent2` is within range, it is not a type that `agent0` can attack.
    Attacks can be blocked by :ref:`blocking <gridworld_blocking>` agents. If an attackable agent is
    masked from an attacking agent, then it cannot be attacked by that agent. The
    masking is determined the same way as view blocking described above.
+
+
+RavelActionWrapper
+``````````````````
+
+The :ref:`RavelActionWrapper <api_gridworld_ravel_action_wrappers>` transforms
+Discrete, MultiBinary, MultiDiscrete, bounded integer Box, and any nesting of those
+spaces into a Discrete space by "ravelling" their values according to numpy's
+``ravel_multi_index`` function. Thus, actions that are represented by arrays are
+converted into unique Discrete numbers. For example, we can apply the RavelActionWrapper
+to the MoveActor, like so:
+
+.. code-block:: python
+
+   from abmarl.sim.gridworld.agent import MovingAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState
+   from abmarl.sim.gridworld.actor import MoveActor
+   from abmarl.sim.gridworld.wrapper import RavelActionWrapper
+   
+   agents = {
+       'agent0': MovingAgent(id='agent0', encoding=1, move_range=1),
+       'agent1': MovingAgent(id='agent1', encoding=1, move_range=2)
+   }
+   grid = Grid(5, 5)
+   position_state = PositionState(agents=agents, grid=grid)
+   move_actor = MoveActor(agents=agents, grid=grid)
+   for agent in agents.values():
+       agent.finalize()
+   position_state.reset()
+
+   # Move actor without wrapper
+   actions = {
+       agent.id: agent.action_space.sample() for agent in agents.values()
+   }
+   print(actions)
+   # >>> {'agent0': OrderedDict([('move', array([1, 1]))]), 'agent1': OrderedDict([('move', array([ 2, -1]))])}
+   
+   # Wrapped move actor
+   move_actor = RavelActionWrapper(move_actor)
+   actions = {
+       agent.id: agent.action_space.sample() for agent in agents.values()
+   }
+   print(actions)
+   # >>> {'agent0': OrderedDict([('move', 1)]), 'agent1': OrderedDict([('move', 22)])}
+
+The actions from the unwrapped actor are in the original `Box` space, whereas after
+we apply the wrapper, the actions from the wrapped actor are in the transformed
+`Discrete` space.

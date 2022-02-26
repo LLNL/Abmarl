@@ -232,6 +232,8 @@ Wrappers
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_ravel_action_wrappers:
+
 .. autoclass:: abmarl.sim.gridworld.wrapper.RavelActionWrapper
 	:members:
 	:undoc-members:
