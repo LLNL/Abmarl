@@ -268,9 +268,9 @@ in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
 
 Debugging
 ---------
-It may be useful to trail run a simulation after setting up a configuration file
-to ensure that the simulation mechanics work as expected. Similar to the ``train``
-command, Abmarl's ``debug`` command will run the simulation with random actions
+It may be useful to trial run a simulation after setting up a configuration file
+to ensure that the simulation mechanics work as expected. Abmarl's ``debug`` command
+will run the simulation with random actions
 and create an output directory, wherein it will copy the configuration file and
 output the observations, actions, rewards, and done conditions for each
 step. The data from each episode will be logged to its own file in the output directory.
