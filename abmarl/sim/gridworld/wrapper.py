@@ -144,6 +144,8 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
 # TODO Abmarl-202: Fill out the details of the abstract observer wrapper.
 class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
+
+
 # Docs for ObserverWrapper:
 """
 Observer Wrappers
