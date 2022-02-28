@@ -590,4 +590,5 @@ to the MoveActor, like so:
 
 The actions from the unwrapped actor are in the original `Box` space, whereas after
 we apply the wrapper, the actions from the wrapped actor are in the transformed
-`Discrete` space.
+`Discrete` space. The actor will receive move actions in the `Discrete` space and convert
+them to the `Box` space before passing them to the MoveActor.
