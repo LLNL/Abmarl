@@ -3,10 +3,12 @@ from gym.spaces import Dict
 
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
+from abmarl.sim.wrappers.ravel_discrete_wrapper import unravel
 
 class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping, **kwargs):
         self.sim = sim
+        self.super_agent_mapping = super_agent_mapping
 
         # TODO: Assert that two super agents don't control the same sub agent.
 
@@ -40,3 +42,16 @@ class SuperAgentWrapper(Wrapper):
                 agent_id: self.sim.agents[agent_id] for agent_id in non_super_agents
             }
         }
+
+    def step(self, action_dict, **kwargs):
+        # "Unravel" the action dict so that super agent actions are decomposed
+        # into the normal agent actions and then pass to the underlying sim.
+        unravelled_action_dict = {}
+        for agent_id, action in action_dict.items():
+            if agent_id in self.super_agent_mapping: # A super agent action
+                for sub_agent_id, sub_action in action.items():
+                    unravelled_action_dict[sub_agent_id] = sub_action
+            else:
+                unravelled_action_dict[agent_id] = action
+        self.sim.step(unravelled_action_dict, **kwargs)
+
