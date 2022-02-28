@@ -26,7 +26,7 @@ class ComponentWrapper(GridWorldBaseComponent):
     @property
     def unwrapped(self):
         """
-        Fall through all the wrappers and obtain the original, completely unwrapped simulation.
+        Fall through all the wrappers and obtain the original, completely unwrapped component.
         """
         try:
             return self.wrapped_component.unwrapped
@@ -180,7 +180,7 @@ class RavelActionWrapper(ActorWrapper):
         Unravel a single discrete point to a value in the space.
 
         Recall that the action from the trainer arrives in the wrapped discrete
-        space, so we need to unravle it so that it is in the unwrapped space before
+        space, so we need to unravel it so that it is in the unwrapped space before
         giving it to the actor.
         """
         return rdw.unravel(space, point)
