@@ -266,6 +266,25 @@ in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
    should be a full path. For example, ``'local_dir': '/usr/local/scratch'``.
 
 
+Debugging
+---------
+It may be useful to trail run a simulation after setting up a configuration file
+to ensure that the simulation mechanics work as expected. Similar to the ``train``
+command, Abmarl's ``debug`` command will run the simulation with random actions
+and create an output directory, wherein it will copy the configuration file and
+output the observations, actions, rewards, and done conditions for each
+step. The data from each episode will be logged to its own file in the output directory.
+For example, the command
+
+.. code-block::
+
+   abmarl debug multi_corridor_example.py -n 2 -s 20 --render
+
+will run the `MultiCorridor` simulation with random actions and output log files
+to the directory it creates for 2 episodes and a horizon of 20, as well as render
+each step in each episode.
+
+
 Visualizing
 -----------
 We can visualize the agents' learned behavior with the ``visualize`` command, which
