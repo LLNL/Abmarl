@@ -55,3 +55,11 @@ class SuperAgentWrapper(Wrapper):
                 unravelled_action_dict[agent_id] = action
         self.sim.step(unravelled_action_dict, **kwargs)
 
+    def get_obs(self, agent_id, **kwargs):
+        if agent_id in self.super_agent_mapping:
+            return {
+                sub_agent_id: self.sim.get_obs(sub_agent_id, **kwargs)
+                for sub_agent_id in self.super_agent_mapping[agent_id]
+            }
+        else:
+            return self.sim.get_obs(agent_id, **kwargs)
