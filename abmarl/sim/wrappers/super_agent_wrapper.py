@@ -9,6 +9,10 @@ class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
+        # TODO: It would be more effective to automatically add the non-included
+        # agents in the super_agent_mapping so that they map to themselves. This
+        # would avoid all the if statements and two-logical processing that we
+        # have to do in the functions below.
 
         # TODO: Assert that two super agents don't control the same sub agent.
 
@@ -63,3 +67,12 @@ class SuperAgentWrapper(Wrapper):
             }
         else:
             return self.sim.get_obs(agent_id, **kwargs)
+
+    def get_rewards(self, agent_id, **kwargs):
+        if agent_id in self.super_agent_mapping:
+            return sum([
+                self.sim.get_reward(sub_agent_id)
+                for sub_agent_id in self.super_agent_mapping[agent_id]
+            ])
+        else:
+            return self.sim.get_reward(agent_id, **kwargs)
