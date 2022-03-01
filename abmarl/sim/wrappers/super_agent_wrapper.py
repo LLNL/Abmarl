@@ -76,3 +76,14 @@ class SuperAgentWrapper(Wrapper):
             ])
         else:
             return self.sim.get_reward(agent_id, **kwargs)
+
+    def get_done_(self, agent_id, **kwargs):
+        # TODO: explain why we choose any istead of all.
+        if agent_id in self.super_agent_mapping:
+            return any([
+                self.sim.get_done(sub_agent_id)
+                for sub_agent_id in self.super_agent_mapping[agent_id]
+            ])
+        else:
+            return self.sim.get_done_(agent_id, **kwargs)
+
