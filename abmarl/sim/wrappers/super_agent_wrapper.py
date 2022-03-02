@@ -9,8 +9,6 @@ class SuperAgentWrapper(Wrapper):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
 
-        # TODO: Assert that two super agents don't control the same sub agent.
-
         # Construct a mapping from the super agents to the sub agents observation
         # and action spaces
         obs_mapping = {}
@@ -41,6 +39,25 @@ class SuperAgentWrapper(Wrapper):
                 agent_id: self.sim.agents[agent_id] for agent_id in non_super_agents
             }
         }
+
+    @property
+    def super_agent_mapping(self):
+        return self._super_agent_mapping
+
+    @super_agent_mapping.setter
+    def super_agent_mapping(self, value):
+        assert type(value) is dict, "super agent mapping must be a dictionary."
+        self._covered_agents = set()
+        for k, v in value.items():
+            assert type(k) is str, "The keys super agent mapping must be the super agent's id."
+            assert type(v) is list, "The values in super agent mapping must be lists of agent ids."
+            for sub_agent in v:
+                assert type(sub_agent) is str, "The sub agents list must be agent ids."
+                assert sub_agent in self.sim.agents, "The sub agent must be an agent in the underlying sim."
+                assert sub_agent not in self._covered_agents, "The sub agent is already covered by another super agent."
+                self._covered_agents.add(sub_agent)
+        self._uncovered_agents = self.sim.agents.keys() - self._covered_agents
+        self._super_agent_mapping = value
 
     def step(self, action_dict, **kwargs):
         # "Unravel" the action dict so that super agent actions are decomposed
