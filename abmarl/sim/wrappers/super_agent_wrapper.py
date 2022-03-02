@@ -58,17 +58,22 @@ class SuperAgentWrapper(Wrapper):
         # into the normal agent actions and then pass to the underlying sim.
         unravelled_action_dict = {}
         for agent_id, action in action_dict.items():
-            # TODO: Assert agent id is not in the covered agents since we want
-            # the wrapper to raise an error if it receives an action from a sub_agent.
+            assert agent_id not in self._covered_agents, \
+                "We cannot receive actions from a sub agent that is covered by a super agent."
             if agent_id in self.super_agent_mapping: # A super agent action
                 for sub_agent_id, sub_action in action.items():
+                    # We can safely assume the format of the actions because we
+                    # generated the action space
                     unravelled_action_dict[sub_agent_id] = sub_action
             else:
                 unravelled_action_dict[agent_id] = action
         self.sim.step(unravelled_action_dict, **kwargs)
 
     def get_obs(self, agent_id, **kwargs):
-        # TODO: Assert that agent_id is not covered
+        assert agent_id not in self._covered_agents, \
+            "We cannot produce observations for a sub agent that is covered by a super agent."
+        # We can safely assume the format of the observations because we generated
+        # the observation space
         if agent_id in self.super_agent_mapping:
             return {
                 sub_agent_id: self.sim.get_obs(sub_agent_id, **kwargs)
@@ -78,7 +83,8 @@ class SuperAgentWrapper(Wrapper):
             return self.sim.get_obs(agent_id, **kwargs)
 
     def get_reward(self, agent_id, **kwargs):
-        # TODO: Assert that agent_id is not covered
+        assert agent_id not in self._covered_agents, \
+            "We cannot get rewards for a sub agent that is covered by a super agent."
         if agent_id in self.super_agent_mapping:
             return sum([
                 self.sim.get_reward(sub_agent_id)
@@ -88,8 +94,10 @@ class SuperAgentWrapper(Wrapper):
             return self.sim.get_reward(agent_id, **kwargs)
 
     def get_done(self, agent_id, **kwargs):
-        # TODO: Assert that agent_id is not covered
+        assert agent_id not in self._covered_agents, \
+            "We cannot get done for a sub agent that is covered by a super agent."
         # TODO: explain why we choose all.
+        # TODO: Do we need to add masking for active agents in the super agent?
         if agent_id in self.super_agent_mapping:
             return all([
                 self.sim.get_done(sub_agent_id)
