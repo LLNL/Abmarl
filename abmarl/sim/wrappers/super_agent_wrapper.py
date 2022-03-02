@@ -5,40 +5,32 @@ from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
 
 class SuperAgentWrapper(Wrapper):
-    def __init__(self, sim, super_agent_mapping, **kwargs):
+    def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
+        self.agents = {}
 
-        # Construct a mapping from the super agents to the sub agents observation
-        # and action spaces
-        obs_mapping = {}
-        action_mapping = {}
-        for super_agent_id, agent_list in super_agent_mapping.items():
-            obs_mapping[super_agent_id] = {}
-            action_mapping[super_agent_id] = {}
-            for agent_id in agent_list:
-                obs_mapping[super_agent_id][agent_id] = self.sim.agents[agent_id].observation_space
-                action_mapping[super_agent_id][agent_id] = self.sim.agents[agent_id].action_space
-            obs_mapping[super_agent_id] = Dict(obs_mapping[super_agent_id])
-            action_mapping[super_agent_id] = Dict(action_mapping[super_agent_id])
-
-        # Determine which sub agents are not combined into a super agent
-        covered_agents = set(agent_id for agents in super_agent_mapping.values() for agent_id in agents)
-        non_super_agents = set(self.sim.agents) - covered_agents
-
-        # Store the super and non-covered sub agents together
-        self.agents = {
-            **{
-                super_agent_id: Agent(
-                    id=super_agent_id,
-                    observation_space=obs_mapping[super_agent_id],
-                    action_space=action_mapping[super_agent_id]
-                ) for super_agent_id in super_agent_mapping
-            },
-            **{
-                agent_id: self.sim.agents[agent_id] for agent_id in non_super_agents
+        # Construct the agent dict with super agents
+        for super_agent_id, sub_agent_list in self.super_agent_mapping.items():
+            # Construct a mapping from the super agents to the sub agents' observation
+            # and action spaces
+            obs_mapping = {
+                sub_agent_id: self.sim.agents[sub_agent_id].observation_space
+                for sub_agent_id in sub_agent_list
             }
-        }
+            action_mapping = {
+                sub_agent_id: self.sim.agents[sub_agent_id].action_space
+                for sub_agent_id in sub_agent_list
+            }
+            self.agents[super_agent_id] = Agent(
+                id=super_agent_id,
+                observation_space=Dict(obs_mapping),
+                action_space=Dict(action_mapping)
+            )
+
+        # Add all uncovered agents to the dict of agetns
+        for agent_id in self._uncovered_agents:
+            self.agents[agent_id] = self.sim.agents[agent_id]
 
     @property
     def super_agent_mapping(self):
@@ -55,6 +47,7 @@ class SuperAgentWrapper(Wrapper):
                 assert type(sub_agent) is str, "The sub agents list must be agent ids."
                 assert sub_agent in self.sim.agents, "The sub agent must be an agent in the underlying sim."
                 assert sub_agent not in self._covered_agents, "The sub agent is already covered by another super agent."
+                assert isinstance(self.sim.agents[sub_agent], Agent), "Covered agents must be learning Agents."
                 self._covered_agents.add(sub_agent)
         self._uncovered_agents = self.sim.agents.keys() - self._covered_agents
         self._super_agent_mapping = value
