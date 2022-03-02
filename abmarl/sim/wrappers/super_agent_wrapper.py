@@ -3,7 +3,6 @@ from gym.spaces import Dict
 
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
-from abmarl.sim.wrappers.ravel_discrete_wrapper import unravel
 
 class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping, **kwargs):
@@ -52,6 +51,8 @@ class SuperAgentWrapper(Wrapper):
         # into the normal agent actions and then pass to the underlying sim.
         unravelled_action_dict = {}
         for agent_id, action in action_dict.items():
+            # TODO: Assert agent id is not in the covered agents since we want
+            # the wrapper to raise an error if it receives an action from a sub_agent.
             if agent_id in self.super_agent_mapping: # A super agent action
                 for sub_agent_id, sub_action in action.items():
                     unravelled_action_dict[sub_agent_id] = sub_action
@@ -60,6 +61,7 @@ class SuperAgentWrapper(Wrapper):
         self.sim.step(unravelled_action_dict, **kwargs)
 
     def get_obs(self, agent_id, **kwargs):
+        # TODO: Assert that agent_id is not covered
         if agent_id in self.super_agent_mapping:
             return {
                 sub_agent_id: self.sim.get_obs(sub_agent_id, **kwargs)
@@ -68,7 +70,8 @@ class SuperAgentWrapper(Wrapper):
         else:
             return self.sim.get_obs(agent_id, **kwargs)
 
-    def get_rewards(self, agent_id, **kwargs):
+    def get_reward(self, agent_id, **kwargs):
+        # TODO: Assert that agent_id is not covered
         if agent_id in self.super_agent_mapping:
             return sum([
                 self.sim.get_reward(sub_agent_id)
@@ -77,7 +80,8 @@ class SuperAgentWrapper(Wrapper):
         else:
             return self.sim.get_reward(agent_id, **kwargs)
 
-    def get_done_(self, agent_id, **kwargs):
+    def get_done(self, agent_id, **kwargs):
+        # TODO: Assert that agent_id is not covered
         # TODO: explain why we choose all.
         if agent_id in self.super_agent_mapping:
             return all([
@@ -85,5 +89,5 @@ class SuperAgentWrapper(Wrapper):
                 for sub_agent_id in self.super_agent_mapping[agent_id]
             ])
         else:
-            return self.sim.get_done_(agent_id, **kwargs)
+            return self.sim.get_done(agent_id, **kwargs)
 
