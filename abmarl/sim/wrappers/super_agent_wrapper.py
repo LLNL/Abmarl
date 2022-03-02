@@ -42,6 +42,7 @@ class SuperAgentWrapper(Wrapper):
         self._covered_agents = set()
         for k, v in value.items():
             assert type(k) is str, "The keys super agent mapping must be the super agent's id."
+            assert k not in self.sim.agents, "A super agent cannot have the same id as a sub_agent."
             assert type(v) is list, "The values in super agent mapping must be lists of agent ids."
             for sub_agent in v:
                 assert type(sub_agent) is str, "The sub agents list must be agent ids."
