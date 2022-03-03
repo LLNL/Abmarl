@@ -18,9 +18,9 @@ class SuperAgentWrapper(Wrapper):
         """
         A dictionary that maps from a super agent's id to a list of covered agent ids.
 
-        Suppose your simulation has 5 agents and you use the following super agent mapping:
+        Suppose our simulation has 5 agents and we use the following super agent mapping:
             {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
-        The resulting agents dict would have keys 'super0', 'super1', and 'agent2',
+        The resulting agents dict would have keys 'super0', 'super1', and 'agent2';
         where 'agent0', 'agent1', 'agent3', and 'agent4' have been covered by the
         super agents and 'agent2' is left uncovered and therefore included in the
         dict of agents. If the super agent mapping is changed, then the dictionary 
@@ -58,12 +58,12 @@ class SuperAgentWrapper(Wrapper):
         Give actions to the simulation.
 
         Super agent actions are decomposed into the covered agent actions and
-        then pass to the underlying sim. Because of the nature of this wrapper,
+        then passed to the underlying sim. Because of the nature of this wrapper,
         the super agents may provide actions for covered agents that are already
         done. We filter out these actions.
 
         Args:
-            action_dict: Dictionary that maps agent's ids to the actions. Covered
+            action_dict: Dictionary that maps agent ids to the actions. Covered
             agents should not be present.
         """
         unravelled_action_dict = {}
@@ -87,8 +87,8 @@ class SuperAgentWrapper(Wrapper):
         Report observations from the simulation.
 
         Args:
-            agent_id: The id of the agent for whom to produce an observation. Covered
-            agents cannot be handled.
+            agent_id: The id of the agent for whom to produce an observation. Should
+            not be a covered agent.
 
         Returns:
             The requested observation. Super agent observations are collected from
@@ -111,8 +111,8 @@ class SuperAgentWrapper(Wrapper):
         Report the agent's reward.
 
         Args:
-            agent_id: The id of the agent for whom to report the reward. Covered
-            agents cannot be handled.
+            agent_id: The id of the agent for whom to report the reward. Should
+            not be a covered agent.
 
         Returns:
             The requested reward. Super agent rewards are summed from the covered
@@ -133,14 +133,14 @@ class SuperAgentWrapper(Wrapper):
         Report the agent's done condition.
         
         Because super agents are composed of multiple agents, it could be the case
-        that a some covered agents are done while other are not for the same super
+        that some covered agents are done while other are not for the same super
         agent. Because we still want those non-done agents to interact with the
         simulation, the super agent only reports done when ALL of its covered agents
         report done.
 
         Args:
             agent_id: The id of the agent for whom to report the done condition.
-            Covered agents cannot be handled.
+            Should not be a covered agent.
 
         Returns:
             The requested done conndition. Super agents are done when all their
@@ -162,8 +162,8 @@ class SuperAgentWrapper(Wrapper):
         Report the agent's additional info.
 
         Args:
-            agent_id: The id of the agent for whom to get info. Covered agents
-            cannot be handled.
+            agent_id: The id of the agent for whom to get info. Should not be a
+            covered agent.
 
         Returns:
             The requested info. Super agents info is collected from covered agents.
