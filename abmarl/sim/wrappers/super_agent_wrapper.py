@@ -4,6 +4,7 @@ from gym.spaces import Dict
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
 
+# TODO: Use of "covered uncovered" vs "super, sub". Mostly, should "sub agents" be exclusively called "covered agents"
 class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
@@ -85,6 +86,10 @@ class SuperAgentWrapper(Wrapper):
             ])
         else:
             return self.sim.get_done(agent_id, **kwargs)
+
+    def get_info(self, agent_id, **kwargs):
+        pass
+        # TODO: forward this to the wrapped sim.
 
     def _construct_agents_from_super_agent_mapping(self):
         agents = {}
