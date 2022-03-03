@@ -88,8 +88,15 @@ class SuperAgentWrapper(Wrapper):
             return self.sim.get_done(agent_id, **kwargs)
 
     def get_info(self, agent_id, **kwargs):
-        pass
-        # TODO: forward this to the wrapped sim.
+        assert agent_id not in self._covered_agents, \
+            "We cannot get info for a sub agent that is covered by a super agent."
+        if agent_id in self.super_agent_mapping:
+            return {
+                sub_agent_id: self.sim.get_info(sub_agent_id, **kwargs)
+                for sub_agent_id in self.super_agent_mapping[agent_id]
+            }
+        else:
+            return self.sim.get_info(agent_id, **kwargs)
 
     def _construct_agents_from_super_agent_mapping(self):
         agents = {}
