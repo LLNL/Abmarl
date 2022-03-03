@@ -8,29 +8,6 @@ class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
-        self.agents = {}
-
-        # Construct the agent dict with super agents
-        for super_agent_id, sub_agent_list in self.super_agent_mapping.items():
-            # Construct a mapping from the super agents to the sub agents' observation
-            # and action spaces
-            obs_mapping = {
-                sub_agent_id: self.sim.agents[sub_agent_id].observation_space
-                for sub_agent_id in sub_agent_list
-            }
-            action_mapping = {
-                sub_agent_id: self.sim.agents[sub_agent_id].action_space
-                for sub_agent_id in sub_agent_list
-            }
-            self.agents[super_agent_id] = Agent(
-                id=super_agent_id,
-                observation_space=Dict(obs_mapping),
-                action_space=Dict(action_mapping)
-            )
-
-        # Add all uncovered agents to the dict of agetns
-        for agent_id in self._uncovered_agents:
-            self.agents[agent_id] = self.sim.agents[agent_id]
 
     @property
     def super_agent_mapping(self):
@@ -52,6 +29,9 @@ class SuperAgentWrapper(Wrapper):
                 self._covered_agents.add(sub_agent)
         self._uncovered_agents = self.sim.agents.keys() - self._covered_agents
         self._super_agent_mapping = value
+        # We need to reconstruct the agent dictionary if the super agent mapping
+        # ever changes
+        self._construct_agents_from_super_agent_mapping()
 
     def step(self, action_dict, **kwargs):
         # "Unravel" the action dict so that super agent actions are decomposed
@@ -105,4 +85,32 @@ class SuperAgentWrapper(Wrapper):
             ])
         else:
             return self.sim.get_done(agent_id, **kwargs)
+
+    def _construct_agents_from_super_agent_mapping(self):
+        agents = {}
+
+        # Construct the agent dict with super agents
+        for super_agent_id, sub_agent_list in self.super_agent_mapping.items():
+            # Construct a mapping from the super agents to the sub agents' observation
+            # and action spaces
+            obs_mapping = {
+                sub_agent_id: self.sim.agents[sub_agent_id].observation_space
+                for sub_agent_id in sub_agent_list
+            }
+            action_mapping = {
+                sub_agent_id: self.sim.agents[sub_agent_id].action_space
+                for sub_agent_id in sub_agent_list
+            }
+            agents[super_agent_id] = Agent(
+                id=super_agent_id,
+                observation_space=Dict(obs_mapping),
+                action_space=Dict(action_mapping)
+            )
+
+        # Add all uncovered agents to the dict of agetns
+        for agent_id in self._uncovered_agents:
+            agents[agent_id] = self.sim.agents[agent_id]
+
+        self.agents = agents
+
 
