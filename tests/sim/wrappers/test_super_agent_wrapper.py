@@ -158,6 +158,7 @@ def test_agent_spaces():
     assert agents['super0'].action_space['agent3'] == original_agents['agent3'].action_space
     assert agents['super0'].observation_space['agent0'] == original_agents['agent0'].observation_space
     assert agents['super0'].observation_space['agent3'] == original_agents['agent3'].observation_space
+    assert agents['super0'].observation_space['mask'] == Dict({'agent0': Discrete(2), 'agent3': Discrete(2)})
 
     assert agents['agent1'] == original_agents['agent1']
     assert agents['agent2'] == original_agents['agent2']
@@ -221,11 +222,13 @@ def test_sim_step_covered_agent_done():
 
 
 def test_sim_obs():
+    sim.unwrapped.step_count = 4
     obs = sim.get_obs('super0')
     assert obs in agents['super0'].observation_space
     assert obs == {
         'agent0': [0, 0, 0, 1],
-        'agent3': {'first': 1, 'second': [3, 1]}
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': True}
     }
 
     obs = sim.get_obs('agent1')
@@ -334,9 +337,11 @@ def test_double_wrap():
     assert obs == {
         'super0': {
             'agent0': [0, 0, 0, 1],
-            'agent3': {'first': 1, 'second': [3, 1]}
+            'agent3': {'first': 1, 'second': [3, 1]},
+            'mask': {'agent0': True, 'agent3': True}
         },
-        'agent1': [0]
+        'agent1': [0],
+        'mask': {'agent1': True, 'super0': True}
     }
     obs = sim2.get_obs('agent2')
     assert obs in sim2.agents['agent2'].observation_space
