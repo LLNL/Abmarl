@@ -36,7 +36,7 @@ class SuperAgentWrapper(Wrapper):
         The resulting agents dict would have keys 'super0', 'super1', and 'agent2';
         where 'agent0', 'agent1', 'agent3', and 'agent4' have been covered by the
         super agents and 'agent2' is left uncovered and therefore included in the
-        dict of agents. If the super agent mapping is changed, then the dictionary 
+        dict of agents. If the super agent mapping is changed, then the dictionary
         of agents gets recreated immediately.
 
         Super agents cannot have the same id as any of the agents in the simulation.
@@ -56,9 +56,12 @@ class SuperAgentWrapper(Wrapper):
             assert type(v) is list, "The values in super agent mapping must be lists of agent ids."
             for covered_agent in v:
                 assert type(covered_agent) is str, "The covered agents list must be agent ids."
-                assert covered_agent in self.sim.agents, "The covered agent must be an agent in the underlying sim."
-                assert covered_agent not in self._covered_agents, "The agent is already covered by another super agent."
-                assert isinstance(self.sim.agents[covered_agent], Agent), "Covered agents must be learning Agents."
+                assert covered_agent in self.sim.agents, \
+                    "The covered agent must be an agent in the underlying sim."
+                assert covered_agent not in self._covered_agents, \
+                    "The agent is already covered by another super agent."
+                assert isinstance(self.sim.agents[covered_agent], Agent), \
+                    "Covered agents must be learning Agents."
                 self._covered_agents.add(covered_agent)
         self._uncovered_agents = self.sim.agents.keys() - self._covered_agents
         self._super_agent_mapping = value
@@ -119,9 +122,9 @@ class SuperAgentWrapper(Wrapper):
         # the observation space
         if agent_id in self.super_agent_mapping:
             obs = {'mask': {}}
-            for covered_agent_id in self.super_agent_mapping[agent_id]:
-                obs[covered_agent_id] = self.sim.get_obs(covered_agent_id, **kwargs)
-                obs['mask'][covered_agent_id] = False if self.sim.get_done(covered_agent_id) else True
+            for covered_agent in self.super_agent_mapping[agent_id]:
+                obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
+                obs['mask'][covered_agent] = False if self.sim.get_done(covered_agent) else True
             return obs
         else:
             return self.sim.get_obs(agent_id, **kwargs)
@@ -151,7 +154,7 @@ class SuperAgentWrapper(Wrapper):
     def get_done(self, agent_id, **kwargs):
         """
         Report the agent's done condition.
-        
+
         Because super agents are composed of multiple agents, it could be the case
         that some covered agents are done while other are not for the same super
         agent. Because we still want those non-done agents to interact with the

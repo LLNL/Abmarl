@@ -5,7 +5,6 @@ import pytest
 from abmarl.sim.agent_based_simulation import AgentBasedSimulation
 from abmarl.sim.agent_based_simulation import Agent, PrincipleAgent
 from abmarl.sim.wrappers import SuperAgentWrapper
-from abmarl.managers import AllStepManager
 
 
 class SimTest(AgentBasedSimulation):
@@ -87,6 +86,7 @@ class SimTest(AgentBasedSimulation):
 
     def get_info(self, agent_id, **kwargs):
         return self.action[agent_id]
+
 
 sim = SuperAgentWrapper(
     SimTest(),
@@ -204,6 +204,7 @@ def test_sim_step_breaks():
     with pytest.raises(AssertionError):
         sim.step(actions)
 
+
 def test_sim_step_covered_agent_done():
     sim.reset()
     sim.unwrapped.step_count = 4
@@ -303,10 +304,15 @@ def test_double_wrap():
     assert 'agent1' in sim2.agents['double0'].action_space.spaces
 
     assert len(sim2.agents) == 3
-    assert sim2.agents['double0'].action_space['super0'] == sim2.sim.agents['super0'].action_space
-    assert sim2.agents['double0'].action_space['agent1'] == sim2.sim.agents['agent1'].action_space
-    assert sim2.agents['double0'].observation_space['super0'] == sim2.sim.agents['super0'].observation_space
-    assert sim2.agents['double0'].observation_space['agent1'] == sim2.sim.agents['agent1'].observation_space
+    assert sim2.agents['double0'].action_space == Dict({
+        'super0': sim2.sim.agents['super0'].action_space,
+        'agent1': sim2.sim.agents['agent1'].action_space
+    })
+    assert sim2.agents['double0'].observation_space == Dict({
+        'super0': sim2.sim.agents['super0'].observation_space,
+        'agent1': sim2.sim.agents['agent1'].observation_space,
+        'mask': Dict({'super0': Discrete(2), 'agent1': Discrete(2)})
+    })
     assert sim2.agents['agent2'] == original_agents['agent2']
     assert sim2.agents['agent4'] == original_agents['agent4']
 
