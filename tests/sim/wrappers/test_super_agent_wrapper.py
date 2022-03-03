@@ -154,12 +154,15 @@ def test_super_agent_mapping_changes_agents():
 
 def test_agent_spaces():
     assert len(agents) == 4
-    assert agents['super0'].action_space['agent0'] == original_agents['agent0'].action_space
-    assert agents['super0'].action_space['agent3'] == original_agents['agent3'].action_space
-    assert agents['super0'].observation_space['agent0'] == original_agents['agent0'].observation_space
-    assert agents['super0'].observation_space['agent3'] == original_agents['agent3'].observation_space
-    assert agents['super0'].observation_space['mask'] == Dict({'agent0': Discrete(2), 'agent3': Discrete(2)})
-
+    assert agents['super0'].action_space == Dict({
+        'agent0': original_agents['agent0'].action_space,
+        'agent3': original_agents['agent3'].action_space,
+    })
+    assert agents['super0'].observation_space == Dict({
+        'agent0': original_agents['agent0'].observation_space,
+        'agent3': original_agents['agent3'].observation_space,
+        'mask': Dict({'agent0': Discrete(2), 'agent3': Discrete(2)})
+    })
     assert agents['agent1'] == original_agents['agent1']
     assert agents['agent2'] == original_agents['agent2']
     assert agents['agent4'] == original_agents['agent4']
