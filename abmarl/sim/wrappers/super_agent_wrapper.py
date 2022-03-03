@@ -9,6 +9,18 @@ from abmarl.tools import gym_utils as gu
 class SuperAgentWrapper(Wrapper):
     """
     The SuperAgentWrapper creates "super" agents who cover and control multiple agents.
+
+    The super agents take the observation and action spaces of all their covered
+    agents. In addition, the observation space is given a "mask" channel to indicate
+    which of their covered agents is done. This channel is important because
+    the simulation dynamics change when a covered agent is done but the super agent
+    may still be active (see comments on get_done). Without this mask, the super
+    agent would experience completely different simulation dynamcis for some of
+    its covered agents with no indication as to why.
+
+    Furthermore, super agents may still report actions for covered agents that
+    are done. This wrapper filters out those actions before passing them to the
+    underlying sim. See step for more details.
     """
     def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
@@ -87,6 +99,12 @@ class SuperAgentWrapper(Wrapper):
         """
         Report observations from the simulation.
 
+        Super agent observations are collected from their covered agents. Super
+        agents also have a "mask" channel that tells them which of their covered
+        agent is done. This should assist the super agent in understanding the
+        changing simulation dynamics for done agents (i.e. why actions from done
+        agents don't do anything).
+
         Args:
             agent_id: The id of the agent for whom to produce an observation. Should
             not be a covered agent.
@@ -150,7 +168,6 @@ class SuperAgentWrapper(Wrapper):
         """
         assert agent_id not in self._covered_agents, \
             "We cannot get done for an agent that is covered by a super agent."
-        # TODO: Do we need to add masking for active agents in the super agent?
         if agent_id in self.super_agent_mapping:
             return all([
                 self.sim.get_done(covered_agent_id)
