@@ -53,6 +53,7 @@ class SimTest(AgentBasedSimulation):
         pass
 
     def reset(self):
+        self.step_count = 0
         self.action = {agent.id: None for agent in self.agents.values() if isinstance(agent, Agent)}
 
     def step(self, action_dict):
@@ -198,6 +199,25 @@ def test_sim_step_breaks():
     }
     with pytest.raises(AssertionError):
         sim.step(actions)
+
+def test_sim_step_covered_agent_done():
+    sim.reset()
+    sim.unwrapped.step_count = 4
+    actions = {
+        'super0': {
+            'agent0': ({'first': 2, 'second': [-1, 2]}, [0, 1, 0]),
+            'agent3': (0, [7, 3], 1)
+        },
+        'agent1': [2, 3, 0],
+        'agent2': {'alpha': [1, 1, 1]}
+    }
+    sim.step(actions)
+    assert sim.unwrapped.action == {
+        'agent0': None,
+        'agent3': (0, [7, 3], 1),
+        'agent1': [2, 3, 0],
+        'agent2': {'alpha': [1, 1, 1]}
+    }
 
 
 def test_sim_obs():
