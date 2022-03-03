@@ -1,8 +1,9 @@
 
-from gym.spaces import Dict
+from gym.spaces import Dict, Discrete
 
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
+from abmarl.tools import gym_utils as gu
 
 
 class SuperAgentWrapper(Wrapper):
@@ -99,10 +100,11 @@ class SuperAgentWrapper(Wrapper):
         # We can safely assume the format of the observations because we generated
         # the observation space
         if agent_id in self.super_agent_mapping:
-            return {
-                covered_agent_id: self.sim.get_obs(covered_agent_id, **kwargs)
-                for covered_agent_id in self.super_agent_mapping[agent_id]
-            }
+            obs = {'mask': {}}
+            for covered_agent_id in self.super_agent_mapping[agent_id]:
+                obs[covered_agent_id] = self.sim.get_obs(covered_agent_id, **kwargs)
+                obs['mask'][covered_agent_id] = False if self.sim.get_done(covered_agent_id) else True
+            return obs
         else:
             return self.sim.get_obs(agent_id, **kwargs)
 
@@ -185,17 +187,17 @@ class SuperAgentWrapper(Wrapper):
         for super_agent_id, covered_agent_list in self.super_agent_mapping.items():
             # Construct a mapping from the super agents to the covered agents' observation
             # and action spaces
-            obs_mapping = {
-                covered_agent_id: self.sim.agents[covered_agent_id].observation_space
-                for covered_agent_id in covered_agent_list
-            }
+            obs_mapping = {'mask': {}}
+            for covered_agent_id in covered_agent_list:
+                obs_mapping[covered_agent_id] = self.sim.agents[covered_agent_id].observation_space
+                obs_mapping['mask'][covered_agent_id] = Discrete(2)
             action_mapping = {
                 covered_agent_id: self.sim.agents[covered_agent_id].action_space
                 for covered_agent_id in covered_agent_list
             }
             agents[super_agent_id] = Agent(
                 id=super_agent_id,
-                observation_space=Dict(obs_mapping),
+                observation_space=gu.make_dict(obs_mapping),
                 action_space=Dict(action_mapping)
             )
 
