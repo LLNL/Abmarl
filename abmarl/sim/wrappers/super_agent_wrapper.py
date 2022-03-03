@@ -6,12 +6,30 @@ from abmarl.sim.wrappers import Wrapper
 
 
 class SuperAgentWrapper(Wrapper):
+    """
+    The SuperAgentWrapper creates "super" agents who cover and control multiple agents.
+    """
     def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
 
     @property
     def super_agent_mapping(self):
+        """
+        A dictionary that maps from a super agent's id to a list of covered agent ids.
+
+        Suppose your simulation has 5 agents and you use the following super agent mapping:
+            {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
+        The resulting agents dict would have keys 'super0', 'super1', and 'agent2',
+        where 'agent0', 'agent1', 'agent3', and 'agent4' have been covered by the
+        super agents and 'agent2' is left uncovered and therefore included in the
+        dict of agents. If the super agent mapping is changed, then the dictionary 
+        of agents gets recreated immediately.
+
+        Super agents cannot have the same id as any of the agents in the simulation.
+        Two super agents cannot cover the same agent. All covered agents must be
+        learning agents.
+        """
         return self._super_agent_mapping
 
     @super_agent_mapping.setter
@@ -36,8 +54,18 @@ class SuperAgentWrapper(Wrapper):
         self._construct_agents_from_super_agent_mapping()
 
     def step(self, action_dict, **kwargs):
-        # "Unravel" the action dict so that super agent actions are decomposed
-        # into the normal agent actions and then pass to the underlying sim.
+        """
+        Give actions to the simulation.
+
+        Super agent actions are decomposed into the covered agent actions and
+        then pass to the underlying sim. Because of the nature of this wrapper,
+        the super agents may provide actions for covered agents that are already
+        done. We filter out these actions.
+
+        Args:
+            action_dict: Dictionary that maps agent's ids to the actions. Covered
+            agents should not be present.
+        """
         unravelled_action_dict = {}
         for agent_id, action in action_dict.items():
             assert agent_id not in self._covered_agents, \
@@ -55,6 +83,17 @@ class SuperAgentWrapper(Wrapper):
         self.sim.step(unravelled_action_dict, **kwargs)
 
     def get_obs(self, agent_id, **kwargs):
+        """
+        Report observations from the simulation.
+
+        Args:
+            agent_id: The id of the agent for whom to produce an observation. Covered
+            agents cannot be handled.
+
+        Returns:
+            The requested observation. Super agent observations are collected from
+            the covered agents.
+        """
         assert agent_id not in self._covered_agents, \
             "We cannot produce observations for an agent that is covered by a super agent."
         # We can safely assume the format of the observations because we generated
@@ -68,6 +107,17 @@ class SuperAgentWrapper(Wrapper):
             return self.sim.get_obs(agent_id, **kwargs)
 
     def get_reward(self, agent_id, **kwargs):
+        """
+        Report the agent's reward.
+
+        Args:
+            agent_id: The id of the agent for whom to report the reward. Covered
+            agents cannot be handled.
+
+        Returns:
+            The requested reward. Super agent rewards are summed from the covered
+            agents.
+        """
         assert agent_id not in self._covered_agents, \
             "We cannot get rewards for an agent that is covered by a super agent."
         if agent_id in self.super_agent_mapping:
@@ -79,9 +129,25 @@ class SuperAgentWrapper(Wrapper):
             return self.sim.get_reward(agent_id, **kwargs)
 
     def get_done(self, agent_id, **kwargs):
+        """
+        Report the agent's done condition.
+        
+        Because super agents are composed of multiple agents, it could be the case
+        that a some covered agents are done while other are not for the same super
+        agent. Because we still want those non-done agents to interact with the
+        simulation, the super agent only reports done when ALL of its covered agents
+        report done.
+
+        Args:
+            agent_id: The id of the agent for whom to report the done condition.
+            Covered agents cannot be handled.
+
+        Returns:
+            The requested done conndition. Super agents are done when all their
+            covered agents are done.
+        """
         assert agent_id not in self._covered_agents, \
             "We cannot get done for an agent that is covered by a super agent."
-        # TODO: explain why we choose all.
         # TODO: Do we need to add masking for active agents in the super agent?
         if agent_id in self.super_agent_mapping:
             return all([
@@ -92,6 +158,16 @@ class SuperAgentWrapper(Wrapper):
             return self.sim.get_done(agent_id, **kwargs)
 
     def get_info(self, agent_id, **kwargs):
+        """
+        Report the agent's additional info.
+
+        Args:
+            agent_id: The id of the agent for whom to get info. Covered agents
+            cannot be handled.
+
+        Returns:
+            The requested info. Super agents info is collected from covered agents.
+        """
         assert agent_id not in self._covered_agents, \
             "We cannot get info for an agent that is covered by a super agent."
         if agent_id in self.super_agent_mapping:
@@ -128,5 +204,3 @@ class SuperAgentWrapper(Wrapper):
             agents[agent_id] = self.sim.agents[agent_id]
 
         self.agents = agents
-
-
