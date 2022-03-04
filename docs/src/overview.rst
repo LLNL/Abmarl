@@ -266,6 +266,25 @@ in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
    should be a full path. For example, ``'local_dir': '/usr/local/scratch'``.
 
 
+Debugging
+---------
+It may be useful to trial run a simulation after setting up a configuration file
+to ensure that the simulation mechanics work as expected. Abmarl's ``debug`` command
+will run the simulation with random actions
+and create an output directory, wherein it will copy the configuration file and
+output the observations, actions, rewards, and done conditions for each
+step. The data from each episode will be logged to its own file in the output directory.
+For example, the command
+
+.. code-block::
+
+   abmarl debug multi_corridor_example.py -n 2 -s 20 --render
+
+will run the `MultiCorridor` simulation with random actions and output log files
+to the directory it creates for 2 episodes and a horizon of 20, as well as render
+each step in each episode.
+
+
 Visualizing
 -----------
 We can visualize the agents' learned behavior with the ``visualize`` command, which
@@ -280,6 +299,11 @@ will load the experiment (notice that the directory name is the experiment
 title from the configuration file appended with a timestamp) and display an animation
 of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
 the training directory.
+
+By default, each episode has a `horizon` of 200 steps (i.e. it will run for up to
+200 steps). It may end earlier depending on the `done` condition from the simulation.
+You can control the `horizon` with ``-s`` or ``--steps-per-episode`` when running
+the visualize command.
 
 
 

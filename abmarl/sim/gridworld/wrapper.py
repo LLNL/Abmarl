@@ -26,7 +26,7 @@ class ComponentWrapper(GridWorldBaseComponent):
     @property
     def unwrapped(self):
         """
-        Fall through all the wrappers and obtain the original, completely unwrapped simulation.
+        Fall through all the wrappers and obtain the original, completely unwrapped component.
         """
         try:
             return self.wrapped_component.unwrapped
@@ -81,8 +81,8 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
     Wraps an ActorComponent.
 
     Modify the action space of the agents involved with the Actor, namely the specific
-    actor's channel. The actions recieved from the trainer are the wrapped space,
-    so we need unwrap them to send them to the actor. This is the opposite from
+    actor's channel. The actions recieved from the trainer are in the wrapped space,
+    so we need to unwrap them to send them to the actor. This is the opposite from
     how we wrap and unwrap observations.
     """
     def __init__(self, component):
@@ -146,6 +146,19 @@ class ObserverWrapper(ComponentWrapper, ObserverBaseComponent):
     pass
 
 
+# Docs for ObserverWrapper:
+"""
+Observer Wrappers
+~~~~~~~~~~~~~~~~~
+
+An Observer Wrapper uses the ``get_obs`` function, at which point
+it can request an observation by passing the request to the underlying Observer
+and then modify the data from the observer before sending it out. Observer Wrappers
+may need to modifiy the observation spaces of corresponding agents to ensure that
+the Trainer is expecting the correct format.
+"""
+
+
 class RavelActionWrapper(ActorWrapper):
     """
     Use numpy's ravel capabilities to convert space and points to Discrete.
@@ -167,7 +180,7 @@ class RavelActionWrapper(ActorWrapper):
         Unravel a single discrete point to a value in the space.
 
         Recall that the action from the trainer arrives in the wrapped discrete
-        space, so we need to unravle it so that it is in the unwrapped space before
+        space, so we need to unravel it so that it is in the unwrapped space before
         giving it to the actor.
         """
         return rdw.unravel(space, point)

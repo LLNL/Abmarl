@@ -215,3 +215,25 @@ Done
 .. autoclass:: abmarl.sim.gridworld.done.OneTeamRemainingDone
 	:members:
 	:undoc-members:
+
+
+Wrappers
+````````
+
+.. _api_gridworld_wrappers:
+
+.. autoclass:: abmarl.sim.gridworld.wrapper.ComponentWrapper
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_wrappers:
+
+.. autoclass:: abmarl.sim.gridworld.wrapper.ActorWrapper
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_ravel_action_wrappers:
+
+.. autoclass:: abmarl.sim.gridworld.wrapper.RavelActionWrapper
+	:members:
+	:undoc-members:

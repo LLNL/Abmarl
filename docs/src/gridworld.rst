@@ -187,6 +187,38 @@ whole. Agents that are reported as done will cease sending actions to the simula
 and the episode will end when all the agents are done or when the simulation is done.
 
 
+.. _gridworld_wrappers:
+
+Component Wrappers
+``````````````````
+
+The GridWorld Simulation Framework also supports
+:ref:`Component Wrappers <api_gridworld_wrappers>`. Wrapping a component
+can be useful when you don't want to add a completely new component and
+only need to make a modification to the way a component already works. A component
+wrapper is itself a component, and so it must implement the same interface as the
+wrapped component to ensure that it works within the framework. A component wrapper
+also defines additional functions for wrapping spaces and data to and from those
+spaces: ``check_space`` for ensuring the space can be transformed, ``wrap_space`` to
+perform the transformation, and ``wrap_point`` to map data to the transformed space.
+
+As its name suggests, a :ref:`Component Wrapper <api_gridworld_wrappers>` stands
+between the underlying component and other
+objects with which it exchanges data. As such, a wrapper typically modifies
+the incoming/outgoing data before leveraging the underlying component for
+the actual datda processing. The main difference among wrapper types is in
+the direction of data flow, which we detail below.
+
+Actor Wrappers
+~~~~~~~~~~~~~~
+
+An :ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receives actions in the
+`wrapped_space` through the ``process_action``
+function. It can modify the data before sending it to the underlying Actor to
+process. An Actor Wrapper may need to modify the action spaces of corresponding agents
+to ensure that the action arrives in the correct format. 
+
+
 .. _gridworld_built_in_features:
 
 Built-in Features
@@ -347,6 +379,9 @@ of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell
 and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly select between their `encodings`
 for the observation.
 
+By setting `observe_self` to False, the :ref:`SingleGridObserver <api_gridworld_observer_single>`
+can be configured so that an agent doesn't observe itself and only observes
+other agents, which may be helpful if overlapping is an important part of the simulation.
 
 .. _gridworld_blocking:
 
@@ -507,3 +542,53 @@ although `agent2` is within range, it is not a type that `agent0` can attack.
    Attacks can be blocked by :ref:`blocking <gridworld_blocking>` agents. If an attackable agent is
    masked from an attacking agent, then it cannot be attacked by that agent. The
    masking is determined the same way as view blocking described above.
+
+
+RavelActionWrapper
+``````````````````
+
+The :ref:`RavelActionWrapper <api_gridworld_ravel_action_wrappers>` transforms
+Discrete, MultiBinary, MultiDiscrete, bounded integer Box, and any nesting of those
+spaces into a Discrete space by "ravelling" their values according to numpy's
+``ravel_multi_index`` function. Thus, actions that are represented by arrays are
+converted into unique Discrete numbers. For example, we can apply the RavelActionWrapper
+to the MoveActor, like so:
+
+.. code-block:: python
+
+   from abmarl.sim.gridworld.agent import MovingAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState
+   from abmarl.sim.gridworld.actor import MoveActor
+   from abmarl.sim.gridworld.wrapper import RavelActionWrapper
+   
+   agents = {
+       'agent0': MovingAgent(id='agent0', encoding=1, move_range=1),
+       'agent1': MovingAgent(id='agent1', encoding=1, move_range=2)
+   }
+   grid = Grid(5, 5)
+   position_state = PositionState(agents=agents, grid=grid)
+   move_actor = MoveActor(agents=agents, grid=grid)
+   for agent in agents.values():
+       agent.finalize()
+   position_state.reset()
+
+   # Move actor without wrapper
+   actions = {
+       agent.id: agent.action_space.sample() for agent in agents.values()
+   }
+   print(actions)
+   # >>> {'agent0': OrderedDict([('move', array([1, 1]))]), 'agent1': OrderedDict([('move', array([ 2, -1]))])}
+   
+   # Wrapped move actor
+   move_actor = RavelActionWrapper(move_actor)
+   actions = {
+       agent.id: agent.action_space.sample() for agent in agents.values()
+   }
+   print(actions)
+   # >>> {'agent0': OrderedDict([('move', 1)]), 'agent1': OrderedDict([('move', 22)])}
+
+The actions from the unwrapped actor are in the original `Box` space, whereas after
+we apply the wrapper, the actions from the wrapped actor are in the transformed
+`Discrete` space. The actor will receive move actions in the `Discrete` space and convert
+them to the `Box` space before passing them to the MoveActor.
