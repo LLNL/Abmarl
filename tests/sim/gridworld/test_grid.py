@@ -83,6 +83,16 @@ def test_grid_query_with_overlap():
     assert grid.query(agent1, (1, 0))
 
 
+def test_grid_query_overlap_with_inactive_agent():
+    grid = Grid(3, 3)
+    grid.reset()
+    agent1 = GridWorldAgent(id='agent1', encoding=1)
+    agent2 = GridWorldAgent(id='agent2', encoding=1)
+    assert grid.place(agent1, (1, 0))
+    agent1._active = False
+    assert grid.query(agent2, (1, 0))
+
+
 def test_grid_place():
     grid = Grid(3, 3)
     grid.reset()
