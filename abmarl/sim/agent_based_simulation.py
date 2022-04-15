@@ -10,6 +10,7 @@ class PrincipleAgent:
     def __init__(self, id=None, seed=None, **kwargs):
         self.id = id
         self.seed = seed
+        self._active = True
 
     @property
     def id(self):
@@ -40,7 +41,7 @@ class PrincipleAgent:
         in our Simulation can die. Then active is True if the agents are alive
         or False if they're dead.
         """
-        return True
+        return self._active
 
     @property
     def configured(self):
