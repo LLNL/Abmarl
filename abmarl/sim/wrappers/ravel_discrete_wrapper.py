@@ -2,7 +2,6 @@ import itertools
 
 import numpy as np
 from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Box, Dict, Tuple
-from gym.spaces.box import get_inf
 
 from .sar_wrapper import SARWrapper
 
@@ -118,10 +117,10 @@ def _isbounded(space):
     of that dtype. This function checks for min/max values of the dtype.
     """
     return space.is_bounded() and \
-        not (space.low == get_inf(int, '-')).any() and \
-        not (space.low == get_inf(int, '+')).any() and \
-        not (space.high == get_inf(int, '-')).any() and \
-        not (space.high == get_inf(int, '+')).any()
+        not (space.low == np.iinfo(space.dtype).min).any() and \
+        not (space.low == np.iinfo(space.dtype).max).any() and \
+        not (space.high == np.iinfo(space.dtype).min).any() and \
+        not (space.high == np.iinfo(space.dtype).max).any()
 
 
 def check_space(space):
