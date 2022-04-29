@@ -62,13 +62,13 @@ def test_acting_agent_action_space():
 
 def test_acting_agent_seed():
     from gym.spaces import Discrete
-    agent = ActingAgent(id='agent', seed=24, action_space={
+    agent = ActingAgent(id='agent', seed=17, action_space={
         1: Discrete(12),
         2: Discrete(3),
     })
     agent.finalize()
     assert agent.configured
-    assert agent.action_space.sample() == {1: 9, 2: 0}
+    assert agent.action_space.sample() == {1: 5, 2: 1}
 
 
 def test_observing_agent_observation_space():
@@ -98,7 +98,7 @@ def test_agent():
     agent.finalize()
     assert agent.configured
 
-    assert agent.action_space.sample() == {'act': 1}
+    assert agent.action_space.sample() == {'act': 2}
     assert agent.observation_space.sample() == {'obs': 0}
 
 
