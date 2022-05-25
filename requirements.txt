@@ -1,6 +1,6 @@
 tensorflow
 gym<0.22
-ray[rllib]==1.9.0
+ray[rllib]
 matplotlib
 seaborn
 sphinx

@@ -1,3 +1,5 @@
+
+from gym.spaces import Dict
 from ray.rllib import MultiAgentEnv
 
 
@@ -16,6 +18,16 @@ class MultiAgentWrapper(MultiAgentEnv):
         from abmarl.managers import SimulationManager
         assert isinstance(sim, SimulationManager)
         self.sim = sim
+
+        self._agent_ids = set(agent for agent in self.sim.agents)
+        self.observation_space = Dict({
+            agent.id: agent.observation_space
+            for agent in self.sim.agents.values()
+        })
+        self.action_space = Dict({
+            agent.id: agent.action_space
+            for agent in self.sim.agents.values()
+        })
 
     def reset(self):
         """See SimulationManager."""
