@@ -8,7 +8,7 @@ sim_name = "MultiCorridor"
 from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
-ref_agent = sim.unwrapped.agents['agent0']
+ref_agent = sim.sim.agents['agent0']
 policies = {
     'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
 }
@@ -34,6 +34,7 @@ params = {
         'verbose': 2,
         'config': {
             # --- Simulation ---
+            'disable_env_checking': True,
             'env': sim_name,
             'horizon': 200,
             'env_config': {},

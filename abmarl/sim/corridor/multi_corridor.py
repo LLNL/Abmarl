@@ -135,9 +135,9 @@ class MultiCorridor(AgentBasedSimulation):
         else:
             right = True
         return {
-            'position': [agent_position],
-            'left': [left],
-            'right': [right],
+            'position': np.array([agent_position]),
+            'left': np.array([int(left)]),
+            'right': np.array([int(right)]),
         }
 
     def get_done(self, agent_id, **kwargs):
