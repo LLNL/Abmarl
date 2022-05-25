@@ -2,13 +2,13 @@ from abmarl.sim.corridor import MultiCorridor
 from abmarl.managers import TurnBasedManager
 from abmarl.external import MultiAgentWrapper
 
-sim = TurnBasedManager(MultiCorridor())
+sim = MultiAgentWrapper(TurnBasedManager(MultiCorridor()))
 
 sim_name = "MultiCorridor"
 from ray.tune.registry import register_env
-register_env(sim_name, lambda sim_config: MultiAgentWrapper(sim))
+register_env(sim_name, lambda sim_config: sim)
 
-ref_agent = sim.agents['agent0']
+ref_agent = sim.sim.agents['agent0']
 policies = {
     'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
 }
