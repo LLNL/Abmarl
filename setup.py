@@ -31,7 +31,7 @@ setuptools.setup(
     install_requires=[
         'tensorflow',
         'gym<0.22',
-        'ray[rllib]',
+        'ray[rllib]==1.12.1',
         'matplotlib',
         'seaborn',
     ],
