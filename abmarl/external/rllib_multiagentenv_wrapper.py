@@ -41,15 +41,15 @@ class MultiAgentWrapper(MultiAgentEnv):
         """See SimulationManager."""
         return self.sim.render(*args, **kwargs)
 
-    @property
-    def unwrapped(self):
-        """
-        Fall through all the wrappers to the SimulationManager.
+    # @property
+    # def unwrapped(self):
+    #     """
+    #     Fall through all the wrappers to the SimulationManager.
 
-        Returns:
-            The wrapped SimulationManager.
-        """
-        try:
-            return self.sim.unwrapped
-        except AttributeError:
-            return self.sim
+    #     Returns:
+    #         The wrapped SimulationManager.
+    #     """
+    #     try:
+    #         return self.sim.unwrapped
+    #     except AttributeError:
+    #         return self.sim
