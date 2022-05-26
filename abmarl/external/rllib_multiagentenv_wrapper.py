@@ -2,6 +2,8 @@
 from gym.spaces import Dict
 from ray.rllib import MultiAgentEnv
 
+from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent
+
 
 class MultiAgentWrapper(MultiAgentEnv):
     """
@@ -19,14 +21,19 @@ class MultiAgentWrapper(MultiAgentEnv):
         assert isinstance(sim, SimulationManager)
         self.sim = sim
 
-        self._agent_ids = set(agent for agent in self.sim.agents)
+        self._agent_ids = set(
+            agent.id for agent in self.sim.agents.values()
+            if isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent)
+        )
         self.observation_space = Dict({
             agent.id: agent.observation_space
             for agent in self.sim.agents.values()
+            if isinstance(agent, ObservingAgent)
         })
         self.action_space = Dict({
             agent.id: agent.action_space
             for agent in self.sim.agents.values()
+            if isinstance(agent, ActingAgent)
         })
 
     def reset(self):
