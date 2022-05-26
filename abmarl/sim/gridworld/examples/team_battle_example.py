@@ -43,8 +43,8 @@ class TeamBattleSim(GridWorldSimulation):
         self.finalize()
 
     def reset(self, **kwargs):
-        self.position_state.reset(**kwargs)
         self.health_state.reset(**kwargs)
+        self.position_state.reset(**kwargs)
 
         # Track the rewards
         self.rewards = {agent.id: 0 for agent in self.agents.values()}
