@@ -45,7 +45,6 @@ from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
 
-ref_agent = sim.sim.agents['agent0']
 policies = {
     'red': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
     'blue': (None, agents['agent1'].observation_space, agents['agent1'].action_space, {}),
@@ -93,7 +92,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 0,
+            "num_workers": 7,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
