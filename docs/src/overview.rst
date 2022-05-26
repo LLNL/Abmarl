@@ -230,6 +230,9 @@ simple corridor simulation with multiple agents.
 .. WARNING::
    The simulation must be a :ref:`Simulation Manager <sim-man>` or an
    :ref:`External Wrapper <external>` as described above.
+   If we use a :ref:`TurnBasedManager <api_turn_based>`, then we must set
+   `disable_env_checking` to True . RLlib introduced environment checking in version
+   1.10, but it doesn't work yet with our `TurnBasedManager`.
    
 .. NOTE::
    This example has ``num_workers`` set to 7 for a computer with 8 CPU's.
