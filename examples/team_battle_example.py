@@ -55,13 +55,13 @@ policies = {
 
 
 def policy_mapping_fn(agent_id):
-    if agent_id.startswith('red'):
+    if agents[agent_id].encoding == 1:
         return 'red'
-    if agent_id.startswith('green'):
-        return 'green'
-    if agent_id.startswith('blue'):
+    if agents[agent_id].encoding == 2:
         return 'blue'
-    if agent_id.startswith('gray'):
+    if agents[agent_id].encoding == 3:
+        return 'green'
+    if agents[agent_id].encoding == 4:
         return 'gray'
 
 
