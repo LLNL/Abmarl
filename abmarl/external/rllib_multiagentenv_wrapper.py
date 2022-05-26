@@ -2,6 +2,8 @@
 from gym.spaces import Dict
 from ray.rllib import MultiAgentEnv
 
+from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent
+
 
 class MultiAgentWrapper(MultiAgentEnv):
     """
@@ -23,10 +25,12 @@ class MultiAgentWrapper(MultiAgentEnv):
         self.observation_space = Dict({
             agent.id: agent.observation_space
             for agent in self.sim.agents.values()
+            if isinstance(agent, ObservingAgent)
         })
         self.action_space = Dict({
             agent.id: agent.action_space
             for agent in self.sim.agents.values()
+            if isinstance(agent, ActingAgent)
         })
 
     def reset(self):
