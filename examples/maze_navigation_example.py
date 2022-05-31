@@ -1,6 +1,4 @@
 
-import numpy as np
-
 from abmarl.sim.gridworld.examples.maze_navigation import MazeNavigationAgent, MazeNaviationSim
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.managers import AllStepManager
@@ -41,7 +39,6 @@ sim = MultiAgentWrapper(
 sim_name = "MazeNavigation"
 from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
-
 
 
 policies = {
