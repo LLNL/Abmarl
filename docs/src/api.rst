@@ -36,6 +36,12 @@ Abmarl Simulations
 	:members:
 	:undoc-members:
 
+.. _api_dynamic_sim:
+
+.. autoclass:: abmarl.sim.DynamicOrderSimulation
+	:members:
+	:undoc-members:
+
 
 .. _api_sim:
 
@@ -55,6 +61,12 @@ Abmarl Simulation Managers
 .. _api_all_step:
 
 .. autoclass:: abmarl.managers.AllStepManager
+	:members:
+	:undoc-members:
+
+.. _api_dynamic_man:
+
+.. autoclass:: abmarl.managers.DynamicOrderManager
 	:members:
 	:undoc-members:
 
