@@ -7,43 +7,39 @@ from abmarl.sim import Agent, DynamicOrderSimulation, AgentBasedSimulation
 from abmarl.managers import DynamicOrderManager
 
 
-class SequentiallyFinishingSim(DynamicOrderSimulation):
-    def __init__(self, **kwargs):
-        self.agents = {
-            f'agent{i}': Agent(
-                id=f'agent{i}', observation_space=Discrete(3), action_space=Discrete(4)
-            ) for i in range(4)
-        }
+    class SequentiallyFinishingSim(DynamicOrderSimulation):
+        def __init__(self, **kwargs):
+            self.agents = {f'agent{i}': PrincipleAgent(id=f'agent{i}') for i in range(4)}
 
-    def reset(self, **kwargs):
-        self.next_agent = 'agent3'
-        self.done_agents = set()
+        def reset(self, **kwargs):
+            self.next_agent = 'agent3'
+            self.done_agents = set()
 
-    def step(self, action_dict, **kwargs):
-        next_agents = set()
-        for agent_id, action in action_dict.items():
-            self.done_agents.add(agent_id)
-            for next_ids in action:
-                next_agents.add(f'agent{next_ids}')
-        self.next_agent = next_agents
+        def step(self, action_dict, **kwargs):
+            next_agents = set()
+            for agent_id, action in action_dict.items():
+                self.done_agents.add(agent_id)
+                for next_ids in action:
+                    next_agents.add(next_ids)
+            self.next_agent = next_agents
 
-    def render(self, **kwargs):
-        pass
+        def render(self, **kwargs):
+            pass
 
-    def get_obs(self, agent_id, **kwargs):
-        return agent_id
+        def get_obs(self, agent_id, **kwargs):
+            return agent_id
 
-    def get_reward(self, agent_id, **kwargs):
-        return {}
+        def get_reward(self, agent_id, **kwargs):
+            return {}
 
-    def get_done(self, agent_id, **kwargs):
-        return agent_id in self.done_agents
+        def get_done(self, agent_id, **kwargs):
+            return agent_id in self.done_agents
 
-    def get_all_done(self, **kwargs):
-        return all([self.get_done(agent_id) for agent_id in self.agents])
+        def get_all_done(self, **kwargs):
+            return all([self.get_done(agent_id) for agent_id in self.agents])
 
-    def get_info(self, agent_id, **kwargs):
-        return {}
+        def get_info(self, agent_id, **kwargs):
+            return {}
 
 
 class ABS(AgentBasedSimulation):
@@ -77,28 +73,6 @@ class ABS(AgentBasedSimulation):
 
     def get_info(self, agent_id, **kwargs):
         return {}
-
-
-def test_next_agent():
-    sim = SequentiallyFinishingSim()
-    sim.next_agent = 'agent0'
-    assert sim.next_agent == set('agent0')
-    sim.next_agent = ['agent1', 'agent2']
-    assert sim.next_agent == ['agent1', 'agent2']
-    sim.next_agent = ('agent3',)
-    assert sim.next_agent == ('agent3',)
-    sim.next_agent = set('agent0', 'agent1')
-    assert sim.next_agent == set('agent0', 'agent1')
-
-
-def test_next_agent_failures():
-    sim = SequentiallyFinishingSim()
-    with pytest.raises(AssertionError):
-        sim.next_agent = 3
-    with pytest.raises(AssertionError):
-        sim.next_agent = 'Agent4'
-    with pytest.raises(AssertionError):
-        sim.next_agent = ['agent0', 'agents1']
 
 
 def test_dynamic_order_manager_wrong_sim():

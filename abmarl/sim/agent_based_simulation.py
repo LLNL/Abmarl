@@ -265,7 +265,4 @@ class DynamicOrderSimulation(AgentBasedSimulation):
         for agent_id in value:
             assert agent_id in self.agents, \
                 "Every next agent must be an agent in the simulation."
-            assert isinstance(self.agents[agent_id], ActingAgent) and \
-                isinstance(self.agents[agent_id], ObservingAgent), \
-                    "Every next agent must be an Agent."
         self._next_agent = value

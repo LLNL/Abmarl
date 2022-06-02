@@ -1,7 +1,8 @@
 
 import pytest
 
-from abmarl.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
+from abmarl.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent, \
+    DynamicOrderSimulation
 
 
 def test_principle_agent_id():
@@ -164,3 +165,51 @@ def test_agent_based_simulation_agents():
 
     with pytest.raises(AssertionError):
         ABS(agents=agents_dict_bad_values)
+
+
+def test_dynamic_order_simulation():
+    class SequentiallyFinishingSim(DynamicOrderSimulation):
+        def __init__(self, **kwargs):
+            self.agents = {f'agent{i}': PrincipleAgent(id=f'agent{i}') for i in range(4)}
+
+        def reset(self, **kwargs):
+            pass
+
+        def step(self, action_dict, **kwargs):
+            pass
+
+        def render(self, **kwargs):
+            pass
+
+        def get_obs(self, agent_id, **kwargs):
+            return {}
+
+        def get_reward(self, agent_id, **kwargs):
+            return {}
+
+        def get_done(self, agent_id, **kwargs):
+            return {}
+
+        def get_all_done(self, **kwargs):
+            return {}
+
+        def get_info(self, agent_id, **kwargs):
+            return {}
+
+    sim = SequentiallyFinishingSim()
+    sim.next_agent = 'agent0'
+    assert sim.next_agent == ['agent0']
+    sim.next_agent = ['agent1', 'agent2']
+    assert sim.next_agent == ['agent1', 'agent2']
+    sim.next_agent = ('agent3',)
+    assert sim.next_agent == ('agent3',)
+    sim.next_agent = set(('agent0', 'agent1'))
+    assert sim.next_agent == set(('agent0', 'agent1'))
+
+    # Expected to fail
+    with pytest.raises(AssertionError):
+        sim.next_agent = 3
+    with pytest.raises(AssertionError):
+        sim.next_agent = 'Agent4'
+    with pytest.raises(AssertionError):
+        sim.next_agent = ['agent0', 'agents1']
