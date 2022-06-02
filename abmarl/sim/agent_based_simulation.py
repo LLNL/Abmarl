@@ -258,10 +258,10 @@ class DynamicOrderSimulation(AgentBasedSimulation):
 
     @next_agent.setter
     def next_agent(self, value):
-        assert isinstance(value, Container, str), \
+        assert isinstance(value, (Container, str)), \
             "The next agent must be a single string or a Container of strings."
         if type(value) == str:
-            self._next_agent = set(value)
+            value = [value]
         for agent_id in value:
             assert agent_id in self.agents, \
                 "Every next agent must be an agent in the simulation."
