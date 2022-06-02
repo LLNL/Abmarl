@@ -1,6 +1,4 @@
 
-from gym.spaces import Discrete
-from matplotlib.pyplot import isinteractive
 import pytest
 
 from abmarl.sim import PrincipleAgent, DynamicOrderSimulation, AgentBasedSimulation

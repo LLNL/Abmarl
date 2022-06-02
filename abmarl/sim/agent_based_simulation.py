@@ -245,6 +245,7 @@ class AgentBasedSimulation(ABC):
         """
         pass
 
+
 class DynamicOrderSimulation(AgentBasedSimulation):
     """
     An AgentBasedSimulation where the simulation chooses the agents' turns dynamically.

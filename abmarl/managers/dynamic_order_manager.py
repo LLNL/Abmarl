@@ -1,6 +1,5 @@
-from itertools import cycle
 
-from abmarl.sim import ActingAgent, ObservingAgent, DynamicOrderSimulation
+from abmarl.sim import DynamicOrderSimulation
 
 from .simulation_manager import SimulationManager
 
@@ -8,7 +7,7 @@ from .simulation_manager import SimulationManager
 class DynamicOrderManager(SimulationManager):
     """
     The DynamicOrderManager allows agents to take turns dynamically decided by the Simulation.
-    
+
     The order of the agents is dynamically decided by the simulation as it runs.
     The simulation must be a DynamicOrderSimulation. The agents reported at reset
     and step are those given in the sim's next_agent property.
