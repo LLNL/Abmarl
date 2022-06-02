@@ -17,10 +17,6 @@ class DynamicOrderManager(SimulationManager):
         assert isinstance(sim, DynamicOrderSimulation), \
             "To use the DynamicOrderManager, the simulation must be a DynamicOrderSimulation."
         super().__init__(sim)
-        # self.agent_order = cycle({
-        #     agent_id: agent for agent_id, agent in self.agents.items()
-        #     if (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent))
-        # })
 
     def reset(self, **kwargs):
         """

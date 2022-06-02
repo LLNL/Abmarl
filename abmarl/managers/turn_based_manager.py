@@ -62,7 +62,7 @@ class TurnBasedManager(SimulationManager):
                 # Check if the agent is just recently done:
                 elif self.sim.get_done(next_agent):
                     # This agent only just recently finished. It sent an action before
-                    # and now expects to receive an observation, rewrard, and done signal.
+                    # and now expects to receive an observation, reward, and done signal.
                     # So I want to add that to the output, but I don't want its action
                     # because it is done. So I want to include its info AND the info from
                     # the next not done agent.

@@ -261,9 +261,11 @@ class DynamicOrderSimulation(AgentBasedSimulation):
         assert isinstance(value, Container, str), \
             "The next agent must be a single string or a Container of strings."
         if type(value) == str:
-            assert value in self.agents, "The next agent must be an agent in the simulation."
-        else:
-            for agent_id in value:
-                assert agent_id in self.agents, \
-                    "Every next agent must be an agent in the simulation."
+            self._next_agent = set(value)
+        for agent_id in value:
+            assert agent_id in self.agents, \
+                "Every next agent must be an agent in the simulation."
+            assert isinstance(self.agents[agent_id], ActingAgent) and \
+                isinstance(self.agents[agent_id], ObservingAgent), \
+                    "Every next agent must be an Agent."
         self._next_agent = value
