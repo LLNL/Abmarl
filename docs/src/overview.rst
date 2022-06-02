@@ -152,7 +152,7 @@ Simluation Managers "wrap" simulations, and they can be used like so:
 
 .. WARNING::
    The :ref:`Dynamic Order Manager <api_dynamic_man>` must be used with a
-   :ref: `Dynamic Order Simulation <api_dynamic_sim>`. This allows the simulation
+   :ref:`Dynamic Order Simulation <api_dynamic_sim>`. This allows the simulation
    to dynamically choose the agents' turns, but it also requires the simulation
    to pay attention to the inteface rules. For example, a Dynamic Order Simulation
    must ensure that at every step there is at least one reported agent who is not done.
