@@ -1,4 +1,3 @@
 matplotlib
 sphinx
 sphinx-rtd-theme
-ray[rllib]==1.4.0
