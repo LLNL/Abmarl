@@ -33,7 +33,8 @@ class DynamicOrderManager(SimulationManager):
         Assert that the incoming action does not come from an agent who is recorded
         as done. Step the simulation forward and return the observation, reward,
         done, and info of the next agent. The simulation is responsible to ensure
-        that there is at least one next_agent that did not finish in this turn.
+        that there is at least one next_agent that did not finish in this turn,
+        unless it is the last turn.
         """
         for agent_id in action_dict:
             assert agent_id not in self.done_agents, \
