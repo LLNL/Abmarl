@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Container
 
 from abmarl.tools import gym_utils as gu
 
@@ -164,7 +165,6 @@ class AgentBasedSimulation(ABC):
         multiple entries in the dictionary, whereas a single-agent simulation
         should only have a single entry in the dictionary.
         """
-
         return self._agents
 
     @agents.setter
@@ -244,3 +244,26 @@ class AgentBasedSimulation(ABC):
         Return the agent's info.
         """
         pass
+
+class DynamicOrderSimulation(AgentBasedSimulation):
+    """
+    An AgentBasedSimulation where the simulation chooses the agents' turns dynamically.
+    """
+    @property
+    def next_agent(self):
+        """
+        The next agent(s) in the game.
+        """
+        return self._next_agent
+
+    @next_agent.setter
+    def next_agent(self, value):
+        assert isinstance(value, Container, str), \
+            "The next agent must be a single string or a Container of strings."
+        if type(value) == str:
+            assert value in self.agents, "The next agent must be an agent in the simulation."
+        else:
+            for agent_id in value:
+                assert agent_id in self.agents, \
+                    "Every next agent must be an agent in the simulation."
+        self._next_agent = value
