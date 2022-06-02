@@ -126,9 +126,10 @@ which specifies the output from ``reset`` and ``step`` as RLlib expects it. Spec
 2. Agents that are done on this step will not provide actions on the next step.
 
 Simulation managers are open-ended requiring only ``reset`` and ``step`` with output
-described above. For convenience, we have provided two managers: :ref:`Turn Based <api_turn_based>`,
-which implements turn-based games; and :ref:`All Step <api_all_step>`, which has every non-done
-agent provide actions at each step.
+described above. For convenience, we have provided three managers: :ref:`Turn Based <api_turn_based>`,
+which implements turn-based games; :ref:`All Step <api_all_step>`, which has every non-done
+agent provide actions at each step; and :ref:`Dynamic Order <api_dynamic_man>`,
+which allows the simulation to decide the agents' turns dynamically.
 
 Simluation Managers "wrap" simulations, and they can be used like so:
 
@@ -148,6 +149,13 @@ Simluation Managers "wrap" simulations, and they can be used like so:
    # Get simulation state for all non-done agents, regardless of which agents
    # actually contribute an action.
    obs, rewards, dones, infos = sim.step({'agent0': 4, 'agent2': [-1, 1]})
+
+.. WARNING::
+   The :ref:`Dynamic Order Manager <api_dynamic_man>` must be used with a
+   :ref: `Dynamic Order Simulation <api_dynamic_sim>`. This allows the simulation
+   to dynamically choose the agents' turns, but it also requires the simulation
+   to pay attention to the inteface rules. For example, a Dynamic Order Simulation
+   must ensure that at every step there is at least one reported agent who is not done.
 
 
 .. _external:
