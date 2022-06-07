@@ -60,8 +60,7 @@ class SuperAgentWrapper(Wrapper):
                     "The covered agent must be an agent in the underlying sim."
                 assert covered_agent not in self._covered_agents, \
                     "The agent is already covered by another super agent."
-                assert isinstance(self.sim.agents[covered_agent], ActingAgent) and \
-                    isinstance(self.sim.agents[covered_agent], ObservingAgent), \
+                assert isinstance(self.sim.agents[covered_agent], Agent), \
                     "Covered agents must be learning Agents."
                 self._covered_agents.add(covered_agent)
         self._uncovered_agents = self.sim.agents.keys() - self._covered_agents

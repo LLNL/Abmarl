@@ -140,7 +140,14 @@ class Agent(ObservingAgent, ActingAgent):
     """
     An Agent that can both observe and act.
     """
-    pass
+    def __instancecheck__(self, __instance: Any) -> bool:
+        if type(__instance) == ObservingAgent:
+            return True
+        elif type(__instance) == ObservingAgent:
+            return True
+        else:
+            return super().__instancecheck__(__instance)
+    
 
 
 class AgentBasedSimulation(ABC):
