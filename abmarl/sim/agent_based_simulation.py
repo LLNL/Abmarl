@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Container
+from typing import Any
 
 from abmarl.tools import gym_utils as gu
 
@@ -141,9 +142,7 @@ class Agent(ObservingAgent, ActingAgent):
     An Agent that can both observe and act.
     """
     def __instancecheck__(self, __instance: Any) -> bool:
-        if type(__instance) == ObservingAgent:
-            return True
-        elif type(__instance) == ObservingAgent:
+        if type(__instance) == ObservingAgent and type(__instance) == ObservingAgent:
             return True
         else:
             return super().__instancecheck__(__instance)
