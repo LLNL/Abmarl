@@ -15,7 +15,7 @@ class AllStepManager(SimulationManager):
         """
         self.done_agents = set(
             agent.id for agent in self.agents.values()
-            if not (isinstance(agent, Agent))
+            if not isinstance(agent, Agent)
         )
         self.sim.reset(**kwargs)
         return {

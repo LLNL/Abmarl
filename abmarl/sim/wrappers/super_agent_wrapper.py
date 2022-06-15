@@ -1,7 +1,7 @@
 
 from gym.spaces import Dict, Discrete
 
-from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent, Agent
+from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
 from abmarl.tools import gym_utils as gu
 
