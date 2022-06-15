@@ -1,6 +1,6 @@
 from itertools import cycle
 
-from abmarl.sim import ActingAgent, ObservingAgent
+from abmarl.sim import Agent
 
 from .simulation_manager import SimulationManager
 
@@ -16,7 +16,7 @@ class TurnBasedManager(SimulationManager):
         super().__init__(sim)
         self.agent_order = cycle({
             agent_id: agent for agent_id, agent in self.agents.items()
-            if (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent))
+            if isinstance(agent, Agent)
         })
 
     def reset(self, **kwargs):

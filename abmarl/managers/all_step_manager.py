@@ -1,4 +1,4 @@
-from abmarl.sim import ObservingAgent, ActingAgent
+from abmarl.sim import Agent
 
 from .simulation_manager import SimulationManager
 
@@ -15,7 +15,7 @@ class AllStepManager(SimulationManager):
         """
         self.done_agents = set(
             agent.id for agent in self.agents.values()
-            if not (isinstance(agent, ActingAgent) and isinstance(agent, ObservingAgent))
+            if not isinstance(agent, Agent)
         )
         self.sim.reset(**kwargs)
         return {

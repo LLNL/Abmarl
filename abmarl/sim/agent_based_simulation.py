@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Container
+from typing import Any
 
 from abmarl.tools import gym_utils as gu
 
@@ -140,7 +141,8 @@ class Agent(ObservingAgent, ActingAgent):
     """
     An Agent that can both observe and act.
     """
-    pass
+    def __instancecheck__(self, __instance: Any) -> bool:
+        return isinstance(__instance, ObservingAgent) and isinstance(__instance, ActingAgent)
 
 
 class AgentBasedSimulation(ABC):
