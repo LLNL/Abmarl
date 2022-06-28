@@ -2,8 +2,6 @@
 import os
 from pprint import pprint
 
-from matplotlib import pyplot as plt
-
 from abmarl.trainers.base import MultiPolicyTrainer
 
 class DebugTrainer(MultiPolicyTrainer):
@@ -23,26 +21,16 @@ class DebugTrainer(MultiPolicyTrainer):
         """
         # TOOD:
         # Output directory
-        # Simulation and agents controller
         for i in range(iterations):
-            self.generate_episode(render=render, **kwargs)
+            observations, actions, rewards, dones = self.generate_episode(render=render, **kwargs)
 
             # Setup dump files
             with open(os.path.join(output_dir, f"Episode_{i}.txt"), 'w') as debug_dump:
-                obs = sim.reset()
-                done = {agent: False for agent in obs}
-                debug_dump.write("Reset:\n")
-                pprint(obs, stream=debug_dump)
-                for j in range(parameters.steps_per_episode): # Data generation
-                    action = {
-                        agent_id: agents[agent_id].action_space.sample()
-                        for agent_id in obs if not done[agent_id]
-                    }
-                    obs, reward, done, info = sim.step(action)
-                    debug_dump.write(f"\nStep {j}:\n")
-                    pprint(action, stream=debug_dump)
-                    pprint(obs, stream=debug_dump)
-                    pprint(reward, stream=debug_dump)
-                    pprint(done, stream=debug_dump)
-                    if done['__all__']:
-                        break
+                debug_dump.write("Observations:\n")
+                pprint(observations, stream=debug_dump)
+                debug_dump.write("\nActions:\n")
+                pprint(actions, stream=debug_dump)
+                debug_dump.write("\nRewards:\n")
+                pprint(rewards, stream=debug_dump)
+                debug_dump.write("\nDones:\n")
+                pprint(dones, stream=debug_dump)
