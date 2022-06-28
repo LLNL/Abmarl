@@ -57,8 +57,6 @@ class DebugTrainer(MultiPolicyTrainer):
             iterations: The number of episodes to generate.
             render: Set to True to visualize the simulation.
         """
-        # TOOD:
-        # Output directory
         for i in range(iterations):
             observations, actions, rewards, dones = self.generate_episode(render=render, **kwargs)
 

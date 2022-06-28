@@ -1,6 +1,5 @@
 from abmarl.tools import utils as adu
 from abmarl.trainers import DebugTrainer
-from abmarl.policies import RandomPolicy
 
 def run(full_config_path, parameters):
     """Debug the SimulationManagers from the config_file."""
@@ -24,14 +23,9 @@ def run(full_config_path, parameters):
         os.makedirs(output_dir)
     shutil.copy(full_config_path, output_dir)
 
-    # Simulation loop
-    from pprint import pprint
-    if parameters.render:
-        from matplotlib import pyplot as plt
+    # Debug the simulation
     sim = experiment_mod.params['experiment']['sim_creator'](
         experiment_mod.params['ray_tune']['config']['env_config']
     )
-    agents = sim.unwrapped.agents
-
-    trainer = DebugTrainer(sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn, output_dir=output_dir)
-    trainer.train(iterations=parameters.episodes, redner=parameters.render)
+    trainer = DebugTrainer(sim=sim, output_dir=output_dir)
+    trainer.train(iterations=parameters.episodes, render=parameters.render)
