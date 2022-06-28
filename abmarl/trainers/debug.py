@@ -1,6 +1,7 @@
 
 import os
 from pprint import pprint
+from abmarl.policies.policy import RandomPolicy
 
 from abmarl.trainers.base import MultiPolicyTrainer
 
@@ -11,9 +12,22 @@ class DebugTrainer(MultiPolicyTrainer):
     The DebugTrainer generates episodes using the simulation and policies. Rather
     than training those policies, The DebugTrainer simply dumps the observations,
     actions, rewards, and dones to disk.
+
+    The DebugTrainer can be run without policies. In this case, we generate random
+    policies for each agent. This will allow you to debug the simulation without
+    having to debug the policy setup too.
     """
-    def __init__(self, output_dir=None, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, sim=None, policies=None, output_dir=None, **kwargs):
+        self.sim = sim # TODO: Does this use the super's property?
+        if not policies:
+            # Create random policies
+            policies = {
+                agent.id: RandomPolicy(
+                    action_space=agent.action_space,
+                    observation_space=agent.observation_space
+                ) for agent in sim.agents.values()
+            }
+        super().__init__(policies=policies, **kwargs)
         self.output_dir = output_dir
 
     @property

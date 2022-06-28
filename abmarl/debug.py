@@ -1,5 +1,6 @@
 from abmarl.tools import utils as adu
 from abmarl.trainers import DebugTrainer
+from abmarl.policies import RandomPolicy
 
 def run(full_config_path, parameters):
     """Debug the SimulationManagers from the config_file."""
@@ -32,5 +33,5 @@ def run(full_config_path, parameters):
     )
     agents = sim.unwrapped.agents
 
-    trainer = DebugTrainer(sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn)
+    trainer = DebugTrainer(sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn, output_dir=output_dir)
     trainer.train(iterations=parameters.episodes, redner=parameters.render)
