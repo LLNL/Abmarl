@@ -14,8 +14,8 @@ class DebugTrainer(MultiPolicyTrainer):
         """
         Generate episodes of data.
 
-        Nothing is technically trained here. We just generate and dump the data.
-        We also visualize the simulation if requested.
+        Nothing is technically trained here. We just generate and dump the data
+        and visualize the simulation if requested.
 
         Args:
             iterations: The number of episodes to generate.
@@ -25,15 +25,12 @@ class DebugTrainer(MultiPolicyTrainer):
         # Output directory
         # Simulation and agents controller
         for i in range(iterations):
+            self.generate_episode(render=render, **kwargs)
+
             # Setup dump files
             with open(os.path.join(output_dir, f"Episode_{i}.txt"), 'w') as debug_dump:
-                if render:
-                    fig = plt.figure()
                 obs = sim.reset()
                 done = {agent: False for agent in obs}
-                if render:
-                    sim.render(fig=fig)
-                    plt.pause(1e-16)
                 debug_dump.write("Reset:\n")
                 pprint(obs, stream=debug_dump)
                 for j in range(parameters.steps_per_episode): # Data generation
@@ -42,9 +39,6 @@ class DebugTrainer(MultiPolicyTrainer):
                         for agent_id in obs if not done[agent_id]
                     }
                     obs, reward, done, info = sim.step(action)
-                    if render:
-                        sim.render(fig=fig)
-                        plt.pause(1e-16)
                     debug_dump.write(f"\nStep {j}:\n")
                     pprint(action, stream=debug_dump)
                     pprint(obs, stream=debug_dump)
@@ -52,5 +46,3 @@ class DebugTrainer(MultiPolicyTrainer):
                     pprint(done, stream=debug_dump)
                     if done['__all__']:
                         break
-                if render:
-                    plt.close(fig)

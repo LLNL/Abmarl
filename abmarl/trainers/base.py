@@ -77,7 +77,7 @@ class MultiPolicyTrainer(ABC):
             for agent_id in obs
         }
 
-    def generate_episode(self, horizon=200, **kwargs):
+    def generate_episode(self, horizon=200, render=False, **kwargs):
         """
         Generate an episode of data.
 
@@ -93,6 +93,8 @@ class MultiPolicyTrainer(ABC):
             horizon: The maximum number of steps per epsidoe. The episode may
                 finish early, but it will not progress further than this number
                 of steps.
+            render: Renders the simulation. This should be False when training,
+                and can be True when debugging or evaluating in post-processing.
 
         Returns:
             Three dictionaries: one for observations, another for actions, and
@@ -103,11 +105,19 @@ class MultiPolicyTrainer(ABC):
             NOTE: In multiagent simulations, the number of SARs may differ for
             each agent.
         """
+        # Check for rendering
+        if render:
+            from matplotlib import pyplot as plt
+            fig = plt.figure()
+
         # Reset the simulation and policies
         obs = self.sim.reset()
         done = {agent: False for agent in obs}
         for policy in self.policies.values():
             policy.reset()
+        if render:
+            self.sim.render(fig=fig)
+            plt.pause(1e-16)
 
         # Data collection
         observations, actions, rewards = {}, {}, {}
@@ -118,6 +128,9 @@ class MultiPolicyTrainer(ABC):
         for j in range(horizon):
             action = self.compute_actions(obs)
             obs, reward, done, _ = self.sim.step(action)
+            if render:
+                self.sim.render(fig=fig)
+                plt.pause(1e-16)
 
             # Store the data
             for agent_id, agent_obs in obs.items():
@@ -145,6 +158,9 @@ class MultiPolicyTrainer(ABC):
                 if agent_done:
                     # This is okay to delete because it has already been stored in observations
                     del obs[agent_id]
+
+        if render:
+            plt.close(fig)
 
         return observations, actions, rewards
 
