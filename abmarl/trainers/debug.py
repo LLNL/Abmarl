@@ -17,17 +17,19 @@ class DebugTrainer(MultiPolicyTrainer):
     policies for each agent. This will allow you to debug the simulation without
     having to debug the policy setup too.
     """
-    def __init__(self, sim=None, policies=None, output_dir=None, **kwargs):
-        self.sim = sim # TODO: Does this use the super's property?
+    def __init__(self, policies=None, output_dir=None, **kwargs):
         if not policies:
+            self.sim = kwargs['sim']
             # Create random policies
-            policies = {
+            self.policies = {
                 agent.id: RandomPolicy(
                     action_space=agent.action_space,
                     observation_space=agent.observation_space
-                ) for agent in sim.agents.values()
+                ) for agent in self.sim.agents.values()
             }
-        super().__init__(policies=policies, **kwargs)
+            self.policy_mapping_fn = lambda agent_id: agent_id
+        else:
+            super().__init__(**kwargs)
         self.output_dir = output_dir
 
     @property
