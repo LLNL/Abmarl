@@ -1,6 +1,7 @@
 from abmarl.tools import utils as adu
 from abmarl.trainers import DebugTrainer
 
+
 def run(full_config_path, parameters):
     """Debug the SimulationManagers from the config_file."""
 

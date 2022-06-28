@@ -5,6 +5,7 @@ from abmarl.policies.policy import RandomPolicy
 
 from abmarl.trainers.base import MultiPolicyTrainer
 
+
 class DebugTrainer(MultiPolicyTrainer):
     """
     Debug the training setup.
