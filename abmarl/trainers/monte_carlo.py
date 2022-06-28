@@ -10,7 +10,7 @@ class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
         state_action_returns = {}
 
         for i in range(iterations):
-            states, actions, rewards = self.generate_episode(**kwargs)
+            states, actions, rewards, dones = self.generate_episode(**kwargs)
             states = next(iter(states.values()))
             states.pop() # Pop off the terminating state.
             states = np.stack(states)

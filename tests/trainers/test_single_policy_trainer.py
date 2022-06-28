@@ -145,7 +145,7 @@ def test_trainer_compute_actions():
 
 def test_trainer_generate_episode_policy_space_coordination():
     trainer = NoTrainer(sim=sim, policy=policy)
-    observations, actions, rewards = trainer.generate_episode(horizon=20)
+    observations, actions, rewards, dones = trainer.generate_episode(horizon=20)
     for agent_id, observation in observations.items():
         assert agent_id in sim.agents
         assert type(observation) is list
@@ -161,33 +161,41 @@ def test_trainer_generate_episode_policy_space_coordination():
         assert type(reward) is list
         for rew in reward:
             assert type(rew) in [float, int]
+    for agent_id, done in dones.items():
+        assert agent_id in [*sim.agents, '__all__']
+        assert type(done) is list
+        for don in done:
+            assert type(don) is bool
 
 
 def test_trainer_generate_episode_check_horizon():
     trainer = NoTrainer(
         sim=sim, policy=policy
     )
-    observations, actions, rewards = trainer.generate_episode(horizon=20)
-    for agent_id, obs in observations.items():
+    observations, actions, rewards, dones = trainer.generate_episode(horizon=20)
+    for obs in observations.values():
         assert len(obs) <= 21
-    for agent_id, action in actions.items():
+    for action in actions.values():
         assert len(action) <= 20
-    for agent_id, reward in rewards.items():
+    for reward in rewards.values():
         assert len(reward) <= 20
+    for done in dones.values():
+        assert len(done) <= 20
 
 
 def test_trainer_generate_episode_check_lengths():
     trainer = NoTrainer(
         sim=sim, policy=policy
     )
-    observations, actions, rewards = trainer.generate_episode(horizon=20)
+    observations, actions, rewards, dones = trainer.generate_episode(horizon=20)
     for agent_id, agent in sim.agents.items():
         if not isinstance(agent, Agent): continue
         obs = observations[agent_id]
         action = actions[agent_id]
         reward = rewards[agent_id]
+        done = dones[agent_id]
         assert len(obs) == len(action) + 1
-        assert len(action) == len(reward)
+        assert len(action) == len(reward) == len(done)
 
 
 def test_policy_action_space_mismatch():
