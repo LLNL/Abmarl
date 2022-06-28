@@ -27,5 +27,5 @@ def run(full_config_path, parameters):
     sim = experiment_mod.params['experiment']['sim_creator'](
         experiment_mod.params['ray_tune']['config']['env_config']
     )
-    trainer = DebugTrainer(sim=sim, output_dir=output_dir)
+    trainer = DebugTrainer(sim=sim.sim, output_dir=output_dir)
     trainer.train(iterations=parameters.episodes, render=parameters.render)
