@@ -14,8 +14,8 @@ class DebugTrainer(MultiPolicyTrainer):
     than training those policies, The DebugTrainer simply dumps the observations,
     actions, rewards, and dones to disk.
 
-    The DebugTrainer can be run without policies. In this case, we generate random
-    policies for each agent. This will allow you to debug the simulation without
+    The DebugTrainer can be run without policies. In this case, it generates a
+    random policy for each agent. This effectively debug the simulation without
     having to debug the policy setup too.
     """
     def __init__(self, policies=None, output_dir=None, **kwargs):
@@ -49,9 +49,9 @@ class DebugTrainer(MultiPolicyTrainer):
 
     def train(self, iterations=5, render=False, **kwargs):
         """
-        Generate episodes of data.
+        Generate episodes and write write to disk.
 
-        Nothing is technically trained here. We just generate and dump the data
+        Nothing is trained here. We just generate and dump the data
         and visualize the simulation if requested.
 
         Args:
