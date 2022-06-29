@@ -168,10 +168,6 @@ class SuperAgentWrapper(Wrapper):
         Report the agent's reward.
 
         A super agent's reward is the sum of all its covered agents' rewards.
-        Covered agents that are done are excluded from the sum.
-        # TODO: What about in the step when the agent just died? In that case,
-        # I think we want to count its reward, but we don't want to count the
-        # reward for all future steps....
 
         Args:
             agent_id: The id of the agent for whom to report the reward. Should
@@ -187,6 +183,7 @@ class SuperAgentWrapper(Wrapper):
             return sum([
                 self.sim.get_reward(covered_agent_id)
                 for covered_agent_id in self.super_agent_mapping[agent_id]
+                if covered_agent_id not in self._already_done_covered_agents
             ])
         else:
             return self.sim.get_reward(agent_id, **kwargs)
