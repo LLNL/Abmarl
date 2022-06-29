@@ -18,6 +18,12 @@ class SuperAgentWrapper(Wrapper):
     agent would experience completely different simulation dynamcis for some of
     its covered agents with no indication as to why.
 
+    Unless handled carefully, the super agent will generate observations for done
+    covered agents. This may contaminate the training data with an unfair advantage.
+    For exmample, a dead covered agent should be able to provide the super agent with
+    useful information. In order to correct this, the user may supply the null
+    observation for each of the agents, so that done agents report the null observation.
+
     Furthermore, super agents may still report actions for covered agents that
     are done. This wrapper filters out those actions before passing them to the
     underlying sim. See step for more details.
@@ -80,19 +86,19 @@ class SuperAgentWrapper(Wrapper):
 
         Args:
             action_dict: Dictionary that maps agent ids to the actions. Covered
-            agents should not be present.
+                agents should not be present.
         """
         unravelled_action_dict = {}
         for agent_id, action in action_dict.items():
             assert agent_id not in self._covered_agents, \
                 "We cannot receive actions from an agent that is covered by a super agent."
             if agent_id in self.super_agent_mapping: # A super agent action
+                # We can safely assume the format of the actions because we
+                # generated the action space
                 for covered_agent_id, covered_action in action.items():
-                    # We can safely assume the format of the actions because we
-                    # generated the action space
+                    # We don't want to send the simulation actions from covered
+                    # agents that are done
                     if not self.sim.get_done(covered_agent_id):
-                        # We don't want to send the simulation actions from covered
-                        # agents that are done
                         unravelled_action_dict[covered_agent_id] = covered_action
             else:
                 unravelled_action_dict[agent_id] = action
@@ -108,9 +114,15 @@ class SuperAgentWrapper(Wrapper):
         changing simulation dynamics for done agents (i.e. why actions from done
         agents don't do anything).
 
+        The super agent will report an observation for done covered agents. This may
+        result in an unfair advantage during training (e.g. dead agent should not
+        produce useful information), and Abmarl will issue a warning. To properly
+        handle this, the user can supply the null observation for each agent. In
+        that case, the super agent will use the null observation for any done agents.
+
         Args:
             agent_id: The id of the agent for whom to produce an observation. Should
-            not be a covered agent.
+                not be a covered agent.
 
         Returns:
             The requested observation. Super agent observations are collected from
