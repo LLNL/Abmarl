@@ -32,6 +32,13 @@ class SuperAgentWrapper(Wrapper):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
 
+    def reset(self, **kwargs):
+        # We use this to track agents that are already done. A recently done agent
+        # is moved to this set after `get_done` is called for it.
+        self._just_done_covered_agents = set()
+        self._already_done_covered_agents = set()
+        self.sim.reset(**kwargs)
+
     @property
     def super_agent_mapping(self):
         """
@@ -98,7 +105,15 @@ class SuperAgentWrapper(Wrapper):
                 for covered_agent_id, covered_action in action.items():
                     # We don't want to send the simulation actions from covered
                     # agents that are done
-                    if not self.sim.get_done(covered_agent_id):
+                    if self.sim.get_done(covered_agent_id):
+                        if covered_agent_id in self._already_done_covered_agents:
+                            continue
+                        elif covered_agent_id in self._just_done_covered_agents:
+                            self._already_done_covered_agents.add(covered_agent_id)
+                            self._just_done_covered_agents.remove(covered_agent_id)
+                        else:
+                            self._just_done_covered_agents.add(covered_agent_id)
+                    else:
                         unravelled_action_dict[covered_agent_id] = covered_action
             else:
                 unravelled_action_dict[agent_id] = action
