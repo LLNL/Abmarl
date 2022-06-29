@@ -194,6 +194,7 @@ def test_debug_trainer_policy_mapping_fn(tmpdir):
         output_dir=str(tmpdir)
     )
 
+
 def test_debug_trainer_no_output_dir():
     with pytest.raises(AssertionError):
         DebugTrainer(
