@@ -145,13 +145,19 @@ class SuperAgentWrapper(Wrapper):
         """
         Report the agent's reward.
 
+        A super agent's reward is the sum of all its covered agents' rewards.
+        Covered agents that are done are excluded from the sum.
+        # TODO: What about in the step when the agent just died? In that case,
+        # I think we want to count its reward, but we don't want to count the
+        # reward for all future steps....
+
         Args:
             agent_id: The id of the agent for whom to report the reward. Should
-            not be a covered agent.
+                not be a covered agent.
 
         Returns:
             The requested reward. Super agent rewards are summed from the covered
-            agents.
+                agents.
         """
         assert agent_id not in self._covered_agents, \
             "We cannot get rewards for an agent that is covered by a super agent."
@@ -175,11 +181,11 @@ class SuperAgentWrapper(Wrapper):
 
         Args:
             agent_id: The id of the agent for whom to report the done condition.
-            Should not be a covered agent.
+                Should not be a covered agent.
 
         Returns:
             The requested done conndition. Super agents are done when all their
-            covered agents are done.
+                covered agents are done.
         """
         assert agent_id not in self._covered_agents, \
             "We cannot get done for an agent that is covered by a super agent."
@@ -197,7 +203,7 @@ class SuperAgentWrapper(Wrapper):
 
         Args:
             agent_id: The id of the agent for whom to get info. Should not be a
-            covered agent.
+                covered agent.
 
         Returns:
             The requested info. Super agents info is collected from covered agents.
@@ -233,7 +239,7 @@ class SuperAgentWrapper(Wrapper):
                 action_space=Dict(action_mapping)
             )
 
-        # Add all uncovered agents to the dict of agetns
+        # Add all uncovered agents to the dict of agents
         for agent_id in self._uncovered_agents:
             agents[agent_id] = self.sim.agents[agent_id]
 
