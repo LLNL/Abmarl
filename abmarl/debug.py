@@ -1,4 +1,5 @@
 from abmarl.tools import utils as adu
+from abmarl.trainers import DebugTrainer
 
 
 def run(full_config_path, parameters):
@@ -23,41 +24,9 @@ def run(full_config_path, parameters):
         os.makedirs(output_dir)
     shutil.copy(full_config_path, output_dir)
 
-    # Simulation loop
-    from pprint import pprint
-    if parameters.render:
-        from matplotlib import pyplot as plt
+    # Debug the simulation
     sim = experiment_mod.params['experiment']['sim_creator'](
         experiment_mod.params['ray_tune']['config']['env_config']
     )
-    agents = sim.unwrapped.agents
-    for i in range(parameters.episodes):
-        # Setup dump files
-        with open(os.path.join(output_dir, f"Episode_{i}.txt"), 'w') as debug_dump:
-            if parameters.render:
-                fig = plt.figure()
-            obs = sim.reset()
-            done = {agent: False for agent in obs}
-            if parameters.render:
-                sim.render(fig=fig)
-                plt.pause(1e-16)
-            debug_dump.write("Reset:\n")
-            pprint(obs, stream=debug_dump)
-            for j in range(parameters.steps_per_episode): # Data generation
-                action = {
-                    agent_id: agents[agent_id].action_space.sample()
-                    for agent_id in obs if not done[agent_id]
-                }
-                obs, reward, done, info = sim.step(action)
-                if parameters.render:
-                    sim.render(fig=fig)
-                    plt.pause(1e-16)
-                debug_dump.write(f"\nStep {j}:\n")
-                pprint(action, stream=debug_dump)
-                pprint(obs, stream=debug_dump)
-                pprint(reward, stream=debug_dump)
-                pprint(done, stream=debug_dump)
-                if done['__all__']:
-                    break
-            if parameters.render:
-                plt.close(fig)
+    trainer = DebugTrainer(sim=sim.sim, output_dir=output_dir)
+    trainer.train(iterations=parameters.episodes, render=parameters.render)

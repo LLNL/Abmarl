@@ -77,7 +77,7 @@ class MultiPolicyTrainer(ABC):
             for agent_id in obs
         }
 
-    def generate_episode(self, horizon=200, **kwargs):
+    def generate_episode(self, horizon=200, render=False, **kwargs):
         """
         Generate an episode of data.
 
@@ -93,24 +93,34 @@ class MultiPolicyTrainer(ABC):
             horizon: The maximum number of steps per epsidoe. The episode may
                 finish early, but it will not progress further than this number
                 of steps.
+            render: Renders the simulation. This should be False when training,
+                and can be True when debugging or evaluating in post-processing.
 
         Returns:
-            Three dictionaries: one for observations, another for actions, and
-            another for rewards, thus making up the SAR sequences. The data is
-            organized by agent_id, so you would call
+            Four dictionaries: one for observations, another for actions,
+            another for rewards, and another for dones. This makes the SAR sequence
+            and provides additional information on the done condition since some
+            algorithms need this. The data is organized by agent_id, so you would call
                 {observations, actions, rewards}[agent_id][i]
             in order to extract the ith SAR for an agent.
             NOTE: In multiagent simulations, the number of SARs may differ for
             each agent.
         """
+        # Check for rendering
+        if render:
+            from matplotlib import pyplot as plt
+            fig = plt.figure()
+
         # Reset the simulation and policies
         obs = self.sim.reset()
-        done = {agent: False for agent in obs}
         for policy in self.policies.values():
             policy.reset()
+        if render:
+            self.sim.render(fig=fig)
+            plt.pause(1e-16)
 
         # Data collection
-        observations, actions, rewards = {}, {}, {}
+        observations, actions, rewards, dones = {}, {}, {}, {}
         for agent_id, agent_obs in obs.items():
             observations[agent_id] = [agent_obs]
 
@@ -118,6 +128,9 @@ class MultiPolicyTrainer(ABC):
         for j in range(horizon):
             action = self.compute_actions(obs)
             obs, reward, done, _ = self.sim.step(action)
+            if render:
+                self.sim.render(fig=fig)
+                plt.pause(1e-16)
 
             # Store the data
             for agent_id, agent_obs in obs.items():
@@ -135,6 +148,11 @@ class MultiPolicyTrainer(ABC):
                     actions[agent_id].append(agent_action)
                 except KeyError:
                     actions[agent_id] = [agent_action]
+            for agent_id, agent_done in done.items():
+                try:
+                    dones[agent_id].append(agent_done)
+                except KeyError:
+                    dones[agent_id] = [agent_done]
 
             # Exit if we're done
             if done['__all__']:
@@ -146,7 +164,10 @@ class MultiPolicyTrainer(ABC):
                     # This is okay to delete because it has already been stored in observations
                     del obs[agent_id]
 
-        return observations, actions, rewards
+        if render:
+            plt.close(fig)
+
+        return observations, actions, rewards, dones
 
     @abstractmethod
     def train(self, iterations=10_000, **kwargs):
@@ -156,7 +177,7 @@ class MultiPolicyTrainer(ABC):
         This function is abstract and should be implemented by the algorithm.
         The implementation should look something like this:
         for iter in range(iterations):
-            observations, actions, rewards = self.generate_episode()
+            observations, actions, rewards, dones = self.generate_episode()
             # Implementation: update the policy with the generated data.
 
         Args:
