@@ -150,8 +150,15 @@ class SuperAgentWrapper(Wrapper):
         if agent_id in self.super_agent_mapping:
             obs = {'mask': {}}
             for covered_agent in self.super_agent_mapping[agent_id]:
-                obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
-                obs['mask'][covered_agent] = False if self.sim.get_done(covered_agent) else True
+                if covered_agent in self._already_done_covered_agents:
+                    obs[covered_agent] = self.null_obs[agent_id]
+                    obs['mask'][covered_agent] = True
+                elif covered_agent in self._just_done_covered_agents:
+                    obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
+                    obs['mask'][covered_agent] = True
+                else:
+                    obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
+                    obs['mask'][covered_agent] = False
             return obs
         else:
             return self.sim.get_obs(agent_id, **kwargs)
