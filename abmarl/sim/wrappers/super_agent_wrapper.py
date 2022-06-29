@@ -31,6 +31,7 @@ class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
+        self._warning_issued = False
 
     def reset(self, **kwargs):
         # We use this to track agents that are already done. A recently done agent
@@ -151,7 +152,7 @@ class SuperAgentWrapper(Wrapper):
             obs = {'mask': {}}
             for covered_agent in self.super_agent_mapping[agent_id]:
                 if covered_agent in self._already_done_covered_agents:
-                    obs[covered_agent] = self.null_obs[agent_id]
+                    obs[covered_agent] = self._get_null_obs(covered_agent, **kwargs)
                     obs['mask'][covered_agent] = True
                 elif covered_agent in self._just_done_covered_agents:
                     obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
@@ -263,3 +264,14 @@ class SuperAgentWrapper(Wrapper):
             agents[agent_id] = self.sim.agents[agent_id]
 
         self.agents = agents
+
+    def _get_null_obs(self, agent_id, **kwargs):
+        assert agent_id in self._covered_agents, "Can only use null obs for covered agents."
+        if agent_id in self._null_obs:
+            return self._null_obs[agent_id]
+            # TODO: I need to implement null obs
+        else:
+            if not self._warning_issued:
+                # TODO: Issue a warning
+                pass
+            return self.sim.get_obs(agent_id, **kwargs)
