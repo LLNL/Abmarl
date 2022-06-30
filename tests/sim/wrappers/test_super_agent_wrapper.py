@@ -71,6 +71,7 @@ class SimTest(AgentBasedSimulation):
             return {'first': 1, 'second': [3, 1]}
 
     def get_reward(self, agent_id, **kwargs):
+        # TODO: The persisent state is annoying. Change this.
         self.ith_call = (self.ith_call + 1) % 7
         return self.rewards[self.ith_call]
 
@@ -253,10 +254,52 @@ def test_using_null_obs_when_done():
     assert not sim._already_done_covered_agents
     assert not sim._just_done_covered_agents
 
+
     sim.step({'agent1': [2, 2, 0]})
     assert sim.unwrapped.step_count == 4
-    # TODO: Finish this test.
+    assert sim.unwrapped.get_done('agent0')
+    assert not sim.unwrapped.get_done('agent3')
 
+    sim.step({'agent1': [2, 2, 0]})
+    assert sim.unwrapped.step_count == 5
+    assert sim.unwrapped.get_done('agent0')
+    assert not sim.unwrapped.get_done('agent3')
+
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 1],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': True, 'agent3': False}
+    }
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 0],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': True, 'agent3': False}
+    }
+    assert sim.unwrapped.get_obs('agent0') == [0, 0, 0, 1]
+
+    assert sim.get_reward('super0') == 100
+    assert sim.get_reward('super0') == 100
+    assert sim.unwrapped.get_reward('agent0') == 100
+
+
+    sim.step({'agent2': {'alpha': [1, 1, 0]}})
+    assert sim.unwrapped.step_count == 6
+    assert sim.unwrapped.get_done('agent0')
+    assert sim.unwrapped.get_done('agent3')
+
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 0],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': True, 'agent3': True}
+    }
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 0],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': True, 'agent3': True}
+    }
+    assert sim.get_reward('super0') == 100
+    assert sim.get_reward('super0') == 100
+    assert sim.unwrapped.get_reward('agent0') == 100
 
 
 def test_sim_obs():
