@@ -30,17 +30,11 @@ class SuperAgentWrapper(Wrapper):
     are done. This wrapper filters out those actions before passing them to the
     underlying sim. See step for more details.
     """
-    def __init__(self, sim, super_agent_mapping=None, **kwargs):
+    def __init__(self, sim, super_agent_mapping=None, null_obs=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
+        self.null_obs = null_obs
         self._warning_issued = False
-
-    def reset(self, **kwargs):
-        # We use this to track agents that are already done. A recently done agent
-        # is moved to this set after `get_done` is called for it.
-        self._just_done_covered_agents = set()
-        self._already_done_covered_agents = set()
-        self.sim.reset(**kwargs)
 
     @property
     def super_agent_mapping(self):
@@ -84,6 +78,31 @@ class SuperAgentWrapper(Wrapper):
         # We need to reconstruct the agent dictionary if the super agent mapping
         # ever changes
         self._construct_agents_from_super_agent_mapping()
+
+    @property
+    def null_obs(self):
+        """
+        Use these observations for the covered agents when they are done.
+        """
+        return self._null_obs
+
+    @null_obs.setter
+    def null_obs(self, value):
+        assert type(value) is dict, \
+            'Null obs must be dict mapping covered_agent id to an observation.'
+        for covered_agent_id, obs in value.items():
+            assert covered_agent_id in self._covered_agents, \
+                "Can only supply null obs for covered agents."
+            assert obs in self.sim.agents[covered_agent_id].observation_space, \
+                f"The null obs for {covered_agent_id} is not in its observation space."
+        self._null_obs = value
+
+    def reset(self, **kwargs):
+        # We use this to track agents that are already done. A recently done agent
+        # is moved to this set after `get_done` is called for it.
+        self._just_done_covered_agents = set()
+        self._already_done_covered_agents = set()
+        self.sim.reset(**kwargs)
 
     def step(self, action_dict, **kwargs):
         """
@@ -269,9 +288,8 @@ class SuperAgentWrapper(Wrapper):
 
     def _get_null_obs(self, agent_id, **kwargs):
         assert agent_id in self._covered_agents, "Can only use null obs for covered agents."
-        if agent_id in self._null_obs:
-            return self._null_obs[agent_id]
-            # TODO: I need to implement null obs
+        if agent_id in self.null_obs:
+            return self.null_obs[agent_id]
         else:
             if not self._warning_issued:
                 self._warning_issued = True
