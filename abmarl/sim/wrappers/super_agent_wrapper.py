@@ -98,10 +98,14 @@ class SuperAgentWrapper(Wrapper):
         self._null_obs = value
 
     def reset(self, **kwargs):
-        # We use this to track agents that are already done. A recently done agent
-        # is moved to this set after `get_done` is called for it.
-        self._just_done_covered_agents = set()
-        self._already_done_covered_agents = set()
+        self._last_obs_reported = {
+            agent.id: False
+            for agent in self.agents.values() if isinstance(agent, Agent)
+        }
+        self._last_reward_reported = {
+            agent.id: False
+            for agent in self.agents.values() if isinstance(agent, Agent)
+        }
         self.sim.reset(**kwargs)
 
     def step(self, action_dict, **kwargs):
@@ -127,19 +131,7 @@ class SuperAgentWrapper(Wrapper):
                 for covered_agent_id, covered_action in action.items():
                     # We don't want to send the simulation actions from covered
                     # agents that are done
-                    # TODO: The done processing should happen for all agents, not
-                    # just the one that just gave the action. Its action may have
-                    # caused another agent to be done, and that agent must be marked
-                    # as such.
-                    if self.sim.get_done(covered_agent_id):
-                        if covered_agent_id in self._already_done_covered_agents:
-                            continue
-                        elif covered_agent_id in self._just_done_covered_agents:
-                            self._already_done_covered_agents.add(covered_agent_id)
-                            self._just_done_covered_agents.remove(covered_agent_id)
-                        else:
-                            self._just_done_covered_agents.add(covered_agent_id)
-                    else:
+                    if not self.sim.get_done(covered_agent_id):
                         unravelled_action_dict[covered_agent_id] = covered_action
             else:
                 unravelled_action_dict[agent_id] = action
@@ -176,12 +168,14 @@ class SuperAgentWrapper(Wrapper):
         if agent_id in self.super_agent_mapping:
             obs = {'mask': {}}
             for covered_agent in self.super_agent_mapping[agent_id]:
-                if covered_agent in self._already_done_covered_agents:
-                    obs[covered_agent] = self._get_null_obs(covered_agent, **kwargs)
-                    obs['mask'][covered_agent] = True
-                elif covered_agent in self._just_done_covered_agents:
-                    obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
-                    obs['mask'][covered_agent] = True
+                if self.sim.get_done(covered_agent, **kwargs):
+                    if self._last_obs_reported[agent_id]:
+                        obs[covered_agent] = self._get_null_obs(covered_agent, **kwargs)
+                        obs['mask'][covered_agent] = True
+                    else:
+                        obs[covered_agent] = self.get_obs(covered_agent, **kwargs)
+                        obs['mask'][covered_agent] = True
+                        self._last_obs_reported[covered_agent] = True
                 else:
                     obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
                     obs['mask'][covered_agent] = False
@@ -206,11 +200,14 @@ class SuperAgentWrapper(Wrapper):
         assert agent_id not in self._covered_agents, \
             "We cannot get rewards for an agent that is covered by a super agent."
         if agent_id in self.super_agent_mapping:
-            return sum([
-                self.sim.get_reward(covered_agent_id)
-                for covered_agent_id in self.super_agent_mapping[agent_id]
-                if covered_agent_id not in self._already_done_covered_agents
-            ])
+            sum = 0
+            for covered_agent in self.super_agent_mapping[agent_id]:
+                if self.sim.get_done(covered_agent, **kwargs):
+                    if not self._last_reward_reported:
+                        sum += self.sim.get_reward(covered_agent, **kwargs)
+                        self._last_reward_reported[covered_agent] = True
+                else:
+                    sum += self.sim.get_reward(covered_agent, **kwargs)
         else:
             return self.sim.get_reward(agent_id, **kwargs)
 
