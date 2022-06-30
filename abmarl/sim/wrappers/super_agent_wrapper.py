@@ -1,4 +1,6 @@
 
+import warnings
+
 from gym.spaces import Dict, Discrete
 
 from abmarl.sim.agent_based_simulation import Agent
@@ -272,6 +274,9 @@ class SuperAgentWrapper(Wrapper):
             # TODO: I need to implement null obs
         else:
             if not self._warning_issued:
-                # TODO: Issue a warning
-                pass
+                self._warning_issued = True
+                warnings.warn(
+                    "SuperAgentWrapper is being used without null observations " + \
+                    "for the covered agents. This may corrupt the learning data.",
+                )
             return self.sim.get_obs(agent_id, **kwargs)
