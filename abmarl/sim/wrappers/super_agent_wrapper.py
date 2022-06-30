@@ -88,23 +88,24 @@ class SuperAgentWrapper(Wrapper):
 
     @null_obs.setter
     def null_obs(self, value):
-        assert type(value) is dict, \
-            'Null obs must be dict mapping covered_agent id to an observation.'
-        for covered_agent_id, obs in value.items():
-            assert covered_agent_id in self._covered_agents, \
-                "Can only supply null obs for covered agents."
-            assert obs in self.sim.agents[covered_agent_id].observation_space, \
-                f"The null obs for {covered_agent_id} is not in its observation space."
+        if value is not None:
+            assert type(value) is dict, \
+                'Null obs must be dict mapping covered_agent id to an observation.'
+            for covered_agent_id, obs in value.items():
+                assert covered_agent_id in self._covered_agents, \
+                    "Can only supply null obs for covered agents."
+                assert obs in self.sim.agents[covered_agent_id].observation_space, \
+                    f"The null obs for {covered_agent_id} is not in its observation space."
         self._null_obs = value
 
     def reset(self, **kwargs):
         self._last_obs_reported = {
-            agent.id: False
-            for agent in self.agents.values() if isinstance(agent, Agent)
+            agent: False
+            for agent in self._covered_agents
         }
         self._last_reward_reported = {
-            agent.id: False
-            for agent in self.agents.values() if isinstance(agent, Agent)
+            agent: False
+            for agent in self._covered_agents
         }
         self.sim.reset(**kwargs)
 
@@ -169,16 +170,16 @@ class SuperAgentWrapper(Wrapper):
             obs = {'mask': {}}
             for covered_agent in self.super_agent_mapping[agent_id]:
                 if self.sim.get_done(covered_agent, **kwargs):
-                    if self._last_obs_reported[agent_id]:
+                    if self._last_obs_reported[covered_agent]:
                         obs[covered_agent] = self._get_null_obs(covered_agent, **kwargs)
-                        obs['mask'][covered_agent] = True
+                        obs['mask'][covered_agent] = False
                     else:
-                        obs[covered_agent] = self.get_obs(covered_agent, **kwargs)
-                        obs['mask'][covered_agent] = True
+                        obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
+                        obs['mask'][covered_agent] = False
                         self._last_obs_reported[covered_agent] = True
                 else:
                     obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
-                    obs['mask'][covered_agent] = False
+                    obs['mask'][covered_agent] = True
             return obs
         else:
             return self.sim.get_obs(agent_id, **kwargs)
@@ -203,11 +204,12 @@ class SuperAgentWrapper(Wrapper):
             sum = 0
             for covered_agent in self.super_agent_mapping[agent_id]:
                 if self.sim.get_done(covered_agent, **kwargs):
-                    if not self._last_reward_reported:
+                    if not self._last_reward_reported[covered_agent]:
                         sum += self.sim.get_reward(covered_agent, **kwargs)
                         self._last_reward_reported[covered_agent] = True
                 else:
                     sum += self.sim.get_reward(covered_agent, **kwargs)
+            return sum
         else:
             return self.sim.get_reward(agent_id, **kwargs)
 
