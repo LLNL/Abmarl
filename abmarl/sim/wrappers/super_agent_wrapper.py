@@ -127,6 +127,10 @@ class SuperAgentWrapper(Wrapper):
                 for covered_agent_id, covered_action in action.items():
                     # We don't want to send the simulation actions from covered
                     # agents that are done
+                    # TODO: The done processing should happen for all agents, not
+                    # just the one that just gave the action. Its action may have
+                    # caused another agent to be done, and that agent must be marked
+                    # as such.
                     if self.sim.get_done(covered_agent_id):
                         if covered_agent_id in self._already_done_covered_agents:
                             continue

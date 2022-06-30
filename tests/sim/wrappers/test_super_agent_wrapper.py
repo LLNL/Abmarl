@@ -92,6 +92,9 @@ sim = SuperAgentWrapper(
     SimTest(),
     super_agent_mapping={
         'super0': ['agent0', 'agent3']
+    },
+    null_obs={
+        'agent0': [0, 0, 0, 0]
     }
 )
 agents = sim.agents
@@ -168,6 +171,19 @@ def test_agent_spaces():
     assert agents['agent4'] == original_agents['agent4']
 
 
+def test_null_obs():
+    assert sim.null_obs == {'agent0': [0, 0, 0, 0]}
+
+
+def test_null_obs_breaks():
+    with pytest.raises(AssertionError):
+        sim.null_obs = [0, 1]
+    with pytest.raises(AssertionError):
+        sim.null_obs = {'agent0': [0, 0, 0, 0], 'agent1': [0]}
+    with pytest.raises(AssertionError):
+        sim.null_obs = {'agent0': [0, 0, 0, 0, 0]}
+
+
 def test_sim_step():
     sim.reset()
     assert sim.unwrapped.action == {
@@ -223,6 +239,24 @@ def test_sim_step_covered_agent_done():
         'agent1': [2, 3, 0],
         'agent2': {'alpha': [1, 1, 1]}
     }
+
+
+def test_using_null_obs_when_done():
+    sim.unwrapped.step_count = 3
+    obs = sim.get_obs('super0')
+    assert obs in agents['super0'].observation_space
+    assert obs == {
+        'agent0': [0, 0, 0, 1],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': False}
+    }
+    assert not sim._already_done_covered_agents
+    assert not sim._just_done_covered_agents
+
+    sim.step({'agent1': [2, 2, 0]})
+    assert sim.unwrapped.step_count == 4
+    # TODO: Finish this test.
+
 
 
 def test_sim_obs():
