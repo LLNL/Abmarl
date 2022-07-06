@@ -2,6 +2,7 @@
 import numpy as np
 
 from abmarl.sim.gridworld.examples.team_battle_example import BattleAgent, TeamBattleSim
+from abmarl.sim.wrappers import SuperAgentWrapper
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 
@@ -14,7 +15,7 @@ agents = {
         encoding=i % 4 + 1,
         render_color=colors[i % 4],
         initial_position=positions[i % 4]
-    ) for i in range(24)
+    ) for i in range(4)
 }
 overlap_map = {
     1: [1],
@@ -28,16 +29,20 @@ attack_map = {
     3: [1, 2, 4],
     4: [1, 2, 3]
 }
-sim = MultiAgentWrapper(
-    AllStepManager(
+sim_ = AllStepManager(
+    SuperAgentWrapper(
         TeamBattleSim.build_sim(
             8, 8,
             agents=agents,
             overlapping=overlap_map,
             attack_mapping=attack_map
-        )
+        ),
+        super_agent_mapping={
+            'super0': [agent.id for agent in agents.values()]
+        }
     )
 )
+sim = MultiAgentWrapper(sim_)
 
 
 sim_name = "TeamBattle"
@@ -46,22 +51,10 @@ register_env(sim_name, lambda sim_config: sim)
 
 
 policies = {
-    'red': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
-    'blue': (None, agents['agent1'].observation_space, agents['agent1'].action_space, {}),
-    'green': (None, agents['agent2'].observation_space, agents['agent2'].action_space, {}),
-    'gray': (None, agents['agent3'].observation_space, agents['agent3'].action_space, {}),
+    'red': (None, sim_.agents['super0'].observation_space, sim_.agents['super0'].action_space, {}),
 }
-
-
 def policy_mapping_fn(agent_id):
-    if agents[agent_id].encoding == 1:
-        return 'red'
-    if agents[agent_id].encoding == 2:
-        return 'blue'
-    if agents[agent_id].encoding == 3:
-        return 'green'
-    if agents[agent_id].encoding == 4:
-        return 'gray'
+    return "red"
 
 
 # Experiment parameters
@@ -92,7 +85,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 7,
+            "num_workers": 0,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },

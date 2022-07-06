@@ -96,7 +96,9 @@ class SuperAgentWrapper(Wrapper):
                     "Can only supply null obs for covered agents."
                 assert obs in self.sim.agents[covered_agent_id].observation_space, \
                     f"The null obs for {covered_agent_id} is not in its observation space."
-        self._null_obs = value
+            self._null_obs = value
+        else:
+            self._null_obs = {}
 
     def reset(self, **kwargs):
         self._last_obs_reported = {
