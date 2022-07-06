@@ -38,7 +38,10 @@ sim_ = AllStepManager(
             attack_mapping=attack_map
         ),
         super_agent_mapping={
-            'super0': [agent.id for agent in agents.values()]
+            'red': [agent.id for agent in agents.values() if agent.encoding == 1],
+            'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
+            'green': [agent.id for agent in agents.values() if agent.encoding == 3],
+            'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
         }
     )
 )
@@ -51,10 +54,13 @@ register_env(sim_name, lambda sim_config: sim)
 
 
 policies = {
-    'red': (None, sim_.agents['super0'].observation_space, sim_.agents['super0'].action_space, {}),
+    'red': (None, sim_.agents['red'].observation_space, sim_.agents['red'].action_space, {}),
+    'blue': (None, sim_.agents['blue'].observation_space, sim_.agents['blue'].action_space, {}),
+    'green': (None, sim_.agents['green'].observation_space, sim_.agents['green'].action_space, {}),
+    'gray': (None, sim_.agents['gray'].observation_space, sim_.agents['gray'].action_space, {}),
 }
 def policy_mapping_fn(agent_id):
-    return "red"
+    return agent_id
 
 
 # Experiment parameters
