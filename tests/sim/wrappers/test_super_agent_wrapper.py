@@ -1,4 +1,6 @@
 
+import warnings
+
 from gym.spaces import MultiBinary, Discrete, Box, MultiDiscrete, Dict, Tuple
 import pytest
 
@@ -449,3 +451,19 @@ def test_using_null_obs_when_done():
     assert sim.get_reward('super0') == 7
     assert sim.get_reward('super0') == 0
     assert sim.unwrapped.get_reward('agent3') == 7
+
+def test_null_obs_warning():
+    sim.reset()
+    sim._warning_issued = False
+    sim.unwrapped.step_count = 35
+    assert sim.unwrapped.get_done('agent3')
+    sim.get_obs('super0') # Get the last observations
+
+    # Now get the null observations
+    with pytest.warns(UserWarning, match=r"SuperAgentWrapper is being used without null observations"):
+        sim.get_obs('super0')
+
+    # Ensure warning is only given once
+    with warnings.catch_warnings():
+        sim.get_obs('super0')
+        warnings.simplefilter("error")
