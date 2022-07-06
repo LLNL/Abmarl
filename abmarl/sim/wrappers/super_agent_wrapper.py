@@ -299,7 +299,7 @@ class SuperAgentWrapper(Wrapper):
             if not self._warning_issued:
                 self._warning_issued = True
                 warnings.warn(
-                    "SuperAgentWrapper is being used without null observations " + \
+                    "SuperAgentWrapper is being used without null observations "
                     "for the covered agents. This may corrupt the learning data.",
                 )
             return self.sim.get_obs(agent_id, **kwargs)

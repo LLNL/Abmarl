@@ -461,7 +461,10 @@ def test_null_obs_warning():
     sim.get_obs('super0') # Get the last observations
 
     # Now get the null observations
-    with pytest.warns(UserWarning, match=r"SuperAgentWrapper is being used without null observations"):
+    with pytest.warns(
+        UserWarning,
+        match=r"SuperAgentWrapper is being used without null observations"
+    ):
         sim.get_obs('super0')
 
     # Ensure warning is only given once
@@ -486,7 +489,10 @@ def test_no_null_obs():
         'mask': {'agent0': False, 'agent3': False}
     }
 
-    with pytest.warns(UserWarning, match=r"SuperAgentWrapper is being used without null observations"):
+    with pytest.warns(
+        UserWarning,
+        match=r"SuperAgentWrapper is being used without null observations"
+    ):
         assert sim.get_obs('super0') == {
             'agent0': [0, 0, 0, 1],
             'agent3': {'first': 1, 'second': [3, 1]},
