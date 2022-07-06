@@ -35,7 +35,7 @@ super_agent_mapping={
     'green': [agent.id for agent in agents.values() if agent.encoding == 3],
     'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
 }
-null_obs = -2 * np.ones((7,7))
+null_obs = {'grid': -2 * np.ones((7,7), dtype=int)}
 
 sim = MultiAgentWrapper(
     AllStepManager(
@@ -68,14 +68,7 @@ policies = {
 
 
 def policy_mapping_fn(agent_id):
-    if agents[agent_id].encoding == 1:
-        return 'red'
-    if agents[agent_id].encoding == 2:
-        return 'blue'
-    if agents[agent_id].encoding == 3:
-        return 'green'
-    if agents[agent_id].encoding == 4:
-        return 'gray'
+    return agent_id
 
 
 # Experiment parameters
@@ -94,7 +87,7 @@ params = {
         'verbose': 2,
         'config': {
             # --- Simulation ---
-            'disable_env_checking': False,
+            'disable_env_checking': True,
             'env': sim_name,
             'horizon': 200,
             'env_config': {},
@@ -106,7 +99,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 7,
+            "num_workers": 0,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
