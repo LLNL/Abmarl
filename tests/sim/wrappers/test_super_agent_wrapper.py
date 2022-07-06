@@ -13,7 +13,7 @@ class SimTest(AgentBasedSimulation):
     def __init__(self):
         self.rewards = [0, 1, 2, 3, 4, 5, 6]
         self.dones = [3, 12, 5, 34]
-        self.step_count = 0 # Remove persistent state dependency
+        self.step_count = 0
         self.agents = {
             'agent0': Agent(
                 id='agent0',

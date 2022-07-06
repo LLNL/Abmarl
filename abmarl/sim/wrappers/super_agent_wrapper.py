@@ -22,7 +22,7 @@ class SuperAgentWrapper(Wrapper):
 
     Unless handled carefully, the super agent will generate observations for done
     covered agents. This may contaminate the training data with an unfair advantage.
-    For exmample, a dead covered agent should be able to provide the super agent with
+    For exmample, a dead covered agent should not be able to provide the super agent with
     useful information. In order to correct this, the user may supply the null
     observation for each of the agents, so that done agents report the null observation.
 
@@ -153,8 +153,8 @@ class SuperAgentWrapper(Wrapper):
         The super agent will report an observation for done covered agents. This may
         result in an unfair advantage during training (e.g. dead agent should not
         produce useful information), and Abmarl will issue a warning. To properly
-        handle this, the user can supply the null observation for each agent. In
-        that case, the super agent will use the null observation for any done agents.
+        handle this, the user can supply the null observation for each covered agent. In
+        that case, the super agent will use the null observation for any done covered agents.
 
         Args:
             agent_id: The id of the agent for whom to produce an observation. Should
@@ -190,14 +190,14 @@ class SuperAgentWrapper(Wrapper):
         """
         Report the agent's reward.
 
-        A super agent's reward is the sum of all its covered agents' rewards.
+        A super agent's reward is the sum of all its active covered agents' rewards.
 
         Args:
             agent_id: The id of the agent for whom to report the reward. Should
                 not be a covered agent.
 
         Returns:
-            The requested reward. Super agent rewards are summed from the covered
+            The requested reward. Super agent rewards are summed from the active covered
                 agents.
         """
         assert agent_id not in self._covered_agents, \
