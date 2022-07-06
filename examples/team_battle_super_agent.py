@@ -2,7 +2,6 @@
 import numpy as np
 
 from abmarl.sim.gridworld.examples.team_battle_example import BattleAgent, TeamBattleSim
-from abmarl.sim.wrappers import SuperAgentWrapper
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 
@@ -29,29 +28,17 @@ attack_map = {
     3: [1, 2, 4],
     4: [1, 2, 3]
 }
-super_agent_mapping={
-    'red': [agent.id for agent in agents.values() if agent.encoding == 1],
-    'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
-    'green': [agent.id for agent in agents.values() if agent.encoding == 3],
-    'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
-}
-null_obs = {'grid': -2 * np.ones((7,7), dtype=int)}
-
-sim_ = AllStepManager(
-    SuperAgentWrapper(
+sim = MultiAgentWrapper(
+    AllStepManager(
         TeamBattleSim.build_sim(
             8, 8,
             agents=agents,
             overlapping=overlap_map,
             attack_mapping=attack_map
-        ), 
-        super_agent_mapping=super_agent_mapping,
-        # null_obs={
-        #     agent_id: null_obs for agent_id in agents
-        # }
+        )
     )
 )
-sim = MultiAgentWrapper(sim_)
+
 
 sim_name = "TeamBattle"
 from ray.tune.registry import register_env
@@ -59,15 +46,22 @@ register_env(sim_name, lambda sim_config: sim)
 
 
 policies = {
-    'red': (None, sim_.agents['red'].observation_space, sim_.agents['red'].action_space, {}),
-    'blue': (None, sim_.agents['blue'].observation_space, sim_.agents['blue'].action_space, {}),
-    'green': (None, sim_.agents['green'].observation_space, sim_.agents['green'].action_space, {}),
-    'gray': (None, sim_.agents['gray'].observation_space, sim_.agents['gray'].action_space, {}),
+    'red': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
+    'blue': (None, agents['agent1'].observation_space, agents['agent1'].action_space, {}),
+    'green': (None, agents['agent2'].observation_space, agents['agent2'].action_space, {}),
+    'gray': (None, agents['agent3'].observation_space, agents['agent3'].action_space, {}),
 }
 
 
 def policy_mapping_fn(agent_id):
-    return agent_id
+    if agents[agent_id].encoding == 1:
+        return 'red'
+    if agents[agent_id].encoding == 2:
+        return 'blue'
+    if agents[agent_id].encoding == 3:
+        return 'green'
+    if agents[agent_id].encoding == 4:
+        return 'gray'
 
 
 # Experiment parameters
@@ -86,7 +80,7 @@ params = {
         'verbose': 2,
         'config': {
             # --- Simulation ---
-            'disable_env_checking': True,
+            'disable_env_checking': False,
             'env': sim_name,
             'horizon': 200,
             'env_config': {},
@@ -98,7 +92,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 0,
+            "num_workers": 7,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
