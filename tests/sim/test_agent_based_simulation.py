@@ -103,6 +103,16 @@ def test_agent():
     assert agent.observation_space.sample() == {'obs': 0}
 
 
+def test_agent_instance():
+    class TestAgent(ObservingAgent, ActingAgent): pass
+    agent_1 = TestAgent(id='agent1')
+    agent_2 = Agent(id='agent2')
+    assert isinstance(agent_1, ObservingAgent)
+    assert isinstance(agent_1, ActingAgent)
+    assert isinstance(agent_1, Agent)
+    assert isinstance(agent_2, Agent)
+
+
 def test_agent_based_simulation_agents():
     class ABS(AgentBasedSimulation):
         def __init__(self, agents):
