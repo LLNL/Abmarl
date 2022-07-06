@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from collections.abc import Container
-from typing import Any
 
 from abmarl.tools import gym_utils as gu
 
@@ -136,12 +135,14 @@ class ObservingAgent(PrincipleAgent):
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
+
 class AgentMeta(type):
     """
     AgentMeta class defines an Agent as an instance of ObservingAgent and ActingAgent.
     """
     def __instancecheck__(self, instance):
         return isinstance(instance, ObservingAgent) and isinstance(instance, ActingAgent)
+
 
 class Agent(ObservingAgent, ActingAgent, metaclass=AgentMeta):
     """
