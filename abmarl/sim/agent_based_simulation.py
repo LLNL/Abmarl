@@ -136,13 +136,18 @@ class ObservingAgent(PrincipleAgent):
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
 
+class AgentMeta(type):
+    """
+    AgentMeta class defines an Agent as an instance of ObservingAgent and ActingAgent.
+    """
+    def __instancecheck__(self, instance):
+        return isinstance(instance, ObservingAgent) and isinstance(instance, ActingAgent)
 
-class Agent(ObservingAgent, ActingAgent):
+class Agent(ObservingAgent, ActingAgent, metaclass=AgentMeta):
     """
     An Agent that can both observe and act.
     """
-    def __instancecheck__(self, __instance: Any) -> bool:
-        return isinstance(__instance, ObservingAgent) and isinstance(__instance, ActingAgent)
+    pass
 
 
 class AgentBasedSimulation(ABC):
