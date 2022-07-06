@@ -452,6 +452,7 @@ def test_using_null_obs_when_done():
     assert sim.get_reward('super0') == 0
     assert sim.unwrapped.get_reward('agent3') == 7
 
+
 def test_null_obs_warning():
     sim.reset()
     sim._warning_issued = False
@@ -467,3 +468,30 @@ def test_null_obs_warning():
     with warnings.catch_warnings():
         sim.get_obs('super0')
         warnings.simplefilter("error")
+
+
+def test_no_null_obs():
+    sim = SuperAgentWrapper(
+        SimTest(),
+        super_agent_mapping={
+            'super0': ['agent0', 'agent3']
+        },
+    )
+    sim.reset()
+    sim.unwrapped.step_count = 35
+    obs = sim.get_obs('super0')
+    assert obs == {
+        'agent0': [0, 0, 0, 1],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': False}
+    }
+
+    with pytest.warns(UserWarning, match=r"SuperAgentWrapper is being used without null observations"):
+        assert sim.get_obs('super0') == {
+            'agent0': [0, 0, 0, 1],
+            'agent3': {'first': 1, 'second': [3, 1]},
+            'mask': {'agent0': False, 'agent3': False}
+        }
+
+    assert sim.get_reward('super0') == 9
+    assert sim.get_reward('super0') == 0
