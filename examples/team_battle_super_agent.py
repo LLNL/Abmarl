@@ -37,22 +37,21 @@ super_agent_mapping={
 }
 null_obs = {'grid': -2 * np.ones((7,7), dtype=int)}
 
-sim = MultiAgentWrapper(
-    AllStepManager(
-        SuperAgentWrapper(
-            TeamBattleSim.build_sim(
-                8, 8,
-                agents=agents,
-                overlapping=overlap_map,
-                attack_mapping=attack_map
-            ), 
-            super_agent_mapping=super_agent_mapping,
-            null_obs={
-                agent_id: null_obs for agent_id in agents
-            }
-        )
+sim_ = AllStepManager(
+    SuperAgentWrapper(
+        TeamBattleSim.build_sim(
+            8, 8,
+            agents=agents,
+            overlapping=overlap_map,
+            attack_mapping=attack_map
+        ), 
+        super_agent_mapping=super_agent_mapping,
+        # null_obs={
+        #     agent_id: null_obs for agent_id in agents
+        # }
     )
 )
+sim = MultiAgentWrapper(sim_)
 
 sim_name = "TeamBattle"
 from ray.tune.registry import register_env
@@ -60,10 +59,10 @@ register_env(sim_name, lambda sim_config: sim)
 
 
 policies = {
-    'red': (None, agents['agent0'].observation_space, agents['agent0'].action_space, {}),
-    'blue': (None, agents['agent1'].observation_space, agents['agent1'].action_space, {}),
-    'green': (None, agents['agent2'].observation_space, agents['agent2'].action_space, {}),
-    'gray': (None, agents['agent3'].observation_space, agents['agent3'].action_space, {}),
+    'red': (None, sim_.agents['red'].observation_space, sim_.agents['red'].action_space, {}),
+    'blue': (None, sim_.agents['blue'].observation_space, sim_.agents['blue'].action_space, {}),
+    'green': (None, sim_.agents['green'].observation_space, sim_.agents['green'].action_space, {}),
+    'gray': (None, sim_.agents['gray'].observation_space, sim_.agents['gray'].action_space, {}),
 }
 
 
