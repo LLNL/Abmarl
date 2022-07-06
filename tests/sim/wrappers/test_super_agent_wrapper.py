@@ -1,4 +1,6 @@
 
+import warnings
+
 from gym.spaces import MultiBinary, Discrete, Box, MultiDiscrete, Dict, Tuple
 import pytest
 
@@ -10,7 +12,6 @@ from abmarl.sim.wrappers import SuperAgentWrapper
 class SimTest(AgentBasedSimulation):
     def __init__(self):
         self.rewards = [0, 1, 2, 3, 4, 5, 6]
-        self.ith_call = -1
         self.dones = [3, 12, 5, 34]
         self.step_count = 0
         self.agents = {
@@ -71,8 +72,12 @@ class SimTest(AgentBasedSimulation):
             return {'first': 1, 'second': [3, 1]}
 
     def get_reward(self, agent_id, **kwargs):
-        self.ith_call = (self.ith_call + 1) % 7
-        return self.rewards[self.ith_call]
+        return {
+            'agent0': 2,
+            'agent1': 3,
+            'agent2': 5,
+            'agent3': 7,
+        }[agent_id]
 
     def get_done(self, agent_id, **kwargs):
         return self.step_count >= self.dones[int(agent_id[-1])]
@@ -92,6 +97,9 @@ sim = SuperAgentWrapper(
     SimTest(),
     super_agent_mapping={
         'super0': ['agent0', 'agent3']
+    },
+    null_obs={
+        'agent0': [0, 0, 0, 0]
     }
 )
 agents = sim.agents
@@ -168,6 +176,19 @@ def test_agent_spaces():
     assert agents['agent4'] == original_agents['agent4']
 
 
+def test_null_obs():
+    assert sim.null_obs == {'agent0': [0, 0, 0, 0]}
+
+
+def test_null_obs_breaks():
+    with pytest.raises(AssertionError):
+        sim.null_obs = [0, 1]
+    with pytest.raises(AssertionError):
+        sim.null_obs = {'agent0': [0, 0, 0, 0], 'agent1': [0]}
+    with pytest.raises(AssertionError):
+        sim.null_obs = {'agent0': [0, 0, 0, 0, 0]}
+
+
 def test_sim_step():
     sim.reset()
     assert sim.unwrapped.action == {
@@ -195,6 +216,7 @@ def test_sim_step():
 
 
 def test_sim_step_breaks():
+    sim.reset()
     actions = {
         'agent0': ({'first': 2, 'second': [-1, 2]}, [0, 1, 0]),
         'agent3': (0, [7, 3], 1),
@@ -252,10 +274,10 @@ def test_sim_obs_breaks():
 
 
 def test_sim_rewards():
-    assert sim.get_reward('super0') == 1
-    assert sim.get_reward('agent1') == 2
-    assert sim.get_reward('agent2') == 3
+    sim.unwrapped.step_count = 0
     assert sim.get_reward('super0') == 9
+    assert sim.get_reward('agent1') == 3
+    assert sim.get_reward('agent2') == 5
 
 
 def test_sim_rewards_breaks():
@@ -356,10 +378,8 @@ def test_double_wrap():
     assert obs in sim2.agents['agent2'].observation_space
     assert obs == [1, 0]
 
-    sim2.unwrapped.ith_call = -1
-    assert sim2.get_reward('double0') == 3
-    assert sim2.get_reward('agent2') == 3
-    assert sim2.get_reward('double0') == 15
+    assert sim2.get_reward('double0') == 12
+    assert sim2.get_reward('agent2') == 5
 
     sim2.unwrapped.step_count = 4
     assert not sim2.get_done('double0')
@@ -372,3 +392,112 @@ def test_double_wrap():
     sim2.unwrapped.step_count = 40
     assert sim2.get_done('double0')
     assert sim2.get_done('agent2')
+
+
+def test_using_null_obs_when_done():
+    sim.reset()
+    sim.unwrapped.step_count = 2
+    obs = sim.get_obs('super0')
+    assert obs in agents['super0'].observation_space
+    assert obs == {
+        'agent0': [0, 0, 0, 1],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': True, 'agent3': True}
+    }
+
+
+    sim.step({'agent1': [2, 2, 0]})
+    assert sim.unwrapped.step_count == 3
+    assert sim.unwrapped.get_done('agent0')
+    assert not sim.unwrapped.get_done('agent3')
+
+    sim.step({'agent1': [2, 2, 0]})
+    assert sim.unwrapped.step_count == 4
+    assert sim.unwrapped.get_done('agent0')
+    assert not sim.unwrapped.get_done('agent3')
+
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 1],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': True}
+    }
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 0],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': True}
+    }
+    assert sim.unwrapped.get_obs('agent0') == [0, 0, 0, 1]
+
+    assert sim.get_reward('super0') == 9
+    assert sim.get_reward('super0') == 7
+    assert sim.unwrapped.get_reward('agent0') == 2
+
+
+    sim.step({'agent2': {'alpha': [1, 1, 0]}})
+    sim.unwrapped.step_count = 35
+    assert sim.unwrapped.get_done('agent0')
+    assert sim.unwrapped.get_done('agent3')
+
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 0],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': False}
+    }
+    assert sim.get_obs('super0') == {
+        'agent0': [0, 0, 0, 0],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': False}
+    }
+    assert sim.get_reward('super0') == 7
+    assert sim.get_reward('super0') == 0
+    assert sim.unwrapped.get_reward('agent3') == 7
+
+
+def test_null_obs_warning():
+    sim.reset()
+    sim._warning_issued = False
+    sim.unwrapped.step_count = 35
+    assert sim.unwrapped.get_done('agent3')
+    sim.get_obs('super0') # Get the last observations
+
+    # Now get the null observations
+    with pytest.warns(
+        UserWarning,
+        match=r"SuperAgentWrapper is being used without null observations"
+    ):
+        sim.get_obs('super0')
+
+    # Ensure warning is only given once
+    with warnings.catch_warnings():
+        sim.get_obs('super0')
+        warnings.simplefilter("error")
+
+
+def test_no_null_obs():
+    sim = SuperAgentWrapper(
+        SimTest(),
+        super_agent_mapping={
+            'super0': ['agent0', 'agent3']
+        },
+    )
+    sim.reset()
+    sim.unwrapped.step_count = 35
+    obs = sim.get_obs('super0')
+    assert obs == {
+        'agent0': [0, 0, 0, 1],
+        'agent3': {'first': 1, 'second': [3, 1]},
+        'mask': {'agent0': False, 'agent3': False}
+    }
+
+    with pytest.warns(
+        UserWarning,
+        match=r"SuperAgentWrapper is being used without null observations"
+    ):
+        assert sim.get_obs('super0') == {
+            'agent0': [0, 0, 0, 1],
+            'agent3': {'first': 1, 'second': [3, 1]},
+            'mask': {'agent0': False, 'agent3': False}
+        }
+
+    assert sim.get_reward('super0') == 9
+    assert sim.get_reward('super0') == 0
