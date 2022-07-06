@@ -15,7 +15,7 @@ agents = {
         encoding=i % 4 + 1,
         render_color=colors[i % 4],
         initial_position=positions[i % 4]
-    ) for i in range(4)
+    ) for i in range(24)
 }
 overlap_map = {
     1: [1],
@@ -29,6 +29,15 @@ attack_map = {
     3: [1, 2, 4],
     4: [1, 2, 3]
 }
+super_agent_mapping = {
+    'red': [agent.id for agent in agents.values() if agent.encoding == 1],
+    'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
+    'green': [agent.id for agent in agents.values() if agent.encoding == 3],
+    'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
+}
+null_obs = {'grid': -2 * np.ones((7, 7), dtype=int)}
+
+
 sim_ = AllStepManager(
     SuperAgentWrapper(
         TeamBattleSim.build_sim(
@@ -37,12 +46,8 @@ sim_ = AllStepManager(
             overlapping=overlap_map,
             attack_mapping=attack_map
         ),
-        super_agent_mapping={
-            'red': [agent.id for agent in agents.values() if agent.encoding == 1],
-            'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
-            'green': [agent.id for agent in agents.values() if agent.encoding == 3],
-            'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
-        }
+        super_agent_mapping=super_agent_mapping,
+        null_obs={agent_id: null_obs for agent_id in agents}
     )
 )
 sim = MultiAgentWrapper(sim_)
@@ -59,6 +64,8 @@ policies = {
     'green': (None, sim_.agents['green'].observation_space, sim_.agents['green'].action_space, {}),
     'gray': (None, sim_.agents['gray'].observation_space, sim_.agents['gray'].action_space, {}),
 }
+
+
 def policy_mapping_fn(agent_id):
     return agent_id
 
@@ -91,7 +98,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 0,
+            "num_workers": 7,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
