@@ -15,7 +15,6 @@ agents = {
         encoding=i % 4 + 1,
         render_color=colors[i % 4],
         initial_position=positions[i % 4],
-        null_observation={'grid': -2 * np.ones((7, 7), dtype=int)}
     ) for i in range(24)
 }
 overlap_map = {
