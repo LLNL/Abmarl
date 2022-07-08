@@ -65,9 +65,10 @@ class ActingAgent(PrincipleAgent):
     The Trainer will produce actions for the agents and send them to the SimulationManager,
     which will process those actions in its step function.
     """
-    def __init__(self, action_space=None, **kwargs):
+    def __init__(self, action_space=None, null_action=None, **kwargs):
         super().__init__(**kwargs)
         self.action_space = action_space
+        self.null_action = null_action
 
     @property
     def action_space(self):
@@ -78,6 +79,19 @@ class ActingAgent(PrincipleAgent):
         assert value is None or gu.check_space(value), \
             "The action space must be None, a gym Space, or a dict of gym Spaces."
         self._action_space = {} if value is None else value
+
+    @property
+    def null_action(self):
+        """
+        The null point in the action space.
+        """
+        return self._null_action
+
+    @null_action.setter
+    def null_action(self, value):
+        assert value is None or gu.check_point_in_space(value, self.action_space), \
+            "The null action must be a point in the action space."
+        self._null_action = {} if value is None else value
 
     @property
     def configured(self):
@@ -104,9 +118,10 @@ class ObservingAgent(PrincipleAgent):
     The agent's observation must be *in* its observation space. The SimulationManager
     will send the observation to the Trainer, which will use it to produce actions.
     """
-    def __init__(self, observation_space=None, **kwargs):
+    def __init__(self, observation_space=None, null_observation=None, **kwargs):
         super().__init__(**kwargs)
         self.observation_space = observation_space
+        self.null_observation = null_observation
 
     @property
     def observation_space(self):
@@ -117,6 +132,19 @@ class ObservingAgent(PrincipleAgent):
         assert value is None or gu.check_space(value), \
             "The observation space must be None, a gym Space, or a dict of gym Spaces."
         self._observation_space = {} if value is None else value
+
+    @property
+    def null_observation(self):
+        """
+        The null point in the observation space.
+        """
+        return self._null_observation
+
+    @null_observation.setter
+    def null_observation(self, value):
+        assert value is None or gu.check_point_in_space(value, self.observation_space), \
+            "The null observation must be a point in the action space."
+        self._null_observation = {} if value is None else value
 
     @property
     def configured(self):
