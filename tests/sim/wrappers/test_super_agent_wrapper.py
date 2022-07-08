@@ -24,7 +24,8 @@ class SimTest(AgentBasedSimulation):
                         'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                     }),
                     MultiBinary(3)
-                ))
+                )),
+                null_observation=[0, 0, 0, 0]
             ),
             'agent1': Agent(
                 id='agent1',
@@ -48,6 +49,8 @@ class SimTest(AgentBasedSimulation):
                 id='agent4'
             )
         }
+
+        self.finalize()
 
     def render(self):
         pass
@@ -98,9 +101,6 @@ sim = SuperAgentWrapper(
     super_agent_mapping={
         'super0': ['agent0', 'agent3']
     },
-    null_obs={
-        'agent0': [0, 0, 0, 0]
-    }
 )
 agents = sim.agents
 original_agents = sim.unwrapped.agents
@@ -175,18 +175,18 @@ def test_agent_spaces():
     assert agents['agent2'] == original_agents['agent2']
     assert agents['agent4'] == original_agents['agent4']
 
+# TODO: Use these tests in the null obs and null_action test in test_abs.py
+# def test_null_obs():
+#     assert sim.null_obs == {'agent0': [0, 0, 0, 0]}
 
-def test_null_obs():
-    assert sim.null_obs == {'agent0': [0, 0, 0, 0]}
 
-
-def test_null_obs_breaks():
-    with pytest.raises(AssertionError):
-        sim.null_obs = [0, 1]
-    with pytest.raises(AssertionError):
-        sim.null_obs = {'agent0': [0, 0, 0, 0], 'agent1': [0]}
-    with pytest.raises(AssertionError):
-        sim.null_obs = {'agent0': [0, 0, 0, 0, 0]}
+# def test_null_obs_breaks():
+#     with pytest.raises(AssertionError):
+#         sim.null_obs = [0, 1]
+#     with pytest.raises(AssertionError):
+#         sim.null_obs = {'agent0': [0, 0, 0, 0], 'agent1': [0]}
+#     with pytest.raises(AssertionError):
+#         sim.null_obs = {'agent0': [0, 0, 0, 0, 0]}
 
 
 def test_sim_step():
@@ -463,7 +463,7 @@ def test_null_obs_warning():
     # Now get the null observations
     with pytest.warns(
         UserWarning,
-        match=r"SuperAgentWrapper is being used without null observations"
+        match=r"Some covered agents in the SuperAgentWrapper do not specify a null observation."
     ):
         sim.get_obs('super0')
 
@@ -471,33 +471,3 @@ def test_null_obs_warning():
     with warnings.catch_warnings():
         sim.get_obs('super0')
         warnings.simplefilter("error")
-
-
-def test_no_null_obs():
-    sim = SuperAgentWrapper(
-        SimTest(),
-        super_agent_mapping={
-            'super0': ['agent0', 'agent3']
-        },
-    )
-    sim.reset()
-    sim.unwrapped.step_count = 35
-    obs = sim.get_obs('super0')
-    assert obs == {
-        'agent0': [0, 0, 0, 1],
-        'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': False, 'agent3': False}
-    }
-
-    with pytest.warns(
-        UserWarning,
-        match=r"SuperAgentWrapper is being used without null observations"
-    ):
-        assert sim.get_obs('super0') == {
-            'agent0': [0, 0, 0, 1],
-            'agent3': {'first': 1, 'second': [3, 1]},
-            'mask': {'agent0': False, 'agent3': False}
-        }
-
-    assert sim.get_reward('super0') == 9
-    assert sim.get_reward('super0') == 0
