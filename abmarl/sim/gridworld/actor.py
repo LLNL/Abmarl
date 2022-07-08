@@ -62,6 +62,7 @@ class MoveActor(ActorBaseComponent):
                 agent.action_space[self.key] = Box(
                     -agent.move_range, agent.move_range, (2,), int
                 )
+                agent.null_action[self.key] = np.zeros((2,), dtype=int)
 
     @property
     def key(self):
@@ -122,6 +123,7 @@ class AttackActor(ActorBaseComponent):
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Discrete(2)
+                agent.null_action[self.key] = 0
 
     @property
     def attack_mapping(self):

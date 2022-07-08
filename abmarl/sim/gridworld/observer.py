@@ -69,6 +69,10 @@ class SingleGridObserver(ObserverBaseComponent):
                 agent.observation_space[self.key] = Box(
                     -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), int
                 )
+                agent.null_observation[self.key] = -2 * np.ones(
+                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1),
+                    dtype=int
+                )
 
     @property
     def key(self):
@@ -166,6 +170,10 @@ class MultiGridObserver(ObserverBaseComponent):
                     len(self.agents),
                     (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
                     int
+                )
+                agent.null_observation[self.key] = -2 * np.ones(
+                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
+                    dtype=int
                 )
 
     @property
