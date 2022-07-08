@@ -61,6 +61,18 @@ def test_acting_agent_action_space():
     assert agent.configured
 
 
+def test_acting_agent_null_action():
+    from gym.spaces import MultiBinary
+    agent1 = ActingAgent(id='agent1', action_space=MultiBinary(4), null_action=[0, 0, 0, 0])
+    agent1.finalize()
+
+    # This will not raise an assertion error because the test happens at finalize
+    agent2 = ActingAgent(id='agent2', action_space=MultiBinary(4), null_action=[0, 0, 0])
+
+    with pytest.raises(AssertionError):
+        agent2.finalize()
+
+
 def test_acting_agent_seed():
     from gym.spaces import Discrete
     agent = ActingAgent(id='agent', seed=17, action_space={
@@ -87,6 +99,22 @@ def test_observing_agent_observation_space():
     assert not agent.configured
     agent.finalize()
     assert agent.configured
+
+
+def test_observing_agent_null_observation():
+    from gym.spaces import MultiBinary
+    agent1 = ObservingAgent(
+        id='agent1', observation_space=MultiBinary(4), null_observation=[0, 0, 0, 0]
+    )
+    agent1.finalize()
+
+    # This will not raise an assertion error because the test happens at finalize
+    agent2 = ObservingAgent(
+        id='agent2', observation_space=MultiBinary(4), null_observation=[0, 0, 0]
+    )
+
+    with pytest.raises(AssertionError):
+        agent2.finalize()
 
 
 def test_agent():
