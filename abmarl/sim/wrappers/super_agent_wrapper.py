@@ -24,7 +24,7 @@ class SuperAgentWrapper(Wrapper):
     covered agents. This may contaminate the training data with an unfair advantage.
     For exmample, a dead covered agent should not be able to provide the super agent with
     useful information. In order to correct this, the user may supply the null
-    observation on an ObservingAgent, like so:
+    observation for an ObservingAgent, like so:
         agent = ObservingAgent(
             id="agent",
             observation_space=Discrete(3),

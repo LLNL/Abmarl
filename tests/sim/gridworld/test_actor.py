@@ -147,7 +147,6 @@ def test_attack_actor():
     assert agents['agent1'].action_space['attack'] == Discrete(2)
 
     agents['agent1'].finalize()
-    assert agents['agent1'].null_action.keys() == set(('attack',))
     assert agents['agent1'].null_action == {'attack': 0}
 
     position_state.reset()
