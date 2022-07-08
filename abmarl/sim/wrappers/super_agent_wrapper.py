@@ -24,16 +24,22 @@ class SuperAgentWrapper(Wrapper):
     covered agents. This may contaminate the training data with an unfair advantage.
     For exmample, a dead covered agent should not be able to provide the super agent with
     useful information. In order to correct this, the user may supply the null
-    observation for each of the agents, so that done agents report the null observation.
+    observation on an ObservingAgent, like so:
+        agent = ObservingAgent(
+            id="agent",
+            observation_space=Discrete(3),
+            null_observation=0
+        )
+    When a covered agent is done, the SuperAgentWrapper will try to use its null
+    observation going forward.
 
     Furthermore, super agents may still report actions for covered agents that
     are done. This wrapper filters out those actions before passing them to the
     underlying sim. See step for more details.
     """
-    def __init__(self, sim, super_agent_mapping=None, null_obs=None, **kwargs):
+    def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
-        self.null_obs = null_obs
         self._warning_issued = False
 
     @property
@@ -78,27 +84,6 @@ class SuperAgentWrapper(Wrapper):
         # We need to reconstruct the agent dictionary if the super agent mapping
         # ever changes
         self._construct_agents_from_super_agent_mapping()
-
-    @property
-    def null_obs(self):
-        """
-        Use these observations for the covered agents when they are done.
-        """
-        return self._null_obs
-
-    @null_obs.setter
-    def null_obs(self, value):
-        if value is not None:
-            assert type(value) is dict, \
-                'Null obs must be dict mapping covered_agent id to an observation.'
-            for covered_agent_id, obs in value.items():
-                assert covered_agent_id in self._covered_agents, \
-                    "Can only supply null obs for covered agents."
-                assert obs in self.sim.agents[covered_agent_id].observation_space, \
-                    f"The null obs for {covered_agent_id} is not in its observation space."
-            self._null_obs = value
-        else:
-            self._null_obs = {}
 
     def reset(self, **kwargs):
         self._last_obs_reported = {
@@ -293,13 +278,15 @@ class SuperAgentWrapper(Wrapper):
 
     def _get_null_obs(self, agent_id, **kwargs):
         assert agent_id in self._covered_agents, "Can only use null obs for covered agents."
-        if agent_id in self.null_obs:
-            return self.null_obs[agent_id]
+        if self.sim.agents[agent_id].null_observation:
+            return self.sim.agents[agent_id].null_observation
+        # if agent_id in self.null_obs:
+        #     return self.null_obs[agent_id]
         else:
             if not self._warning_issued:
                 self._warning_issued = True
                 warnings.warn(
-                    "SuperAgentWrapper is being used without null observations "
-                    "for the covered agents. This may corrupt the learning data.",
+                    "Some covered agents in the SuperAgentWrapper do not specify "
+                    "a null observation. This may corrupt the learning data.",
                 )
             return self.sim.get_obs(agent_id, **kwargs)
