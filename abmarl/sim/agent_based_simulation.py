@@ -89,8 +89,6 @@ class ActingAgent(PrincipleAgent):
 
     @null_action.setter
     def null_action(self, value):
-        assert value is None or gu.check_point_in_space(value, self.action_space), \
-            "The null action must be a point in the action space."
         self._null_action = {} if value is None else value
 
     @property
@@ -109,6 +107,9 @@ class ActingAgent(PrincipleAgent):
         if type(self.action_space) is dict:
             self.action_space = gu.make_dict(self.action_space)
         self.action_space.seed(self.seed)
+        if self.null_action:
+            assert self.null_action in self.action_space, \
+                "The null action must be in the action space."
 
 
 class ObservingAgent(PrincipleAgent):
@@ -142,8 +143,6 @@ class ObservingAgent(PrincipleAgent):
 
     @null_observation.setter
     def null_observation(self, value):
-        assert value is None or gu.check_point_in_space(value, self.observation_space), \
-            "The null observation must be a point in the action space."
         self._null_observation = {} if value is None else value
 
     @property
@@ -162,6 +161,9 @@ class ObservingAgent(PrincipleAgent):
         if type(self.observation_space) is dict:
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
+        if self.null_observation:
+            assert self.null_observation in self.observation_space, \
+                "The null observation must be in the observation space."
 
 
 class AgentMeta(type):
