@@ -14,7 +14,8 @@ agents = {
         id=f'agent{i}',
         encoding=i % 4 + 1,
         render_color=colors[i % 4],
-        initial_position=positions[i % 4]
+        initial_position=positions[i % 4],
+        null_observation={'grid': -2 * np.ones((7, 7), dtype=int)}
     ) for i in range(24)
 }
 overlap_map = {
@@ -35,7 +36,6 @@ super_agent_mapping = {
     'green': [agent.id for agent in agents.values() if agent.encoding == 3],
     'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
 }
-null_obs = {'grid': -2 * np.ones((7, 7), dtype=int)}
 
 
 sim_ = AllStepManager(
@@ -47,7 +47,6 @@ sim_ = AllStepManager(
             attack_mapping=attack_map
         ),
         super_agent_mapping=super_agent_mapping,
-        null_obs={agent_id: null_obs for agent_id in agents}
     )
 )
 sim = MultiAgentWrapper(sim_)
