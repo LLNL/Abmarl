@@ -175,19 +175,6 @@ def test_agent_spaces():
     assert agents['agent2'] == original_agents['agent2']
     assert agents['agent4'] == original_agents['agent4']
 
-# TODO: Use these tests in the null obs and null_action test in test_abs.py
-# def test_null_obs():
-#     assert sim.null_obs == {'agent0': [0, 0, 0, 0]}
-
-
-# def test_null_obs_breaks():
-#     with pytest.raises(AssertionError):
-#         sim.null_obs = [0, 1]
-#     with pytest.raises(AssertionError):
-#         sim.null_obs = {'agent0': [0, 0, 0, 0], 'agent1': [0]}
-#     with pytest.raises(AssertionError):
-#         sim.null_obs = {'agent0': [0, 0, 0, 0, 0]}
-
 
 def test_sim_step():
     sim.reset()

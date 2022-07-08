@@ -37,6 +37,11 @@ def test_move_actor():
     assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), int)
     assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), int)
 
+    for agent in agents.values():
+        agent.finalize()
+        assert agent.null_action.keys() == set(('move',))
+        np.testing.assert_array_equal(agent.null_action['move'], np.zeros((2,), dtype=int))
+
     position_state.reset()
     action = {
         'agent0': {'move': np.array([1, 1])},
@@ -140,6 +145,10 @@ def test_attack_actor():
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
     assert agents['agent1'].action_space['attack'] == Discrete(2)
+
+    agents['agent1'].finalize()
+    assert agents['agent1'].null_action.keys() == set(('attack',))
+    assert agents['agent1'].null_action == {'attack': 0}
 
     position_state.reset()
     health_state.reset()
