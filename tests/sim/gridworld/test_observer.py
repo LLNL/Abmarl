@@ -41,6 +41,22 @@ def test_single_grid_observer():
         -2, 6, (9, 9), int
     )
 
+    agents['agent0'].finalize()
+    assert agents['agent0'].null_observation.keys() == set(('grid',))
+    np.testing.assert_array_equal(
+        agents['agent0'].null_observation['grid'], -2 * np.ones((5, 5), dtype=int)
+    )
+    agents['agent1'].finalize()
+    assert agents['agent1'].null_observation.keys() == set(('grid',))
+    np.testing.assert_array_equal(
+        agents['agent1'].null_observation['grid'], -2 * np.ones((3, 3), dtype=int)
+    )
+    agents['agent2'].finalize()
+    assert agents['agent2'].null_observation.keys() == set(('grid',))
+    np.testing.assert_array_equal(
+        agents['agent2'].null_observation['grid'], -2 * np.ones((9, 9), dtype=int)
+    )
+
     position_state.reset()
     np.testing.assert_array_equal(
         observer.get_obs(agents['agent0'])['grid'],
@@ -187,6 +203,23 @@ def test_multi_grid_observer():
     assert agents['agent2'].observation_space['grid'] == Box(
         -2, 9, (9, 9, 6), int
     )
+
+    agents['agent0'].finalize()
+    assert agents['agent0'].null_observation.keys() == set(('grid',))
+    np.testing.assert_array_equal(
+        agents['agent0'].null_observation['grid'], -2 * np.ones((5, 5, 6), dtype=int)
+    )
+    agents['agent1'].finalize()
+    assert agents['agent1'].null_observation.keys() == set(('grid',))
+    np.testing.assert_array_equal(
+        agents['agent1'].null_observation['grid'], -2 * np.ones((3, 3, 6), dtype=int)
+    )
+    agents['agent2'].finalize()
+    assert agents['agent2'].null_observation.keys() == set(('grid',))
+    np.testing.assert_array_equal(
+        agents['agent2'].null_observation['grid'], -2 * np.ones((9, 9, 6), dtype=int)
+    )
+
     position_state.reset()
 
     np.testing.assert_array_equal(
