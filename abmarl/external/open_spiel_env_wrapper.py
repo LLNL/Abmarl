@@ -66,16 +66,30 @@ class OpenSpielWrapper:
 
         return TimeStep(
             observations=observations,
-            rewards=[reward],
+            rewards=reward,
             discounts=self._discounts, # TODO: I need to get discounts
             step_type=step_type
         )
 
     def observation_spec(self):
-        pass
+        return {
+            agent.id: {
+                'info_state': agent.observation_space,
+                'legal_actions': num_actions,
+                'current_player': ()
+            } for agent in self.sim.agents.values() if isinstance(agent, Agent)
+        }
 
     def action_spec(self):
-        pass
+        return {
+            agent.id: {
+                'num_actions': agent.action_space,
+                'min': min,
+                'max': max,
+                'dtype': int
+            } for agent in self.sim.agents.values() if isinstance(agent, Agent)
+        }
+        # TODO: I might need to make a function that converts gym space to open-spiel spec.
 
     def get_legal_actions(self, agent_id):
         """
