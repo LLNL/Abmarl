@@ -22,7 +22,7 @@ class OpenSpielWrapper:
 
         observations = {
             "info_state": [obs],
-            "legal_actions": [legal_actions], # TODO: Get this!
+            "legal_actions": self.get_legal_actions(),
             "current_player": 0, # TODO: figure out the logic for this!
         }
 
@@ -41,11 +41,10 @@ class OpenSpielWrapper:
 
         step_type = StepType.LAST if done else StepType.MID
         self._should_reset = step_type == StepType.LAST
-        legal_actions = [] # TODO: Build this up!
 
         observations = {
             "info_state": [obs],
-            "legal_actions": [legal_actions],
+            "legal_actions": self.get_legal_actions(),
             "current_player": 0, # TODO: figure out the logic for this!
         }
 
@@ -61,4 +60,14 @@ class OpenSpielWrapper:
 
     def action_spec(self):
         pass
+
+    def get_legal_actions(self):
+        """
+        Return the legal actions available to the player.
+
+        By default, this wrapper uses all the available actions as the legal actions
+        in each time step. This function can be overwritten in a derived class
+        to add logic for obtaining the actual legal actions available.
+        """
+        return [action_space.n] # TODO: Something like this.
 
