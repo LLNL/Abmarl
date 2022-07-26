@@ -6,7 +6,7 @@ from abmarl.sim.agent_based_simulation import Agent
 from abmarl.managers import TurnBasedManager, SimulationManager
 
 class OpenSpielWrapper:
-    def __init__(self, sim, **kwargs):
+    def __init__(self, sim, discount=1.0, **kwargs):
         assert isinstance(sim, SimulationManager)
         # The wrapper assumes that each space is discrete, so we should check for
         # that.
@@ -15,6 +15,12 @@ class OpenSpielWrapper:
                 isinstance(agent.action_space, Discrete), \
                 "OpenSpielWrapper can only work with simulations that have all Discrete spaces."
         self.sim = sim
+        if type(discount) is float:
+            discount = {
+                agent.id: discount
+                for agent in self.sim.agents.values() if isinstance(agent, Agent)
+            }
+        self._discounts = discount
         self._should_reset = True
 
     @property
@@ -68,7 +74,7 @@ class OpenSpielWrapper:
         return TimeStep(
             observations=observations,
             rewards=reward,
-            discounts=self._discounts, # TODO: I need to get discounts
+            discounts=self._discounts,
             step_type=step_type
         )
 
