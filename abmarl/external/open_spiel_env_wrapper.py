@@ -31,6 +31,7 @@ class OpenSpielWrapper:
     def is_turn_based(self):
         return isinstance(self.sim, TurnBasedManager)
 
+
     def reset(self, **kwargs):
         self._should_reset = False
         obs = self.sim.reset(**kwargs)
@@ -43,7 +44,7 @@ class OpenSpielWrapper:
                 agent.id: self.get_legal_actions(agent.id)
                 for agent in self.sim.agents.values() if isinstance(agent, Agent)
             },
-            "current_player": 0, # TODO: figure out the logic for this!
+            "current_player": next(iter(obs)),
         }
 
         return TimeStep(
@@ -54,6 +55,7 @@ class OpenSpielWrapper:
         )
 
     def step(self, actions, **kwargs):
+        # TODO: Do actions come in as a list or a dict?
         if self._should_reset:
             return self.reset(**kwargs)
 
@@ -68,7 +70,7 @@ class OpenSpielWrapper:
                 agent.id: self.get_legal_actions(agent.id)
                 for agent in self.sim.agents.values() if isinstance(agent, Agent)
             },
-            "current_player": 0, # TODO: figure out the logic for this!
+            "current_player": next(iter(obs)),
         }
 
         return TimeStep(
