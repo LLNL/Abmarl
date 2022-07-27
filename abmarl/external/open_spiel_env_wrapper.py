@@ -8,13 +8,20 @@ from abmarl.managers import TurnBasedManager, SimulationManager
 class OpenSpielWrapper:
     def __init__(self, sim, discount=1.0, **kwargs):
         assert isinstance(sim, SimulationManager)
-        # The wrapper assumes that each space is discrete, so we should check for
-        # that.
+        # The wrapper assumes that each space is discrete, so we check for that.
         for agent in sim.agents.values():
             assert isinstance(agent.observation_space, Discrete) and \
                 isinstance(agent.action_space, Discrete), \
                 "OpenSpielWrapper can only work with simulations that have all Discrete spaces."
         self.sim = sim
+
+        # We keep track of the learning agents separately so that we can append
+        # observations and rewards for each of these agents. OpenSpiel expects
+        # them to all be present in every time_step.
+        self._learning_agents = set({
+            agent.id for agent in self.sim.agents.values() if isinstance(agent, Agent)
+        })
+
         if type(discount) is float:
             discount = {
                 agent.id: discount
@@ -48,7 +55,7 @@ class OpenSpielWrapper:
         # If it is a turn based sim, then the current player should be the next
         # player whose turn it will be. But what is current player for an all-step game?
         observations = {
-            "info_state": obs,
+            "info_state": self._append_obs(obs),
             "legal_actions": {
                 agent.id: self.get_legal_actions(agent.id)
                 for agent in self.sim.agents.values() if isinstance(agent, Agent)
@@ -95,7 +102,7 @@ class OpenSpielWrapper:
         self._should_reset = step_type == StepType.LAST
 
         observations = {
-            "info_state": obs,
+            "info_state": self._append_obs(obs),
             "legal_actions": {
                 agent.id: self.get_legal_actions(agent.id)
                 for agent in self.sim.agents.values() if isinstance(agent, Agent)
@@ -105,7 +112,7 @@ class OpenSpielWrapper:
 
         return TimeStep(
             observations=observations,
-            rewards=reward,
+            rewards=self._append_reward(reward),
             discounts=self._discounts,
             step_type=step_type
         )
@@ -138,3 +145,21 @@ class OpenSpielWrapper:
         to add logic for obtaining the actual legal actions available.
         """
         return [i for i in range(self.sim.agents[agent_id].action_space.n)]
+
+    def _append_obs(self, obs):
+        # OpenSpiel expects every agent to appear in the observation at every
+        # time step. The simulation manager won't produce an observation for a
+        # done agent, so we have to add it ourselves.
+        for agent_id in self._learning_agents:
+            if agent_id not in obs:
+                obs[agent_id] = self.sim.sim.get_obs(agent_id)
+        return obs
+
+    def _append_reward(self, reward):
+        # OpenSpiel expects every agent to appear in the reward at every
+        # time step. The simulation manager won't produce a reward for a
+        # done agent, so we have to add it ourselves.
+        for agent_id in self._learning_agents:
+            if agent_id not in reward:
+                reward[agent_id] = 0
+        return reward
