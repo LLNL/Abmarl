@@ -91,6 +91,11 @@ class OpenSpielWrapper:
                 del action_dict[agent_id]
             except KeyError:
                 pass
+        # We have just deleted actions from agents that are already done, which
+        # can result in an empty action dictionary (e.g. in a turn-based game).
+        # In this case, we just take a fake step.
+        if not action_dict: # No actions
+            return self._take_fake_step()
 
         if self._should_reset:
             return self.reset(**kwargs)
@@ -163,3 +168,23 @@ class OpenSpielWrapper:
             if agent_id not in reward:
                 reward[agent_id] = 0
         return reward
+
+    def _take_fake_step(self):
+        # This is used when all the actions are from done agents. In that case,
+        # we just move along with no state update.
+        obs = self._append_obs({})
+        self.current_player = next(iter(obs))
+        observations = {
+            "info_state": obs,
+            "legal_actions": {
+                agent.id: self.get_legal_actions(agent.id)
+                for agent in self.sim.agents.values() if isinstance(agent, Agent)
+            },
+            "current_player": self.current_player,
+        }
+        return TimeStep(
+            observations=observations,
+            rewards=self._append_reward({}),
+            discounts=self._discounts,
+            step_type=StepType.MID
+        )
