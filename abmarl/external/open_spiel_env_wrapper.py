@@ -74,6 +74,17 @@ class OpenSpielWrapper:
                 for i, agent in enumerate(self.sim.agents.values())
                 if isinstance(agent, Agent)
             }
+        # OpenSpiel can send actions for agents that are already done, which doesn't
+        # work with our simulation managers. So we filter out these actions before
+        # passing them to the manager.
+        # TODO: Although all implemeted managers do track the done agents, this is not
+        # a part of the SimulationManager interface.
+        for agent_id in self.sim.done_agents:
+            try:
+                del action_dict[agent_id]
+            except KeyError:
+                pass
+
         if self._should_reset:
             return self.reset(**kwargs)
 
