@@ -5,6 +5,7 @@ from open_spiel.python.rl_environment import TimeStep, StepType
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.managers import TurnBasedManager, SimulationManager
 
+
 class OpenSpielWrapper:
     """
     Enable connection between SimulationManager and OpenSpiel agents.
