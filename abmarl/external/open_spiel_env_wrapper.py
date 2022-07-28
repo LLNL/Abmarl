@@ -65,13 +65,38 @@ class OpenSpielWrapper:
             agent.id for agent in self.sim.agents.values() if isinstance(agent, Agent)
         })
 
-        if type(discount) is float:
-            discount = {
-                agent.id: discount
-                for agent in self.sim.agents.values() if isinstance(agent, Agent)
-            }
-        self._discounts = discount
+        self.discounts = discount
         self._should_reset = True
+
+    @property
+    def discounts(self):
+        """
+        The learing discounts for each agent.
+
+        If provided as a number, then that value wil apply to all the agents.
+        Make seperate discounts for each agent by providing a dictionary assigning
+        each agent to its own discounted value.
+        """
+        return self._discounts
+
+    @discounts.setter
+    def discounts(self, value):
+        assert type(value) in (int, float, dict), \
+            "The discounts must be either a number or a dict."
+        if type(value) in (float, int):
+            self._discounts = {
+                agent_id: value for agent_id in self._learning_agents
+            }
+        else: # type(value) == dict
+            for discount_id, discount in value.items():
+                assert discount_id in self._learning_agents, \
+                    "id for the discount must be an agent id."
+                assert type(discount) in (float, int), \
+                    "discount values must be a number."
+            assert all([
+                True if agent_id in value.keys() else False for agent_id in self._learning_agents
+            ]), "All agents must be given a discounted value."
+            self._discounts = value
 
     @property
     def num_players(self):
