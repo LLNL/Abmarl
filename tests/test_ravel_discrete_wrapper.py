@@ -1,11 +1,11 @@
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.sim import Agent
+from abmarl.examples import EmptyABS, MultiAgentGymSpacesSim
 
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np
 import pytest
-from .helpers import FillInHelper, MultiAgentGymSpacesSim
 
 
 def test_ravel():
@@ -49,15 +49,15 @@ def test_ravel():
     assert unravelled_point['f'] == point['f']
 
 
-# Observations that we don't support
-class FloatObservation(FillInHelper):
+# Observations that we can't ravel
+class FloatObservation(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3)
         )}
 
 
-class UnboundedBelowObservation(FillInHelper):
+class UnboundedBelowObservation(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(
@@ -69,7 +69,7 @@ class UnboundedBelowObservation(FillInHelper):
         )}
 
 
-class UnboundedAboveObservation(FillInHelper):
+class UnboundedAboveObservation(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(
@@ -81,15 +81,15 @@ class UnboundedAboveObservation(FillInHelper):
         )}
 
 
-# Actions that we don't support
-class FloatAction(FillInHelper):
+# Actions that we can't ravel
+class FloatAction(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3)
         )}
 
 
-class UnboundedBelowAction(FillInHelper):
+class UnboundedBelowAction(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0',
@@ -102,7 +102,7 @@ class UnboundedBelowAction(FillInHelper):
         )}
 
 
-class UnboundedAboveAction(FillInHelper):
+class UnboundedAboveAction(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0',

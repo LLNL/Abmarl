@@ -1,8 +1,9 @@
 
 import pytest
 
-from abmarl.sim import PrincipleAgent, DynamicOrderSimulation, AgentBasedSimulation
+from abmarl.sim import PrincipleAgent, DynamicOrderSimulation
 from abmarl.managers import DynamicOrderManager
+from abmarl.examples import MultiAgentSim
 
 
 class SequentiallyFinishingSim(DynamicOrderSimulation):
@@ -40,38 +41,9 @@ class SequentiallyFinishingSim(DynamicOrderSimulation):
         return {}
 
 
-class ABS(AgentBasedSimulation):
-    def __init__(self, **kwargs):
-        self.agents = {f'agent{i}': PrincipleAgent(f'agent{i}') for i in range(4)}
-
-    def reset(self, **kwargs):
-        pass
-
-    def step(self, action_dict, **kwargs):
-        pass
-
-    def render(self, **kwargs):
-        pass
-
-    def get_obs(self, agent_id, **kwargs):
-        return {}
-
-    def get_reward(self, agent_id, **kwargs):
-        return {}
-
-    def get_done(self, agent_id, **kwargs):
-        return {}
-
-    def get_all_done(self, **kwargs):
-        return {}
-
-    def get_info(self, agent_id, **kwargs):
-        return {}
-
-
 def test_dynamic_order_manager_wrong_sim():
     with pytest.raises(AssertionError):
-        DynamicOrderManager(ABS())
+        DynamicOrderManager(MultiAgentSim())
 
 
 def test_dynamic_order_manager_reset():
