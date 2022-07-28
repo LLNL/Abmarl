@@ -49,23 +49,24 @@ class OpenSpielWrapper:
     observation space of every agent is Discrete. Most simulations will need to
     be wrapped with the RavelDiscreteWrapper.
     """
-    def __init__(self, sim, discount=1.0, **kwargs):
+    def __init__(self, sim, discounts=1.0, **kwargs):
         assert isinstance(sim, SimulationManager)
-        # The wrapper assumes that each space is discrete, so we check for that.
-        for agent in sim.agents.values():
-            assert isinstance(agent.observation_space, Discrete) and \
-                isinstance(agent.action_space, Discrete), \
-                "OpenSpielWrapper can only work with simulations that have all Discrete spaces."
-        self.sim = sim
 
         # We keep track of the learning agents separately so that we can append
         # observations and rewards for each of these agents. OpenSpiel expects
         # them to all be present in every time_step.
         self._learning_agents = {
-            agent.id: agent for agent in self.sim.agents.values() if isinstance(agent, Agent)
+            agent.id: agent for agent in sim.agents.values() if isinstance(agent, Agent)
         }
 
-        self.discounts = discount
+        # The wrapper assumes that each space is discrete, so we check for that.
+        for agent in self._learning_agents.values():
+            assert isinstance(agent.observation_space, Discrete) and \
+                isinstance(agent.action_space, Discrete), \
+                "OpenSpielWrapper can only work with simulations that have all Discrete spaces."
+        self.sim = sim
+
+        self.discounts = discounts
         self._should_reset = True
 
     @property

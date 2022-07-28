@@ -1,11 +1,12 @@
 
+from open_spiel.python.algorithms import random_agent
+from open_spiel.python.rl_environment import TimeStep, StepType
+import pytest
+
 from abmarl.sim.corridor import MultiCorridor
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.managers import AllStepManager, TurnBasedManager
 from abmarl.external.open_spiel_env_wrapper import OpenSpielWrapper
-
-from open_spiel.python.algorithms import random_agent
-from open_spiel.python.rl_environment import TimeStep, StepType
 
 abs = RavelDiscreteWrapper(
     MultiCorridor()
@@ -25,9 +26,9 @@ def test_wrapper():
     sim = OpenSpielWrapper(
         AllStepManager(abs)
     )
+    assert sim._learning_agents == abs.agents
     assert sim.sim.sim == abs
-    assert sim._learning_agents == set({'agent0', 'agent1', 'agent2', 'agent3', 'agent4'})
-    assert sim._discounts == {
+    assert sim.discounts == {
         'agent0': 1.0,
         'agent1': 1.0,
         'agent2': 1.0,
@@ -53,6 +54,55 @@ def test_wrapper():
             'dtype': int
         } for agent in agents.values()
     }
+
+
+def test_sim():
+    with pytest.raises(AssertionError):
+        OpenSpielWrapper(TurnBasedManager(MultiCorridor()))
+
+    with pytest.raises(AssertionError):
+        OpenSpielWrapper(abs)
+
+
+def test_discounts():
+    with pytest.raises(AssertionError):
+        OpenSpielWrapper(
+            AllStepManager(MultiCorridor()),
+            discounts='str'
+        )
+    with pytest.raises(AssertionError):
+        OpenSpielWrapper(
+            AllStepManager(MultiCorridor()),
+            discounts={
+                'agent0': 0.1,
+                'agent1': 0.5,
+                'agent2': 'str',
+                'agent3': 0.6,
+                'agent4': 1.0,
+            }
+        )
+    with pytest.raises(AssertionError):
+        OpenSpielWrapper(
+            AllStepManager(MultiCorridor()),
+            discounts={
+                'agent0': 0.1,
+                'agent1': 0.5,
+                'agent2': 1.0,
+                'agent3': 0.6,
+                'agent4': 1.0,
+                'agent5': 0.9,
+            }
+        )
+    with pytest.raises(AssertionError):
+        OpenSpielWrapper(
+            AllStepManager(MultiCorridor()),
+            discounts={
+                'agent0': 0.1,
+                'agent1': 0.5,
+                'agent2': 1.0,
+                'agent3': 0.6,
+            }
+        )
 
 
 def test_wrapper_reset():
@@ -145,6 +195,7 @@ def test_rl_main_loop_all_step():
     sim = OpenSpielWrapper(
         AllStepManager(abs)
     )
+    assert not sim.is_turn_based
     for _ in range(5):
         time_step = sim.reset()
         for _ in range(20):
@@ -164,6 +215,7 @@ def test_rl_main_loop_turn_based():
     sim = OpenSpielWrapper(
         TurnBasedManager(abs)
     )
+    assert sim.is_turn_based
     for _ in range(5):
         time_step = sim.reset()
         for _ in range(20):
