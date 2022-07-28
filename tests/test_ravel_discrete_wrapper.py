@@ -135,6 +135,7 @@ def test_ravel_wrapper():
     wrapped_sim = RavelDiscreteWrapper(sim)
     assert wrapped_sim.unwrapped == sim
     for agent_id in wrapped_sim.agents:
+        if not isinstance(wrapped_sim.agents[agent_id], Agent): continue
         assert isinstance(wrapped_sim.agents[agent_id].observation_space, Discrete)
         assert isinstance(wrapped_sim.agents[agent_id].action_space, Discrete)
     sim = wrapped_sim
@@ -184,15 +185,15 @@ def test_ravel_wrapper():
     assert sim.get_obs('agent2') == 2
     assert sim.get_obs('agent3') == 47
 
-    assert sim.get_reward('agent0') == 'Reward from agent0'
-    assert sim.get_reward('agent1') == 'Reward from agent1'
-    assert sim.get_reward('agent2') == 'Reward from agent2'
-    assert sim.get_reward('agent3') == 'Reward from agent3'
+    assert sim.get_reward('agent0') == 2
+    assert sim.get_reward('agent1') == 3
+    assert sim.get_reward('agent2') == 5
+    assert sim.get_reward('agent3') == 7
 
-    assert sim.get_done('agent0') == 'Done from agent0'
-    assert sim.get_done('agent1') == 'Done from agent1'
-    assert sim.get_done('agent2') == 'Done from agent2'
-    assert sim.get_done('agent3') == 'Done from agent3'
+    assert sim.get_done('agent0') == False
+    assert sim.get_done('agent1') == False
+    assert sim.get_done('agent2') == False
+    assert sim.get_done('agent3') == False
 
     assert sim.get_info('agent0')[0]['first'] == action_0['agent0'][0]['first']
     np.testing.assert_array_equal(
