@@ -5,12 +5,11 @@
 MultiCorridor
 =============
 
-# TODO: Just explain what it is, don't need to reference RLlib.
-MultiCorridor extends RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
-wherein agents must learn to move to the right in a one-dimensonal corridor to reach the end.
-Our implementation provides the ability to instantiate multiple agents in the simulation
-and restricts agents from occupying the same square. Every agent is homogeneous:
-they all have the same action space, observation space, and objective function.
+MultiCorridor is a multi-agent-based simulation wherein agents must learn to move
+to the right in a one-dimensonal corridor to reach the end. Our implementation
+provides the ability to instantiate multiple agents in the simulation and restricts
+agents from occupying the same square. Every agent is homogeneous: they all have
+the same action space, observation space, and objective function.
 
 .. figure:: /.images/multicorridor.*
    :width: 80 %
@@ -18,9 +17,9 @@ they all have the same action space, observation space, and objective function.
 
    Animation of agents moving left and right in a corridor until they reach the end.
 
-# TODO: Update these references
-This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/corridor/multi_corridor.py>`_
+This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/multi_corridor.py>`_
 and the `MultiCorridor configuration <https://github.com/LLNL/Abmarl/blob/main/examples/multi_corridor_example.py>`_.
+# TODO: Update this ^ reference
 
 Creating the MultiCorridor Simulation
 -------------------------------------
