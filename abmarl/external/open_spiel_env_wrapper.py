@@ -100,22 +100,40 @@ class OpenSpielWrapper:
 
     @property
     def num_players(self):
-        return sum([1 for agent in self.sim.agents.values() if isinstance(agent, Agent)])
+        """
+        The number of player is the number of learning agents in the simulation.
+        """
+        return sum([1 for _ in self._learning_agents])
 
     @property
     def is_turn_based(self):
+        """
+        The game is turn based if the simulation is wrapped with a TurnBasedManager.
+        """
         return isinstance(self.sim, TurnBasedManager)
 
     @property
     def current_player(self):
+        """
+        The current player is the player that currently provides the action.
+
+        This is used the in the observation part of the TimeStep output. If it
+        is a turn based game, then the current player is the single agent who
+        is providing an action. If it is a simultaneous game, then OpenSpiel does
+        not use this property and the current player is just the first player
+        in the list.
+        """
         return self._current_player
 
     @current_player.setter
     def current_player(self, value):
-        assert value in self.sim.agents, "Current player must be an agent in the simulation."
+        assert value in self._learning_agents, "Current player must be an agent in the simulation."
         self._current_player = value
 
     def reset(self, **kwargs):
+        """
+        Reset the simulation.
+        """
         self._should_reset = False
         obs = self.sim.reset(**kwargs)
         self.current_player = next(iter(obs))
@@ -139,15 +157,27 @@ class OpenSpielWrapper:
         )
 
     def step(self, action_list, **kwargs):
+        """
+        Step the simulation forward using the reported actions.
+
+        OpenSpiel provides an action list of either (1) the agent whose turn it
+        is in a turn-based game or (2) all the agents in a simultaneous game. The
+        OpenSpielWrapper converts the list of actions to a dictionary before passing
+        it to the underlying simulation.
+
+        OpenSpiel does not support the ability for some agents of a game to finish
+        before others. As such, it may provide actions for agents that are already
+        done. To work with Abmarl, this wrapper removes actions for agents that
+        are already done.
+        """
         # Actions come in as a list, so we need to convert to a dict before forwarding
         # to the SimulationManager.
         if self.is_turn_based:
             action_dict = {self.current_player: action_list[0]}
         else:
             action_dict = {
-                agent.id: action_list[i]
-                for i, agent in enumerate(self.sim.agents.values())
-                if isinstance(agent, Agent)
+                agent_id: action_list[i]
+                for i, agent_id in enumerate(self._learning_agents)
             }
         # OpenSpiel can send actions for agents that are already done, which doesn't
         # work with our simulation managers. So we filter out these actions before
@@ -191,6 +221,12 @@ class OpenSpielWrapper:
         )
 
     def observation_spec(self):
+        """
+        The agents' observations spaces.
+
+        Abmarl uses gym spaces for the observation space. This wrapper converts
+        the gym space into a format that OpenSpiel expects.
+        """
         return {
             agent.id: {
                 'info_state': (agent.observation_space.n,),
@@ -200,6 +236,12 @@ class OpenSpielWrapper:
         }
 
     def action_spec(self):
+        """
+        The agents' action spaces.
+
+        Abmarl uses gym spaces for the action space. This wrapper converts
+        the gym space into a format that OpenSpiel expects.
+        """
         return {
             agent.id: {
                 'num_actions': agent.action_space.n,
@@ -211,7 +253,7 @@ class OpenSpielWrapper:
 
     def get_legal_actions(self, agent_id):
         """
-        Return the legal actions available to the player.
+        Return the legal actions available to the agent.
 
         By default, this wrapper uses all the available actions as the legal actions
         in each time step. This function can be overwritten in a derived class
