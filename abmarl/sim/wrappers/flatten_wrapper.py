@@ -1,4 +1,3 @@
-import copy
 
 from gym.spaces import Box, Discrete, Tuple, Dict, MultiDiscrete, MultiBinary
 import numpy as np
