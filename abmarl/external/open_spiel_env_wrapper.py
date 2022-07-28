@@ -6,6 +6,49 @@ from abmarl.sim.agent_based_simulation import Agent
 from abmarl.managers import TurnBasedManager, SimulationManager
 
 class OpenSpielWrapper:
+    """
+    Enable connection between SimulationManager and OpenSpiel agents.
+
+    OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
+    through the TurnBasedManager and AllStepManager. OpenSpiel expects TimeStep
+    objects as output, which include the observations, rewards, and step type.
+    Among the observations, it expects a list of legal actions availbe to the agent.
+    The OpenSpielWrapper converts output from the simulation manager to the expected
+    format. A TimeStep output typically looks like this:
+        TimeStpe(
+            observations={
+                info_state: {agent_id: agent_obs for agent_id in agents},
+                legal_actions: {agent_id: agent_legal_actions for agent_id in agents},
+                current_player: current_agent_id
+            }
+            rewards={
+                {agnet_id: agent_reward for agnt_id in agents}
+            }
+            discounts={
+                {agent_id: agent_discout for agent_id in agents}
+            }
+            step_type=StepType enum
+        )
+
+    Furthermore, OpenSpiel provides actions as a list. This wrapper converts it
+    those actions to a dict before forwarding it to the underlying simulation manager.
+
+    OpenSpiel does not support the ability for some agents of a game to finish
+    before others. The game is either ongoing, in which all agents are providing
+    actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
+    done before others while the game is still going. Abmarl expects that done
+    agents will not provide actions. OpenSpiel, however, will always provide actions
+    for all players. So this wrapper removes the actions from agents that are
+    already done before forwarding the action to the underlying simulation manager.
+    Furthermore, OpenSpiel expects every agent to be present in the TimeStep outputs.
+    Normally, Abmarl will not provide output for agents that are done since they
+    have finished generating data in this episode. In order to work with OpenSpiel,
+    this wrapper forces output from all agents at every step.
+
+    Currently, the OpenSpielWrapper only works with simulations in which the action and
+    observation space of every agent is Discrete. Most simulations will need to
+    be wrapped with the RavelDiscreteWrapper.
+    """
     def __init__(self, sim, discount=1.0, **kwargs):
         assert isinstance(sim, SimulationManager)
         # The wrapper assumes that each space is discrete, so we check for that.
