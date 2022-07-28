@@ -92,7 +92,7 @@ class TeamBattleSim(GridWorldSimulation):
     def get_info(self, agent_id, **kwargs):
         return {}
 
-
+# TODO: Replace this with more examples
 if __name__ == "__main__":
     colors = ['red', 'blue', 'green', 'gray']
     positions = [np.array([1, 1]), np.array([1, 6]), np.array([6, 1]), np.array([6, 6])]

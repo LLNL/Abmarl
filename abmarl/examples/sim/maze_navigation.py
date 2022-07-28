@@ -68,7 +68,7 @@ class MazeNaviationSim(GridWorldSimulation):
     def get_info(self, agent_id, **kwargs):
         return {}
 
-
+# TODO: Replace this more examples
 if __name__ == "__main__":
     object_registry = {
         'N': lambda n: MazeNavigationAgent(
