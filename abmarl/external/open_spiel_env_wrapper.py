@@ -61,9 +61,9 @@ class OpenSpielWrapper:
         # We keep track of the learning agents separately so that we can append
         # observations and rewards for each of these agents. OpenSpiel expects
         # them to all be present in every time_step.
-        self._learning_agents = set({
-            agent.id for agent in self.sim.agents.values() if isinstance(agent, Agent)
-        })
+        self._learning_agents = {
+            agent.id: agent for agent in self.sim.agents.values() if isinstance(agent, Agent)
+        }
 
         self.discounts = discount
         self._should_reset = True
@@ -143,8 +143,8 @@ class OpenSpielWrapper:
         observations = {
             "info_state": self._append_obs(obs),
             "legal_actions": {
-                agent.id: self.get_legal_actions(agent.id)
-                for agent in self.sim.agents.values() if isinstance(agent, Agent)
+                agent_id: self.get_legal_actions(agent_id)
+                for agent_id in self._learning_agents
             },
             "current_player": self.current_player,
         }
@@ -207,8 +207,8 @@ class OpenSpielWrapper:
         observations = {
             "info_state": self._append_obs(obs),
             "legal_actions": {
-                agent.id: self.get_legal_actions(agent.id)
-                for agent in self.sim.agents.values() if isinstance(agent, Agent)
+                agent_id: self.get_legal_actions(agent_id)
+                for agent_id in self._learning_agents
             },
             "current_player": self.current_player,
         }
@@ -232,7 +232,7 @@ class OpenSpielWrapper:
                 'info_state': (agent.observation_space.n,),
                 'legal_actions': (agent.action_space.n,),
                 'current_player': ()
-            } for agent in self.sim.agents.values() if isinstance(agent, Agent)
+            } for agent in self._learning_agents.values()
         }
 
     def action_spec(self):
@@ -248,7 +248,7 @@ class OpenSpielWrapper:
                 'min': 0,
                 'max': agent.action_space.n - 1,
                 'dtype': int
-            } for agent in self.sim.agents.values() if isinstance(agent, Agent)
+            } for agent in self._learning_agents.values()
         }
 
     def get_legal_actions(self, agent_id):
@@ -259,7 +259,7 @@ class OpenSpielWrapper:
         in each time step. This function can be overwritten in a derived class
         to add logic for obtaining the actual legal actions available.
         """
-        return [i for i in range(self.sim.agents[agent_id].action_space.n)]
+        return [i for i in range(self._learning_agents[agent_id].action_space.n)]
 
     def _append_obs(self, obs):
         # OpenSpiel expects every agent to appear in the observation at every
@@ -287,8 +287,8 @@ class OpenSpielWrapper:
         observations = {
             "info_state": obs,
             "legal_actions": {
-                agent.id: self.get_legal_actions(agent.id)
-                for agent in self.sim.agents.values() if isinstance(agent, Agent)
+                agent_id: self.get_legal_actions(agent_id)
+                for agent_id in self._learning_agents
             },
             "current_player": self.current_player,
         }
