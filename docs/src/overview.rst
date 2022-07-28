@@ -182,7 +182,7 @@ simple corridor simulation with multiple agents.
 
    # Import the MultiCorridor ABS, a simulation manager, and the multiagent
    # wrapper needed to connect to RLlib's trainers
-   from abmarl.sim.corridor import MultiCorridor
+   from abmarl.examples import MultiCorridor
    from abmarl.managers import TurnBasedManager
    from abmarl.external import MultiAgentWrapper
    
