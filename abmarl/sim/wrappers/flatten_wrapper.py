@@ -200,7 +200,6 @@ class FlattenActionWrapper(SARWrapper):
     """
     def __init__(self, sim):
         super().__init__(sim)
-        self.agents = copy.deepcopy(self.sim.agents)
         for agent_id, wrapped_agent in self.sim.agents.items():
             # Wrap the action spaces of the agents
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
