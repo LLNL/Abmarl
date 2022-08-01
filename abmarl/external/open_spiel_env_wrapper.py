@@ -34,10 +34,10 @@ class OpenSpielWrapper:
     Furthermore, OpenSpiel provides actions as a list. This wrapper converts it
     those actions to a dict before forwarding it to the underlying simulation manager.
 
-    OpenSpiel does not support the ability for some agents of a game to finish
-    before others. The game is either ongoing, in which all agents are providing
+    OpenSpiel does not support the ability for some agents in a simulation to finish
+    before others. The simulation is either ongoing, in which all agents are providing
     actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
-    done before others while the game is still going. Abmarl expects that done
+    done before others while the simulation is still going. Abmarl expects that done
     agents will not provide actions. OpenSpiel, however, will always provide actions
     for all players. So this wrapper removes the actions from agents that are
     already done before forwarding the action to the underlying simulation manager.
@@ -110,7 +110,7 @@ class OpenSpielWrapper:
     @property
     def is_turn_based(self):
         """
-        The game is turn based if the simulation is wrapped with a TurnBasedManager.
+        The simulation is turn based if the simulation is wrapped with a TurnBasedManager.
         """
         return isinstance(self.sim, TurnBasedManager)
 
@@ -120,8 +120,8 @@ class OpenSpielWrapper:
         The current player is the player that currently provides the action.
 
         This is used the in the observation part of the TimeStep output. If it
-        is a turn based game, then the current player is the single agent who
-        is providing an action. If it is a simultaneous game, then OpenSpiel does
+        is a turn based simulation, then the current player is the single agent who
+        is providing an action. If it is a simultaneous simulation, then OpenSpiel does
         not use this property and the current player is just the first player
         in the list.
         """
@@ -140,8 +140,6 @@ class OpenSpielWrapper:
         obs = self.sim.reset(**kwargs)
         self.current_player = next(iter(obs))
 
-        # If it is a turn based sim, then the current player should be the next
-        # player whose turn it will be. But what is current player for an all-step game?
         observations = {
             "info_state": self._append_obs(obs),
             "legal_actions": {
@@ -163,11 +161,11 @@ class OpenSpielWrapper:
         Step the simulation forward using the reported actions.
 
         OpenSpiel provides an action list of either (1) the agent whose turn it
-        is in a turn-based game or (2) all the agents in a simultaneous game. The
+        is in a turn-based simulation or (2) all the agents in a simultaneous simulation. The
         OpenSpielWrapper converts the list of actions to a dictionary before passing
         it to the underlying simulation.
 
-        OpenSpiel does not support the ability for some agents of a game to finish
+        OpenSpiel does not support the ability for some agents of a simulation to finish
         before others. As such, it may provide actions for agents that are already
         done. To work with Abmarl, this wrapper removes actions for agents that
         are already done.
@@ -192,7 +190,7 @@ class OpenSpielWrapper:
             except KeyError:
                 pass
         # We have just deleted actions from agents that are already done, which
-        # can result in an empty action dictionary (e.g. in a turn-based game).
+        # can result in an empty action dictionary (e.g. in a turn-based simulation).
         # In this case, we just take a fake step.
         if not action_dict: # No actions
             return self._take_fake_step()
