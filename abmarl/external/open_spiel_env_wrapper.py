@@ -189,6 +189,9 @@ class OpenSpielWrapper:
         if self.is_turn_based:
             action_dict = {self.current_player: action_list[0]}
         else:
+            assert len(action_list) == len(self._learning_agents), \
+                "The number of actions must match the number of learning agnets " + \
+                "in a simultaneous simulation."
             action_dict = {
                 agent_id: action_list[i]
                 for i, agent_id in enumerate(self._learning_agents)

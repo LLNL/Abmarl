@@ -163,6 +163,16 @@ def test_wrapper_step():
     assert time_step.step_type == StepType.MID
 
 
+def test_step_mismatched_number():
+    sim = OpenSpielWrapper(
+        AllStepManager(abs)
+    )
+    sim.reset()
+    with pytest.raises(AssertionError):
+        action_list = [0, 1, 2, 2]
+        time_step = sim.step(action_list)
+
+
 def test_take_fake_step():
     sim = OpenSpielWrapper(
         AllStepManager(abs)
