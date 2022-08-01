@@ -178,7 +178,8 @@ def test_take_fake_step():
         AllStepManager(abs)
     )
     sim.reset()
-    time_step = sim._take_fake_step()
+    sim.sim.done_agents = set({'agent0', 'agent1', 'agent2', 'agent3', 'agent4'})
+    time_step = sim.step([0, 1, 2, 2, 1])
     assert isinstance(time_step, TimeStep)
     assert time_step.observations.keys() == set({'info_state', 'legal_actions', 'current_player'})
     assert time_step.observations['info_state'] == {
