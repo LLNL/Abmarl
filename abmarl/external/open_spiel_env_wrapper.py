@@ -174,6 +174,15 @@ class OpenSpielWrapper:
         before others. As such, it may provide actions for agents that are already
         done. To work with Abmarl, the OpenSpielWrapper removes actions for agents that
         are already done.
+
+        Args:
+            action_list: list of actions for the agents.
+
+        Returns:
+            TimeStep object containing the observations of the new state, the rewards,
+            and StepType.MID if the simulation is still progressing, otherwise
+            StepType.LAST.
+
         """
         # Actions come in as a list, so we need to convert to a dict before forwarding
         # to the SimulationManager.
