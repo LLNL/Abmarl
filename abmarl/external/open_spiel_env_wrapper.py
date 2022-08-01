@@ -147,10 +147,7 @@ class OpenSpielWrapper:
 
         observations = {
             "info_state": self._append_obs(obs),
-            "legal_actions": {
-                agent_id: self.get_legal_actions(agent_id)
-                for agent_id in self._learning_agents
-            },
+            "legal_actions": self._get_all_legal_actions(),
             "current_player": self.current_player,
         }
 
@@ -223,10 +220,7 @@ class OpenSpielWrapper:
 
         observations = {
             "info_state": self._append_obs(obs),
-            "legal_actions": {
-                agent_id: self.get_legal_actions(agent_id)
-                for agent_id in self._learning_agents
-            },
+            "legal_actions": self._get_all_legal_actions(),
             "current_player": self.current_player,
         }
 
@@ -296,6 +290,13 @@ class OpenSpielWrapper:
                 reward[agent_id] = 0
         return reward
 
+    def _get_all_legal_actions(self):
+        # Shorcut function for getting all the legal actions
+        return {
+            agent_id: self.get_legal_actions(agent_id)
+            for agent_id in self._learning_agents
+        }
+
     def _take_fake_step(self):
         # This is used when all the actions are from done agents. In that case,
         # we just move along with no state update.
@@ -303,10 +304,7 @@ class OpenSpielWrapper:
         self.current_player = next(iter(obs))
         observations = {
             "info_state": obs,
-            "legal_actions": {
-                agent_id: self.get_legal_actions(agent_id)
-                for agent_id in self._learning_agents
-            },
+            "legal_actions": self._get_all_legal_actions(),
             "current_player": self.current_player,
         }
         return TimeStep(
