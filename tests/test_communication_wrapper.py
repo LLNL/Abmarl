@@ -13,9 +13,9 @@ class CommsSimulation(MultiAgentGymSpacesSim):
         if 'agent1' in fusion_matrix and fusion_matrix['agent1']:
             agent_1_obs = self.get_obs('agent1')
             if my_id == 'agent0':
-                my_obs[0] += agent_1_obs
+                my_obs[0] += agent_1_obs[0]
             elif my_id == 'agent3':
-                my_obs['first'] = agent_1_obs
+                my_obs['first'] = agent_1_obs[0]
         elif 'agent2' in fusion_matrix and fusion_matrix['agent2']:
             agent_2_obs = self.get_obs('agent2')
             if my_id == 'agent0':
@@ -99,7 +99,7 @@ def test_communication_wrapper_step():
     assert sim.get_obs('agent0')['message_buffer'] == {
         'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
-    assert sim.get_obs('agent1')['obs'] == 0
+    assert sim.get_obs('agent1')['obs'] == [0]
     assert sim.get_obs('agent1')['message_buffer'] == {
         'agent0': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
@@ -139,7 +139,7 @@ def test_communication_wrapper_step():
     assert sim.get_obs('agent0')['message_buffer'] == {
         'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
-    assert sim.get_obs('agent1')['obs'] == 0
+    assert sim.get_obs('agent1')['obs'] == [0]
     assert sim.get_obs('agent1')['message_buffer'] == {
         'agent0': False, 'agent2': True, 'agent3': True, 'agent4': False
     }
@@ -179,7 +179,7 @@ def test_communication_wrapper_step():
     assert sim.get_obs('agent0')['message_buffer'] == {
         'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
-    assert sim.get_obs('agent1')['obs'] == 0
+    assert sim.get_obs('agent1')['obs'] == [0]
     assert sim.get_obs('agent1')['message_buffer'] == {
         'agent0': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
