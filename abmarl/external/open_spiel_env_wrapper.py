@@ -136,6 +136,10 @@ class OpenSpielWrapper:
     def reset(self, **kwargs):
         """
         Reset the simulation.
+
+        Return:
+            TimeStep object containing the initial observations. Uniquely at reset,
+                the rewards and discounts are None and the step type is StepType.FIRST.
         """
         self._should_reset = False
         obs = self.sim.reset(**kwargs)
