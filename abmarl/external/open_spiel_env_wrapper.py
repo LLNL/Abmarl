@@ -39,7 +39,7 @@ class OpenSpielWrapper:
     actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
     done before others while the simulation is still going. Abmarl expects that done
     agents will not provide actions. OpenSpiel, however, will always provide actions
-    for all players. So this wrapper removes the actions from agents that are
+    for all agents. So this wrapper removes the actions from agents that are
     already done before forwarding the action to the underlying simulation manager.
     Furthermore, OpenSpiel expects every agent to be present in the TimeStep outputs.
     Normally, Abmarl will not provide output for agents that are done since they
@@ -103,7 +103,7 @@ class OpenSpielWrapper:
     @property
     def num_players(self):
         """
-        The number of player is the number of learning agents in the simulation.
+        The number of learning agents in the simulation.
         """
         return sum([1 for _ in self._learning_agents])
 
@@ -117,13 +117,13 @@ class OpenSpielWrapper:
     @property
     def current_player(self):
         """
-        The current player is the player that currently provides the action.
+        The agent that currently provides the action.
 
         This is used the in the observation part of the TimeStep output. If it
         is a turn based simulation, then the current player is the single agent who
         is providing an action. If it is a simultaneous simulation, then OpenSpiel does
-        not use this property and the current player is just the first player
-        in the list.
+        not use this property and the current player is just the first agent
+        in the list of agents in the simulation.
         """
         return self._current_player
 
