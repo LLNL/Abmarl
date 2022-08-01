@@ -32,6 +32,7 @@ setuptools.setup(
         'tensorflow',
         'gym<0.22',
         'ray[rllib]==1.12.1',
+        'open-spiel',
         'matplotlib',
         'seaborn',
     ],
