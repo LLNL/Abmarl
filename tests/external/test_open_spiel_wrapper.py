@@ -202,6 +202,23 @@ def test_take_fake_step():
     assert time_step.step_type == StepType.MID
 
 
+def test_should_reset():
+    sim = OpenSpielWrapper(
+        AllStepManager(abs)
+    )
+    assert sim._should_reset
+    time_step = sim.reset()
+    assert not sim._should_reset
+    assert time_step.step_type == StepType.FIRST
+
+    time_step = sim.step([0, 1, 2, 2, 1])
+    assert time_step.step_type == StepType.MID
+
+    sim._should_reset = True
+    time_step = sim.step([0, 1, 2, 2, 1])
+    assert time_step.step_type == StepType.FIRST
+
+
 def test_rl_main_loop_all_step():
     sim = OpenSpielWrapper(
         AllStepManager(abs)

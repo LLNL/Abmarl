@@ -184,6 +184,9 @@ class OpenSpielWrapper:
             StepType.LAST.
 
         """
+        if self._should_reset:
+            return self.reset(**kwargs)
+
         # Actions come in as a list, so we need to convert to a dict before forwarding
         # to the SimulationManager.
         if self.is_turn_based:
@@ -211,9 +214,6 @@ class OpenSpielWrapper:
         # In this case, we just take a fake step.
         if not action_dict: # No actions
             return self._take_fake_step()
-
-        if self._should_reset:
-            return self.reset(**kwargs)
 
         obs, reward, done, info = self.sim.step(action_dict, **kwargs)
         self.current_player = next(iter(obs))
