@@ -12,7 +12,6 @@ Each agent can move around the grid and attack agents from other teams. Each age
 can observe the grid around its position. We will reward each agent for successful
 kills and penalize them for bad moves. This tutorial can be found in full
 `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/team_battle_example.py>`_.
-# TODO: Check this ^ reference
 
 .. figure:: /.images/gridworld_tutorial_team_battle.*
    :width: 75 %

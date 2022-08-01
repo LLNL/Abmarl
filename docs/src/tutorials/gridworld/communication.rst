@@ -13,7 +13,6 @@ already contains the features for the blocking agents; in this tutorial, we show
 how to create *new* components for the communication feature and connect them with
 the simulation framework. The tutorial can be found in full
 `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/comms_blocking.py>`_.
-# TODO: Check this ^ reference
 
 .. figure:: /.images/gridworld_tutorial_communications.*
    :width: 75 %

@@ -40,7 +40,6 @@ Train agents in a multicorridor simulation:
 ```
 abmarl train examples/multi_corridor_example.py
 ```
-# TODO: Update this ^ reference
 
 Visualize trained behavior:
 ```

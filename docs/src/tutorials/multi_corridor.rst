@@ -19,7 +19,6 @@ the same action space, observation space, and objective function.
 
 This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/multi_corridor.py>`_
 and the `MultiCorridor configuration <https://github.com/LLNL/Abmarl/blob/main/examples/multi_corridor_example.py>`_.
-# TODO: Update this ^ reference
 
 Creating the MultiCorridor Simulation
 -------------------------------------

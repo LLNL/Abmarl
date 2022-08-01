@@ -9,7 +9,6 @@ we can create a Maze Navigation Simulation that contains a single moving agent n
 defined by wall agents in the grid. The moving agent's goal is to reach a target
 agent. We will construct the Grid by :ref:`reading a grid file <api_gridworld_sim>`.
 This tutorial can be found in full `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/maze_navigation.py>`_.
-# TODO: Check this ^ reference
 
 .. figure:: /.images/gridworld_tutorial_maze_navigation.*
    :width: 75 %
