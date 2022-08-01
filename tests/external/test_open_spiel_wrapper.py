@@ -6,7 +6,7 @@ import pytest
 from abmarl.sim.corridor import MultiCorridor
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.managers import AllStepManager, TurnBasedManager
-from abmarl.external.open_spiel_env_wrapper import OpenSpielWrapper
+from abmarl.external import OpenSpielWrapper
 
 abs = RavelDiscreteWrapper(
     MultiCorridor()
