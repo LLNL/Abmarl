@@ -276,7 +276,7 @@ class OpenSpielWrapper:
         as its legal actions in each time step. This function can be overwritten in a derived class
         to add logic for obtaining the actual legal actions available.
         """
-        return [i for i in range(self._learning_agents[agent_id].action_space.n)]
+        return [*range(self._learning_agents[agent_id].action_space.n)]
 
     def _append_obs(self, obs):
         # OpenSpiel expects every agent to appear in the observation at every
