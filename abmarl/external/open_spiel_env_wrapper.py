@@ -8,12 +8,12 @@ from abmarl.managers import TurnBasedManager, SimulationManager
 
 class OpenSpielWrapper:
     """
-    Enable connection between SimulationManager and OpenSpiel agents.
+    Enable connection between Abmarl's SimulationManager and OpenSpiel agents.
 
     OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
     through the TurnBasedManager and AllStepManager. OpenSpiel expects TimeStep
     objects as output, which include the observations, rewards, and step type.
-    Among the observations, it expects a list of legal actions availbe to the agent.
+    Among the observations, it expects a list of legal actions available to the agent.
     The OpenSpielWrapper converts output from the simulation manager to the expected
     format. A TimeStep output typically looks like this:
         TimeStpe(
@@ -23,7 +23,7 @@ class OpenSpielWrapper:
                 current_player: current_agent_id
             }
             rewards={
-                {agnet_id: agent_reward for agnt_id in agents}
+                {agent_id: agent_reward for agent_id in agents}
             }
             discounts={
                 {agent_id: agent_discout for agent_id in agents}
@@ -31,20 +31,21 @@ class OpenSpielWrapper:
             step_type=StepType enum
         )
 
-    Furthermore, OpenSpiel provides actions as a list. The OpenSpielWrapper converts it
+    Furthermore, OpenSpiel provides actions as a list. The OpenSpielWrapper converts
     those actions to a dict before forwarding it to the underlying simulation manager.
 
     OpenSpiel does not support the ability for some agents in a simulation to finish
     before others. The simulation is either ongoing, in which all agents are providing
     actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
-    done before others while the simulation is still going. Abmarl expects that done
+    done before others as the simulation progresses. Abmarl expects that done
     agents will not provide actions. OpenSpiel, however, will always provide actions
     for all agents. The OpenSpielWrapper removes the actions from agents that are
     already done before forwarding the action to the underlying simulation manager.
     Furthermore, OpenSpiel expects every agent to be present in the TimeStep outputs.
     Normally, Abmarl will not provide output for agents that are done since they
     have finished generating data in the episode. In order to work with OpenSpiel,
-    the OpenSpielWrapper forces output from all agents at every step.
+    the OpenSpielWrapper forces output from all agents at every step, including
+    those already done.
 
     Currently, the OpenSpielWrapper only works with simulations in which the action and
     observation space of every agent is Discrete. Most simulations will need to
@@ -97,7 +98,7 @@ class OpenSpielWrapper:
                     "discount values must be a number."
             assert all([
                 True if agent_id in value.keys() else False for agent_id in self._learning_agents
-            ]), "All agents must be given a discounted value."
+            ]), "All agents must be given a discount."
             self._discounts = value
 
     @property
@@ -110,7 +111,7 @@ class OpenSpielWrapper:
     @property
     def is_turn_based(self):
         """
-        The simulation is turn based if the simulation is wrapped with a TurnBasedManager.
+        TurnBasedManager.
         """
         return isinstance(self.sim, TurnBasedManager)
 
@@ -189,7 +190,7 @@ class OpenSpielWrapper:
                 del action_dict[agent_id]
             except KeyError:
                 pass
-        # We have just deleted actions from agents that are already done, which
+        # We have just deleted actions for agents that are already done, which
         # can result in an empty action dictionary (e.g. in a turn-based simulation).
         # In this case, we just take a fake step.
         if not action_dict: # No actions
@@ -255,8 +256,8 @@ class OpenSpielWrapper:
         """
         Return the legal actions available to the agent.
 
-        By default, the OpenSpielWrapper wrapper uses all the available actions
-        as the legal actions in each time step. This function can be overwritten in a derived class
+        By default, the OpenSpielWrapper wrapper uses the agent's entire action space
+        as its legal actions in each time step. This function can be overwritten in a derived class
         to add logic for obtaining the actual legal actions available.
         """
         return [i for i in range(self._learning_agents[agent_id].action_space.n)]
