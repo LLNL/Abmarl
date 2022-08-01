@@ -31,7 +31,7 @@ class OpenSpielWrapper:
             step_type=StepType enum
         )
 
-    Furthermore, OpenSpiel provides actions as a list. This wrapper converts it
+    Furthermore, OpenSpiel provides actions as a list. The OpenSpielWrapper converts it
     those actions to a dict before forwarding it to the underlying simulation manager.
 
     OpenSpiel does not support the ability for some agents in a simulation to finish
@@ -39,12 +39,12 @@ class OpenSpielWrapper:
     actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
     done before others while the simulation is still going. Abmarl expects that done
     agents will not provide actions. OpenSpiel, however, will always provide actions
-    for all agents. So this wrapper removes the actions from agents that are
+    for all agents. The OpenSpielWrapper removes the actions from agents that are
     already done before forwarding the action to the underlying simulation manager.
     Furthermore, OpenSpiel expects every agent to be present in the TimeStep outputs.
     Normally, Abmarl will not provide output for agents that are done since they
-    have finished generating data in this episode. In order to work with OpenSpiel,
-    this wrapper forces output from all agents at every step.
+    have finished generating data in the episode. In order to work with OpenSpiel,
+    the OpenSpielWrapper forces output from all agents at every step.
 
     Currently, the OpenSpielWrapper only works with simulations in which the action and
     observation space of every agent is Discrete. Most simulations will need to
@@ -119,7 +119,7 @@ class OpenSpielWrapper:
         """
         The agent that currently provides the action.
 
-        This is used the in the observation part of the TimeStep output. If it
+        Current player is used the in the observation part of the TimeStep output. If it
         is a turn based simulation, then the current player is the single agent who
         is providing an action. If it is a simultaneous simulation, then OpenSpiel does
         not use this property and the current player is just the first agent
@@ -167,7 +167,7 @@ class OpenSpielWrapper:
 
         OpenSpiel does not support the ability for some agents of a simulation to finish
         before others. As such, it may provide actions for agents that are already
-        done. To work with Abmarl, this wrapper removes actions for agents that
+        done. To work with Abmarl, the OpenSpielWrapper removes actions for agents that
         are already done.
         """
         # Actions come in as a list, so we need to convert to a dict before forwarding
@@ -224,7 +224,7 @@ class OpenSpielWrapper:
         """
         The agents' observations spaces.
 
-        Abmarl uses gym spaces for the observation space. This wrapper converts
+        Abmarl uses gym spaces for the observation space. The OpenSpielWrapper converts
         the gym space into a format that OpenSpiel expects.
         """
         return {
@@ -239,7 +239,7 @@ class OpenSpielWrapper:
         """
         The agents' action spaces.
 
-        Abmarl uses gym spaces for the action space. This wrapper converts
+        Abmarl uses gym spaces for the action space. The OpenSpiel wrapper converts
         the gym space into a format that OpenSpiel expects.
         """
         return {
@@ -255,8 +255,8 @@ class OpenSpielWrapper:
         """
         Return the legal actions available to the agent.
 
-        By default, this wrapper uses all the available actions as the legal actions
-        in each time step. This function can be overwritten in a derived class
+        By default, the OpenSpielWrapper wrapper uses all the available actions
+        as the legal actions in each time step. This function can be overwritten in a derived class
         to add logic for obtaining the actual legal actions available.
         """
         return [i for i in range(self._learning_agents[agent_id].action_space.n)]
