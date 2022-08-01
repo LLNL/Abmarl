@@ -199,8 +199,6 @@ class OpenSpielWrapper:
         # OpenSpiel can send actions for agents that are already done, which doesn't
         # work with our simulation managers. So we filter out these actions before
         # passing them to the manager.
-        # TODO: Although all implemeted managers do track the done agents, this is not
-        # a part of the SimulationManager interface.
         for agent_id in self.sim.done_agents:
             try:
                 del action_dict[agent_id]
