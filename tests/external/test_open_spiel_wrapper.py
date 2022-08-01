@@ -170,7 +170,7 @@ def test_step_mismatched_number():
     sim.reset()
     with pytest.raises(AssertionError):
         action_list = [0, 1, 2, 2]
-        time_step = sim.step(action_list)
+        sim.step(action_list)
 
 
 def test_take_fake_step():

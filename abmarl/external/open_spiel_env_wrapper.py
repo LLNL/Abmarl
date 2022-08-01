@@ -120,7 +120,7 @@ class OpenSpielWrapper:
         """
         The agent that currently provides the action.
 
-        Current player is used the in the observation part of the TimeStep output. If it
+        Current player is used in the observation part of the TimeStep output. If it
         is a turn based simulation, then the current player is the single agent who
         is providing an action. If it is a simultaneous simulation, then OpenSpiel does
         not use this property and the current player is just the first agent
@@ -190,7 +190,7 @@ class OpenSpielWrapper:
             action_dict = {self.current_player: action_list[0]}
         else:
             assert len(action_list) == len(self._learning_agents), \
-                "The number of actions must match the number of learning agnets " + \
+                "The number of actions must match the number of learning agents " + \
                 "in a simultaneous simulation."
             action_dict = {
                 agent_id: action_list[i]
@@ -248,7 +248,7 @@ class OpenSpielWrapper:
         """
         The agents' action spaces.
 
-        Abmarl uses gym spaces for the action space. The OpenSpiel wrapper converts
+        Abmarl uses gym spaces for the action space. The OpenSpielWrapper converts
         the gym space into a format that OpenSpiel expects.
         """
         return {
@@ -264,7 +264,7 @@ class OpenSpielWrapper:
         """
         Return the legal actions available to the agent.
 
-        By default, the OpenSpielWrapper wrapper uses the agent's entire action space
+        By default, the OpenSpielWrapper uses the agent's entire action space
         as its legal actions in each time step. This function can be overwritten in a derived class
         to add logic for obtaining the actual legal actions available.
         """
