@@ -84,7 +84,8 @@ class MultiAgentGymSpacesSim(MultiAgentSim):
                         'second': Box(low=-1, high=3, shape=(2,), dtype=int)
                     }),
                     MultiBinary(3)
-                ))
+                )),
+                null_observation=[0, 0, 0, 0]
             ),
             'agent1': Agent(
                 id='agent1',
@@ -116,7 +117,7 @@ class MultiAgentGymSpacesSim(MultiAgentSim):
         if agent_id == 'agent0':
             return [0, 0, 0, 1]
         elif agent_id == 'agent1':
-            return 0
+            return [0]
         elif agent_id == 'agent2':
             return [1, 0]
         elif agent_id == 'agent3':

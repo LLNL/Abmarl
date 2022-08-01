@@ -1,103 +1,15 @@
 
 import warnings
 
-from gym.spaces import MultiBinary, Discrete, Box, MultiDiscrete, Dict, Tuple
+from gym.spaces import Discrete, Dict
 import pytest
 
-from abmarl.sim.agent_based_simulation import AgentBasedSimulation
-from abmarl.sim.agent_based_simulation import Agent, PrincipleAgent
 from abmarl.sim.wrappers import SuperAgentWrapper
-
-
-class SimTest(AgentBasedSimulation):
-    def __init__(self):
-        self.rewards = [0, 1, 2, 3, 4, 5, 6]
-        self.dones = [3, 12, 5, 34]
-        self.step_count = 0
-        self.agents = {
-            'agent0': Agent(
-                id='agent0',
-                observation_space=MultiBinary(4),
-                action_space=Tuple((
-                    Dict({
-                        'first': Discrete(4),
-                        'second': Box(low=-1, high=3, shape=(2,), dtype=int)
-                    }),
-                    MultiBinary(3)
-                )),
-                null_observation=[0, 0, 0, 0]
-            ),
-            'agent1': Agent(
-                id='agent1',
-                observation_space=Box(low=0, high=1, shape=(1,), dtype=int),
-                action_space=MultiDiscrete([4, 6, 2])
-            ),
-            'agent2': Agent(
-                id='agent2',
-                observation_space=MultiDiscrete([2, 2]),
-                action_space=Dict({'alpha': MultiBinary(3)})
-            ),
-            'agent3': Agent(
-                id='agent3',
-                observation_space=Dict({
-                    'first': Discrete(4),
-                    'second': Box(low=-1, high=3, shape=(2,), dtype=int)
-                }),
-                action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
-            ),
-            'agent4': PrincipleAgent(
-                id='agent4'
-            )
-        }
-
-        self.finalize()
-
-    def render(self):
-        pass
-
-    def reset(self):
-        self.step_count = 0
-        self.action = {agent.id: None for agent in self.agents.values() if isinstance(agent, Agent)}
-
-    def step(self, action_dict):
-        self.step_count += 1
-        for agent_id, action in action_dict.items():
-            self.action[agent_id] = action
-
-    def get_obs(self, agent_id, **kwargs):
-        if agent_id == 'agent0':
-            return [0, 0, 0, 1]
-        elif agent_id == 'agent1':
-            return [0]
-        elif agent_id == 'agent2':
-            return [1, 0]
-        elif agent_id == 'agent3':
-            return {'first': 1, 'second': [3, 1]}
-
-    def get_reward(self, agent_id, **kwargs):
-        return {
-            'agent0': 2,
-            'agent1': 3,
-            'agent2': 5,
-            'agent3': 7,
-        }[agent_id]
-
-    def get_done(self, agent_id, **kwargs):
-        return self.step_count >= self.dones[int(agent_id[-1])]
-
-    def get_all_done(self, **kwargs):
-        for agent in self.agents.values():
-            if not isinstance(agent, Agent): continue
-            if not self.get_done(agent.id):
-                return False
-        return True
-
-    def get_info(self, agent_id, **kwargs):
-        return self.action[agent_id]
+from abmarl.examples import MultiAgentGymSpacesSim
 
 
 sim = SuperAgentWrapper(
-    SimTest(),
+    MultiAgentGymSpacesSim(),
     super_agent_mapping={
         'super0': ['agent0', 'agent3']
     },
@@ -116,22 +28,22 @@ def test_super_agent_mapping():
 
 def test_super_agent_mapping_breaks():
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping=['agent0'])
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping=['agent0'])
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping={1: ['agent0']})
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={1: ['agent0']})
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping={'agent0': ['agent1', 'agent2']})
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'agent0': ['agent1', 'agent2']})
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping={'super0': 'agent1'})
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'super0': 'agent1'})
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping={'super0': [0, 1]})
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'super0': [0, 1]})
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping={'super0': ['agent5']})
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'super0': ['agent5']})
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(SimTest(), super_agent_mapping={'super0': ['agent4']})
+        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'super0': ['agent4']})
     with pytest.raises(AssertionError):
         SuperAgentWrapper(
-            SimTest(),
+            MultiAgentGymSpacesSim(),
             super_agent_mapping={
                 'super0': ['agent1', 'agent2'],
                 'super1': ['agent0', 'agent1'],
@@ -141,7 +53,7 @@ def test_super_agent_mapping_breaks():
 
 def test_super_agent_mapping_changes_agents():
     tmp_sim = SuperAgentWrapper(
-        SimTest(),
+        MultiAgentGymSpacesSim(),
         super_agent_mapping={
             'super0': ['agent0', 'agent3']
         }
