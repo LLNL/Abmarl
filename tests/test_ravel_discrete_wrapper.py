@@ -250,7 +250,7 @@ def test_ravel_null_points():
     assert agents['agent3'].null_observation in agents['agent3'].observation_space
     agents['agent3'].null_action = (0, [0, 0], 0)
     assert agents['agent3'].null_action in agents['agent3'].action_space
-    
+
     sim = RavelDiscreteWrapper(abs)
     agents = sim.agents
     assert agents['agent0'].null_observation == 0
