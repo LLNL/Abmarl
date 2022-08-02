@@ -2,6 +2,8 @@
 from gym.spaces import Box, Discrete, Tuple, Dict, MultiDiscrete, MultiBinary
 import numpy as np
 
+from abmarl.sim import Agent
+
 from .sar_wrapper import SARWrapper
 
 
@@ -175,10 +177,21 @@ class FlattenWrapper(SARWrapper):
     def __init__(self, sim):
         super().__init__(sim)
         for agent_id, wrapped_agent in self.sim.agents.items(): # Wrap the agents' spaces
+            if not isinstance(wrapped_agent, Agent): continue
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
             self.agents[agent_id].observation_space = flatten_space(
                 wrapped_agent.observation_space
             )
+            if self.agents[agent_id].null_observation:
+                self.agents[agent_id].null_observation = flatten(
+                    self.sim.agents[agent_id].observation_space,
+                    wrapped_agent.null_observation
+                )
+            if self.agents[agent_id].null_action:
+                self.agents[agent_id].null_action = flatten(
+                    self.sim.agents[agent_id].action_space,
+                    wrapped_agent.null_action
+                )
 
     def wrap_observation(self, from_agent, observation):
         return flatten(from_agent.observation_space, observation)
@@ -200,8 +213,14 @@ class FlattenActionWrapper(SARWrapper):
     def __init__(self, sim):
         super().__init__(sim)
         for agent_id, wrapped_agent in self.sim.agents.items():
+            if not isinstance(wrapped_agent, Agent): continue
             # Wrap the action spaces of the agents
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
+            if self.agents[agent_id].null_action:
+                self.agents[agent_id].null_action = flatten(
+                    self.sim.agents[agent_id].action_space,
+                    wrapped_agent.null_action
+                )
 
     def wrap_action(self, from_agent, action):
         return unflatten(from_agent.action_space, action)

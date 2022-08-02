@@ -176,6 +176,8 @@ class MultiAgentContinuousGymSpaceSim(MultiAgentSim):
             )
         }
 
+        self.finalize()
+
     def get_obs(self, agent_id, **kwargs):
         if agent_id == 'agent0':
             return [0, 1, 1, 0]
