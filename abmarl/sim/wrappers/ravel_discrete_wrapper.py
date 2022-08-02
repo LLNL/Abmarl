@@ -144,11 +144,16 @@ def check_space(space):
 
 class RavelDiscreteWrapper(SARWrapper):
     """
+    Convert complex observations and action spaces into Discrete spaces.
+
     Convert Discrete, MultiBinary, MultiDiscrete, bounded integer Box, and any nesting of these
     observations and actions into Discrete observations and actions by "ravelling" their values
     according to numpy's ravel_mult_index function. Thus, observations and actions that are
     represented by arrays are converted into unique numbers. This is useful for building Q
     tables where each observation and action is a row and column of the Q table, respectively.
+
+    If the agent has a null observation or a null action, that value is also ravelled
+    into the new Discrete space.
     """
     def __init__(self, sim):
         super().__init__(sim)
@@ -160,6 +165,16 @@ class RavelDiscreteWrapper(SARWrapper):
                 f"{agent_id} action must be discretizable."
             self.agents[agent_id].observation_space = ravel_space(wrapped_agent.observation_space)
             self.agents[agent_id].action_space = ravel_space(wrapped_agent.action_space)
+            if self.agents[agent_id].null_observation:
+                self.agents[agent_id].null_observation = ravel(
+                    self.sim.agents[agent_id].observation_space,
+                    wrapped_agent.null_observation
+                )
+            if self.agents[agent_id].null_action:
+                self.agents[agent_id].null_action = ravel(
+                    self.sim.agents[agent_id].action_space,
+                    wrapped_agent.null_action
+                )
 
     def wrap_observation(self, from_agent, observation):
         return ravel(from_agent.observation_space, observation)

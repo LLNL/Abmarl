@@ -229,3 +229,35 @@ def test_ravel_wrapper():
     np.testing.assert_array_equal(sim.get_info('agent3')[0], action_2['agent3'][0])
     np.testing.assert_array_equal(sim.get_info('agent3')[1], action_2['agent3'][1])
     np.testing.assert_array_equal(sim.get_info('agent3')[2], action_2['agent3'][2])
+
+
+def test_ravel_null_points():
+    abs = MultiAgentGymSpacesSim()
+    agents = abs.agents
+    agents['agent0'].null_observation = [0, 0, 0, 0]
+    assert agents['agent0'].null_observation in agents['agent0'].observation_space
+    agents['agent0'].null_action = ({'first': 0, 'second': [0, 0]}, [0, 0, 0])
+    assert agents['agent0'].null_action in agents['agent0'].action_space
+    agents['agent1'].null_observation = [0]
+    assert agents['agent1'].null_observation in agents['agent1'].observation_space
+    agents['agent1'].null_action = [0, 0, 0]
+    assert agents['agent1'].null_action in agents['agent1'].action_space
+    agents['agent2'].null_observation = [0, 0]
+    assert agents['agent2'].null_observation in agents['agent2'].observation_space
+    agents['agent2'].null_action = {'alpha': [0, 0, 0]}
+    assert agents['agent2'].null_action in agents['agent2'].action_space
+    agents['agent3'].null_observation = {'first': 0, 'second': [0, 0]}
+    assert agents['agent3'].null_observation in agents['agent3'].observation_space
+    agents['agent3'].null_action = (0, [0, 0], 0)
+    assert agents['agent3'].null_action in agents['agent3'].action_space
+
+    sim = RavelDiscreteWrapper(abs)
+    agents = sim.agents
+    assert agents['agent0'].null_observation == 0
+    assert agents['agent0'].null_action == 48
+    assert agents['agent1'].null_observation == 0
+    assert agents['agent1'].null_action == 0
+    assert agents['agent2'].null_observation == 0
+    assert agents['agent2'].null_action == 0
+    assert agents['agent3'].null_observation == 6
+    assert agents['agent3'].null_action == 0
