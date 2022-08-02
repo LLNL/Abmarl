@@ -14,12 +14,14 @@ class SimulationManager(ABC):
     Attributes:
         sim: The AgentBasedSimulation.
         agents: The agents that are in the AgentBasedSimulation.
+        done_agents: Set of agents that are done.
     """
     def __init__(self, sim):
         assert isinstance(sim, AgentBasedSimulation), \
             "SimulationManager can only interface with AgentBasedSimulation."
         self.sim = sim
         self.agents = sim.agents
+        self.done_agents = set()
 
     @abstractmethod
     def reset(self, **kwargs):
