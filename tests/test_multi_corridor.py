@@ -2,7 +2,7 @@ from gym.spaces import Box, MultiBinary, Discrete, Dict
 import numpy as np
 
 from abmarl.sim import Agent
-from abmarl.examples import MultiCorridor 
+from abmarl.examples import MultiCorridor
 
 
 def test_corridor_attributes():

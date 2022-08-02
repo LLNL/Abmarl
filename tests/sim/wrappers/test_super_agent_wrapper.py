@@ -32,7 +32,9 @@ def test_super_agent_mapping_breaks():
     with pytest.raises(AssertionError):
         SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={1: ['agent0']})
     with pytest.raises(AssertionError):
-        SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'agent0': ['agent1', 'agent2']})
+        SuperAgentWrapper(
+            MultiAgentGymSpacesSim(), super_agent_mapping={'agent0': ['agent1', 'agent2']}
+        )
     with pytest.raises(AssertionError):
         SuperAgentWrapper(MultiAgentGymSpacesSim(), super_agent_mapping={'super0': 'agent1'})
     with pytest.raises(AssertionError):

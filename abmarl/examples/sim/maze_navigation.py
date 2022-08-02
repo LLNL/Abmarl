@@ -1,9 +1,8 @@
 
-from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldSimulation
-from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent
 from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import SingleGridObserver

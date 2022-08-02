@@ -1,7 +1,4 @@
 
-from matplotlib import pyplot as plt
-import numpy as np
-
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState

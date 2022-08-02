@@ -41,7 +41,9 @@ def policy_mapping_fn(agent_id):
 
 def test_trainer_sim():
     with pytest.raises(AssertionError):
-        NoTrainer(sim=MultiAgentGymSpacesSim(), policies=policies, policy_mapping_fn=policy_mapping_fn)
+        NoTrainer(
+            sim=MultiAgentGymSpacesSim(), policies=policies, policy_mapping_fn=policy_mapping_fn
+        )
 
     trainer = NoTrainer(
         sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn

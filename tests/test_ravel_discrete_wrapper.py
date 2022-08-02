@@ -190,10 +190,10 @@ def test_ravel_wrapper():
     assert sim.get_reward('agent2') == 5
     assert sim.get_reward('agent3') == 7
 
-    assert sim.get_done('agent0') == False
-    assert sim.get_done('agent1') == False
-    assert sim.get_done('agent2') == False
-    assert sim.get_done('agent3') == False
+    assert not sim.get_done('agent0')
+    assert not sim.get_done('agent1')
+    assert not sim.get_done('agent2')
+    assert not sim.get_done('agent3')
 
     assert sim.get_info('agent0')[0]['first'] == action_0['agent0'][0]['first']
     np.testing.assert_array_equal(
