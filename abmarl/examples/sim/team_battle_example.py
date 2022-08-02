@@ -1,7 +1,4 @@
 
-from matplotlib import pyplot as plt
-import numpy as np
-
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
@@ -91,53 +88,3 @@ class TeamBattleSim(GridWorldSimulation):
 
     def get_info(self, agent_id, **kwargs):
         return {}
-
-
-if __name__ == "__main__":
-    colors = ['red', 'blue', 'green', 'gray']
-    positions = [np.array([1, 1]), np.array([1, 6]), np.array([6, 1]), np.array([6, 6])]
-    agents = {
-        f'agent{i}': BattleAgent(
-            id=f'agent{i}',
-            encoding=i % 4 + 1,
-            render_color=colors[i % 4],
-            initial_position=positions[i % 4]
-        ) for i in range(24)
-    }
-    overlap_map = {
-        1: [1],
-        2: [2],
-        3: [3],
-        4: [4]
-    }
-    attack_map = {
-        1: [2, 3, 4],
-        2: [1, 3, 4],
-        3: [1, 2, 4],
-        4: [1, 2, 3]
-    }
-    sim = TeamBattleSim.build_sim(
-        8, 8,
-        agents=agents,
-        overlapping=overlap_map,
-        attack_mapping=attack_map
-    )
-
-    sim.reset()
-    fig = plt.figure()
-    sim.render(fig=fig)
-
-    done_agents = set()
-    for i in range(50):
-        action = {
-            agent.id: agent.action_space.sample()
-            for agent in agents.values() if agent.id not in done_agents
-        }
-        sim.step(action)
-        sim.render(fig=fig)
-
-        if sim.get_all_done():
-            break
-        for agent in agents:
-            if sim.get_done(agent):
-                done_agents.add(agent)

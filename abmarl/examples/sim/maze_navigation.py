@@ -1,9 +1,8 @@
 
-from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldSimulation
-from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent
 from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
@@ -67,44 +66,3 @@ class MazeNaviationSim(GridWorldSimulation):
 
     def get_info(self, agent_id, **kwargs):
         return {}
-
-
-if __name__ == "__main__":
-    object_registry = {
-        'N': lambda n: MazeNavigationAgent(
-            id='navigator',
-            encoding=1,
-            view_range=2,
-            render_color='blue',
-        ),
-        'T': lambda n: GridWorldAgent(
-            id='target',
-            encoding=3,
-            render_color='green'
-        ),
-        'W': lambda n: GridWorldAgent(
-            id=f'wall{n}',
-            encoding=2,
-            blocking=True,
-            render_shape='s'
-        )
-    }
-
-    file_name = 'maze.txt'
-    sim = MazeNaviationSim.build_sim_from_file(
-        file_name,
-        object_registry,
-        overlapping={1: [3], 3: [1]}
-    )
-    sim.reset()
-    fig = plt.figure()
-    sim.render(fig=fig)
-
-    for i in range(100):
-        action = {'navigator': sim.navigator.action_space.sample()}
-        sim.step(action)
-        sim.render(fig=fig)
-        done = sim.get_all_done()
-        if done:
-            plt.pause(1)
-            break

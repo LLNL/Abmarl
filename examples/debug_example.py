@@ -2,7 +2,7 @@
 import os
 import time
 
-from abmarl.sim.corridor import MultiCorridor
+from abmarl.examples import MultiCorridor
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.managers import TurnBasedManager
 from abmarl.policies.q_table_policy import EpsilonSoftPolicy

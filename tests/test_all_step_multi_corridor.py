@@ -1,12 +1,12 @@
 import numpy as np
 import pytest
 
-from abmarl.sim.corridor import MultiCorridor as Corridor
+from abmarl.examples import MultiCorridor
 from abmarl.managers import AllStepManager
 
 
 def test_init():
-    sim = Corridor()
+    sim = MultiCorridor()
     wrapped_sim = AllStepManager(sim)
     assert wrapped_sim.sim == sim
     assert wrapped_sim.agents == sim.agents
@@ -14,7 +14,7 @@ def test_init():
 
 def test_reset_and_step():
     np.random.seed(24)
-    sim = AllStepManager(Corridor())
+    sim = AllStepManager(MultiCorridor())
 
     obs = sim.reset()
     assert sim.sim.corridor[4].id == 'agent3'
@@ -31,11 +31,11 @@ def test_reset_and_step():
 
 
     obs, reward, done, _ = sim.step({
-        'agent0': Corridor.Actions.RIGHT,
-        'agent1': Corridor.Actions.RIGHT,
-        'agent2': Corridor.Actions.RIGHT,
-        'agent3': Corridor.Actions.RIGHT,
-        'agent4': Corridor.Actions.RIGHT,
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.RIGHT,
+        'agent2': MultiCorridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
+        'agent4': MultiCorridor.Actions.RIGHT,
     })
 
     assert obs['agent0'] == {'left': [True], 'position': [9], 'right': [False]}
@@ -58,18 +58,18 @@ def test_reset_and_step():
 
     with pytest.raises(AssertionError):
         sim.step({
-            'agent0': Corridor.Actions.RIGHT,
-            'agent1': Corridor.Actions.STAY,
-            'agent2': Corridor.Actions.LEFT,
-            'agent3': Corridor.Actions.STAY,
-            'agent4': Corridor.Actions.LEFT,
+            'agent0': MultiCorridor.Actions.RIGHT,
+            'agent1': MultiCorridor.Actions.STAY,
+            'agent2': MultiCorridor.Actions.LEFT,
+            'agent3': MultiCorridor.Actions.STAY,
+            'agent4': MultiCorridor.Actions.LEFT,
         })
 
     obs, reward, done, _ = sim.step({
-        'agent1': Corridor.Actions.STAY,
-        'agent2': Corridor.Actions.LEFT,
-        'agent3': Corridor.Actions.STAY,
-        'agent4': Corridor.Actions.LEFT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent4': MultiCorridor.Actions.LEFT,
     })
 
     assert 'agent0' not in obs
@@ -91,10 +91,10 @@ def test_reset_and_step():
 
 
     obs, reward, done, _ = sim.step({
-        'agent1': Corridor.Actions.RIGHT,
-        'agent2': Corridor.Actions.RIGHT,
-        'agent3': Corridor.Actions.RIGHT,
-        'agent4': Corridor.Actions.LEFT,
+        'agent1': MultiCorridor.Actions.RIGHT,
+        'agent2': MultiCorridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
+        'agent4': MultiCorridor.Actions.LEFT,
     })
 
     assert obs['agent1'] == {'left': [True], 'position': [9], 'right': [False]}
@@ -114,16 +114,16 @@ def test_reset_and_step():
 
     with pytest.raises(AssertionError):
         sim.step({
-            'agent1': Corridor.Actions.STAY,
-            'agent2': Corridor.Actions.STAY,
-            'agent3': Corridor.Actions.LEFT,
-            'agent4': Corridor.Actions.RIGHT,
+            'agent1': MultiCorridor.Actions.STAY,
+            'agent2': MultiCorridor.Actions.STAY,
+            'agent3': MultiCorridor.Actions.LEFT,
+            'agent4': MultiCorridor.Actions.RIGHT,
         })
 
     obs, reward, done, _ = sim.step({
-        'agent2': Corridor.Actions.STAY,
-        'agent3': Corridor.Actions.LEFT,
-        'agent4': Corridor.Actions.RIGHT,
+        'agent2': MultiCorridor.Actions.STAY,
+        'agent3': MultiCorridor.Actions.LEFT,
+        'agent4': MultiCorridor.Actions.RIGHT,
     })
 
     assert 'agent1' not in obs
@@ -142,9 +142,9 @@ def test_reset_and_step():
 
 
     obs, reward, done, _ = sim.step({
-        'agent2': Corridor.Actions.RIGHT,
-        'agent3': Corridor.Actions.RIGHT,
-        'agent4': Corridor.Actions.RIGHT,
+        'agent2': MultiCorridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
+        'agent4': MultiCorridor.Actions.RIGHT,
     })
 
     assert obs['agent2'] == {'left': [False], 'position': [9], 'right': [False]}
@@ -161,14 +161,14 @@ def test_reset_and_step():
 
     with pytest.raises(AssertionError):
         sim.step({
-            'agent2': Corridor.Actions.STAY,
-            'agent3': Corridor.Actions.RIGHT,
-            'agent4': Corridor.Actions.RIGHT,
+            'agent2': MultiCorridor.Actions.STAY,
+            'agent3': MultiCorridor.Actions.RIGHT,
+            'agent4': MultiCorridor.Actions.RIGHT,
         })
 
     obs, reward, done, _ = sim.step({
-        'agent3': Corridor.Actions.RIGHT,
-        'agent4': Corridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
+        'agent4': MultiCorridor.Actions.RIGHT,
     })
 
     assert 'agent2' not in obs
@@ -184,8 +184,8 @@ def test_reset_and_step():
 
 
     obs, reward, done, _ = sim.step({
-        'agent3': Corridor.Actions.RIGHT,
-        'agent4': Corridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
+        'agent4': MultiCorridor.Actions.RIGHT,
     })
 
     assert obs['agent3'] == {'left': [False], 'position': [6], 'right': [False]}
@@ -199,12 +199,12 @@ def test_reset_and_step():
 
     with pytest.raises(AssertionError):
         sim.step({
-            'agent3': Corridor.Actions.RIGHT,
-            'agent4': Corridor.Actions.STAY,
+            'agent3': MultiCorridor.Actions.RIGHT,
+            'agent4': MultiCorridor.Actions.STAY,
         })
 
     obs, reward, done, _ = sim.step({
-        'agent3': Corridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
     })
 
     assert 'agent4' not in obs
@@ -216,7 +216,7 @@ def test_reset_and_step():
 
 
     obs, reward, done, _ = sim.step({
-        'agent3': Corridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
     })
 
     assert obs == {'agent3': {'left': [False], 'position': [8], 'right': [False]}}
@@ -225,7 +225,7 @@ def test_reset_and_step():
 
 
     obs, reward, done, _ = sim.step({
-        'agent3': Corridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.RIGHT,
     })
 
     assert obs == {'agent3': {'left': [False], 'position': [9], 'right': [False]}}

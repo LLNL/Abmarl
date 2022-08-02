@@ -1,10 +1,9 @@
 from gym.spaces import Dict, Tuple, Box, Discrete, MultiDiscrete, MultiBinary
 import numpy as np
 
-from abmarl.sim import Agent
 from abmarl.sim.wrappers import FlattenWrapper
 from abmarl.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
-from .helpers import MultiAgentSim
+from abmarl.examples import MultiAgentContinuousGymSpaceSim
 
 # --- Test flatten helper commands --- #
 
@@ -186,53 +185,7 @@ def test_flatten_space():
     )
 
 
-# -- Test flatten wrappers --- #
-class MultiAgentContinuousGymSpaceSim(MultiAgentSim):
-    def __init__(self):
-        self.params = {'params': "there are none"}
-        self.agents = {
-            'agent0': Agent(
-                id='agent0',
-                observation_space=MultiBinary(4),
-                action_space=Tuple((
-                    Dict({'first': Discrete(4), 'second': Box(low=-1, high=3, shape=(2,))}),
-                    MultiBinary(3)
-                ))
-            ),
-            'agent1': Agent(
-                id='agent1',
-                observation_space=Box(low=0, high=1, shape=(1,)),
-                action_space=MultiDiscrete([4, 6, 2])
-            ),
-            'agent2': Agent(
-                id='agent2',
-                observation_space=MultiDiscrete([2, 2]),
-                action_space=Dict({'alpha': MultiBinary(3)})
-            ),
-            'agent3': Agent(
-                id='agent3',
-                observation_space=Dict({
-                    'first': Discrete(4),
-                    'second': Box(low=-1, high=3, shape=(2,), dtype=int)
-                }),
-                action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
-            )
-        }
-
-    def get_obs(self, agent_id, **kwargs):
-        if agent_id == 'agent0':
-            return [0, 1, 1, 0]
-        elif agent_id == 'agent1':
-            return [0.98]
-        elif agent_id == 'agent2':
-            return [1, 0]
-        elif agent_id == 'agent3':
-            return {'first': 1, 'second': [-1, 1]}
-
-    def get_info(self, agent_id, **kwargs):
-        return self.action[agent_id]
-
-
+# --- Test flatten wrappers --- #
 def test_flatten_wrapper():
     sim = MultiAgentContinuousGymSpaceSim()
     wrapped_sim = FlattenWrapper(sim)

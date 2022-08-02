@@ -200,10 +200,10 @@ class MultiPolicyTrainer(ABC):
             policy_id = self.policy_mapping_fn(agent.id)
             policy = self.policies[policy_id]
             assert agent.action_space == policy.action_space, \
-                f"agent{agent.id} has been assigned to policy {policy_id} but " + \
+                f"{agent.id} has been assigned to {policy_id} but " + \
                 "the action spaces are different."
             assert agent.observation_space == policy.observation_space, \
-                f"agent{agent.id} has been assigned to policy {policy_id} but " + \
+                f"{agent.id} has been assigned to {policy_id} but " + \
                 "the observation spaces are different."
 
 

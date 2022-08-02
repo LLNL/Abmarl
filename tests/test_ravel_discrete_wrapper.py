@@ -1,11 +1,11 @@
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.sim import Agent
+from abmarl.examples import EmptyABS, MultiAgentGymSpacesSim
 
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
 import numpy as np
 import pytest
-from .helpers import FillInHelper, MultiAgentGymSpacesSim
 
 
 def test_ravel():
@@ -49,15 +49,15 @@ def test_ravel():
     assert unravelled_point['f'] == point['f']
 
 
-# Observations that we don't support
-class FloatObservation(FillInHelper):
+# Observations that we can't ravel
+class FloatObservation(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3)
         )}
 
 
-class UnboundedBelowObservation(FillInHelper):
+class UnboundedBelowObservation(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(
@@ -69,7 +69,7 @@ class UnboundedBelowObservation(FillInHelper):
         )}
 
 
-class UnboundedAboveObservation(FillInHelper):
+class UnboundedAboveObservation(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(
@@ -81,15 +81,15 @@ class UnboundedAboveObservation(FillInHelper):
         )}
 
 
-# Actions that we don't support
-class FloatAction(FillInHelper):
+# Actions that we can't ravel
+class FloatAction(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0', observation_space=Box(-1.0, 1.0, shape=(4,)), action_space=Discrete(3)
         )}
 
 
-class UnboundedBelowAction(FillInHelper):
+class UnboundedBelowAction(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0',
@@ -102,7 +102,7 @@ class UnboundedBelowAction(FillInHelper):
         )}
 
 
-class UnboundedAboveAction(FillInHelper):
+class UnboundedAboveAction(EmptyABS):
     def __init__(self):
         self.agents = {'agent0': Agent(
             id='agent0',
@@ -135,6 +135,7 @@ def test_ravel_wrapper():
     wrapped_sim = RavelDiscreteWrapper(sim)
     assert wrapped_sim.unwrapped == sim
     for agent_id in wrapped_sim.agents:
+        if not isinstance(wrapped_sim.agents[agent_id], Agent): continue
         assert isinstance(wrapped_sim.agents[agent_id].observation_space, Discrete)
         assert isinstance(wrapped_sim.agents[agent_id].action_space, Discrete)
     sim = wrapped_sim
@@ -184,15 +185,15 @@ def test_ravel_wrapper():
     assert sim.get_obs('agent2') == 2
     assert sim.get_obs('agent3') == 47
 
-    assert sim.get_reward('agent0') == 'Reward from agent0'
-    assert sim.get_reward('agent1') == 'Reward from agent1'
-    assert sim.get_reward('agent2') == 'Reward from agent2'
-    assert sim.get_reward('agent3') == 'Reward from agent3'
+    assert sim.get_reward('agent0') == 2
+    assert sim.get_reward('agent1') == 3
+    assert sim.get_reward('agent2') == 5
+    assert sim.get_reward('agent3') == 7
 
-    assert sim.get_done('agent0') == 'Done from agent0'
-    assert sim.get_done('agent1') == 'Done from agent1'
-    assert sim.get_done('agent2') == 'Done from agent2'
-    assert sim.get_done('agent3') == 'Done from agent3'
+    assert not sim.get_done('agent0')
+    assert not sim.get_done('agent1')
+    assert not sim.get_done('agent2')
+    assert not sim.get_done('agent3')
 
     assert sim.get_info('agent0')[0]['first'] == action_0['agent0'][0]['first']
     np.testing.assert_array_equal(

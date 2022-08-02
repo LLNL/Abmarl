@@ -3,7 +3,7 @@ from open_spiel.python.algorithms import random_agent
 from open_spiel.python.rl_environment import TimeStep, StepType
 import pytest
 
-from abmarl.sim.corridor import MultiCorridor
+from abmarl.examples import MultiCorridor
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.managers import AllStepManager, TurnBasedManager
 from abmarl.external import OpenSpielWrapper

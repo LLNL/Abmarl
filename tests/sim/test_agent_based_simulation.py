@@ -1,8 +1,9 @@
 
 import pytest
 
-from abmarl.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent, \
-    DynamicOrderSimulation
+from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent, Agent, DynamicOrderSimulation
+
+from abmarl.examples import EmptyABS
 
 
 def test_principle_agent_id():
@@ -142,34 +143,6 @@ def test_agent_instance():
 
 
 def test_agent_based_simulation_agents():
-    class ABS(AgentBasedSimulation):
-        def __init__(self, agents):
-            self.agents = agents
-
-        def reset(self, **kwargs):
-            pass
-
-        def step(self, action, **kwargs):
-            pass
-
-        def render(self, **kwargs):
-            pass
-
-        def get_obs(self, agent_id, **kwargs):
-            pass
-
-        def get_reward(self, agent_id, **kwargs):
-            pass
-
-        def get_done(self, agent_id, **kwargs):
-            pass
-
-        def get_all_done(self, **kwargs):
-            pass
-
-        def get_info(self, agent_id, **kwargs):
-            pass
-
     agents_single_object = PrincipleAgent(id='just_a_simple_agent')
     agents_list = [PrincipleAgent(id=f'{i}') for i in range(3)]
     agents_dict_key_id_no_match = {f'{i-1}': PrincipleAgent(id=f'{i}') for i in range(3)}
@@ -177,18 +150,18 @@ def test_agent_based_simulation_agents():
     agents_dict = {f'{i}': PrincipleAgent(id=f'{i}') for i in range(3)}
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_single_object)
+        EmptyABS(agents=agents_single_object)
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_list)
+        EmptyABS(agents=agents_list)
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_dict_key_id_no_match)
+        EmptyABS(agents=agents_dict_key_id_no_match)
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_dict_bad_values)
+        EmptyABS(agents=agents_dict_bad_values)
 
-    sim = ABS(agents=agents_dict)
+    sim = EmptyABS(agents=agents_dict)
     assert sim.agents == agents_dict
     sim.finalize()
 
@@ -202,7 +175,7 @@ def test_agent_based_simulation_agents():
         sim.agents = agents_dict_key_id_no_match
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_dict_bad_values)
+        EmptyABS(agents=agents_dict_bad_values)
 
 
 def test_dynamic_order_simulation():

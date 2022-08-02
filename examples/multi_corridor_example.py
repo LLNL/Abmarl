@@ -1,4 +1,4 @@
-from abmarl.sim.corridor import MultiCorridor
+from abmarl.examples import MultiCorridor
 from abmarl.managers import TurnBasedManager
 from abmarl.external import MultiAgentWrapper
 

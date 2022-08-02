@@ -12,7 +12,7 @@ formats:
 python:
   version: 3.7
   install:
-    - requirements: docs/requirements.txt
+    - requirements: requirements.txt
     # Below will install abmarl to the RTD virtual environment so that the API build works.
     - method: pip
       path: .

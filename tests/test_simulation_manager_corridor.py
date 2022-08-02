@@ -1,12 +1,12 @@
 import numpy as np
 
 from abmarl.managers import TurnBasedManager, AllStepManager
-from abmarl.sim.corridor import MultiCorridor as Corridor
+from abmarl.examples import MultiCorridor
 
 
 def test_managers_are_same_for_single_agent():
-    turn_based_sim = TurnBasedManager(Corridor(num_agents=1))
-    all_step_sim = AllStepManager(Corridor(num_agents=1))
+    turn_based_sim = TurnBasedManager(MultiCorridor(num_agents=1))
+    all_step_sim = AllStepManager(MultiCorridor(num_agents=1))
 
     np.random.seed(5)
     turn_based_reset = turn_based_sim.reset()
