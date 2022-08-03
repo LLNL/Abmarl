@@ -23,6 +23,7 @@ for pre-existing projects to prototype RL as a potential solution.
    :maxdepth: 2
    :caption: Contents
 
+   release
    overview
    gridworld
    featured_usage
