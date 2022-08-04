@@ -165,7 +165,8 @@ External Integration
 ````````````````````
 
 Abmarl supports integration with several training libraries through its external
-wrappers.
+wrappers. Each wrapper automatically handles the interaction between the external
+library and the underlying simulation.
 
 
 OpenAI Gym
@@ -174,7 +175,7 @@ OpenAI Gym
 The :ref:`GymWrapper <api_gym_wrapper>` can be used for single-agent simulations
 This wrapper allows integration with OpenAI's `gym.Env` class that many RL practitioners
 are used to, and many RL libraries support it. The simulation must contain only
-a single agent in the `agents` dict. That `observation space` and `action space`
+a single agent in the `agents` dict. The `observation space` and `action space`
 is then inferred from that agent. The `reset` and `step` operate on the values
 themselves as opposed to a dictionary mapping the agents' ids to the values.
 
@@ -182,15 +183,67 @@ themselves as opposed to a dictionary mapping the agents' ids to the values.
 RLlib MultiAgentEnv
 ~~~~~~~~~~~~~~~~~~~
 
-The :ref:`MultiAgentWrapper <api_ma_wrapper>` can be used
-more broadly  for multiagent simulations with RLlib,
-and the :ref:`OpenSpielWrapper <api_openspiel_wrapper>` for simulations with OpenSpiel.
+The :ref:`MultiAgentWrapper <api_ma_wrapper>` can be used for multi-agent simulations
+and connects with RLlib's `MultiAgentEnv` class. This interface is very similar
+to Abmarl's :ref:`Simulation Manager <sim-man>`, and the featureset is the same
+between the two, so the wrapper is mostly boilerplate. It does explictly expose
+a set `agent_ids`, an `observation space` dictionary mappin the agent ids to their
+observation spaces, and an `action spaces` dictionary that does the same.
+
+
+OpenSpiel Environment
+~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` enables integration with OpenSpiel.
+OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
+through its :ref:`TurnBasedManager <api_turn_based>`` and
+:ref:`AllStepManager <api_all_step>`. OpenSpiel algorithms expect `TimeStep`` objects
+as output, which include the observations, rewards, and step type. Among the observations,
+it expects a list of legal actions available to each agent. The OpenSpielWrapper
+converts output from the underlying simulation to the expected format. A TimeStep
+output typically looks like this:
+
+.. code-block:: python
+
+   TimeStpe(
+       observations={
+           info_state: {agent_id: agent_obs for agent_id in agents},
+           legal_actions: {agent_id: agent_legal_actions for agent_id in agents},
+           current_player: current_agent_id
+       }
+       rewards={
+           {agent_id: agent_reward for agent_id in agents}
+       }
+       discounts={
+           {agent_id: agent_discout for agent_id in agents}
+       }
+       step_type=StepType enum
+   )
+
+Furthermore, OpenSpiel provides actions as a list. The
+:ref:`OpenSpielWrapper <api_openspiel_wrapper>` converts those actions to a dict
+before forwarding it to the underlying simulation manager.
+
+OpenSpiel does *not* support the ability for some agents in a simulation to finish
+before others. The simulation is either ongoing, in which all agents are providing
+actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
+done before others as the simulation progresses. Abmarl expects that done
+agents will not provide actions. OpenSpiel, however, will always provide actions
+for all agents. The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` removes the
+actions from agents that are already done before forwarding the action to the underlyin
+simulation manager. Furthermore, OpenSpiel expects every agent to be present in
+the TimeStep outputs. Normally, Abmarl will not provide output for agents that
+are done since they have finished generating data in the episode. In order to work
+with OpenSpiel, the OpenSpielWrapper forces output from all agents at every step,
+including those already done.
+
+.. WARNING::
+   The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` only works with simulations
+   in which the action and observation space of every agent is Discrete. Most simulations
+   will need to be wrapped with the :ref:`RavelDiscreteWrapper <>`.
+
 # TODO: Create api_openspiel_wrapper reference.
-
-The :ref:`GymWrapper <api_gym_wrapper>` integrates with the `gym.Env` class that
-many RL practitioners are used to. It requires a single agent in the `agents` dict.
-The wrapper takes that agent
-
+# TODO: Add RavelDiscreteWrapper docs, api, and reference
 
 
 Training with an Experiment Configuration
