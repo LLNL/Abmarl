@@ -213,6 +213,8 @@ For example, see how the following nested space is ravelled to a Discrete space:
        'e': ([1,0,4], [1, 1], {'my_dict': 5}),
        'f': 1
    }
+   ravel_space(my_space)
+   >>> Discrete(107775360000)
    ravel(my_space, point)
    >>> 74748022765
 
@@ -226,6 +228,45 @@ The :ref:`FlattenWrapper <api_ravel_wrapper>` flattens observation and action sp
 into continuous Box spaces and automatically maps data to and from it. The wrapper
 is largely based on OpenAI's own flatten wrapper, with some modifications.
 
+For example, see how the following nested space is flattened:
+
+.. code-block:: python
+
+   my_space = Dict({
+       'a': MultiDiscrete([5, 3]),
+       'b': MultiBinary(4),
+       'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
+       'd': Dict({
+           1: Discrete(3),
+           2: Box(1, 3, (2,), int)
+       }),
+       'e': Tuple((
+           MultiDiscrete([4, 1, 5]),
+           MultiBinary(2),
+           Dict({
+               'my_dict': Discrete(11)
+           })
+       )),
+       'f': Discrete(6),
+   })
+   point = {
+       'a': [3, 1],
+       'b': [0, 1, 1, 0],
+       'c': np.array([[0, 7, 5],[1, 3, 1]]),
+       'd': {1: 2, 2: np.array([1, 3])},
+       'e': ([1,0,4], [1, 1], {'my_dict': 5}),
+       'f': 1
+   }
+   flatten_space(my_space)
+   >>> Box(low=[0, 0, 0, 0, 0, 0, -2,  6, 3, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+           high=[5, 3, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 1, 1, 1, 3, 3, 4, 1, 5, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+           (39,),
+           int64)
+   flatten(my_space, point)
+   >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 0, 0, 1, 1, 3, 1, 0, 4, 1, 1,
+              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
 
 .. _super_agent_wrapper:
 
