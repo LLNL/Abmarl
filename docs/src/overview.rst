@@ -164,10 +164,32 @@ Simluation Managers "wrap" simulations, and they can be used like so:
 External Integration
 ````````````````````
 
-In order to train agents in a Simulation Manager using RLlib, we must wrap the simulation
-with either a :ref:`GymWrapper <api_gym_wrapper>` for single-agent simulations
-(i.e. only a single entry in the `agents` dict) or a
-:ref:`MultiAgentWrapper <api_ma_wrapper>` for multiagent simulations.
+Abmarl supports integration with several training libraries through its external
+wrappers.
+
+
+OpenAI Gym
+~~~~~~~~~~
+
+The :ref:`GymWrapper <api_gym_wrapper>` can be used for single-agent simulations
+This wrapper allows integration with OpenAI's `gym.Env` class that many RL practitioners
+are used to, and many RL libraries support it. The simulation must contain only
+a single agent in the `agents` dict. That `observation space` and `action space`
+is then inferred from that agent. The `reset` and `step` operate on the values
+themselves as opposed to a dictionary mapping the agents' ids to the values.
+
+
+RLlib MultiAgentEnv
+~~~~~~~~~~~~~~~~~~~
+
+The :ref:`MultiAgentWrapper <api_ma_wrapper>` can be used
+more broadly  for multiagent simulations with RLlib,
+and the :ref:`OpenSpielWrapper <api_openspiel_wrapper>` for simulations with OpenSpiel.
+# TODO: Create api_openspiel_wrapper reference.
+
+The :ref:`GymWrapper <api_gym_wrapper>` integrates with the `gym.Env` class that
+many RL practitioners are used to. It requires a single agent in the `agents` dict.
+The wrapper takes that agent
 
 
 
