@@ -3,10 +3,10 @@
 Abmarl is a package for developing Agent-Based Simulations and training them with
 MultiAgent Reinforcement Learning (MARL). We provide an intuitive command line
 interface for engaging with the full workflow of MARL experimentation: training,
-visualizing, and analyzing agent behavior. We define an Agent-Based
-Simulation Interface and Simulation Manager, which control which agents interact
-with the simulation at each step. We support integration with popular reinforcement
-learning simulation interfaces, including gym.Env and MultiAgentEnv. We define
+visualizing, and analyzing agent behavior. We define an Agent-Based Simulation
+Interface and Simulation Manager, which control which agents interact with the
+simulation at each step. We support integration with popular reinforcement learning
+simulation interfaces, including gym.Env, MultiAgentEnv, and OpenSpiel. We define
 our own GridWorld Simulation Framework for creating custom grid-based Agent Based
 Simulations.
 

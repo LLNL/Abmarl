@@ -37,7 +37,7 @@ demonstrates this workflow.
 Creating Agents and Simulations
 -------------------------------
 
-Abmarl provides three interfaces for setting up an agent-based simulations.
+Abmarl provides three interfaces for setting up agent-based simulations.
 
 .. _overview_agent:
 
@@ -45,7 +45,7 @@ Agent
 `````
 
 First, we have :ref:`Agents <api_agent>`. An agent is an object with an observation and
-action space. Many practitioners may be accustomed to gym.Env's interface, which
+action space. Many practitioners may be accustomed to `gym.Env's` interface, which
 defines the observation and action space for the *simulation*. However, in heterogeneous
 multiagent settings, each *agent* can have different spaces; thus we assign these
 spaces to the agents and not the simulation.
@@ -59,11 +59,22 @@ An agent can be created like so:
    agent = Agent(
        id='agent0',
        observation_space=Box(-1, 1, (2,)),
-       action_space=Discrete(3)
+       action_space=Discrete(3),
+       null_observation=[0, 0],
+       null_action=0
    )
 
 At this level, the Agent is basically a dataclass. We have left it open for our
 users to extend its features as they see fit.
+
+In Abmarl, agents who are `done` will be removed from the RL loop--they
+will no longer provide actions and no longer report observations and rewards. In
+some uses cases, such as when using the :ref:`SuperAgentWrapper <super_agent_wrapper>`
+or running with :ref:`OpenSpiel <open_spiel_external>`, agents continue in the loop
+even after they're done. To keep the training data from becoming contaminated,
+Abmarl provides the ability to specify a `null observation` and `null action` for
+each agent. These null points will be used in the rare case when a done agent is
+queried.
 
 .. _abs:
 
@@ -101,7 +112,7 @@ An Agent Based Simulation can be created and used like so:
 
 .. WARNING::
    Implementations of AgentBasedSimulation should call ``finalize`` at the
-   end of its ``__init__``. Finalize ensures that all agents are configured and
+   end of their ``__init__``. Finalize ensures that all agents are configured and
    ready to be used for training.
 
 .. NOTE::
@@ -156,7 +167,182 @@ Simluation Managers "wrap" simulations, and they can be used like so:
    to dynamically choose the agents' turns, but it also requires the simulation
    to pay attention to the interface rules. For example, a Dynamic Order Simulation
    must ensure that at every step there is at least one reported agent who is not done,
-   unless it is the last turn.
+   unless it is the last turn, which the other managers handle automatically.
+
+
+.. _wrappers:
+
+Wrappers
+````````
+
+:ref:`Agent Based Simulations <abs>` can be *wrapped* to modify incoming and outgoing
+data. Abmarl's :ref:`Wrappers <api_wrappers>` are themselves `AgentBasedSimulations`
+and provide an additional `unwrapped` property that cascades through potentially
+many layers of wrapping to get the original, unwrapped simulation. Abmarl supports
+several built-in wrappers.
+
+
+.. _ravel_wrapper:
+
+Ravel Discrete Wrapper
+~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts complex observation
+and action spaces into Discrete spaces and automatically maps data to and from
+those spaces. It can convert Discrete, MultiBinary, MultiDiscrete, bounded integer
+Box, and any nesting of these observations and actions into Discrete observations
+and actions by *ravelling* their values according to numpy's `ravel_mult_index`
+function. Thus, observations and actions that are represented by (nested) arrays
+are converted into unique scalars. For example, see how the following nested space
+is ravelled to a Discrete space:
+
+.. code-block:: python
+
+   my_space = Dict({
+       'a': MultiDiscrete([5, 3]),
+       'b': MultiBinary(4),
+       'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
+       'd': Dict({
+           1: Discrete(3),
+           2: Box(1, 3, (2,), int)
+       }),
+       'e': Tuple((
+           MultiDiscrete([4, 1, 5]),
+           MultiBinary(2),
+           Dict({
+               'my_dict': Discrete(11)
+           })
+       )),
+       'f': Discrete(6),
+   })
+   point = {
+       'a': [3, 1],
+       'b': [0, 1, 1, 0],
+       'c': np.array([[0, 7, 5],[1, 3, 1]]),
+       'd': {1: 2, 2: np.array([1, 3])},
+       'e': ([1,0,4], [1, 1], {'my_dict': 5}),
+       'f': 1
+   }
+   ravel_space(my_space)
+   >>> Discrete(107775360000)
+   ravel(my_space, point)
+   >>> 74748022765
+
+.. WARNING::
+   Some complex spaces have very high dimensionality. The
+   :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` was designed to work with tabular
+   RL algorithms, and may not be the best choice for simulations with such complex
+   spaces. Some RL libraries convert the Discrete space into a one-hot encoding
+   layer, which is not possible for a very high-dimensional space. In these situations,
+   it is better to either rely on the RL library's own processing or use Abmarl's
+   :ref:`FlattenWrapper <flatten_wrapper>`.
+
+
+.. _flatten_wrapper:
+
+Flatten Wrapper
+~~~~~~~~~~~~~~~
+
+The :ref:`FlattenWrapper <api_flatten_wrapper>` flattens observation and action spaces
+into continuous Box spaces and automatically maps data to and from it. The wrapper
+is largely based on OpenAI's own flatten wrapper, with some modifications for maintaining
+if the resuting `Box` space can have integer `dtype` or if it must use `float`. See
+how the following nested space is flattened:
+
+.. code-block:: python
+
+   my_space = Dict({
+       'a': MultiDiscrete([5, 3]),
+       'b': MultiBinary(4),
+       'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
+       'd': Dict({
+           1: Discrete(3),
+           2: Box(1, 3, (2,), int)
+       }),
+       'e': Tuple((
+           MultiDiscrete([4, 1, 5]),
+           MultiBinary(2),
+           Dict({
+               'my_dict': Discrete(11)
+           })
+       )),
+       'f': Discrete(6),
+   })
+   point = {
+       'a': [3, 1],
+       'b': [0, 1, 1, 0],
+       'c': np.array([[0, 7, 5],[1, 3, 1]]),
+       'd': {1: 2, 2: np.array([1, 3])},
+       'e': ([1,0,4], [1, 1], {'my_dict': 5}),
+       'f': 1
+   }
+   flatten_space(my_space)
+   >>> Box(low=[0, 0, 0, 0, 0, 0, -2,  6, 3, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+           high=[5, 3, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 1, 1, 1, 3, 3, 4, 1, 5, 1, 1,
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+           (39,),
+           int64) # We maintain the integer type instead of needlessly casting to float.
+   flatten(my_space, point)
+   >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 0, 0, 1, 1, 3, 1, 0, 4, 1, 1,
+              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+
+.. _super_agent_wrapper:
+
+Super Agent Wrapper
+~~~~~~~~~~~~~~~~~~~
+
+The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` creates *super* agents who
+*cover* and control multiple agents in the simulation. The super agents concatenate
+the observation and action spaces of all their covered agents. In addition, the
+observation space is given a *mask* channel to indicate which of their covered agents is done. This
+channel is important because the simulation dynamics change when a covered agent
+is done but the super agent may still be active. Without this mask, the super
+agent would experience completely different simulation dynamics for some of
+its covered agents with no indication as to why.
+
+Unless handled carefully, the super agent will report observations for done
+covered agents. This may contaminate the training data with an unfair advantage.
+For example, a dead covered agent should not be able to provide the super agent with
+useful information. In order to correct this, the user may supply a
+:ref:`null observation <overview_agent>` for an `ObservingAgent`. When a covered agent is done,
+the :ref:`SuperAgentWrapper <api_super_agent_wrapper>` will try to use its null
+observation going forward.
+
+A super agent's reward is the sum of its covered agents' rewards. This is also
+a point of concern because the simulation may continue generating rewards or penalties
+for done agents. Therefore when a covered agent is done, the
+:ref:`SuperAgentWrapper <api_super_agent_wrapper>` will report a reward of zero
+so as to not affect the reward for the super agent.
+
+Furthermore, super agents may still report actions for covered agents that
+are done. The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` filters out those
+actions before passing the action dict to the underlying sim.
+
+Finally a super agent is considered done when *all* of its covered agents are done.
+
+To use the :ref:`SuperAgentWrapper <api_super_agent_wrapper>`, simply provide a
+`super_agent_mapping`, which maps the super agent's id to a list of covered agents,
+like so:
+
+.. code-block:: python
+
+   AllStepManager(
+       SuperAgentWrapper(
+           TeamBattleSim.build_sim(
+               8, 8,
+               agents=agents,
+               overlapping=overlap_map,
+               attack_mapping=attack_map
+           ),
+           super_agent_mapping = {
+               'red': [agent.id for agent in agents.values() if agent.encoding == 1],
+               'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
+               'green': [agent.id for agent in agents.values() if agent.encoding == 3],
+               'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
+           }
+       )
+   )
 
 
 .. _external:
@@ -164,11 +350,89 @@ Simluation Managers "wrap" simulations, and they can be used like so:
 External Integration
 ````````````````````
 
-In order to train agents in a Simulation Manager using RLlib, we must wrap the simulation
-with either a :ref:`GymWrapper <api_gym_wrapper>` for single-agent simulations
-(i.e. only a single entry in the `agents` dict) or a
-:ref:`MultiAgentWrapper <api_ma_wrapper>` for multiagent simulations.
+Abmarl supports integration with several training libraries through its external
+wrappers. Each wrapper automatically handles the interaction between the external
+library and the underlying simulation.
 
+
+.. _gym_external:
+
+OpenAI Gym
+~~~~~~~~~~
+
+The :ref:`GymWrapper <api_gym_wrapper>` can be used for single-agent simulations
+This wrapper allows integration with OpenAI's `gym.Env` class with which many RL
+practitioners are familiar, and many RL libraries support it. The simulation must contain only
+a single agent in the `agents` dict. The `observation space` and `action space`
+is then inferred from that agent. The `reset` and `step` functions operate on the values
+themselves as opposed to a dictionary mapping the agents' ids to the values.
+
+
+.. _rllib_external:
+
+RLlib MultiAgentEnv
+~~~~~~~~~~~~~~~~~~~
+
+The :ref:`MultiAgentWrapper <api_ma_wrapper>` can be used for multi-agent simulations
+and connects with RLlib's `MultiAgentEnv` class. This interface is very similar
+to Abmarl's :ref:`Simulation Manager <sim-man>`, and the featureset and data format is the same
+between the two, so the wrapper is mostly boilerplate. It does explictly expose
+a set `agent_ids`, an `observation space` dictionary mapping the agent ids to their
+observation spaces, and an `action space` dictionary that does the same.
+
+
+.. _open_spiel_external:
+
+OpenSpiel Environment
+~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` enables integration with OpenSpiel.
+OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
+through its :ref:`TurnBasedManager <api_turn_based>` and
+:ref:`AllStepManager <api_all_step>`. OpenSpiel algorithms interact with the simulation
+through `TimeStep` objects, which include the observations, rewards, and step type.
+Among the observations, it expects a list of legal actions available to each agent.
+The OpenSpielWrapper converts output from the underlying simulation to the expected
+format. A TimeStep output typically looks like this:
+
+.. code-block:: python
+
+   TimeStpe(
+       observations={
+           info_state: {agent_id: agent_obs for agent_id in agents},
+           legal_actions: {agent_id: agent_legal_actions for agent_id in agents},
+           current_player: current_agent_id
+       }
+       rewards={
+           {agent_id: agent_reward for agent_id in agents}
+       }
+       discounts={
+           {agent_id: agent_discout for agent_id in agents}
+       }
+       step_type=StepType enum
+   )
+
+Furthermore, OpenSpiel provides actions as a list. The
+:ref:`OpenSpielWrapper <api_openspiel_wrapper>` converts those actions to a dict
+before forwarding it to the underlying simulation manager.
+
+OpenSpiel does *not* support the ability for some agents in a simulation to finish
+before others. The simulation is either ongoing, in which all agents are providing
+actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
+done before others as the simulation progresses. Abmarl expects that done
+agents will not provide actions. OpenSpiel, however, will always provide actions
+for all agents. The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` removes the
+actions from agents that are already done before forwarding the action to the underlying
+simulation manager. Furthermore, OpenSpiel expects every agent to be present in
+the TimeStep outputs. Normally, Abmarl will not provide output for agents that
+are done since they have finished generating data in the episode. In order to work
+with OpenSpiel, the OpenSpielWrapper forces output from all agents at every step,
+including those already done.
+
+.. WARNING::
+   The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` only works with simulations
+   in which the action and observation space of every agent is Discrete. Most simulations
+   will need to be wrapped with the :ref:`RavelDiscreteWrapper <ravel_wrapper>`.
 
 
 Training with an Experiment Configuration
@@ -252,7 +516,7 @@ Experiment Parameters
 The strucutre of the parameters dictionary is very important. It *must* have an
 `experiment` key which contains both the `title` of the experiment and the `sim_creator`
 function. This function should receive a config and, if appropriate, pass it to
-the simulation constructor. In the example configuration above, we just retrun the
+the simulation constructor. In the example configuration above, we just return the
 already-configured simulation. Without the title and simulation creator, Abmarl
 may not behave as expected.
 
@@ -295,6 +559,10 @@ For example, the command
 will run the `MultiCorridor` simulation with random actions and output log files
 to the directory it creates for 2 episodes and a horizon of 20, as well as render
 each step in each episode.
+
+Check out the
+`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>_`
+to see how to debug within a python script.
 
 
 Visualizing
@@ -364,3 +632,39 @@ Analysis can then be performed using the command line interface:
 .. code-block::
 
    abmarl analyze ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
+
+
+.. _trainer:
+
+Trainer Prototype
+-----------------
+
+Abmarl provide an initial prototype of its own :ref:`Trainer <api_multi_policy_trainer>`
+framework to support in-house algorithm development. Trainers manage the interaction
+between policies and agents in a simulation. Abmarl currently supports a
+:ref:`MultiPolicyTrainer <api_multi_policy_trainer>`, which allows each agent to
+have its own policy, and a :ref:`SinglePolicyTrainer <api_single_policy_trainer>`,
+which allows for a single policy shared among multiple agents. The trainer abstracts
+the data generation process behind its `generate_episode` function. The simulation
+reports an initial observation, which the trainer feeds through its policies according
+to the `policy_mapping_fn`. These policies return actions, which the trainer uses
+to step the simulation forward. Derived trainers overwrite the `train` function
+to implement the RL algorithm. For example, a custom trainer would look something
+like this:
+
+.. code-block:: python
+
+   class MyCustomTrainer(SinglePolicyTrainer):
+       def train(self, iterations=10, gamma=0.9, **kwargs):
+           for _ in range(iterations):
+               states, actions, rewards, _ = self.generate_episode(**kwargs)
+               self.policy.update(states, actions, rewards)
+               # Perform some kind of policy update ^
+
+Abmarl currently supports a :ref:`Monte Carlo Trainer <api_monte_carlo_trainer>`
+and a :ref:`Debug Trainer <api_debug_trainer>`, which is used by ``abmarl debug``
+command line interface.
+
+.. NOTE::
+    Abmarl's trainer framework is in its early design stages. Stay tuned for more
+    developments.

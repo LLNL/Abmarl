@@ -71,6 +71,30 @@ Abmarl Simulation Managers
 	:undoc-members:
 
 
+.. _api_wrappers:
+
+Abmarl Wrappers
+---------------
+
+.. _api_ravel_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.RavelDiscreteWrapper
+	:members:
+	:undoc-members:
+
+.. _api_flatten_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.FlattenWrapper
+	:members:
+	:undoc-members:
+
+.. _api_super_agent_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.SuperAgentWrapper
+	:members:
+	:undoc-members:
+
+
 .. _api_gym_wrapper:
 
 Abmarl External Integration
@@ -82,6 +106,11 @@ Abmarl External Integration
 .. _api_ma_wrapper:
 
 .. autoclass:: abmarl.external.MultiAgentWrapper
+	:members:
+
+.. _api_openspiel_wrapper:
+
+.. autoclass:: abmarl.external.OpenSpielWrapper
 	:members:
 
 
@@ -249,3 +278,32 @@ Wrappers
 .. autoclass:: abmarl.sim.gridworld.wrapper.RavelActionWrapper
 	:members:
 	:undoc-members:
+
+
+.. _api_multi_policy_trainer:
+
+Abmarl Trainers
+---------------
+
+.. autoclass:: abmarl.trainers.MultiPolicyTrainer
+	:members:
+	:undoc-members:
+
+.. _api_single_policy_trainer:
+
+.. autoclass:: abmarl.trainers.SinglePolicyTrainer
+	:members:
+	:undoc-members:
+
+.. _api_monte_carlo_trainer:
+
+.. autoclass:: abmarl.trainers.monte_carlo.OnPolicyMonteCarloTrainer
+	:members:
+	:undoc-members:
+
+.. _api_debug_trainer:
+
+.. autoclass:: abmarl.trainers.DebugTrainer
+	:members:
+	:undoc-members:
+

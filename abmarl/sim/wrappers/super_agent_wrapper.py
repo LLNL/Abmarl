@@ -24,14 +24,8 @@ class SuperAgentWrapper(Wrapper):
     covered agents. This may contaminate the training data with an unfair advantage.
     For exmample, a dead covered agent should not be able to provide the super agent with
     useful information. In order to correct this, the user may supply the null
-    observation for an ObservingAgent, like so:
-        agent = ObservingAgent(
-            id="agent",
-            observation_space=Discrete(3),
-            null_observation=0
-        )
-    When a covered agent is done, the SuperAgentWrapper will try to use its null
-    observation going forward.
+    observation for an ObservingAgent. When a covered agent is done, the SuperAgentWrapper
+    will try to use its null observation going forward.
 
     Furthermore, super agents may still report actions for covered agents that
     are done. This wrapper filters out those actions before passing them to the
@@ -48,7 +42,7 @@ class SuperAgentWrapper(Wrapper):
         A dictionary that maps from a super agent's id to a list of covered agent ids.
 
         Suppose our simulation has 5 agents and we use the following super agent mapping:
-            {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
+        {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
         The resulting agents dict would have keys 'super0', 'super1', and 'agent2';
         where 'agent0', 'agent1', 'agent3', and 'agent4' have been covered by the
         super agents and 'agent2' is left uncovered and therefore included in the
