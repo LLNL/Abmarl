@@ -87,10 +87,6 @@ for their observations and even report actions. In order to keep the training da
 "clean", users can now specify null observations and actions for agents, which
 will be used in these rare cases.
 
-# TODO:
-GSF agents automatically implment null obs.
-TODO: Update GSF docs to indicate what are the null points.
-
 
 Trainer Prototype
 -----------------

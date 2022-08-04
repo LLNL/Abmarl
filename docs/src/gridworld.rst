@@ -281,10 +281,12 @@ anywhere in the grid (except for (2,4) because they cannot overlap).
 Movement
 ````````
 
-:ref:`MovingAgents <api_gridworld_agent_moving>` can move around the :ref:`Grid <gridworld_grid>` in conjunction with the :ref:`MoveActor <api_gridworld_actor_move>`. MovingAgents
-require a `move range` parameter, indicating how many spaces away they can move
-in a single step. Agents cannot move out of bounds and can only move to the same
-cell as another agent if they are allowed to overlap. For example, in this setup
+:ref:`MovingAgents <api_gridworld_agent_moving>` can move around the
+:ref:`Grid <gridworld_grid>` in conjunction with the
+:ref:`MoveActor <api_gridworld_actor_move>`. MovingAgents require a `move range`
+parameter, indicating how many spaces away they can move in a single step. Agents
+cannot move out of bounds and can only move to the same cell as another agent if
+they are allowed to overlap. For example, in this setup
 
 .. code-block:: python
 
@@ -320,6 +322,9 @@ at position (2, 3).
    :alt: Agents moving in the grid
 
    agent0 and agent1 move to the same cell.
+
+The :ref:`MoveActor <api_gridworld_actor_move>` automatically assigns a `null action`
+of `[0, 0]`, indicating no move.
 
 
 .. _gridworld_single_observer:
@@ -382,6 +387,10 @@ for the observation.
 By setting `observe_self` to False, the :ref:`SingleGridObserver <api_gridworld_observer_single>`
 can be configured so that an agent doesn't observe itself and only observes
 other agents, which may be helpful if overlapping is an important part of the simulation.
+
+The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assigns
+a `null observation` as a view matrix of all -2s, indicating that everything is
+masked.
 
 .. _gridworld_blocking:
 
@@ -452,9 +461,12 @@ show an observation like so:
    [-1,  0,  0,  0,  0,  0, -2]
    ...
 
-:ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to :ref:`SingleGridObserver <api_gridworld_observer_single>` in simulations where
+:ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to
+:ref:`SingleGridObserver <api_gridworld_observer_single>` in simulations where
 there are many overlapping agents.
 
+The :ref:`MultiGridObserver <api_gridworld_observer_multi>` automatically assigns
+a `null observation` of a tensor of all -2s, indicating that everything is masked.
 
 Health
 ``````
@@ -542,6 +554,9 @@ although `agent2` is within range, it is not a type that `agent0` can attack.
    Attacks can be blocked by :ref:`blocking <gridworld_blocking>` agents. If an attackable agent is
    masked from an attacking agent, then it cannot be attacked by that agent. The
    masking is determined the same way as view blocking described above.
+
+The :ref:`AttackActor <api_gridworld_actor_attack>` automatically assigns a
+`null action` of 0, indicating no attack.
 
 
 RavelActionWrapper
