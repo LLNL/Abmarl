@@ -218,6 +218,15 @@ For example, see how the following nested space is ravelled to a Discrete space:
    ravel(my_space, point)
    >>> 74748022765
 
+.. WARNING::
+   Some complex spaces have very high dimensionality. The
+   :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` was designed to work with tabular
+   RL algorithms, and may not be the best choice for simulations with such complex
+   spaces. Some RL libraries convert the Discrete space into a one-hot encoding
+   layer, which is not possible for a very high-dimensional space. In these situations,
+   it is better to either rely on the RL library's own processing or use Abmarl's
+   :ref:`FlattenWrapper <flatten_wrapper>`.
+
 
 .. _flatten_wrapper:
 
