@@ -84,6 +84,11 @@ Abmarl External Integration
 .. autoclass:: abmarl.external.MultiAgentWrapper
 	:members:
 
+.. _api_openspiel_wrapper:
+
+.. autoclass:: abmarl.external.OpenSpielWrapper
+	:members:
+
 
 
 Abmarl GridWorld Simulation Framework

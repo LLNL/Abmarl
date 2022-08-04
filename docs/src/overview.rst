@@ -242,7 +242,6 @@ including those already done.
    in which the action and observation space of every agent is Discrete. Most simulations
    will need to be wrapped with the :ref:`RavelDiscreteWrapper <>`.
 
-# TODO: Create api_openspiel_wrapper reference.
 # TODO: Add RavelDiscreteWrapper docs, api, and reference
 
 
