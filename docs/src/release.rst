@@ -51,8 +51,8 @@ With the new SuperAgentWrapper, users can define groupings of agents so that a s
 policy is responsible for digesting all the observations and generating all the
 actions for its agents in a single pass.
 
-The SuperAgentWrapper can be used with an Abmarl Simulation and a mapping of "super"
-agents to "covered" agents, like so:
+The SuperAgentWrapper can be used with an Abmarl Simulation and a mapping of *super*
+agents to *covered* agents, like so:
 
 .. code-block:: python
 
@@ -73,92 +73,7 @@ agents to "covered" agents, like so:
        )
    )
 
-# TODO: text for docs
-Talk about how this is distinct from single-policy-multi-agent setup.
-Wrapper logic for the covered agents.
-
-The SuperAgentWrapper creates "super" agents who cover and control multiple agents.
-The super agents take the observation and action spaces of all their covered
-agents. In addition, the observation space is given a "mask" channel to indicate
-which of their covered agents is done. This channel is important because
-the simulation dynamics change when a covered agent is done but the super agent
-may still be active (see comments on get_done). Without this mask, the super
-agent would experience completely different simulation dynamcis for some of
-its covered agents with no indication as to why.
-Unless handled carefully, the super agent will generate observations for done
-covered agents. This may contaminate the training data with an unfair advantage.
-For exmample, a dead covered agent should not be able to provide the super agent with
-useful information. In order to correct this, the user may supply the null
-observation for each of the agents, so that done agents report the null observation.
-Furthermore, super agents may still report actions for covered agents that
-are done. This wrapper filters out those actions before passing them to the
-underlying sim. See step for more details.
-
-Super agent actions are decomposed into the covered agent actions and
-then passed to the underlying sim. Because of the nature of this wrapper,
-the super agents may provide actions for covered agents that are already
-done. We filter out these actions.
-
-Report observations from the simulation.
-Super agent observations are collected from their covered agents. Super
-agents also have a "mask" channel that tells them which of their covered
-agent is done. This should assist the super agent in understanding the
-changing simulation dynamics for done agents (i.e. why actions from done
-agents don't do anything).
-The super agent will report an observation for done covered agents. This may
-result in an unfair advantage during training (e.g. dead agent should not
-produce useful information), and Abmarl will issue a warning. To properly
-handle this, the user can supply the null observation for each covered agent. In
-that case, the super agent will use the null observation for any done covered agents.
-Args:
-agent_id: The id of the agent for whom to produce an observation. Should
-not be a covered agent.
-
-```
-agents = {
-    f'agent{i}': BattleAgent(
-        id=f'agent{i}',
-        encoding=i % 4 + 1,
-        render_color=colors[i % 4],
-        initial_position=positions[i % 4]
-    ) for i in range(24)
-}
-overlap_map = {
-    1: [1],
-    2: [2],
-    3: [3],
-    4: [4]
-}
-attack_map = {
-    1: [2, 3, 4],
-    2: [1, 3, 4],
-    3: [1, 2, 4],
-    4: [1, 2, 3]
-}
-super_agent_mapping = {
-    'red': [agent.id for agent in agents.values() if agent.encoding == 1],
-    'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
-    'green': [agent.id for agent in agents.values() if agent.encoding == 3],
-    'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
-}
-null_obs = {'grid': -2 * np.ones((7, 7), dtype=int)}
-
-
-sim_ = AllStepManager(
-    SuperAgentWrapper(
-        TeamBattleSim.build_sim(
-            8, 8,
-            agents=agents,
-            overlapping=overlap_map,
-            attack_mapping=attack_map
-        ),
-        super_agent_mapping=super_agent_mapping,
-        null_obs={agent_id: null_obs for agent_id in agents}
-    )
-)
-```
-
-To full support integration with the RL loop, users can now specify null observations
+To fully support integration with the RL loop, users can now specify null observations
 and actions for agents.
 
 

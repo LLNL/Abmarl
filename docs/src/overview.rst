@@ -184,6 +184,7 @@ and actions by "ravelling" their values according to numpy's `ravel_mult_index`
 function. Thus, observations and actions that are represented by arrays are converted
 into unique numbers.
 
+
 .. _flatten_wrapper:
 
 Flatten Wrapper
@@ -192,6 +193,64 @@ Flatten Wrapper
 The :ref:`FlattenWrapper <api_ravel_wrapper>` flattens observation and action spaces
 into continuous Box spaces and automatically maps data to and from it. The wrapper
 is largely based on OpenAI's own flatten wrapper, with some modifications.
+
+
+.. _super_agent_wrapper:
+
+Super Agent Wrapper
+~~~~~~~~~~~~~~~~~~~
+
+The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` creates *super* agents who
+*cover* and control multiple agents. The super agents concatenate the observation and
+action spaces of all their covered agents. In addition, the observation space is
+given a *mask* channel to indicate which of their covered agents is done. This
+channel is important because the simulation dynamics change when a covered agent
+is done but the super agent may still be active. Without this mask, the super
+agent would experience completely different simulation dynamcis for some of
+its covered agents with no indication as to why.
+
+Unless handled carefully, the super agent will report observations for done
+covered agents. This may contaminate the training data with an unfair advantage.
+For exmample, a dead covered agent should not be able to provide the super agent with
+useful information. In order to correct this, the user may supply the
+:ref:`null observation <>` for an `ObservingAgent`. When a covered agent is done,
+the :ref:`SuperAgentWrapper <api_super_agent_wrapper>` will try to use its null
+observation going forward.
+
+A super agent's reward is the sum of its covered agents' rewards. This is also
+a point of concern because the simulation may continue generating rewards or penalties
+for done agents. Therefore when a covered agent is done, the
+:ref:`SuperAgentWrapper <api_super_agent_wrapper>` will report a reward of zero
+so as to not affect the reward for the super agent.
+
+Furthermore, super agents may still report actions for covered agents that
+are done. The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` filters out those
+actions before passing them to the underlying sim.
+
+Finally a super agent is considered done when *all* of its covered agents are done.
+
+To use the :ref:`SuperAgentWrapper <api_super_agent_wrapper>`, simply provide a
+`super_agent_mapping`, which maps the super agent's id to a list of covered agents,
+like so:
+
+.. code-block:: python
+
+   AllStepManager(
+       SuperAgentWrapper(
+           TeamBattleSim.build_sim(
+               8, 8,
+               agents=agents,
+               overlapping=overlap_map,
+               attack_mapping=attack_map
+           ),
+           super_agent_mapping = {
+               'red': [agent.id for agent in agents.values() if agent.encoding == 1],
+               'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
+               'green': [agent.id for agent in agents.values() if agent.encoding == 3],
+               'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
+           }
+       )
+   )
 
 
 .. _external:

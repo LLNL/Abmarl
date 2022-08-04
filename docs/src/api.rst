@@ -88,6 +88,12 @@ Abmarl Wrappers
 	:members:
 	:undoc-members:
 
+.. _api_super_agent_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.SuperAgentWrapper
+	:members:
+	:undoc-members:
+
 
 .. _api_gym_wrapper:
 
