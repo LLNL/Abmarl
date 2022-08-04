@@ -176,15 +176,14 @@ several built-in wrappers.
 Ravel Discrete Wrapper
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts comlex observation
-and action spaces into Discrete space and automatically maps data to and from
+The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts complex observation
+and action spaces into Discrete spaces and automatically maps data to and from
 those spaces. It can convert Discrete, MultiBinary, MultiDiscrete, bounded integer
 Box, and any nesting of these observations and actions into Discrete observations
-and actions by "ravelling" their values according to numpy's `ravel_mult_index`
-function. Thus, observations and actions that are represented by arrays are converted
-into unique numbers.
-
-For example, see how the following nested space is ravelled to a Discrete space:
+and actions by *ravelling* their values according to numpy's `ravel_mult_index`
+function. Thus, observations and actions that are represented by (nested) arrays
+are converted into unique scalars. For example, see how the following nested space
+is ravelled to a Discrete space:
 
 .. code-block:: python
 
@@ -235,9 +234,8 @@ Flatten Wrapper
 
 The :ref:`FlattenWrapper <api_ravel_wrapper>` flattens observation and action spaces
 into continuous Box spaces and automatically maps data to and from it. The wrapper
-is largely based on OpenAI's own flatten wrapper, with some modifications.
-
-For example, see how the following nested space is flattened:
+is largely based on OpenAI's own flatten wrapper, with some modifications. See
+how the following nested space is flattened:
 
 .. code-block:: python
 
@@ -283,18 +281,18 @@ Super Agent Wrapper
 ~~~~~~~~~~~~~~~~~~~
 
 The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` creates *super* agents who
-*cover* and control multiple agents. The super agents concatenate the observation and
-action spaces of all their covered agents. In addition, the observation space is
-given a *mask* channel to indicate which of their covered agents is done. This
+*cover* and control multiple agents in the simulation. The super agents concatenate
+the observation and action spaces of all their covered agents. In addition, the
+observation space is given a *mask* channel to indicate which of their covered agents is done. This
 channel is important because the simulation dynamics change when a covered agent
 is done but the super agent may still be active. Without this mask, the super
-agent would experience completely different simulation dynamcis for some of
+agent would experience completely different simulation dynamics for some of
 its covered agents with no indication as to why.
 
 Unless handled carefully, the super agent will report observations for done
 covered agents. This may contaminate the training data with an unfair advantage.
-For exmample, a dead covered agent should not be able to provide the super agent with
-useful information. In order to correct this, the user may supply the
+For example, a dead covered agent should not be able to provide the super agent with
+useful information. In order to correct this, the user may supply a
 :ref:`null observation <>` for an `ObservingAgent`. When a covered agent is done,
 the :ref:`SuperAgentWrapper <api_super_agent_wrapper>` will try to use its null
 observation going forward.
@@ -307,7 +305,7 @@ so as to not affect the reward for the super agent.
 
 Furthermore, super agents may still report actions for covered agents that
 are done. The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` filters out those
-actions before passing them to the underlying sim.
+actions before passing the action dict to the underlying sim.
 
 Finally a super agent is considered done when *all* of its covered agents are done.
 
