@@ -278,3 +278,32 @@ Wrappers
 .. autoclass:: abmarl.sim.gridworld.wrapper.RavelActionWrapper
 	:members:
 	:undoc-members:
+
+
+.. _api_multi_policy_trainer:
+
+Abmarl Trainers
+---------------
+
+.. autoclass:: abmarl.trainers.MultiPolicyTrainer
+	:members:
+	:undoc-members:
+
+.. _api_single_policy_trainer:
+
+.. autoclass:: abmarl.trainers.SinglePolicyTrainer
+	:members:
+	:undoc-members:
+
+.. _api_monte_carlo_trainer:
+
+.. autoclass:: abmarl.trainers.monte_carlo.OnPolicyMonteCarloTrainer
+	:members:
+	:undoc-members:
+
+.. _api_debug_trainer:
+
+.. autoclass:: abmarl.trainers.DebugTrainer
+	:members:
+	:undoc-members:
+

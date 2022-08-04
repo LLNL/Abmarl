@@ -621,3 +621,39 @@ Analysis can then be performed using the command line interface:
 .. code-block::
 
    abmarl analyze ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
+
+
+.. _trainer:
+
+Trainer Prototype
+-----------------
+
+Abmarl provide an initial prototype of its own :ref:`Trainer <api_multi_policy_trainer>`
+framework to support in-house algorithm development. Trainers manage the interaction
+between policies and agents in a simulation. Abmarl currently supports a
+:ref:`MultiPolicyTrainer <api_multi_policy_trainer>`, which allows each agent to
+have its own policy, and a :ref:`SinglePolicyTrainer <api_single_policy_trainer>`,
+which allows for a single policy shared among multiple agents. The trainer abstracts
+the data generation process behind its `generate_episode` function. The simulation
+reports an initial observation, which the trainer feeds through its policies according
+to the `policy_mapping_fn`. These policies return actions, which the trainer uses
+to step the simulation forward. Derived trainers overwrite the `train` function
+to implement the RL algorithm. For example, a custom trainer would look something
+like this:
+
+.. code-block:: python
+
+   class MyCustomTrainer(SinglePolicyTrainer):
+       def train(self, iterations=10, gamma=0.9, **kwargs):
+           for _ in range(iterations):
+               states, actions, rewards, _ = self.generate_episode(**kwargs)
+               self.policy.update(states, actions, rewards)
+               # Perform some kind of policy update ^
+
+Abmarl currently supports a :ref:`Monte Carlo Trainer <api_monte_carlo_trainer>`
+and a :ref:`Debug Trainer <api_debug_trainer>`, which is used by ``abmarl debug``
+command line interface.
+
+.. NOTE::
+    Abmarl's trainer framework is in its early design stages. Stay tuned for more
+    developments.

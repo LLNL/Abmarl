@@ -96,16 +96,6 @@ The prototype is built off an on-policy monte-carlo algorithm and abstracts the
 data generation process, leaving the user to focus on developing the training rules.
 As Abmarl continues to grow, one can expect more development in the training framework.
 
-# TODO:
-Added Prototype for Trainer framework.
-Limits:
-* based on Monte Carlo algorithms.
-* on policy
-* single agent per policy.
-Expect more development here.
-
-* debug through random trainer. Show example.
-
 
 Dynamic Order Manager and Simulation
 ------------------------------------
