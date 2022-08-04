@@ -70,7 +70,7 @@ users to extend its features as they see fit.
 In Abmarl, agents who are `done` will be removed from the RL loop--they
 will no longer provide actions and no longer report observations and rewards. In
 some uses cases, such as when using the :ref:`SuperAgentWrapper <super_agent_wrapper>`
-or running with :ref:`OpenSpiel <open_spiel_wrapper>`, agents continue in the loop
+or running with :ref:`OpenSpiel <open_spiel_external>`, agents continue in the loop
 even after they're done. To keep the training data from becoming contaminated,
 Abmarl provides the ability to specify a `null observation` and `null action` for
 each agent. These null points will be used in the rare case when a done agent is

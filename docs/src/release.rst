@@ -15,7 +15,7 @@ OpenSpiel Wrapper
 -----------------
 
 The :ref:`OpenSpielWrapper <open_spiel_external>` is an external wrapper alongside
-the :ref:`MultiAgentEnvWrapper <rllib_external>`` and the :ref:`GymWrapper <gym_external>`.
+the :ref:`MultiAgentWrapper <rllib_external>` and the :ref:`GymWrapper <gym_external>`.
 The OpenSpiel Wrapper enables the connection between Abmarl's :ref:`SimulationManager <sim-man>`
 and OpenSpiel algorithms, increasing Abmarl's ease of use for MARL researchers.
 
@@ -51,10 +51,9 @@ collaborative agents.
 
 With the new :ref:`SuperAgentWrapper <super_agent_wrapper>`, users can define groupings
 of agents so that a single policy is responsible for digesting all the observations
-and generating all the actions for its agents in a single pass.
-
-The :ref:`SuperAgentWrapper <super_agent_wrapper>` can be used with an Abmarl Simulation
-and a mapping of *super* agents to *covered* agents, like so:
+and generating all the actions for its agents in a single pass. To use the SuperAgentWrapper,
+simply provide a `super_agent_mapping`, which maps the super agent's id to a list
+of covered agents, like so:
 
 .. code-block:: python
 
@@ -75,20 +74,19 @@ and a mapping of *super* agents to *covered* agents, like so:
        )
    )
 
-To fully support integration with the RL loop, users can now specify
-:ref:`null observations and actions <overview_agent>` for agents.
-
 
 Null Observations and Actions
 -----------------------------
 
-Up until now, any agent that finishes the simulation early will return its final
-experience and refrain from further interaction in the simulation. With the introduction
-of the :ref:`SuperAgentWrapper <super_agent_wrapper>` and the
+To fully support integration with the RL loop, users can now specify
+:ref:`null observations and actions <overview_agent>` for agents. Up until now,
+any agent that finishes the simulation early will return its final experience and
+refrain from further interaction in the simulation. With the introduction of the
+:ref:`SuperAgentWrapper <super_agent_wrapper>` and the
 :ref:`OpenSpielWrapper <open_spiel_external>`, done agents may still be queried
 for their observations and even report actions. In order to keep the training data
-*clean*, users can now specify :ref:`null observations and actions <overview_agent>`
-for agents, which will be used in these rare cases.
+*clean*, users can now specify null observations and actions for agents, which
+will be used in these rare cases.
 
 
 Trainer Prototype
@@ -97,8 +95,8 @@ Trainer Prototype
 The :ref:`Trainer <trainer>` prototype is a first attempt to support Abmarl's
 in-house algorithm development. The prototype is built off an on-policy monte-carlo
 algorithm and abstracts the data generation process, enabling the user to focus
-on developing the training rules. As Abmarl continues to grow, one can expect
-more development in the training framework.
+on developing the training rules. Abmarl's trainer framework is in its early design
+stages. Stay tuned for more developments.
 
 
 Dynamic Order Manager and Simulation
@@ -113,18 +111,27 @@ Miscellaneous
 -------------
 
 * Checking the ``isinstance`` of an :ref:`Agent <api_agent>` now automatically
-captures :ref:`ObservingAgents <api_observing_agent>` and
-:ref:`ActingAgents <api_acting_agent>`.
+  captures :ref:`ObservingAgents <api_observing_agent>` and
+  :ref:`ActingAgents <api_acting_agent>`, so that this code now works as expected:
+
+.. code-block:: python
+
+   class MyAgent(ObservingAgent, ActingAgent): pass
+   my_agent = MyAgent()
+   isinstance(my_agent, Agent)
+   >>> True
+
 * Example simulations have been centralized in ``abmarl.examples.sim``. These examples
-are a store of useful simulations for testing, debugging, understanding RL, etc.
+  are a store of useful simulations for testing, debugging, understanding RL, etc.
 * Updated ray dependency to version 1.12.1. This had the following side-effects:
 
    * Update Abmarl :ref:`MultiAgentWrapper <rllib_external>` to work with new RLlib interface.
-   * Pinned the gym version to be less than 0.22. These version of gym are not
-   as clever in decided whether a point is in a space, so `Box` spaces must now
-   explicitly output a list or array, even if there is only a single element.
+   * Pinned the gym version to be less than 0.22. These versions of gym are not
+     as clever in deciding if a point is in a space, so `Box` spaces must now
+     explicitly output a list or array, even if there is only a single element.
    * Users may want to make use of the new ``disable_env_checking`` flag available
-   in RLlib's configuration.
+     in RLlib's configuration.
 
-* Done agents are not removed from the Grid, so agents that cannot overlap are
-needlessly restricted. Grid overlapping logic now checks if an agent is done.
+* Done agents are not removed from the :ref:`Grid <gridworld_grid>`, so agents
+  that cannot overlap are needlessly restricted. Grid overlapping logic now checks
+  if an agent is done.
