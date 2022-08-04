@@ -10,8 +10,9 @@ visualizing, and analyzing agent behavior. We define an
 :ref:`Agent-Based Simulation Interface <abs>` and :ref:`Simulation Manager <sim-man>`,
 which control which agents interact with the simulation at each step. We support
 :ref:`integration <external>` with popular reinforcement learning simulation interfaces, including
-:ref:`gym.Env <api_gym_wrapper>` and :ref:`MultiAgentEnv <api_ma_wrapper>`. We
-define our own :ref:`GridWorld Simulation Framework <gridworld>` for creating custom grid-based
+:ref:`gym.Env <gym_external>`, :ref:`MultiAgentEnv <rllib_external>`, and
+:ref:`OpenSpiel <open_spiel_external>`. We define our own
+:ref:`GridWorld Simulation Framework <gridworld>` for creating custom grid-based
 Agent Based Simulations.
 
 Abmarl leverages RLlib's framework for reinforcement learning and extends it to more easily

@@ -37,7 +37,7 @@ demonstrates this workflow.
 Creating Agents and Simulations
 -------------------------------
 
-Abmarl provides three interfaces for setting up an agent-based simulations.
+Abmarl provides three interfaces for setting up agent-based simulations.
 
 .. _overview_agent:
 
@@ -45,7 +45,7 @@ Agent
 `````
 
 First, we have :ref:`Agents <api_agent>`. An agent is an object with an observation and
-action space. Many practitioners may be accustomed to gym.Env's interface, which
+action space. Many practitioners may be accustomed to `gym.Env's` interface, which
 defines the observation and action space for the *simulation*. However, in heterogeneous
 multiagent settings, each *agent* can have different spaces; thus we assign these
 spaces to the agents and not the simulation.
@@ -112,7 +112,7 @@ An Agent Based Simulation can be created and used like so:
 
 .. WARNING::
    Implementations of AgentBasedSimulation should call ``finalize`` at the
-   end of its ``__init__``. Finalize ensures that all agents are configured and
+   end of their ``__init__``. Finalize ensures that all agents are configured and
    ready to be used for training.
 
 .. NOTE::
@@ -167,7 +167,7 @@ Simluation Managers "wrap" simulations, and they can be used like so:
    to dynamically choose the agents' turns, but it also requires the simulation
    to pay attention to the interface rules. For example, a Dynamic Order Simulation
    must ensure that at every step there is at least one reported agent who is not done,
-   unless it is the last turn.
+   unless it is the last turn, which the other managers handle automatically.
 
 
 .. _wrappers:
@@ -243,9 +243,10 @@ is ravelled to a Discrete space:
 Flatten Wrapper
 ~~~~~~~~~~~~~~~
 
-The :ref:`FlattenWrapper <api_ravel_wrapper>` flattens observation and action spaces
+The :ref:`FlattenWrapper <api_flatten_wrapper>` flattens observation and action spaces
 into continuous Box spaces and automatically maps data to and from it. The wrapper
-is largely based on OpenAI's own flatten wrapper, with some modifications. See
+is largely based on OpenAI's own flatten wrapper, with some modifications for maintaining
+if the resuting `Box` space can have integer `dtype` or if it must use `float`. See
 how the following nested space is flattened:
 
 .. code-block:: python
@@ -281,7 +282,7 @@ how the following nested space is flattened:
            high=[5, 3, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 1, 1, 1, 3, 3, 4, 1, 5, 1, 1,
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
            (39,),
-           int64)
+           int64) # We maintain the integer type instead of needlessly casting to float.
    flatten(my_space, point)
    >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 0, 0, 1, 1, 3, 1, 0, 4, 1, 1,
               0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
@@ -388,11 +389,11 @@ OpenSpiel Environment
 The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` enables integration with OpenSpiel.
 OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
 through its :ref:`TurnBasedManager <api_turn_based>` and
-:ref:`AllStepManager <api_all_step>`. OpenSpiel algorithms expect `TimeStep` objects
-as output, which include the observations, rewards, and step type. Among the observations,
-it expects a list of legal actions available to each agent. The OpenSpielWrapper
-converts output from the underlying simulation to the expected format. A TimeStep
-output typically looks like this:
+:ref:`AllStepManager <api_all_step>`. OpenSpiel algorithms interact with the simulation
+through `TimeStep` objects, which include the observations, rewards, and step type.
+Among the observations, it expects a list of legal actions available to each agent.
+The OpenSpielWrapper converts output from the underlying simulation to the expected
+format. A TimeStep output typically looks like this:
 
 .. code-block:: python
 
@@ -421,7 +422,7 @@ actions, or else it is done for all agents. In contrast, Abmarl allows some agen
 done before others as the simulation progresses. Abmarl expects that done
 agents will not provide actions. OpenSpiel, however, will always provide actions
 for all agents. The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` removes the
-actions from agents that are already done before forwarding the action to the underlyin
+actions from agents that are already done before forwarding the action to the underlying
 simulation manager. Furthermore, OpenSpiel expects every agent to be present in
 the TimeStep outputs. Normally, Abmarl will not provide output for agents that
 are done since they have finished generating data in the episode. In order to work
@@ -515,7 +516,7 @@ Experiment Parameters
 The strucutre of the parameters dictionary is very important. It *must* have an
 `experiment` key which contains both the `title` of the experiment and the `sim_creator`
 function. This function should receive a config and, if appropriate, pass it to
-the simulation constructor. In the example configuration above, we just retrun the
+the simulation constructor. In the example configuration above, we just return the
 already-configured simulation. Without the title and simulation creator, Abmarl
 may not behave as expected.
 
@@ -558,6 +559,10 @@ For example, the command
 will run the `MultiCorridor` simulation with random actions and output log files
 to the directory it creates for 2 episodes and a horizon of 20, as well as render
 each step in each episode.
+
+Check out the
+:ref:`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>_`
+to see how to debug within a python script.
 
 
 Visualizing

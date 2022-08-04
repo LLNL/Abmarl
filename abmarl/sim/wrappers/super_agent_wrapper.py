@@ -24,14 +24,8 @@ class SuperAgentWrapper(Wrapper):
     covered agents. This may contaminate the training data with an unfair advantage.
     For exmample, a dead covered agent should not be able to provide the super agent with
     useful information. In order to correct this, the user may supply the null
-    observation for an ObservingAgent, like so:
-        agent = ObservingAgent(
-            id="agent",
-            observation_space=Discrete(3),
-            null_observation=0
-        )
-    When a covered agent is done, the SuperAgentWrapper will try to use its null
-    observation going forward.
+    observation for an ObservingAgent. When a covered agent is done, the SuperAgentWrapper
+    will try to use its null observation going forward.
 
     Furthermore, super agents may still report actions for covered agents that
     are done. This wrapper filters out those actions before passing them to the
