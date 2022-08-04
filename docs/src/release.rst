@@ -38,46 +38,6 @@ MARL researchers.
 Along with this feature, the Simulation Managers now explicity track the set of
 done agents.
 
-# TODO: use this text in the actual docs
-OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
-through the TurnBasedManager and AllStepManager. OpenSpiel expects TimeStep
-objects as output, which include the observations, rewards, and step type.
-Among the observations, it expects a list of legal actions available to the agent.
-The OpenSpielWrapper converts output from the simulation manager to the expected
-format. A TimeStep output typically looks like this:
-    TimeStpe(
-        observations={
-            info_state: {agent_id: agent_obs for agent_id in agents},
-            legal_actions: {agent_id: agent_legal_actions for agent_id in agents},
-            current_player: current_agent_id
-        }
-        rewards={
-            {agent_id: agent_reward for agent_id in agents}
-        }
-        discounts={
-            {agent_id: agent_discout for agent_id in agents}
-        }
-        step_type=StepType enum
-    )
-Furthermore, OpenSpiel provides actions as a list. The OpenSpielWrapper converts
-those actions to a dict before forwarding it to the underlying simulation manager.
-OpenSpiel does not support the ability for some agents in a simulation to finish
-before others. The simulation is either ongoing, in which all agents are providing
-actions, or else it is done for all agents. In contrast, Abmarl allows some agents to be
-done before others as the simulation progresses. Abmarl expects that done
-agents will not provide actions. OpenSpiel, however, will always provide actions
-for all agents. The OpenSpielWrapper removes the actions from agents that are
-already done before forwarding the action to the underlying simulation manager.
-Furthermore, OpenSpiel expects every agent to be present in the TimeStep outputs.
-Normally, Abmarl will not provide output for agents that are done since they
-have finished generating data in the episode. In order to work with OpenSpiel,
-the OpenSpielWrapper forces output from all agents at every step, including
-those already done.
-Currently, the OpenSpielWrapper only works with simulations in which the action and
-observation space of every agent is Discrete. Most simulations will need to
-be wrapped with the RavelDiscreteWrapper.
-
-
 SuperAgentWrapper
 -----------------
 

@@ -240,9 +240,7 @@ including those already done.
 .. WARNING::
    The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` only works with simulations
    in which the action and observation space of every agent is Discrete. Most simulations
-   will need to be wrapped with the :ref:`RavelDiscreteWrapper <>`.
-
-# TODO: Add RavelDiscreteWrapper docs, api, and reference
+   will need to be wrapped with the :ref:`RavelDiscreteWrapper <api_ravel_wrapper>`.
 
 
 Training with an Experiment Configuration

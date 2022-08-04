@@ -42,6 +42,12 @@ Abmarl Simulations
 	:members:
 	:undoc-members:
 
+.. _api_ravel_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.RavelDiscreteWrapper
+	:members:
+	:undoc-members:
+
 
 .. _api_sim:
 
