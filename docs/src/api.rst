@@ -42,12 +42,6 @@ Abmarl Simulations
 	:members:
 	:undoc-members:
 
-.. _api_ravel_wrapper:
-
-.. autoclass:: abmarl.sim.wrappers.RavelDiscreteWrapper
-	:members:
-	:undoc-members:
-
 
 .. _api_sim:
 
@@ -73,6 +67,24 @@ Abmarl Simulation Managers
 .. _api_dynamic_man:
 
 .. autoclass:: abmarl.managers.DynamicOrderManager
+	:members:
+	:undoc-members:
+
+
+.. _api_wrappers:
+
+Abmarl Wrappers
+---------------
+
+.. _api_ravel_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.RavelDiscreteWrapper
+	:members:
+	:undoc-members:
+
+.. _api_flatten_wrapper:
+
+.. autoclass:: abmarl.sim.wrappers.FlattenWrapper
 	:members:
 	:undoc-members:
 

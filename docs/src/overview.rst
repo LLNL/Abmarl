@@ -159,6 +159,41 @@ Simluation Managers "wrap" simulations, and they can be used like so:
    unless it is the last turn.
 
 
+.. _wrappers:
+
+Wrappers
+````````
+
+:ref:`Agent Based Simulations <abs>` can be *wrapped* to modify incoming and outgoing
+data. Abmarl's :ref:`Wrappers <api_wrappers>` are themselves `AgentBasedSimulations`
+and provide an additional `unwrapped` property that cascades through potentially
+many layers of wrapping to get the original, unwrapped simulation. Abmarl supports
+several built-in wrappers.
+
+
+.. _ravel_wrapper:
+
+Ravel Discrete Wrapper
+~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts comlex observation
+and action spaces into Discrete space and automatically maps data to and from
+those spaces. It can convert Discrete, MultiBinary, MultiDiscrete, bounded integer
+Box, and any nesting of these observations and actions into Discrete observations
+and actions by "ravelling" their values according to numpy's `ravel_mult_index`
+function. Thus, observations and actions that are represented by arrays are converted
+into unique numbers.
+
+.. _flatten_wrapper:
+
+Flatten Wrapper
+~~~~~~~~~~~~~~~
+
+The :ref:`FlattenWrapper <api_ravel_wrapper>` flattens observation and action spaces
+into continuous Box spaces and automatically maps data to and from it. The wrapper
+is largely based on OpenAI's own flatten wrapper, with some modifications.
+
+
 .. _external:
 
 External Integration
@@ -240,7 +275,7 @@ including those already done.
 .. WARNING::
    The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` only works with simulations
    in which the action and observation space of every agent is Discrete. Most simulations
-   will need to be wrapped with the :ref:`RavelDiscreteWrapper <api_ravel_wrapper>`.
+   will need to be wrapped with the :ref:`RavelDiscreteWrapper <ravel_wrapper>`.
 
 
 Training with an Experiment Configuration
