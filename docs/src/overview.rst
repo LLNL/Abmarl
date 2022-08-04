@@ -305,7 +305,7 @@ Unless handled carefully, the super agent will report observations for done
 covered agents. This may contaminate the training data with an unfair advantage.
 For example, a dead covered agent should not be able to provide the super agent with
 useful information. In order to correct this, the user may supply a
-:ref:`null observation <>` for an `ObservingAgent`. When a covered agent is done,
+:ref:`null observation <overview_agent>` for an `ObservingAgent`. When a covered agent is done,
 the :ref:`SuperAgentWrapper <api_super_agent_wrapper>` will try to use its null
 observation going forward.
 
@@ -561,7 +561,7 @@ to the directory it creates for 2 episodes and a horizon of 20, as well as rende
 each step in each episode.
 
 Check out the
-:ref:`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>_`
+`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>_`
 to see how to debug within a python script.
 
 

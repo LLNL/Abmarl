@@ -81,7 +81,7 @@ class MultiPolicyTrainer(ABC):
         """
         Generate an episode of data.
 
-        The fundamental data object is a SAR--a (state, action, reward) tuple.
+        The fundamental data object is a SAR, a (state, action, reward) tuple.
         We restart the sim, generating initial observations (states) for agents
         reporting from the sim. Then we use the compute_action function to generate
         actions for agents who report an observation. Those actions are given to the sim,
@@ -97,14 +97,14 @@ class MultiPolicyTrainer(ABC):
                 and can be True when debugging or evaluating in post-processing.
 
         Returns:
-            Four dictionaries: one for observations, another for actions,
-            another for rewards, and another for dones. This makes the SAR sequence
-            and provides additional information on the done condition since some
-            algorithms need this. The data is organized by agent_id, so you would call
+            Four dictionaries, one for observations, another for actions,
+                another for rewards, and another for dones. This makes the SAR sequence
+                and provides additional information on the done condition since some
+                algorithms need this. The data is organized by agent_id, so you would call
                 {observations, actions, rewards}[agent_id][i]
-            in order to extract the ith SAR for an agent.
-            NOTE: In multiagent simulations, the number of SARs may differ for
-            each agent.
+                in order to extract the ith SAR for an agent.
+                NOTE: In multiagent simulations, the number of SARs may differ for
+                each agent.
         """
         # Check for rendering
         if render:
@@ -175,10 +175,6 @@ class MultiPolicyTrainer(ABC):
         Train the policy objects using generated data.
 
         This function is abstract and should be implemented by the algorithm.
-        The implementation should look something like this:
-        for iter in range(iterations):
-            observations, actions, rewards, dones = self.generate_episode()
-            # Implementation: update the policy with the generated data.
 
         Args:
             iterations: The number of training iterations.

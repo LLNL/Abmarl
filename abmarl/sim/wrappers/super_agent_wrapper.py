@@ -42,7 +42,7 @@ class SuperAgentWrapper(Wrapper):
         A dictionary that maps from a super agent's id to a list of covered agent ids.
 
         Suppose our simulation has 5 agents and we use the following super agent mapping:
-            {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
+        {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
         The resulting agents dict would have keys 'super0', 'super1', and 'agent2';
         where 'agent0', 'agent1', 'agent3', and 'agent4' have been covered by the
         super agents and 'agent2' is left uncovered and therefore included in the

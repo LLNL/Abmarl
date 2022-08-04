@@ -7,6 +7,9 @@ from abmarl.tools import numpy_utils as npu
 
 class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
     def train(self, iterations=10_000, gamma=0.9, **kwargs):
+        """
+        Implements on-policy monte carlo.
+        """
         state_action_returns = {}
 
         for i in range(iterations):
