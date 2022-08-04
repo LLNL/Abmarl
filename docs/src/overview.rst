@@ -59,11 +59,22 @@ An agent can be created like so:
    agent = Agent(
        id='agent0',
        observation_space=Box(-1, 1, (2,)),
-       action_space=Discrete(3)
+       action_space=Discrete(3),
+       null_observation=[0, 0],
+       null_action=0
    )
 
 At this level, the Agent is basically a dataclass. We have left it open for our
 users to extend its features as they see fit.
+
+In Abmarl, agents who are `done` will be removed from the RL loop--they
+will no longer provide actions and no longer report observations and rewards. In
+some uses cases, such as when using the :ref:`SuperAgentWrapper <super_agent_wrapper>`
+or running with :ref:`OpenSpiel <open_spiel_wrapper>`, agents continue in the loop
+even after they're done. To keep the training data from becoming contaminated,
+Abmarl provides the ability to specify a `null observation` and `null action` for
+each agent. These null points will be used in the rare case when a done agent is
+queried.
 
 .. _abs:
 

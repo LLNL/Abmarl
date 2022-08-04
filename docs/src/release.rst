@@ -89,7 +89,6 @@ will be used in these rare cases.
 
 # TODO:
 GSF agents automatically implment null obs.
-Null points are also wrapped by SAR Wrappers.
 TODO: Update GSF docs to indicate what are the null points.
 
 
