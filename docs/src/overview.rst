@@ -173,10 +173,10 @@ OpenAI Gym
 ~~~~~~~~~~
 
 The :ref:`GymWrapper <api_gym_wrapper>` can be used for single-agent simulations
-This wrapper allows integration with OpenAI's `gym.Env` class that many RL practitioners
-are used to, and many RL libraries support it. The simulation must contain only
+This wrapper allows integration with OpenAI's `gym.Env` class with which many RL
+practitioners are familiar, and many RL libraries support it. The simulation must contain only
 a single agent in the `agents` dict. The `observation space` and `action space`
-is then inferred from that agent. The `reset` and `step` operate on the values
+is then inferred from that agent. The `reset` and `step` functions operate on the values
 themselves as opposed to a dictionary mapping the agents' ids to the values.
 
 
@@ -185,10 +185,10 @@ RLlib MultiAgentEnv
 
 The :ref:`MultiAgentWrapper <api_ma_wrapper>` can be used for multi-agent simulations
 and connects with RLlib's `MultiAgentEnv` class. This interface is very similar
-to Abmarl's :ref:`Simulation Manager <sim-man>`, and the featureset is the same
+to Abmarl's :ref:`Simulation Manager <sim-man>`, and the featureset and data format is the same
 between the two, so the wrapper is mostly boilerplate. It does explictly expose
-a set `agent_ids`, an `observation space` dictionary mappin the agent ids to their
-observation spaces, and an `action spaces` dictionary that does the same.
+a set `agent_ids`, an `observation space` dictionary mapping the agent ids to their
+observation spaces, and an `action space` dictionary that does the same.
 
 
 OpenSpiel Environment
@@ -196,8 +196,8 @@ OpenSpiel Environment
 
 The :ref:`OpenSpielWrapper <api_openspiel_wrapper>` enables integration with OpenSpiel.
 OpenSpiel support turn-based and simultaneous simulations, which Abmarl provides
-through its :ref:`TurnBasedManager <api_turn_based>`` and
-:ref:`AllStepManager <api_all_step>`. OpenSpiel algorithms expect `TimeStep`` objects
+through its :ref:`TurnBasedManager <api_turn_based>` and
+:ref:`AllStepManager <api_all_step>`. OpenSpiel algorithms expect `TimeStep` objects
 as output, which include the observations, rewards, and step type. Among the observations,
 it expects a list of legal actions available to each agent. The OpenSpielWrapper
 converts output from the underlying simulation to the expected format. A TimeStep
