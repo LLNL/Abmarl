@@ -354,6 +354,8 @@ wrappers. Each wrapper automatically handles the interaction between the externa
 library and the underlying simulation.
 
 
+.. _gym_external:
+
 OpenAI Gym
 ~~~~~~~~~~
 
@@ -365,6 +367,8 @@ is then inferred from that agent. The `reset` and `step` functions operate on th
 themselves as opposed to a dictionary mapping the agents' ids to the values.
 
 
+.. _rllib_external:
+
 RLlib MultiAgentEnv
 ~~~~~~~~~~~~~~~~~~~
 
@@ -375,6 +379,8 @@ between the two, so the wrapper is mostly boilerplate. It does explictly expose
 a set `agent_ids`, an `observation space` dictionary mapping the agent ids to their
 observation spaces, and an `action space` dictionary that does the same.
 
+
+.. _open_spiel_external:
 
 OpenSpiel Environment
 ~~~~~~~~~~~~~~~~~~~~~
