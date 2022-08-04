@@ -184,6 +184,38 @@ and actions by "ravelling" their values according to numpy's `ravel_mult_index`
 function. Thus, observations and actions that are represented by arrays are converted
 into unique numbers.
 
+For example, see how the following nested space is ravelled to a Discrete space:
+
+.. code-block:: python
+
+   my_space = Dict({
+       'a': MultiDiscrete([5, 3]),
+       'b': MultiBinary(4),
+       'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
+       'd': Dict({
+           1: Discrete(3),
+           2: Box(1, 3, (2,), int)
+       }),
+       'e': Tuple((
+           MultiDiscrete([4, 1, 5]),
+           MultiBinary(2),
+           Dict({
+               'my_dict': Discrete(11)
+           })
+       )),
+       'f': Discrete(6),
+   })
+   point = {
+       'a': [3, 1],
+       'b': [0, 1, 1, 0],
+       'c': np.array([[0, 7, 5],[1, 3, 1]]),
+       'd': {1: 2, 2: np.array([1, 3])},
+       'e': ([1,0,4], [1, 1], {'my_dict': 5}),
+       'f': 1
+   }
+   ravel(my_space, point)
+   >>> 74748022765
+
 
 .. _flatten_wrapper:
 
