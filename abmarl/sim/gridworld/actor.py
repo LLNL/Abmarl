@@ -113,7 +113,7 @@ class MoveActor(ActorBaseComponent):
                 return False
 
 
-class AttackActor(ActorBaseComponent):
+class BinaryAttackActor(ActorBaseComponent):
     """
     Agents can attack other agents.
     """

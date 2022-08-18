@@ -495,16 +495,17 @@ Consider the following setup:
 Attacking
 `````````
 
-`Health` becomes more interesting when we let agents attack one another. :ref:`AttackingAgents <api_gridworld_agent_attack>`
-work in conjunction with the :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
+`Health` becomes more interesting when we let agents attack one another.
+:ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with the
+:ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
 attack being successful; and an `attack strength`, which dictates how much `health`
 is depleted from the attacked agent. An agent's choice to attack is a boolean--either
-attack or don't attack--and then the AttackActor determines the successfulness
-based on the state of the simulation and the attributes of the AttackingAgent. The AttackActor
-requires an `attack mapping` dictionary which determines which `encodings` can attack
-other `encodings`, similar to the `overlapping` parameter for the :ref:`Grid <gridworld_grid>`. Consider the
-following setup:
+attack or don't attack--and then the BinaryAttackActor determines the successfulness
+based on the state of the simulation and the attributes of the AttackingAgent.
+The BinaryAttackActor requires an `attack mapping` dictionary which determines
+which `encodings` can attack other `encodings`, similar to the `overlapping` parameter
+for the :ref:`Grid <gridworld_grid>`. Consider the following setup:
 
 .. code-block:: python
 
@@ -512,7 +513,7 @@ following setup:
    from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
    from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState, HealthState
-   from abmarl.sim.gridworld.actor import AttackActor
+   from abmarl.sim.gridworld.actor import BinaryAttackActor
 
    agents = {
        'agent0': AttackingAgent(
@@ -529,7 +530,7 @@ following setup:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = AttackActor(agents=agents, grid=grid, attack_mapping={1: [2]})
+   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]})
 
    position_state.reset()
    health_state.reset()
@@ -555,8 +556,8 @@ although `agent2` is within range, it is not a type that `agent0` can attack.
    masked from an attacking agent, then it cannot be attacked by that agent. The
    masking is determined the same way as view blocking described above.
 
-The :ref:`AttackActor <api_gridworld_actor_attack>` automatically assigns a
-`null action` of 0, indicating no attack.
+The :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>` automatically
+assigns a `null action` of 0, indicating no attack.
 
 
 RavelActionWrapper

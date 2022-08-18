@@ -2,7 +2,7 @@
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
-from abmarl.sim.gridworld.actor import MoveActor, AttackActor
+from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
 from abmarl.sim.gridworld.done import OneTeamRemainingDone
 
@@ -29,7 +29,7 @@ class TeamBattleSim(GridWorldSimulation):
 
         # Action Components
         self.move_actor = MoveActor(**kwargs)
-        self.attack_actor = AttackActor(**kwargs)
+        self.attack_actor = BinaryAttackActor(**kwargs)
 
         # Observation Components
         self.grid_observer = SingleGridObserver(**kwargs)

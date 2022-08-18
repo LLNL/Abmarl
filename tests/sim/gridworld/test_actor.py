@@ -3,7 +3,7 @@ from gym.spaces import Box, Discrete
 import numpy as np
 import pytest
 
-from abmarl.sim.gridworld.actor import MoveActor, AttackActor, ActorBaseComponent
+from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor, ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
@@ -123,7 +123,7 @@ def test_move_actor_with_overlap():
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
 
 
-def test_attack_actor():
+def test_binary_attack_actor():
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(
@@ -140,7 +140,7 @@ def test_attack_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = AttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -166,7 +166,7 @@ def test_attack_actor():
     assert grid[2, 3]
 
 
-def test_attack_actor_attack_mapping():
+def test_binary_attack_actor_attack_mapping():
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(
@@ -182,13 +182,13 @@ def test_attack_actor_attack_mapping():
     }
 
     with pytest.raises(AssertionError):
-        AttackActor(agents=agents, grid=grid, attack_mapping=[1, 2, 3])
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping=[1, 2, 3])
 
     with pytest.raises(AssertionError):
-        AttackActor(agents=agents, grid=grid, attack_mapping={'1': [3], 2.0: [6]})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={'1': [3], 2.0: [6]})
 
     with pytest.raises(AssertionError):
-        AttackActor(agents=agents, grid=grid, attack_mapping={1: 3, 2: [6]})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: 3, 2: [6]})
 
     with pytest.raises(AssertionError):
-        AttackActor(agents=agents, grid=grid, attack_mapping={1: ['2', 3], 2: [2, 3]})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: ['2', 3], 2: [2, 3]})
