@@ -222,8 +222,9 @@ class SelectiveAttackActor(ActorBaseComponent):
     The attack is a grid of 1s and 0s, 1 being attack and 0 being don't attack.
     The grid is centered on the agent's location.
     """
-    def __init__(self, **kwargs):
+    def __init__(self, attack_mapping=None, **kwargs):
         super().__init__(**kwargs)
+        self.attack_mapping = attack_mapping
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Box(
@@ -316,16 +317,16 @@ class SelectiveAttackActor(ActorBaseComponent):
                                 else:
                                     attackable_agents.append(other)
                     if attackable_agents:
-                        attacked_agent.append(np.random.choice(attackable_agents))
+                        attacked_agents.append(np.random.choice(attackable_agents))
                         # TODO: Variation for attacking all agents here?
             return attacked_agents
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
-            if action: # Agent has chosen to attack
-                attacked_agents = determine_attack(attacking_agent)
+            if np.any(action): # Agent has chosen to attack
+                attacked_agents = determine_attack(attacking_agent, action)
                 for attacked_agent in attacked_agents:
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
                         self.grid.remove(attacked_agent, attacked_agent.position)
-                return attacked_agent
+                return attacked_agents

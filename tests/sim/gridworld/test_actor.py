@@ -3,7 +3,8 @@ from gym.spaces import Box, Discrete
 import numpy as np
 import pytest
 
-from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor, ActorBaseComponent
+from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor, SelectiveAttackActor, \
+    ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
@@ -192,3 +193,159 @@ def test_binary_attack_actor_attack_mapping():
 
     with pytest.raises(AssertionError):
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: ['2', 3], 2: [2, 3]})
+
+
+def test_selective_attack_actor():
+    agents = {
+        'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
+        'agent1': AttackingAgent(
+            id='agent1',
+            initial_position=np.array([2, 2]),
+            encoding=1,
+            attack_range=2,
+            attack_strength=1,
+            attack_accuracy=1
+        ),
+        'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
+        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = SelectiveAttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+    assert isinstance(attack_actor, ActorBaseComponent)
+    assert attack_actor.key == 'attack'
+    assert attack_actor.supported_agent_type == AttackingAgent
+    assert agents['agent1'].action_space['attack'] == Box(0, 1, (5, 5), int)
+
+    agents['agent1'].finalize()
+    np.testing.assert_array_equal(
+        agents['agent1'].null_action['attack'],
+        np.zeros((5,5), dtype=int)
+    )
+
+    position_state.reset()
+    health_state.reset()
+
+    # Attacking agent0
+    attack = {'attack': np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1]
+    ], dtype=int)}
+    assert attack in agents['agent1'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent1'], attack)
+    assert attacked_agents == [agents['agent0']]
+    assert not agents['agent0'].active
+    assert agents['agent0'].health <= 0
+    assert not grid[4, 4]
+
+    # Attacking agent3
+    attack = {'attack': np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent1'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent1'], attack)
+    assert attacked_agents == [agents['agent3']]
+    assert not agents['agent3'].active
+    assert agents['agent3'].health <= 0
+    assert not grid[3, 2]
+
+
+    # Attacking both agent0 and agent3
+    position_state.reset()
+    health_state.reset()
+
+    attack = {'attack': np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0],
+        [0, 0, 0, 0, 1]
+    ], dtype=int)}
+    assert attack in agents['agent1'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent1'], attack)
+    assert attacked_agents == [agents['agent3'], agents['agent0']]
+    assert not agents['agent0'].active
+    assert not agents['agent3'].active
+    assert agents['agent0'].health <= 0
+    assert agents['agent3'].health <= 0
+    assert not grid[4, 4]
+    assert not grid[3, 2]
+
+
+    # Attacking everywhere except for agent0 and agent3
+    position_state.reset()
+    health_state.reset()
+
+    attack = {'attack': np.array([
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 0, 1, 1],
+        [1, 1, 1, 1, 0]
+    ], dtype=int)}
+    assert attack in agents['agent1'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent1'], attack)
+    assert not attacked_agents
+    assert agents['agent0'].active
+    assert agents['agent1'].active
+    assert agents['agent2'].active
+    assert agents['agent3'].active
+    assert grid[4, 4]
+    assert grid[3, 2]
+    assert grid[2, 2]
+    assert grid[2, 3]
+
+
+    # Attacking everywhere
+    attack = {'attack': np.array([
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1]
+    ], dtype=int)}
+    assert attack in agents['agent1'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent1'], attack)
+    assert attacked_agents == [agents['agent3'], agents['agent0']]
+    assert not agents['agent0'].active
+    assert not agents['agent3'].active
+    assert agents['agent1'].active
+    assert agents['agent2'].active
+    assert agents['agent0'].health <= 0
+    assert agents['agent3'].health <= 0
+    assert not grid[4, 4]
+    assert not grid[3, 2]
+    assert grid[2, 2]
+    assert grid[2, 3]
+
+
+    # Attacking nowhere everywhere
+    position_state.reset()
+    health_state.reset()
+    attack = {'attack': np.array([
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent1'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent1'], attack)
+    assert not attacked_agents
+    assert agents['agent0'].active
+    assert agents['agent1'].active
+    assert agents['agent2'].active
+    assert agents['agent3'].active
+    assert grid[4, 4]
+    assert grid[3, 2]
+    assert grid[2, 2]
+    assert grid[2, 3]
+# test_selective_attack_actor()
