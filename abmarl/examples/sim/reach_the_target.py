@@ -104,7 +104,7 @@ class ReachTheTargetSim(GridWorldSimulation):
         # Done components
         self.active_done = ActiveDone(**kwargs)
         self.target_done = TargetDone(target=self.target, **kwargs)
-        self.only_agent_done = OnlyAgentLeftDone()
+        self.only_agent_done = OnlyAgentLeftDone(**kwargs)
 
         self.finalize()
 
@@ -162,3 +162,6 @@ class ReachTheTargetSim(GridWorldSimulation):
 
     def get_all_done(self, **kwargs):
         return self.only_agent_done.get_all_done(**kwargs)
+
+    def get_info(self, agent_id, **kwargs):
+        pass
