@@ -138,6 +138,7 @@ class ReachTheTargetSim(GridWorldSimulation):
             if self.target_done.get_done(agent):
                 self.rewards[agent_id] += 1
                 self.grid.remove(agent, agent.position)
+                agent.active = False
 
         # Entropy penalty for the runners
         for agent_id in action_dict:
