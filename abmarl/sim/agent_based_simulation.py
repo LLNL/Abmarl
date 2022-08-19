@@ -11,7 +11,7 @@ class PrincipleAgent:
     def __init__(self, id=None, seed=None, **kwargs):
         self.id = id
         self.seed = seed
-        self._active = True
+        self.active = True
 
     @property
     def id(self):
@@ -43,6 +43,11 @@ class PrincipleAgent:
         or False if they're dead.
         """
         return self._active
+
+    @active.setter
+    def active(self, value):
+        assert type(value) is bool, "Active must be either True or False."
+        self._active = value
 
     @property
     def configured(self):

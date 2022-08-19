@@ -160,7 +160,8 @@ class HealthAgent(GridWorldAgent):
     """
     Agents have health points and can die.
 
-    Health is bounded between 0 and 1.
+    Health is bounded between 0 and 1. Agents become inactive when the health
+    falls to 0.
     """
     def __init__(self, initial_health=None, **kwargs):
         super().__init__(**kwargs)
@@ -179,6 +180,7 @@ class HealthAgent(GridWorldAgent):
     def health(self, value):
         assert type(value) in [int, float], "Health must be a numeric value."
         self._health = min(max(value, 0), 1)
+        self.active = self.health > 0
 
     @property
     def initial_health(self):
@@ -193,13 +195,6 @@ class HealthAgent(GridWorldAgent):
             assert type(value) in [int, float], "Initial health must be a numeric value."
             assert 0 < value <= 1, "Initial value must be between 0 and 1."
         self._initial_health = value
-
-    @property
-    def active(self):
-        """
-        The agent is active if its health is greater than 0.
-        """
-        return self.health > 0
 
 
 class AttackingAgent(ActingAgent, GridWorldAgent):
