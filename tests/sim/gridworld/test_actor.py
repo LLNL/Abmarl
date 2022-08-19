@@ -348,4 +348,3 @@ def test_selective_attack_actor():
     assert grid[3, 2]
     assert grid[2, 2]
     assert grid[2, 3]
-# test_selective_attack_actor()
