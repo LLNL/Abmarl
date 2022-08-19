@@ -54,10 +54,56 @@ sim = MultiAgentWrapper(
     )
 )
 
-from abmarl.trainers import DebugTrainer
-trainer = DebugTrainer(sim=sim.sim, output_dir='abmarl_results')
-trainer.train(render=True, horizon=200)
 
-# sim_name = "ReachTheTarget"
-# from ray.tune.registry import register_env
+sim_name = "ReachTheTarget"
+from ray.tune.registry import register_env
+register_env(sim_name, lambda sim_config: sim)
+
+
+policies = {
+    'target': (None, agents['target'].observations_space, agents['target'].action_space, {}),
+    'runner': (None, agents['runner0'].observations_space, agents['runner0'].action_space, {}),
+}
+
+
+def policy_mapping_fn(agent_id):
+    return 'runner' if agent_id.startswith('runner') else 'target'
+
+
+
+# Experiment parameters
+params = {
+    'experiment': {
+        'title': f'{sim_name}',
+        'sim_creator': lambda config=None: sim,
+    },
+    'ray_tune': {
+        'run_or_experiment': 'A2C',
+        'checkpoint_freq': 50,
+        'checkpoint_at_end': True,
+        'stop': {
+            'episodes_total': 2000,
+        },
+        'verbose': 2,
+        'config': {
+            # --- Simulation ---
+            'disable_env_checking': False,
+            'env': sim_name,
+            'horizon': 20,
+            'env_config': {},
+            # --- Multiagent ---
+            'multiagent': {
+                'policies': policies,
+                'policy_mapping_fn': policy_mapping_fn,
+            },
+            # "lr": 0.0001,
+            # --- Parallelism ---
+            # Number of workers per experiment: int
+            "num_workers": 7,
+            # Number of simulations that each worker starts: int
+            "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
+        },
+    }
+}
+
 
