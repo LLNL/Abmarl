@@ -169,4 +169,4 @@ class ReachTheTargetSim(GridWorldSimulation):
         return self.only_agent_done.get_all_done(**kwargs)
 
     def get_info(self, agent_id, **kwargs):
-        pass
+        return {}
