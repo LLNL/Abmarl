@@ -61,8 +61,8 @@ register_env(sim_name, lambda sim_config: sim)
 
 
 policies = {
-    'target': (None, agents['target'].observations_space, agents['target'].action_space, {}),
-    'runner': (None, agents['runner0'].observations_space, agents['runner0'].action_space, {}),
+    'target': (None, agents['target'].observation_space, agents['target'].action_space, {}),
+    'runner': (None, agents['runner0'].observation_space, agents['runner0'].action_space, {}),
 }
 
 

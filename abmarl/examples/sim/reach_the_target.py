@@ -131,14 +131,15 @@ class ReachTheTargetSim(GridWorldSimulation):
         # Process the moves
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            if agent.active:
-                move_result = self.move_actor.process_action(agent, action, **kwargs)
-                if not move_result:
-                    self.rewards[agent_id] -= 0.1
-            if self.target_done.get_done(agent):
-                self.rewards[agent_id] += 1
-                self.grid.remove(agent, agent.position)
-                agent.active = False
+            if isinstance(agent, MovingAgent):
+                if agent.active:
+                    move_result = self.move_actor.process_action(agent, action, **kwargs)
+                    if not move_result:
+                        self.rewards[agent_id] -= 0.1
+                if self.target_done.get_done(agent):
+                    self.rewards[agent_id] += 1
+                    self.grid.remove(agent, agent.position)
+                    agent.active = False
 
         # Entropy penalty for the runners
         for agent_id in action_dict:
