@@ -55,7 +55,7 @@ sim = MultiAgentWrapper(
 )
 
 from abmarl.trainers import DebugTrainer
-trainer = DebugTrainer(sim=sim.sim, output_dir='~/abmarl_results')
+trainer = DebugTrainer(sim=sim.sim, output_dir='abmarl_results')
 trainer.train(render=True, horizon=24)
 
 # sim_name = "ReachTheTarget"

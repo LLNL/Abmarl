@@ -35,7 +35,10 @@ class TargetDone(ActiveDone):
         """
         Return True if the agent overlaps with the target. Otherwise, return False.
         """
-        return np.array_equal(agent.position, self.target.position)
+        if agent == self.target:
+            return False
+        else:
+            return np.array_equal(agent.position, self.target.position)
 
 
 class OnlyAgentLeftDone(DoneBaseComponent):
@@ -49,10 +52,10 @@ class OnlyAgentLeftDone(DoneBaseComponent):
         ])
 
     def get_done(self, agent_id, **kwargs):
-        return self._agents_remaining <= 1
+        return self._agents_remaining() <= 1
 
     def get_all_done(self, **kwargs):
-        return self._agents_remaining <= 1
+        return self._agents_remaining() <= 1
 
 
 class BarrierAgent(GridWorldAgent):
@@ -119,7 +122,7 @@ class ReachTheTargetSim(GridWorldSimulation):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if agent.active:
-                attacked_agents = self.move_actor.process_action(agent, action, **kwargs)
+                attacked_agents = self.attack_actor.process_action(agent, action, **kwargs)
                 for attacked_agent in attacked_agents:
                     if not attacked_agent.active: # Agent has died
                         self.rewards[attacked_agent.id] -= 1
@@ -132,7 +135,7 @@ class ReachTheTargetSim(GridWorldSimulation):
                 move_result = self.move_actor.process_action(agent, action, **kwargs)
                 if not move_result:
                     self.rewards[agent_id] -= 0.1
-            if self.target_done(agent):
+            if self.target_done.get_done(agent):
                 self.rewards[agent_id] += 1
                 self.grid.remove(agent, agent.position)
 
@@ -155,10 +158,10 @@ class ReachTheTargetSim(GridWorldSimulation):
     def get_done(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
         if isinstance(agent, RunningAgent):
-            return self.active_done.get_done(agent_id, **kwargs) \
-                or self.target_done.get_done(agent_id, **kwargs)
+            return self.active_done.get_done(agent, **kwargs) \
+                or self.target_done.get_done(agent, **kwargs)
         elif isinstance(agent, TargetAgent):
-            return self.only_agent_done.get_done(agent_id, **kwargs)
+            return self.only_agent_done.get_done(agent, **kwargs)
 
     def get_all_done(self, **kwargs):
         return self.only_agent_done.get_all_done(**kwargs)

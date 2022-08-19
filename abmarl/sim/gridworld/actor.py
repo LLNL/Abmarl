@@ -323,10 +323,12 @@ class SelectiveAttackActor(ActorBaseComponent):
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
-            if np.any(action): # Agent has chosen to attack
-                attacked_agents = determine_attack(attacking_agent, action)
-                for attacked_agent in attacked_agents:
-                    attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
-                    if not attacked_agent.active:
-                        self.grid.remove(attacked_agent, attacked_agent.position)
-                return attacked_agents
+            # if np.any(action): # Agent has chosen to attack
+            attacked_agents = determine_attack(attacking_agent, action)
+            for attacked_agent in attacked_agents:
+                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                if not attacked_agent.active:
+                    self.grid.remove(attacked_agent, attacked_agent.position)
+            return attacked_agents
+        else:
+            return []
