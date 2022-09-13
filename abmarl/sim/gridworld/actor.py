@@ -269,6 +269,75 @@ class EncodingBasedAttackActor(ActorBaseComponent):
         """
         return AttackingAgent
 
+    def process_action(self, attacking_agent, action_dict, **kwargs):
+        """
+        Process the agent's attack.
+
+        The agent indicates which encoding(s) to attack. For each encoding
+
+        If the agent has chosen to attack, then we process their attack. The attack
+        is possible if there is an attacked agent such that:
+
+        1. The attacked agent is active.
+        2. The attacked agent is within range.
+        3. The attacked agent has attacked encoding.
+
+        If the attack is possible, then we determine the success of the attack
+        based on the attacking agent's accuracy. If the attack is successful, then
+        the attacked agent's health is depleted by the attacking agent's strength,
+        possibly resulting in its death.
+
+        Only one agent per encoding can be attacked. If there are multiple agents
+        with the same encoding, then we randomly pick one of them.
+        """
+        def determine_attack(agent, attack):
+            # Generate local grid and an attack mask.
+            local_grid, mask = gu.create_grid_and_mask(
+                agent, self.grid, agent.attack_range, self.agents
+            )
+
+            # Randomly scan the local grid for attackable agents.
+            attacked_agents = {encoding: [] for encoding, activated in attack.items() if activated}
+            for r in range(2 * agent.attack_range + 1):
+                for c in range(2 * agent.attack_range + 1):
+                    attackable_agents = {
+                        encoding: [] for encoding, activated in attack.items() if activated
+                    }
+                    if mask[r, c]: # We can see this cell
+                        # TODO: Variation for masked cell?
+                        candidate_agents = local_grid[r, c]
+                        if candidate_agents is not None:
+                            for other in candidate_agents.values():
+                                if other.id == agent.id: # Cannot attack yourself
+                                    continue
+                                elif not other.active: # Cannot attack inactive agents
+                                    continue
+                                elif other.encoding not in attacked_agents:
+                                    # Did not attack this encoding
+                                    continue
+                                elif np.random.uniform() > agent.attack_accuracy:
+                                    # Failed attack
+                                    continue
+                                else:
+                                    attackable_agents[other.encoding].append(other)
+            attacked_agents = [
+                np.random.choice(attackable_agents[encoding]) for encoding in attackable_agents
+            ]
+            # TODO: Variation for attacking all agents here?
+            return attacked_agents
+
+        if isinstance(attacking_agent, self.supported_agent_type):
+            action = action_dict[self.key]
+            # if np.any(action): # Agent has chosen to attack
+            attacked_agents = determine_attack(attacking_agent, action)
+            for attacked_agent in attacked_agents:
+                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                if not attacked_agent.active:
+                    self.grid.remove(attacked_agent, attacked_agent.position)
+            return attacked_agents
+        else:
+            return []
+
 
 class SelectiveAttackActor(ActorBaseComponent):
     """
@@ -348,7 +417,6 @@ class SelectiveAttackActor(ActorBaseComponent):
                 agent, self.grid, agent.attack_range, self.agents
             )
 
-            # Randomly scan the local grid for attackable agents.
             attacked_agents = []
             for r in range(2 * agent.attack_range + 1):
                 for c in range(2 * agent.attack_range + 1):
