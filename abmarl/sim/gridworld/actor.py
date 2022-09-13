@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from gym.spaces import Box, Discrete
+from gym.spaces import Box, Discrete, Dict
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
@@ -213,6 +213,61 @@ class BinaryAttackActor(ActorBaseComponent):
                     if not attacked_agent.active:
                         self.grid.remove(attacked_agent, attacked_agent.position)
                 return attacked_agent
+
+
+class EncodingBasedAttackActor(ActorBaseComponent):
+    """
+    Agents can attack other agents around it.
+
+    The attacking agent specifies which encoding it would like to attack. If that
+    encoding is nearby, then the attack may be succesful. Note: multiple encodings
+    can be attacked at the same time.
+    """
+    def __init__(self, attack_mapping=None, **kwargs):
+        super().__init__(**kwargs)
+        self.attack_mapping = attack_mapping
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                attackable_encodings = self.attack_mapping[agent.encoding]
+                agent.action_space[self.key] = Dict({
+                    i: Discrete(2) for i in attackable_encodings
+                })
+                agent.null_action[self.key] = {i: 0 for i in attackable_encodings}
+
+    @property
+    def attack_mapping(self):
+        """
+        Dict that dictates which agents the attacking agent can attack.
+
+        The dictionary maps the attacking agents' encodings to a list of encodings
+        that they can attack.
+        """
+        return self._attack_mapping
+
+    @attack_mapping.setter
+    def attack_mapping(self, value):
+        assert type(value) is dict, "Attack mapping must be dictionary."
+        for k, v in value.items():
+            assert type(k) is int, "All keys in attack mapping must be integer."
+            assert type(v) is list, "All values in attack mapping must be list."
+            for i in v:
+                assert type(i) is int, \
+                    "All elements in the attack mapping values must be integers."
+        self._attack_mapping = value
+
+    @property
+    def key(self):
+        """
+        This Actor's key is "attack".
+        """
+        return 'attack'
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Actor works with AttackingAgents.
+        """
+        return AttackingAgent
 
 
 class SelectiveAttackActor(ActorBaseComponent):
