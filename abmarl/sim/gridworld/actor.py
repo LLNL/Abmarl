@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from gym.spaces import Box, Discrete, Dict
+from gym.spaces import Box, Discrete, MultiDiscrete, Dict
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
@@ -335,6 +335,84 @@ class EncodingBasedAttackActor(ActorBaseComponent):
             return attacked_agents
         else:
             return []
+
+
+class RestrictedSelectiveAttackActor(ActorBaseComponent):
+    """
+    Agents can attack other agents around it.
+
+    The attacking agent is given up to K attacks to use on a nearby grid.
+    """
+    def __init__(self, attack_mapping=None, **kwargs):
+        super().__init__(**kwargs)
+        self.attack_mapping = attack_mapping
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                grid_cells = (2 * agent.attack_range + 1) ** 2
+                agent.action_space[self.key] = MultiDiscrete(
+                    [grid_cells + 1] * agent.number_of_attacks
+                )
+                agent.null_action[self.key] = np.zeros((grid_cells + 1,), dtype=int)
+
+    @property
+    def attack_mapping(self):
+        """
+        Dict that dictates which agents the attacking agent can attack.
+
+        The dictionary maps the attacking agents' encodings to a list of encodings
+        that they can attack.
+        """
+        return self._attack_mapping
+
+    @attack_mapping.setter
+    def attack_mapping(self, value):
+        assert type(value) is dict, "Attack mapping must be dictionary."
+        for k, v in value.items():
+            assert type(k) is int, "All keys in attack mapping must be integer."
+            assert type(v) is list, "All values in attack mapping must be list."
+            for i in v:
+                assert type(i) is int, \
+                    "All elements in the attack mapping values must be integers."
+        self._attack_mapping = value
+
+    @property
+    def key(self):
+        """
+        This Actor's key is "attack".
+        """
+        return "attack"
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Actor works with AttackingAgents.
+        """
+        return AttackingAgent
+
+    def process_action(self, attacking_agent, action_dict, **kwargs):
+        """
+        Process the agent's attack.
+
+        The agent indicates which cells in a surrounding grid to attack. It can
+        attack up to K cells, depending on the number of attacks it has per turn.
+        It can also choose not to use one of its attacks and choose not to attack
+        at all by not using any of its attacks. For each attack, the processing
+        goes through a series of checks. The attack is possible if there is an
+        attacked agent such that:
+
+        1. The attacked agent is active.
+        2. The attacked agent is located at the attacked cell.
+        3. The attacked agent is valid according to the attack_mapping.
+
+        If the attack is possible, then we determine the success of the attack
+        based on the attacking agent's accuracy. If the attack is successful, then
+        the attacked agent's health is depleted by the attacking agent's strength,
+        possibly resulting in its death.
+        """
+        # TODO: Can attacked agents be attacked more than once per turn? That is,
+        # can the attacking agent use more than one attack on a single agent, compounding
+        # its effect?
+        pass
 
 
 class SelectiveAttackActor(ActorBaseComponent):
