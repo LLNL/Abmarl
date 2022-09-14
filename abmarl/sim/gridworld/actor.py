@@ -352,7 +352,7 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
                 agent.action_space[self.key] = MultiDiscrete(
                     [grid_cells + 1] * agent.number_of_attacks
                 )
-                agent.null_action[self.key] = np.zeros((grid_cells + 1,), dtype=int)
+                agent.null_action[self.key] = np.zeros((agent.number_of_attacks,), dtype=int)
 
     @property
     def attack_mapping(self):
