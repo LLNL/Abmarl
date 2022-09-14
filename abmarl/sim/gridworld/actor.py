@@ -412,7 +412,57 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
         # TODO: Can attacked agents be attacked more than once per turn? That is,
         # can the attacking agent use more than one attack on a single agent, compounding
         # its effect?
-        pass
+        def determine_attack(agent, attack):
+            # Generate local grid and an attack mask.
+            local_grid, mask = gu.create_grid_and_mask(
+                agent, self.grid, agent.attack_range, self.agents
+            )
+
+            attacked_agents = []
+            for raveled_cell in attack:
+                if raveled_cell == 0:
+                    # Agent has chosen not to use this attack
+                    continue
+                else:
+                    raveled_cell -= 1
+                    r = raveled_cell % (2 * agent.attack_range + 1)
+                    c = int(raveled_cell / (2 * agent.attack_range + 1))
+                    attackable_agents = []
+                    if mask[r, c]: # We can see this cell
+                        # TODO: Variation for masked cell?
+                        candidate_agents = local_grid[r, c]
+                        if candidate_agents is not None:
+                            for other in candidate_agents.values():
+                                if other.id == agent.id: # Cannot attack yourself
+                                    continue
+                                elif not other.active: # Cannot attack inactive agents
+                                    continue
+                                elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                    # Cannot attack this type of agent
+                                    continue
+                                elif np.random.uniform() > agent.attack_accuracy:
+                                    # Failed attack
+                                    continue
+                                elif other in attacked_agents:
+                                    # Cannot attack this agent again.
+                                    # TODO: Variation for attacking an agent more than once.
+                                    continue
+                                else:
+                                    attackable_agents.append(other)
+                    if attackable_agents:
+                        attacked_agents.append(np.random.choice(attackable_agents))
+            return attacked_agents
+
+        if isinstance(attacking_agent, self.supported_agent_type):
+            action = action_dict[self.key]
+            attacked_agents = determine_attack(attacking_agent, action)
+            for attacked_agent in attacked_agents:
+                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                if not attacked_agent.active:
+                    self.grid.remove(attacked_agent, attacked_agent.position)
+            return attacked_agents
+        else:
+            return []
 
 
 class SelectiveAttackActor(ActorBaseComponent):
