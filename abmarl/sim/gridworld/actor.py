@@ -297,12 +297,9 @@ class EncodingBasedAttackActor(ActorBaseComponent):
             )
 
             # Randomly scan the local grid for attackable agents.
-            attacked_agents = {encoding: [] for encoding, activated in attack.items() if activated}
+            attackable_agents = {encoding: [] for encoding, activated in attack.items() if activated}
             for r in range(2 * agent.attack_range + 1):
                 for c in range(2 * agent.attack_range + 1):
-                    attackable_agents = {
-                        encoding: [] for encoding, activated in attack.items() if activated
-                    }
                     if mask[r, c]: # We can see this cell
                         # TODO: Variation for masked cell?
                         candidate_agents = local_grid[r, c]
@@ -312,7 +309,7 @@ class EncodingBasedAttackActor(ActorBaseComponent):
                                     continue
                                 elif not other.active: # Cannot attack inactive agents
                                     continue
-                                elif other.encoding not in attacked_agents:
+                                elif other.encoding not in attackable_agents:
                                     # Did not attack this encoding
                                     continue
                                 elif np.random.uniform() > agent.attack_accuracy:
@@ -321,7 +318,8 @@ class EncodingBasedAttackActor(ActorBaseComponent):
                                 else:
                                     attackable_agents[other.encoding].append(other)
             attacked_agents = [
-                np.random.choice(attackable_agents[encoding]) for encoding in attackable_agents
+                np.random.choice(agent_list)
+                for agent_list in attackable_agents.values() if agent_list
             ]
             # TODO: Variation for attacking all agents here?
             return attacked_agents
