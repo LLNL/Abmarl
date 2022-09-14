@@ -1,10 +1,10 @@
 
-from gym.spaces import Box, Discrete, Dict
+from gym.spaces import Box, Discrete, MultiDiscrete, Dict
 import numpy as np
 import pytest
 
 from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor, SelectiveAttackActor, \
-    EncodingBasedAttackActor, ActorBaseComponent
+    EncodingBasedAttackActor, RestrictedSelectiveAttackActor, ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
@@ -354,7 +354,6 @@ def test_encoding_based_attack_actor():
     grid = Grid(2, 2, overlapping={1: [3], 3: [1]})
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
-        'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
         'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
         'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
         'agent3': AttackingAgent(
@@ -414,3 +413,66 @@ def test_encoding_based_attack_actor():
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1: 1, 2: 1}})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 0
+
+
+
+def test_restricted_selective_attack_actor():
+    grid = Grid(2, 2, overlapping={1: [1]})
+    agents = {
+        'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
+        'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
+        'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
+        'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
+        'agent3': AttackingAgent(
+            id='agent3',
+            initial_position=np.array([1, 1]),
+            encoding=3,
+            attack_range=1,
+            attack_strength=0,
+            attack_accuracy=1,
+            number_of_attacks=2
+        ),
+        'agent4': HealthAgent(id='agent4', initial_position=np.array([0, 0]), encoding=1),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = RestrictedSelectiveAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    assert isinstance(attack_actor, ActorBaseComponent)
+    assert attack_actor.key == 'attack'
+    assert attack_actor.supported_agent_type == AttackingAgent
+    assert agents['agent3'].action_space['attack'] == MultiDiscrete([10, 10])
+
+    agents['agent3'].finalize()
+    np.testing.assert_array_equal(
+        agents['agent3'].null_action['attack'], np.zeros((2,), dtype=int)
+    )
+
+    position_state.reset()
+    health_state.reset()
+    attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [0, 0]})
+    assert type(attacked_agents) is list
+    assert len(attacked_agents) == 0
+
+    attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [1, 1]})
+    assert type(attacked_agents) is list
+    assert len(attacked_agents) == 2
+    assert attacked_agents[0].id != attacked_agents[1].id
+    assert attacked_agents[0].encoding == 1
+    assert attacked_agents[1].encoding == 1
+    assert attacked_agents[0].active
+    assert attacked_agents[1].active
+
+    attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [2, 2]})
+    assert type(attacked_agents) is list
+    assert len(attacked_agents) == 1
+    assert attacked_agents[0].active
+    assert attacked_agents[0].encoding == 2
+
+    attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [1, 4]})
+    assert type(attacked_agents) is list
+    assert len(attacked_agents) == 2
+    assert attacked_agents[0].active
+    assert attacked_agents[0].encoding == 1
+    assert attacked_agents[1].active
+    assert attacked_agents[1].encoding == 2
