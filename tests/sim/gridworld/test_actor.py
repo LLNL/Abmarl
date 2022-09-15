@@ -430,7 +430,7 @@ def test_restricted_selective_attack_actor():
             attack_range=1,
             attack_strength=0,
             attack_accuracy=1,
-            number_of_attacks=2
+            attack_count=2
         ),
         'agent4': HealthAgent(id='agent4', initial_position=np.array([0, 0]), encoding=1),
     }

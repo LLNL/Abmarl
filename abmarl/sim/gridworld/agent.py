@@ -202,12 +202,12 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     Agents that can attack other agents.
     """
     def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, 
-                 number_of_attacks=0, **kwargs):
+                 attack_count=0, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
         self.attack_accuracy = attack_accuracy
-        self.number_of_attacks = number_of_attacks
+        self.attack_count = attack_count
 
     @property
     def attack_range(self):
@@ -252,7 +252,7 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         self._attack_accuracy = value
 
     @property
-    def number_of_attacks(self):
+    def attack_count(self):
         """
         The number of attacks the agent can make per turn.
 
@@ -263,16 +263,16 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         # TODO: The question of one vs all in the attack actors can be answered
         # with this parameter. The agent can attack up to this many other agents
         # per turn. Should update some actors to work with this parameter.
-        return self._number_of_attacks
+        return self._attack_count
 
-    @number_of_attacks.setter
-    def number_of_attacks(self, value):
+    @attack_count.setter
+    def attack_count(self, value):
         assert type(value) is int, "Number of attacks must be an integer."
         assert value >= 0, "Number of attacks must be nonnegative."
-        self._number_of_attacks = value
+        self._attack_count = value
 
     @property
     def configured(self):
         return super().configured and self.attack_range is not None and \
             self.attack_strength is not None and self.attack_accuracy is not None and \
-            self.number_of_attacks is not None
+            self.attack_count is not None
