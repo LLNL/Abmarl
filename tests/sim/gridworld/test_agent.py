@@ -172,3 +172,13 @@ def test_attacking_agent():
             attack_strength=0.6,
             attack_accuracy=-0.3
         )
+
+    with pytest.raises(AssertionError):
+        agent = AttackingAgent(
+            id='agent',
+            encoding=1,
+            attack_range=3,
+            attack_strength=0.6,
+            attack_accuracy=0.95,
+            attack_count = -2
+        )
