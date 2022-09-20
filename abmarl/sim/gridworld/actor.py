@@ -539,18 +539,21 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
 
 class SelectiveAttackActor(ActorBaseComponent):
     """
-    Agents can attack other agents around it.
+    Agents can attack other agents.
 
-    The attack is a grid of 1s and 0s, 1 being attack and 0 being don't attack.
-    The grid is centered on the agent's location.
+    The attack is a grid centered on the agent's position, and its size depends
+    on the agent's attack range. Each cell in the grid has a nonnegative integer
+    up to the agent's attack count, and it indicates how many attacks to use on
+    that cell.
     """
-    def __init__(self, attack_mapping=None, **kwargs):
+    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
         self.attack_mapping = attack_mapping
+        self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.action_space[self.key] = Box(
-                    0, 1, (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), int
+                    0, agent.attack_count, (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), int
                 )
                 agent.null_action[self.key] = np.zeros(
                     (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), dtype=int
@@ -576,6 +579,23 @@ class SelectiveAttackActor(ActorBaseComponent):
                 assert type(i) is int, \
                     "All elements in the attack mapping values must be integers."
         self._attack_mapping = value
+
+    @property
+    def stacked_attacks(self):
+        """
+        Allows an agent to attack the same agent multiple times per step.
+
+        When an agent attacks the same cell multiple times per turn, this parameter
+        allows it to use more than one attack on the same agent. Otherwise, the
+        attacks will be applied to other agents on the cell, and if there are not
+        enough attackable agents, then the extra attacks will be wasted.
+        """
+        return self._stacked_attacks
+
+    @stacked_attacks.setter
+    def stacked_attacks(self, value):
+        assert type(value) is bool, "Stacked attacks must be a boolean."
+        self._stacked_attacks = value
 
     @property
     def key(self):
