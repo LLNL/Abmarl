@@ -123,7 +123,7 @@ class BinaryAttackActor(ActorBaseComponent):
     nearby local grid defined by the agent's attack range for attackable agents,
     and randomly chooses from that set up to the number of attacks issued.
     """
-    def __init__(self, attack_mapping=None, stacked_attacks=None, **kwargs):
+    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
         self.attack_mapping = attack_mapping
         self.stacked_attacks = stacked_attacks
