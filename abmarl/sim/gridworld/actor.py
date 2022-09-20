@@ -392,13 +392,16 @@ class EncodingBasedAttackActor(ActorBaseComponent):
 
 class RestrictedSelectiveAttackActor(ActorBaseComponent):
     """
-    Agents can attack other agents around it.
+    Agents can attack other agents.
 
-    The attacking agent is given up to K attacks to use on a nearby grid.
+    Agents choose to attack specific cells in the surrounding grid. The agent can
+    attack up to its attack count. It can choose to attack different cells or the
+    same cell multiple times.
     """
-    def __init__(self, attack_mapping=None, **kwargs):
+    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
         self.attack_mapping = attack_mapping
+        self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 grid_cells = (2 * agent.attack_range + 1) ** 2
@@ -429,6 +432,23 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
         self._attack_mapping = value
 
     @property
+    def stacked_attacks(self):
+        """
+        Allows an agent to attack the same agent multiple times per step.
+
+        When an agent attacks the same cell multiple times per turn, this parameter
+        allows it to use more than one attack on the same agent. Otherwise, the
+        attacks will be applied to other agents on the cell, and if there are not
+        enough attackable agents, then the extra attacks will be wasted.
+        """
+        return self._stacked_attacks
+
+    @stacked_attacks.setter
+    def stacked_attacks(self, value):
+        assert type(value) is bool, "Stacked attacks must be a boolean."
+        self._stacked_attacks = value
+
+    @property
     def key(self):
         """
         This Actor's key is "attack".
@@ -450,21 +470,20 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
         attack up to K cells, depending on the number of attacks it has per turn.
         It can also choose not to use one of its attacks and choose not to attack
         at all by not using any of its attacks. For each attack, the processing
-        goes through a series of checks. The attack is possible if there is an
+        goes through a series of checks. The attack is successful if there is an
         attacked agent such that:
 
         1. The attacked agent is active.
         2. The attacked agent is located at the attacked cell.
         3. The attacked agent is valid according to the attack_mapping.
+        4. The attacking agent's accuracy is high enough.
 
-        If the attack is possible, then we determine the success of the attack
-        based on the attacking agent's accuracy. If the attack is successful, then
-        the attacked agent's health is depleted by the attacking agent's strength,
-        possibly resulting in its death.
+        Furthemore, a single agent may only be attacked once if stacked_attacks
+        is False. Additional attacks will be applied on other agents or wasted.
+
+        If the attack is successful, then the attacked agent's health is depleted
+        by the attacking agent's strength, possibly resulting in its death.
         """
-        # TODO: Can attacked agents be attacked more than once per turn? That is,
-        # can the attacking agent use more than one attack on a single agent, compounding
-        # its effect?
         def determine_attack(agent, attack):
             # Generate local grid and an attack mask.
             local_grid, mask = gu.create_grid_and_mask(
@@ -496,9 +515,8 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
                                 elif np.random.uniform() > agent.attack_accuracy:
                                     # Failed attack
                                     continue
-                                elif other in attacked_agents:
+                                elif other in attacked_agents and not self.stacked_attacks:
                                     # Cannot attack this agent again.
-                                    # TODO: Variation for attacking an agent more than once.
                                     continue
                                 else:
                                     attackable_agents.append(other)
@@ -514,8 +532,7 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
                 if not attacked_agent.active:
                     self.grid.remove(attacked_agent, attacked_agent.position)
             return attacked_agents
-        else:
-            return []
+        return []
 
 
 class SelectiveAttackActor(ActorBaseComponent):
