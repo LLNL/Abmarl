@@ -202,7 +202,7 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     Agents that can attack other agents.
     """
     def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, 
-                 attack_count=0, **kwargs):
+                 attack_count=1, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
@@ -257,8 +257,8 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         The number of attacks the agent can make per turn.
 
         This parameter is interpreted differently by each attack actor, but generally
-        it specifies how many attacks this agent will carry out in a single step.
-        See specific attack documentation for more information.
+        it specifies how many attacks this agent can carry out in a single step.
+        See specific AttackActor documentation for more information.
         """
         # TODO: The question of one vs all in the attack actors can be answered
         # with this parameter. The agent can attack up to this many other agents
