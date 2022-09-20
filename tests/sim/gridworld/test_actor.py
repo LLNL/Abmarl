@@ -480,6 +480,185 @@ def test_selective_attack_actor():
     assert grid[2, 3]
 
 
+def test_selective_attack_actor_attack_count():
+    grid = Grid(2, 2, overlapping={1: [1, 2, 3], 2: [1, 2, 3], 3: [1, 2, 3]})
+    agents = {
+        'agent0': AttackingAgent(
+            id='agent0',
+            initial_position=np.array([1, 1]),
+            encoding=3,
+            attack_range=1,
+            attack_strength=0,
+            attack_accuracy=1,
+            attack_count=3
+        ),
+        'agent1': HealthAgent(
+            id='agent1', initial_position=np.array([0, 0]), encoding=1, initial_health=1
+        ),
+        'agent2': HealthAgent(
+            id='agent2', initial_position=np.array([1, 1]), encoding=2, initial_health=1
+        ),
+        'agent3': HealthAgent(
+            id='agent3', initial_position=np.array([1, 1]), encoding=2, initial_health=1
+        ),
+        'agent4': HealthAgent(
+            id='agent4', initial_position=np.array([1, 1]), encoding=1, initial_health=1
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = SelectiveAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    assert isinstance(attack_actor, ActorBaseComponent)
+    assert attack_actor.key == 'attack'
+    assert attack_actor.supported_agent_type == AttackingAgent
+    assert agents['agent0'].action_space['attack'] == Box(0, 3, (3, 3), int)
+    agents['agent0'].finalize()
+    np.testing.assert_array_equal(
+        agents['agent0'].null_action['attack'],
+        np.zeros((3, 3), dtype=int)
+    )
+
+    position_state.reset()
+    health_state.reset()
+
+    attack = {'attack': np.array([
+        [0, 0, 0],
+        [0, 0, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 0
+
+    attack = {'attack': np.array([
+        [1, 0, 0],
+        [0, 1, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 2
+    assert agents['agent1'] in attacked_agents
+
+    attack = {'attack': np.array([
+        [2, 0, 0],
+        [0, 2, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 3
+    assert agents['agent1'] in attacked_agents
+
+    attack = {'attack': np.array([
+        [3, 0, 0],
+        [0, 3, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 4
+
+    agents['agent0'].attack_strength = 1
+    attack = {'attack': np.array([
+        [3, 0, 0],
+        [0, 3, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 4
+    assert not agents['agent1'].active
+    assert not agents['agent2'].active
+    assert not agents['agent3'].active
+    assert not agents['agent4'].active
+
+
+def test_selective_attack_actor_stacked_attack():
+    np.random.seed(24)
+    grid = Grid(2, 2, overlapping={1: [1, 2, 3], 2: [1, 2, 3], 3: [1, 2, 3]})
+    agents = {
+        'agent0': AttackingAgent(
+            id='agent0',
+            initial_position=np.array([1, 1]),
+            encoding=3,
+            attack_range=1,
+            attack_strength=1,
+            attack_accuracy=1,
+            attack_count=3
+        ),
+        'agent1': HealthAgent(
+            id='agent1', initial_position=np.array([0, 0]), encoding=1, initial_health=1
+        ),
+        'agent2': HealthAgent(
+            id='agent2', initial_position=np.array([1, 1]), encoding=2, initial_health=1
+        ),
+        'agent3': HealthAgent(
+            id='agent3', initial_position=np.array([1, 1]), encoding=2, initial_health=1
+        ),
+        'agent4': HealthAgent(
+            id='agent4', initial_position=np.array([1, 1]), encoding=1, initial_health=1
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = SelectiveAttackActor(
+        attack_mapping={3: [1, 2]}, grid=grid, agents=agents
+    )
+    agents['agent0'].finalize()
+
+    position_state.reset()
+    health_state.reset()
+
+    attack = {'attack': np.array([
+        [0, 0, 0],
+        [0, 2, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 2
+    assert agents['agent2'] in attacked_agents
+    assert agents['agent4'] in attacked_agents
+    assert not agents['agent2'].active
+    assert not agents['agent4'].active
+
+    agents['agent0'].attack_strength = 0.5
+    attack_actor = SelectiveAttackActor(
+        attack_mapping={3: [1, 2]}, stacked_attacks=True, grid=grid, agents=agents
+    )
+
+    attack = {'attack': np.array([
+        [1, 0, 0],
+        [0, 3, 0],
+        [0, 0, 0]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 4
+    assert attacked_agents[0] == agents['agent1']
+    assert attacked_agents[1] == agents['agent3']
+    assert attacked_agents[2] == agents['agent3']
+    assert attacked_agents[3] == agents['agent3']
+    assert agents['agent1'].active
+    assert not agents['agent3'].active
+
+    attack = {'attack': np.array([
+        [3, 3, 3],
+        [3, 3, 3],
+        [3, 3, 3]
+    ], dtype=int)}
+    assert attack in agents['agent0'].action_space
+    attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert len(attacked_agents) == 3
+    assert attacked_agents[0] == agents['agent1']
+    assert attacked_agents[1] == agents['agent1']
+    assert attacked_agents[2] == agents['agent1']
+    assert not agents['agent1'].active
+
+
 def test_encoding_based_attack_actor():
     grid = Grid(2, 2, overlapping={1: [3], 3: [1]})
     agents = {
