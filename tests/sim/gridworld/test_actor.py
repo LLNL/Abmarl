@@ -195,6 +195,136 @@ def test_binary_attack_actor_attack_mapping():
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: ['2', 3], 2: [2, 3]})
 
 
+def test_binary_attack_actor_attack_count():
+    agents = {
+        'agent0': AttackingAgent(
+            id='agent0',
+            initial_position=np.array([2, 2]),
+            encoding=1,
+            attack_range=2,
+            attack_strength=0,
+            attack_accuracy=1,
+            attack_count=3
+        ),
+        'agent1': HealthAgent(
+            id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
+        ),
+        'agent2': HealthAgent(
+            id='agent2', initial_position=np.array([2, 3]), encoding=2, initial_health=1
+        ),
+        'agent3': HealthAgent(
+            id='agent3', initial_position=np.array([3, 2]), encoding=1, initial_health=1
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(attack_mapping={1: [1, 2]}, grid=grid, agents=agents)
+    assert agents['agent0'].action_space['attack'] == Discrete(4)
+
+    agents['agent0'].finalize()
+    assert agents['agent0'].null_action == {'attack': 0}
+
+    position_state.reset()
+    health_state.reset()
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 0})
+    assert type(attacked_agents) is list
+    assert not attacked_agents
+
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 1})
+    assert len(attacked_agents) == 1
+
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert len(attacked_agents) == 2
+
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 3})
+    assert len(attacked_agents) == 3
+
+    agents['agent0'].attack_strength = 1
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 3})
+    assert len(attacked_agents) == 3
+    assert not agents['agent1'].active
+    assert not agents['agent2'].active
+    assert not agents['agent3'].active
+    assert agents['agent1'].health <= 0
+    assert agents['agent2'].health <= 0
+    assert agents['agent3'].health <= 0
+    assert not grid[4, 4]
+    assert not grid[2, 3]
+    assert not grid[3, 2]
+
+
+def test_binary_attack_actor_stacked_attack():
+    agents = {
+        'agent0': AttackingAgent(
+            id='agent0',
+            initial_position=np.array([2, 2]),
+            encoding=1,
+            attack_range=2,
+            attack_strength=1,
+            attack_accuracy=1,
+            attack_count=2
+        ),
+        'agent1': HealthAgent(
+            id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
+        ),
+        'agent2': HealthAgent(
+            id='agent2', initial_position=np.array([2, 3]), encoding=2, initial_health=1
+        ),
+        'agent3': HealthAgent(
+            id='agent3', initial_position=np.array([3, 2]), encoding=1, initial_health=1
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    health_state = HealthState(grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(
+        attack_mapping={1: [1]}, stacked_attacks=False, grid=grid, agents=agents
+    )
+    assert agents['agent0'].action_space['attack'] == Discrete(3)
+
+    agents['agent0'].finalize()
+    assert agents['agent0'].null_action == {'attack': 0}
+
+    position_state.reset()
+    health_state.reset()
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert len(attacked_agents) == 2
+    assert agents['agent1'] in attacked_agents
+    assert agents['agent3'] in attacked_agents
+    assert agents['agent2'] not in attacked_agents
+    assert not agents['agent1'].active
+    assert not agents['agent3'].active
+    assert agents['agent1'].health <= 0
+    assert agents['agent3'].health <= 0
+    assert not grid[4, 4]
+    assert not grid[3, 2]
+
+    agents['agent0'].attack_strength = 0.5
+    attack_actor = BinaryAttackActor(
+        attack_mapping={1: [2]}, stacked_attacks=True, grid=grid, agents=agents
+    )
+
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 1})
+    assert len(attacked_agents) == 1
+    assert attacked_agents[0] == agents['agent2']
+    assert agents['agent2'].health == 0.5
+
+    agents['agent0'].attack_strength = 0
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert len(attacked_agents) == 2
+    assert attacked_agents[0] == attacked_agents[1]
+    assert agents['agent2'].health == 0.5
+
+    agents['agent0'].attack_strength = 0.25
+    attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert len(attacked_agents) == 2
+    assert attacked_agents[0] == attacked_agents[1]
+    assert not agents['agent2'].active
+    assert agents['agent2'].health <= 0
+    assert not grid[2, 3]
+
+
 def test_selective_attack_actor():
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),

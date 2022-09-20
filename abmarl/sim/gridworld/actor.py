@@ -234,8 +234,7 @@ class BinaryAttackActor(ActorBaseComponent):
                 return np.random.choice(
                     attackable_agents, size=attack, replace=self.stacked_attacks
                 )
-            else:
-                return []
+            return []
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
@@ -245,9 +244,8 @@ class BinaryAttackActor(ActorBaseComponent):
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
                         self.grid.remove(attacked_agent, attacked_agent.position)
-                return attacked_agent
-        else:
-            return []
+                return attacked_agents
+        return []
 
 
 class EncodingBasedAttackActor(ActorBaseComponent):
