@@ -325,22 +325,19 @@ class EncodingBasedAttackActor(ActorBaseComponent):
         """
         Process the agent's attack.
 
-        The agent indicates which encoding(s) to attack. For each encoding
+        The agent indicates which encoding(s) to attack. Each attack is successful
+        if there is an attackable agent such that:
 
-        If the agent has chosen to attack, then we process their attack. The attack
-        is possible if there is an attacked agent such that:
+        1. The attackable agent is active.
+        2. The attackable agent is within range.
+        3. The attackable agent is valid according to the attack_mapping.
+        4. The attacking agent's accuracy is high enough.
 
-        1. The attacked agent is active.
-        2. The attacked agent is within range.
-        3. The attacked agent has attacked encoding.
+        Furthemore, a single agent may only be attacked once if stacked_attacks
+        is False. Additional attacks will be applied on other agents or wasted.
 
-        If the attack is possible, then we determine the success of the attack
-        based on the attacking agent's accuracy. If the attack is successful, then
-        the attacked agent's health is depleted by the attacking agent's strength,
-        possibly resulting in its death.
-
-        Only one agent per encoding can be attacked. If there are multiple agents
-        with the same encoding, then we randomly pick one of them.
+        If the attack is successful, then the attacked agent's health is depleted
+        by the attacking agent's strength, possibly resulting in its death.
         """
         def determine_attack(agent, attack):
             # Generate local grid and an attack mask.
@@ -349,7 +346,7 @@ class EncodingBasedAttackActor(ActorBaseComponent):
             )
 
             # Randomly scan the local grid for attackable agents.
-            attackable_agents = {encoding: [] for encoding, activated in attack.items() if activated}
+            attackable_agents = {encoding: [] for encoding in attack}
             for r in range(2 * agent.attack_range + 1):
                 for c in range(2 * agent.attack_range + 1):
                     if mask[r, c]: # We can see this cell
@@ -361,32 +358,32 @@ class EncodingBasedAttackActor(ActorBaseComponent):
                                     continue
                                 elif not other.active: # Cannot attack inactive agents
                                     continue
-                                elif other.encoding not in attackable_agents:
-                                    # Did not attack this encoding
+                                elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                    # Cannot attack this type of agent
                                     continue
                                 elif np.random.uniform() > agent.attack_accuracy:
                                     # Failed attack
                                     continue
                                 else:
                                     attackable_agents[other.encoding].append(other)
-            attacked_agents = [
-                np.random.choice(agent_list)
-                for agent_list in attackable_agents.values() if agent_list
-            ]
-            # TODO: Variation for attacking all agents here?
+            attacked_agents = []
+            for encoding, num_attacks in attack.items():
+                if not self.stacked_attacks and num_attacks > len(attackable_agents[encoding]):
+                    num_attacks = len(attackable_agents[encoding])
+                attacked_agents.extend(np.random.choice(
+                    attackable_agents[encoding], size=num_attacks, replace=self.stacked_attacks
+                ))
             return attacked_agents
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
-            # if np.any(action): # Agent has chosen to attack
             attacked_agents = determine_attack(attacking_agent, action)
             for attacked_agent in attacked_agents:
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                 if not attacked_agent.active:
                     self.grid.remove(attacked_agent, attacked_agent.position)
             return attacked_agents
-        else:
-            return []
+        return []
 
 
 class RestrictedSelectiveAttackActor(ActorBaseComponent):
