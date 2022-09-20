@@ -258,9 +258,10 @@ class EncodingBasedAttackActor(ActorBaseComponent):
     it may specify up to 3 attacks on encoding 1 and up to 3 attack on encoding 2.
     Agents with those encodings in the surrounding grid are liable to be attacked.
     """
-    def __init__(self, attack_mapping=None, **kwargs):
+    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
         self.attack_mapping = attack_mapping
+        self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 attackable_encodings = self.attack_mapping[agent.encoding]
