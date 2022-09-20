@@ -241,6 +241,7 @@ class BinaryAttackActor(ActorBaseComponent):
             if action: # Agent has chosen to attack
                 attacked_agents = determine_attack(attacking_agent, action)
                 for attacked_agent in attacked_agents:
+                    if not attacked_agent.active: continue # Skip this agent since it is dead
                     attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                     if not attacked_agent.active:
                         self.grid.remove(attacked_agent, attacked_agent.position)
@@ -528,6 +529,7 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
             action = action_dict[self.key]
             attacked_agents = determine_attack(attacking_agent, action)
             for attacked_agent in attacked_agents:
+                if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                 if not attacked_agent.active:
                     self.grid.remove(attacked_agent, attacked_agent.position)
@@ -645,6 +647,7 @@ class SelectiveAttackActor(ActorBaseComponent):
             # if np.any(action): # Agent has chosen to attack
             attacked_agents = determine_attack(attacking_agent, action)
             for attacked_agent in attacked_agents:
+                if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                 if not attacked_agent.active:
                     self.grid.remove(attacked_agent, attacked_agent.position)
