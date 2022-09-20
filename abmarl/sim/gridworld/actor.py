@@ -472,11 +472,11 @@ class RestrictedSelectiveAttackActor(ActorBaseComponent):
         It can also choose not to use one of its attacks and choose not to attack
         at all by not using any of its attacks. For each attack, the processing
         goes through a series of checks. The attack is successful if there is an
-        attacked agent such that:
+        attackable agent such that:
 
-        1. The attacked agent is active.
-        2. The attacked agent is located at the attacked cell.
-        3. The attacked agent is valid according to the attack_mapping.
+        1. The attackable agent is active.
+        2. The attackable agent is positioned at the attacked cell.
+        3. The attackable agent is valid according to the attack_mapping.
         4. The attacking agent's accuracy is high enough.
 
         Furthemore, a single agent may only be attacked once if stacked_attacks
@@ -615,19 +615,20 @@ class SelectiveAttackActor(ActorBaseComponent):
         """
         Process the agent's attack.
 
-        The agent indicates which cells in a surrounding grid to attack. If the
-        cell value is 1, then it attacks, otherwise it does not attack. For each
-        attack, the processing goes through a series of checks. The attack is possible
-        if there is an attacked agent such that:
+        The agent indicates which cells in a surrounding grid to attack. It can
+        attack each cell up to its attack count. An attack is successful if there
+        is an attackable agent such that:
 
-        1. The attacked agent is active.
-        2. The attacked agent is within range.
-        3. The attacked agent is valid according to the attack_mapping.
+        1. The attackable agent is active.
+        2. The attackable agent is positioned at the attacked cell.
+        3. The attackable agent is valid according to the attack_mapping.
+        4. The attacking agent's accuracy is high enough.
 
-        If the attack is possible, then we determine the success of the attack
-        based on the attacking agent's accuracy. If the attack is successful, then
-        the attacked agent's health is depleted by the attacking agent's strength,
-        possibly resulting in its death.
+        Furthemore, a single agent may only be attacked once if stacked_attacks
+        is False. Additional attacks will be applied on other agents or wasted.
+
+        If the attack is successful, then the attacked agent's health is depleted
+        by the attacking agent's strength, possibly resulting in its death.
         """
         def determine_attack(agent, attack):
             # Generate local grid and an attack mask.
@@ -658,8 +659,14 @@ class SelectiveAttackActor(ActorBaseComponent):
                                 else:
                                     attackable_agents.append(other)
                     if attackable_agents:
-                        attacked_agents.append(np.random.choice(attackable_agents))
-                        # TODO: Variation for attacking all agents here?
+                        num_attacks = attack[r, c]
+                        if not self.stacked_attacks and num_attacks > len(attackable_agents):
+                            num_attacks = len(attackable_agents)
+                        attacked_agents.extend(np.random.choice(
+                            attackable_agents,
+                            size=num_attacks,
+                            replace=self.stacked_attacks
+                        ))
             return attacked_agents
 
         if isinstance(attacking_agent, self.supported_agent_type):
@@ -672,5 +679,4 @@ class SelectiveAttackActor(ActorBaseComponent):
                 if not attacked_agent.active:
                     self.grid.remove(attacked_agent, attacked_agent.position)
             return attacked_agents
-        else:
-            return []
+        return []
