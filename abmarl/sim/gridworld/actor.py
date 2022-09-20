@@ -369,7 +369,9 @@ class EncodingBasedAttackActor(ActorBaseComponent):
                                     attackable_agents[other.encoding].append(other)
             attacked_agents = []
             for encoding, num_attacks in attack.items():
-                if not self.stacked_attacks and num_attacks > len(attackable_agents[encoding]):
+                if len(attackable_agents[encoding]) == 0:
+                    continue
+                elif not self.stacked_attacks and num_attacks > len(attackable_agents[encoding]):
                     num_attacks = len(attackable_agents[encoding])
                 attacked_agents.extend(np.random.choice(
                     attackable_agents[encoding], size=num_attacks, replace=self.stacked_attacks
@@ -380,6 +382,7 @@ class EncodingBasedAttackActor(ActorBaseComponent):
             action = action_dict[self.key]
             attacked_agents = determine_attack(attacking_agent, action)
             for attacked_agent in attacked_agents:
+                if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
                 if not attacked_agent.active:
                     self.grid.remove(attacked_agent, attacked_agent.position)
