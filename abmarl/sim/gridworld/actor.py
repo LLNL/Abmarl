@@ -119,7 +119,7 @@ class BinaryAttackActor(ActorBaseComponent):
 
     Agents can choose to use up to some number of their attacks. For example,
     if an agent has an attack count of 3, then it can choose no attack, attack
-    once, attack twice, or attack three times. The BinaryAttackActor searches the
+    once, attack twice, or attack thrice. The BinaryAttackActor searches the
     nearby local grid defined by the agent's attack range for attackable agents,
     and randomly chooses from that set up to the number of attacks issued.
     """
@@ -156,7 +156,7 @@ class BinaryAttackActor(ActorBaseComponent):
     @property
     def stacked_attacks(self):
         """
-        Allows an agent to attack another agent multiple times per step.
+        Allows an agent to attack the same agent multiple times per step.
 
         When an agent has more than 1 attack per turn, this parameter allows
         them to use more than one attack on the same agent. Otherwise, the attacks
@@ -250,11 +250,13 @@ class BinaryAttackActor(ActorBaseComponent):
 
 class EncodingBasedAttackActor(ActorBaseComponent):
     """
-    Agents can attack other agents around it.
+    Agents can attack other agents.
 
-    The attacking agent specifies which encoding it would like to attack. If that
-    encoding is nearby, then the attack may be succesful. Note: multiple encodings
-    can be attacked at the same time.
+    The attacking agent specifies how many attacks it would like to use per available
+    encoding, based on its attack count and the attack mapping. For example, if
+    the agent can attack encodings 1 and 2 and has up to 3 attacks available, then
+    it may specify up to 3 attacks on encoding 1 and up to 3 attack on encoding 2.
+    Agents with those encodings in the surrounding grid are liable to be attacked.
     """
     def __init__(self, attack_mapping=None, **kwargs):
         super().__init__(**kwargs)
@@ -263,7 +265,7 @@ class EncodingBasedAttackActor(ActorBaseComponent):
             if isinstance(agent, self.supported_agent_type):
                 attackable_encodings = self.attack_mapping[agent.encoding]
                 agent.action_space[self.key] = Dict({
-                    i: Discrete(2) for i in attackable_encodings
+                    i: Discrete(agent.attack_count + 1) for i in attackable_encodings
                 })
                 agent.null_action[self.key] = {i: 0 for i in attackable_encodings}
 
@@ -301,6 +303,23 @@ class EncodingBasedAttackActor(ActorBaseComponent):
         This Actor works with AttackingAgents.
         """
         return AttackingAgent
+
+    @property
+    def stacked_attacks(self):
+        """
+        Allows an agent to attack the same agent multiple times per step.
+
+        When an agent has more than 1 attack per encoding, this parameter allows
+        them to use more than one attack on the same agent. Otherwise, the attacks
+        will be applied to other agents, and if there are not enough attackable
+        agents, then the extra attacks will be wasted.
+        """
+        return self._stacked_attacks
+
+    @stacked_attacks.setter
+    def stacked_attacks(self, value):
+        assert type(value) is bool, "Stacked attacks must be a boolean."
+        self._stacked_attacks = value
 
     def process_action(self, attacking_agent, action_dict, **kwargs):
         """
