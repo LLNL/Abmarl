@@ -899,7 +899,9 @@ def test_restricted_selective_attack_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = RestrictedSelectiveAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = RestrictedSelectiveAttackActor(
+        attack_mapping={3: [1, 2]}, grid=grid, agents=agents
+    )
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent

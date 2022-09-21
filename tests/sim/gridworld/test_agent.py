@@ -180,5 +180,5 @@ def test_attacking_agent():
             attack_range=3,
             attack_strength=0.6,
             attack_accuracy=0.95,
-            attack_count = -2
+            attack_count=-2
         )

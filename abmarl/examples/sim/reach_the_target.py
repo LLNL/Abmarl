@@ -103,7 +103,7 @@ class ReachTheTargetSim(GridWorldSimulation):
 
         # Observer Components
         self.grid_observer = SingleGridObserver(**kwargs)
-        
+
         # Done components
         self.active_done = ActiveDone(**kwargs)
         self.target_done = TargetDone(target=self.target, **kwargs)

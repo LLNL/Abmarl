@@ -70,7 +70,6 @@ def policy_mapping_fn(agent_id):
     return 'runner' if agent_id.startswith('runner') else 'target'
 
 
-
 # Experiment parameters
 params = {
     'experiment': {
@@ -105,5 +104,3 @@ params = {
         },
     }
 }
-
-
