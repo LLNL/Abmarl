@@ -114,6 +114,9 @@ class MoveActor(ActorBaseComponent):
 
 
 class AttackActorBaseComponent(ActorBaseComponent, ABC):
+    """
+    Abstract class that provides the properties and structure for attack actors.
+    """
     def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
         self.attack_mapping = attack_mapping
@@ -195,7 +198,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         pass
 
 
-class BinaryAttackActor(ActorBaseComponent):
+class BinaryAttackActor(AttackActorBaseComponent):
     """
     Agents can attack other agents.
 
@@ -205,68 +208,11 @@ class BinaryAttackActor(ActorBaseComponent):
     nearby local grid defined by the agent's attack range for attackable agents,
     and randomly chooses from that set up to the number of attacks issued.
     """
-    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
-        super().__init__(**kwargs)
-        self.attack_mapping = attack_mapping
-        self.stacked_attacks = stacked_attacks
-        for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
-                agent.action_space[self.key] = Discrete(agent.attack_count + 1)
-                agent.null_action[self.key] = 0
+    def _assign_space(self, agent):
+        agent.action_space[self.key] = Discrete(agent.attack_count + 1)
+        agent.null_action[self.key] = 0
 
-    @property
-    def attack_mapping(self):
-        """
-        Dict that dictates which agents the attacking agent can attack.
-
-        The dictionary maps the attacking agents' encodings to a list of encodings
-        that they can attack.
-        """
-        return self._attack_mapping
-
-    @attack_mapping.setter
-    def attack_mapping(self, value):
-        assert type(value) is dict, "Attack mapping must be dictionary."
-        for k, v in value.items():
-            assert type(k) is int, "All keys in attack mapping must be integer."
-            assert type(v) is list, "All values in attack mapping must be list."
-            for i in v:
-                assert type(i) is int, \
-                    "All elements in the attack mapping values must be integers."
-        self._attack_mapping = value
-
-    @property
-    def stacked_attacks(self):
-        """
-        Allows an agent to attack the same agent multiple times per step.
-
-        When an agent has more than 1 attack per turn, this parameter allows
-        them to use more than one attack on the same agent. Otherwise, the attacks
-        will be applied to other agents, and if there are not enough attackable
-        agents, then the extra attacks will be wasted.
-        """
-        return self._stacked_attacks
-
-    @stacked_attacks.setter
-    def stacked_attacks(self, value):
-        assert type(value) is bool, "Stacked attacks must be a boolean."
-        self._stacked_attacks = value
-
-    @property
-    def key(self):
-        """
-        This Actor's key is "attack".
-        """
-        return 'attack'
-
-    @property
-    def supported_agent_type(self):
-        """
-        This Actor works with AttackingAgents.
-        """
-        return AttackingAgent
-
-    def process_action(self, attacking_agent, action_dict, **kwargs):
+    def _determine_attack(self, agent, attack):
         """
         Process the agent's attack.
 
@@ -284,51 +230,39 @@ class BinaryAttackActor(ActorBaseComponent):
         If the attack is successful, then the attacked agent's health is depleted
         by the attacking agent's strength, possibly resulting in its death.
         """
-        def determine_attack(agent, attack):
-            if not attack:
-                return []
-            # Generate local grid and an attack mask.
-            local_grid, mask = gu.create_grid_and_mask(
-                agent, self.grid, agent.attack_range, self.agents
-            )
-
-            # Randomly scan the local grid for attackable agents.
-            attackable_agents = []
-            for r in range(2 * agent.attack_range + 1):
-                for c in range(2 * agent.attack_range + 1):
-                    if mask[r, c]: # We can see this cell
-                        candidate_agents = local_grid[r, c]
-                        if candidate_agents is not None:
-                            for other in candidate_agents.values():
-                                if other.id == agent.id: # Cannot attack yourself
-                                    continue
-                                elif not other.active: # Cannot attack inactive agents
-                                    continue
-                                elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                    # Cannot attack this type of agent
-                                    continue
-                                elif np.random.uniform() > agent.attack_accuracy:
-                                    # Failed attack
-                                    continue
-                                else:
-                                    attackable_agents.append(other)
-            if attackable_agents:
-                if not self.stacked_attacks and attack > len(attackable_agents):
-                    attack = len(attackable_agents)
-                return np.random.choice(
-                    attackable_agents, size=attack, replace=self.stacked_attacks
-                )
+        if not attack:
             return []
+        # Generate local grid and an attack mask.
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.attack_range, self.agents
+        )
 
-        if isinstance(attacking_agent, self.supported_agent_type):
-            action = action_dict[self.key]
-            attacked_agents = determine_attack(attacking_agent, action)
-            for attacked_agent in attacked_agents:
-                if not attacked_agent.active: continue # Skip this agent since it is dead
-                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
-                if not attacked_agent.active:
-                    self.grid.remove(attacked_agent, attacked_agent.position)
-            return attacked_agents
+        # Randomly scan the local grid for attackable agents.
+        attackable_agents = []
+        for r in range(2 * agent.attack_range + 1):
+            for c in range(2 * agent.attack_range + 1):
+                if mask[r, c]: # We can see this cell
+                    candidate_agents = local_grid[r, c]
+                    if candidate_agents is not None:
+                        for other in candidate_agents.values():
+                            if other.id == agent.id: # Cannot attack yourself
+                                continue
+                            elif not other.active: # Cannot attack inactive agents
+                                continue
+                            elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                # Cannot attack this type of agent
+                                continue
+                            elif np.random.uniform() > agent.attack_accuracy:
+                                # Failed attack
+                                continue
+                            else:
+                                attackable_agents.append(other)
+        if attackable_agents:
+            if not self.stacked_attacks and attack > len(attackable_agents):
+                attack = len(attackable_agents)
+            return np.random.choice(
+                attackable_agents, size=attack, replace=self.stacked_attacks
+            )
         return []
 
 
