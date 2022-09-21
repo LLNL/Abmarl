@@ -211,6 +211,59 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             return attacked_agents
         return []
 
+    def _basic_criteria(self, attacking_agent, candidate):
+        """
+        Basic criteria shared among attack actors for attack success.
+
+        The basic criteria shared amoung all attacking actors is the following:
+        1. The candidate must not be the same as the attacking agent.
+        2. The candidate must be active.
+        3. The candidate's encoding must be in the attacker's attack mapping.
+        4. Attempt the attack by rolling the dice against the attacker's accuracy.
+
+        If each of these criteria's is met, then the attack is succesful.
+
+        Args:
+            attacking_agent: The attacking agent.
+            candidate: The candidate agent.
+        Returns:
+            True if the attack is successful, otherwise False.
+        """
+        if candidate.id == attacking_agent.id: # Cannot attack yourself
+            return False
+        elif not candidate.active: # Cannot attack inactive agents
+            return False
+        elif candidate.encoding not in self.attack_mapping[attacking_agent.encoding]:
+            # Cannot attack this type of agent
+            return False
+        elif np.random.uniform() > attacking_agent.attack_accuracy:
+            # Failed attack
+            return False
+        else:
+            return True
+
+    def _subset_attackables(self, attackable_agents, number_of_attacks):
+        """
+        Subset the list of attackable agents by the number of attacks.
+
+        If the number of attacks is greater than the list of agents and stacked
+        attacks is False, then return the entire list of agents. Otherwise, randomly
+        choose agents from the list of attackable_agents, using replacement if
+        stacked attacks is True.
+
+        Args:
+            attackable_agents: List of attackable agents.
+            number_of_attacks: The number agents to choose from the list. If stacked
+            attacks is True, then the same agent could be chosen multiple times.
+        Returns:
+            List of agents chosen from this list.
+        """
+        if not self.stacked_attacks and number_of_attacks > len(attackable_agents):
+            return attackable_agents
+        return np.random.choice(
+            attackable_agents, size=number_of_attacks, replace=self.stacked_attacks
+        )
+
     @abstractmethod
     def _determine_attack(self, agent, attack):
         """
@@ -273,25 +326,13 @@ class BinaryAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if other.id == agent.id: # Cannot attack yourself
-                                continue
-                            elif not other.active: # Cannot attack inactive agents
-                                continue
-                            elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                # Cannot attack this type of agent
-                                continue
-                            elif np.random.uniform() > agent.attack_accuracy:
-                                # Failed attack
-                                continue
-                            else:
+                            if self._basic_criteria(agent, other):
                                 attackable_agents.append(other)
+
         if attackable_agents:
-            if not self.stacked_attacks and attack > len(attackable_agents):
-                attack = len(attackable_agents)
-            return np.random.choice(
-                attackable_agents, size=attack, replace=self.stacked_attacks
-            )
-        return []
+            return self._subset_attackables(attackable_agents, attack)
+        else:
+            return []
 
 
 class EncodingBasedAttackActor(AttackActorBaseComponent):
@@ -346,27 +387,17 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if other.id == agent.id: # Cannot attack yourself
-                                continue
-                            elif not other.active: # Cannot attack inactive agents
-                                continue
-                            elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                # Cannot attack this type of agent
-                                continue
-                            elif np.random.uniform() > agent.attack_accuracy:
-                                # Failed attack
-                                continue
-                            else:
+                            if self._basic_criteria(agent, other):
                                 attackable_agents[other.encoding].append(other)
+
         attacked_agents = []
         for encoding, num_attacks in attack.items():
             if len(attackable_agents[encoding]) == 0:
                 continue
-            elif not self.stacked_attacks and num_attacks > len(attackable_agents[encoding]):
-                num_attacks = len(attackable_agents[encoding])
-            attacked_agents.extend(np.random.choice(
-                attackable_agents[encoding], size=num_attacks, replace=self.stacked_attacks
-            ))
+            attacked_agents.extend(
+                self._subset_attackables(attackable_agents[encoding], num_attacks)
+            )
+
         return attacked_agents
 
 
@@ -424,23 +455,17 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if other.id == agent.id: # Cannot attack yourself
-                                continue
-                            elif not other.active: # Cannot attack inactive agents
-                                continue
-                            elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                # Cannot attack this type of agent
-                                continue
-                            elif np.random.uniform() > agent.attack_accuracy:
-                                # Failed attack
+                            if not self._basic_criteria(agent, other):
                                 continue
                             elif other in attacked_agents and not self.stacked_attacks:
                                 # Cannot attack this agent again.
                                 continue
                             else:
                                 attackable_agents.append(other)
+
                 if attackable_agents:
                     attacked_agents.append(np.random.choice(attackable_agents))
+
         return attacked_agents
 
 
@@ -495,25 +520,12 @@ class SelectiveAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if other.id == agent.id: # Cannot attack yourself
-                                continue
-                            elif not other.active: # Cannot attack inactive agents
-                                continue
-                            elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                # Cannot attack this type of agent
-                                continue
-                            elif np.random.uniform() > agent.attack_accuracy:
-                                # Failed attack
-                                continue
-                            else:
+                            if self._basic_criteria(agent, other):
                                 attackable_agents.append(other)
+
                 if attackable_agents:
-                    num_attacks = attack[r, c]
-                    if not self.stacked_attacks and num_attacks > len(attackable_agents):
-                        num_attacks = len(attackable_agents)
-                    attacked_agents.extend(np.random.choice(
-                        attackable_agents,
-                        size=num_attacks,
-                        replace=self.stacked_attacks
-                    ))
+                    attacked_agents.extend(
+                        self._subset_attackables(attackable_agents, attack[r, c])
+                    )
+
         return attacked_agents
