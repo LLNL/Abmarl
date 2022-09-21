@@ -266,7 +266,7 @@ class BinaryAttackActor(AttackActorBaseComponent):
         return []
 
 
-class EncodingBasedAttackActor(ActorBaseComponent):
+class EncodingBasedAttackActor(AttackActorBaseComponent):
     """
     Agents can attack other agents.
 
@@ -276,71 +276,14 @@ class EncodingBasedAttackActor(ActorBaseComponent):
     it may specify up to 3 attacks on encoding 1 and up to 3 attack on encoding 2.
     Agents with those encodings in the surrounding grid are liable to be attacked.
     """
-    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
-        super().__init__(**kwargs)
-        self.attack_mapping = attack_mapping
-        self.stacked_attacks = stacked_attacks
-        for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
-                attackable_encodings = self.attack_mapping[agent.encoding]
-                agent.action_space[self.key] = Dict({
-                    i: Discrete(agent.attack_count + 1) for i in attackable_encodings
-                })
-                agent.null_action[self.key] = {i: 0 for i in attackable_encodings}
+    def _assign_space(self, agent):
+        attackable_encodings = self.attack_mapping[agent.encoding]
+        agent.action_space[self.key] = Dict({
+            i: Discrete(agent.attack_count + 1) for i in attackable_encodings
+        })
+        agent.null_action[self.key] = {i: 0 for i in attackable_encodings}
 
-    @property
-    def attack_mapping(self):
-        """
-        Dict that dictates which agents the attacking agent can attack.
-
-        The dictionary maps the attacking agents' encodings to a list of encodings
-        that they can attack.
-        """
-        return self._attack_mapping
-
-    @attack_mapping.setter
-    def attack_mapping(self, value):
-        assert type(value) is dict, "Attack mapping must be dictionary."
-        for k, v in value.items():
-            assert type(k) is int, "All keys in attack mapping must be integer."
-            assert type(v) is list, "All values in attack mapping must be list."
-            for i in v:
-                assert type(i) is int, \
-                    "All elements in the attack mapping values must be integers."
-        self._attack_mapping = value
-
-    @property
-    def key(self):
-        """
-        This Actor's key is "attack".
-        """
-        return 'attack'
-
-    @property
-    def supported_agent_type(self):
-        """
-        This Actor works with AttackingAgents.
-        """
-        return AttackingAgent
-
-    @property
-    def stacked_attacks(self):
-        """
-        Allows an agent to attack the same agent multiple times per step.
-
-        When an agent has more than 1 attack per encoding, this parameter allows
-        them to use more than one attack on the same agent. Otherwise, the attacks
-        will be applied to other agents, and if there are not enough attackable
-        agents, then the extra attacks will be wasted.
-        """
-        return self._stacked_attacks
-
-    @stacked_attacks.setter
-    def stacked_attacks(self, value):
-        assert type(value) is bool, "Stacked attacks must be a boolean."
-        self._stacked_attacks = value
-
-    def process_action(self, attacking_agent, action_dict, **kwargs):
+    def _determine_attack(self, agent, attack):
         """
         Process the agent's attack.
 
@@ -358,54 +301,42 @@ class EncodingBasedAttackActor(ActorBaseComponent):
         If the attack is successful, then the attacked agent's health is depleted
         by the attacking agent's strength, possibly resulting in its death.
         """
-        def determine_attack(agent, attack):
-            # Generate local grid and an attack mask.
-            local_grid, mask = gu.create_grid_and_mask(
-                agent, self.grid, agent.attack_range, self.agents
-            )
+        # Generate local grid and an attack mask.
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.attack_range, self.agents
+        )
 
-            # Randomly scan the local grid for attackable agents.
-            attackable_agents = {encoding: [] for encoding in attack}
-            for r in range(2 * agent.attack_range + 1):
-                for c in range(2 * agent.attack_range + 1):
-                    if mask[r, c]: # We can see this cell
-                        # TODO: Variation for masked cell?
-                        candidate_agents = local_grid[r, c]
-                        if candidate_agents is not None:
-                            for other in candidate_agents.values():
-                                if other.id == agent.id: # Cannot attack yourself
-                                    continue
-                                elif not other.active: # Cannot attack inactive agents
-                                    continue
-                                elif other.encoding not in self.attack_mapping[agent.encoding]:
-                                    # Cannot attack this type of agent
-                                    continue
-                                elif np.random.uniform() > agent.attack_accuracy:
-                                    # Failed attack
-                                    continue
-                                else:
-                                    attackable_agents[other.encoding].append(other)
-            attacked_agents = []
-            for encoding, num_attacks in attack.items():
-                if len(attackable_agents[encoding]) == 0:
-                    continue
-                elif not self.stacked_attacks and num_attacks > len(attackable_agents[encoding]):
-                    num_attacks = len(attackable_agents[encoding])
-                attacked_agents.extend(np.random.choice(
-                    attackable_agents[encoding], size=num_attacks, replace=self.stacked_attacks
-                ))
-            return attacked_agents
-
-        if isinstance(attacking_agent, self.supported_agent_type):
-            action = action_dict[self.key]
-            attacked_agents = determine_attack(attacking_agent, action)
-            for attacked_agent in attacked_agents:
-                if not attacked_agent.active: continue # Skip this agent since it is dead
-                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
-                if not attacked_agent.active:
-                    self.grid.remove(attacked_agent, attacked_agent.position)
-            return attacked_agents
-        return []
+        # Randomly scan the local grid for attackable agents.
+        attackable_agents = {encoding: [] for encoding in attack}
+        for r in range(2 * agent.attack_range + 1):
+            for c in range(2 * agent.attack_range + 1):
+                if mask[r, c]: # We can see this cell
+                    # TODO: Variation for masked cell?
+                    candidate_agents = local_grid[r, c]
+                    if candidate_agents is not None:
+                        for other in candidate_agents.values():
+                            if other.id == agent.id: # Cannot attack yourself
+                                continue
+                            elif not other.active: # Cannot attack inactive agents
+                                continue
+                            elif other.encoding not in self.attack_mapping[agent.encoding]:
+                                # Cannot attack this type of agent
+                                continue
+                            elif np.random.uniform() > agent.attack_accuracy:
+                                # Failed attack
+                                continue
+                            else:
+                                attackable_agents[other.encoding].append(other)
+        attacked_agents = []
+        for encoding, num_attacks in attack.items():
+            if len(attackable_agents[encoding]) == 0:
+                continue
+            elif not self.stacked_attacks and num_attacks > len(attackable_agents[encoding]):
+                num_attacks = len(attackable_agents[encoding])
+            attacked_agents.extend(np.random.choice(
+                attackable_agents[encoding], size=num_attacks, replace=self.stacked_attacks
+            ))
+        return attacked_agents
 
 
 class RestrictedSelectiveAttackActor(ActorBaseComponent):
