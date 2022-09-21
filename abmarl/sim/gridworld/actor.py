@@ -177,14 +177,13 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     def process_action(self, attacking_agent, action_dict, **kwargs):
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
-            if action: # Agent has chosen to attack
-                attacked_agents = self._determine_attack(attacking_agent, action)
-                for attacked_agent in attacked_agents:
-                    if not attacked_agent.active: continue # Skip this agent since it is dead
-                    attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
-                    if not attacked_agent.active:
-                        self.grid.remove(attacked_agent, attacked_agent.position)
-                return attacked_agents
+            attacked_agents = self._determine_attack(attacking_agent, action)
+            for attacked_agent in attacked_agents:
+                if not attacked_agent.active: continue # Skip this agent since it is dead
+                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                if not attacked_agent.active:
+                    self.grid.remove(attacked_agent, attacked_agent.position)
+            return attacked_agents
         return []
 
     @abstractmethod
@@ -286,6 +285,8 @@ class BinaryAttackActor(ActorBaseComponent):
         by the attacking agent's strength, possibly resulting in its death.
         """
         def determine_attack(agent, attack):
+            if not attack:
+                return []
             # Generate local grid and an attack mask.
             local_grid, mask = gu.create_grid_and_mask(
                 agent, self.grid, agent.attack_range, self.agents
@@ -321,14 +322,13 @@ class BinaryAttackActor(ActorBaseComponent):
 
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
-            if action: # Agent has chosen to attack
-                attacked_agents = determine_attack(attacking_agent, action)
-                for attacked_agent in attacked_agents:
-                    if not attacked_agent.active: continue # Skip this agent since it is dead
-                    attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
-                    if not attacked_agent.active:
-                        self.grid.remove(attacked_agent, attacked_agent.position)
-                return attacked_agents
+            attacked_agents = determine_attack(attacking_agent, action)
+            for attacked_agent in attacked_agents:
+                if not attacked_agent.active: continue # Skip this agent since it is dead
+                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                if not attacked_agent.active:
+                    self.grid.remove(attacked_agent, attacked_agent.position)
+            return attacked_agents
         return []
 
 
