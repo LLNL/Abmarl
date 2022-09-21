@@ -244,19 +244,17 @@ class BinaryAttackActor(AttackActorBaseComponent):
         """
         Process the agent's attack.
 
-        The agent can attack up to the number of its attack count. Each attack is
-        successful if there is an attackable agent such that:
+        The agent specifies how many attacks to carry out. The BinaryAttackActor
+        searches the nearby local grid defined by the agent's attack range for attackable
+        agents, and randomly chooses from that set up to the number of attacks issued.
 
-        1. The attackable agent is active.
-        2. The attackable agent is within range.
-        3. The attackable agent is valid according to the attack_mapping.
-        4. The attacking agent's accuracy is high enough.
-
-        Furthemore, a single agent may only be attacked once if stacked_attacks
-        is False. Additional attacks will be applied on other agents or wasted.
-
-        If the attack is successful, then the attacked agent's health is depleted
-        by the attacking agent's strength, possibly resulting in its death.
+        Args:
+            agent: The attacking agent.
+            attack: The number of attacks to perform.
+        Returns:
+            List of attacked agents, up to the number of attacks the agent can
+            carry out per step. The agent's attack count is a total upper bound
+            on the attack.
         """
         if not attack:
             return []
@@ -315,19 +313,18 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
         """
         Process the agent's attack.
 
-        The agent indicates which encoding(s) to attack. Each attack is successful
-        if there is an attackable agent such that:
+        The agent specifies how many attacks to carry out per encoding. The
+        EncodingBasedAttackActor searches the nearby local grid defined by the
+        agent's attack range for attackable agents, and randomly chooses from that
+        set up to the number of attacks issued for each encoding.
 
-        1. The attackable agent is active.
-        2. The attackable agent is within range.
-        3. The attackable agent is valid according to the attack_mapping.
-        4. The attacking agent's accuracy is high enough.
-
-        Furthemore, a single agent may only be attacked once if stacked_attacks
-        is False. Additional attacks will be applied on other agents or wasted.
-
-        If the attack is successful, then the attacked agent's health is depleted
-        by the attacking agent's strength, possibly resulting in its death.
+        Args:
+            agent: The attacking agent.
+            attack: The number of attacks to perform per each encoding.
+        Returns:
+            List of attacked agents, up to the number of attacks the agent can
+            carry out per encoding per step. The agent's attack count is an upper bound
+            on the attack per encoding, not a total upper bound.
         """
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -386,23 +383,16 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
         """
         Process the agent's attack.
 
-        The agent indicates which cells in a surrounding grid to attack. It can
-        attack up to K cells, depending on the number of attacks it has per turn.
-        It can also choose not to use one of its attacks and choose not to attack
-        at all by not using any of its attacks. For each attack, the processing
-        goes through a series of checks. The attack is successful if there is an
-        attackable agent such that:
+        The agent specifies which grid cells to attack. The RestrictedSelectiveAttackActor
+        randomly chooses attackable agents on each attacked cell.
 
-        1. The attackable agent is active.
-        2. The attackable agent is positioned at the attacked cell.
-        3. The attackable agent is valid according to the attack_mapping.
-        4. The attacking agent's accuracy is high enough.
-
-        Furthemore, a single agent may only be attacked once if stacked_attacks
-        is False. Additional attacks will be applied on other agents or wasted.
-
-        If the attack is successful, then the attacked agent's health is depleted
-        by the attacking agent's strength, possibly resulting in its death.
+        Args:
+            agent: The attacking agent.
+            attack: The nearby cells to attack.
+        Returns:
+            List of attacked agents, up to the number of attacks the agent can
+            carry out per step. The agent's attack count is a total upper bound
+            on the attack.
         """
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -465,20 +455,16 @@ class SelectiveAttackActor(AttackActorBaseComponent):
         """
         Process the agent's attack.
 
-        The agent indicates which cells in a surrounding grid to attack. It can
-        attack each cell up to its attack count. An attack is successful if there
-        is an attackable agent such that:
+        The agent specifies which grid cells to attack. The SelectiveAttackActor
+        randomly chooses attackable agents on each attacked cell.
 
-        1. The attackable agent is active.
-        2. The attackable agent is positioned at the attacked cell.
-        3. The attackable agent is valid according to the attack_mapping.
-        4. The attacking agent's accuracy is high enough.
-
-        Furthemore, a single agent may only be attacked once if stacked_attacks
-        is False. Additional attacks will be applied on other agents or wasted.
-
-        If the attack is successful, then the attacked agent's health is depleted
-        by the attacking agent's strength, possibly resulting in its death.
+        Args:
+            agent: The attacking agent.
+            attack: The nearby cells to attack.
+        Returns:
+            List of attacked agents, up to the number of attacks the agent can
+            carry out per cell per step. The agent's attack count is an upper bound
+            on the attack per cell, not a total upper bound.
         """
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
