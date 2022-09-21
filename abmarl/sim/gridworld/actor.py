@@ -256,8 +256,10 @@ class BinaryAttackActor(AttackActorBaseComponent):
             carry out per step. The agent's attack count is a total upper bound
             on the attack.
         """
+        # Return empty list if no attack is specified.
         if not attack:
             return []
+
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
             agent, self.grid, agent.attack_range, self.agents
@@ -326,6 +328,10 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
             carry out per encoding per step. The agent's attack count is an upper bound
             on the attack per encoding, not a total upper bound.
         """
+        # Return empty list if no attack is specified.
+        if not any([num_attacks for num_attacks in attack.values()]):
+            return []
+
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
             agent, self.grid, agent.attack_range, self.agents
@@ -394,6 +400,10 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
             carry out per step. The agent's attack count is a total upper bound
             on the attack.
         """
+        # Return empty list if no attack is specified.
+        if not any(attack):
+            return []
+
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
             agent, self.grid, agent.attack_range, self.agents
@@ -466,6 +476,10 @@ class SelectiveAttackActor(AttackActorBaseComponent):
             carry out per cell per step. The agent's attack count is an upper bound
             on the attack per cell, not a total upper bound.
         """
+        # Return empty list if no attack is specified.
+        if not np.any(attack):
+            return []
+
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
             agent, self.grid, agent.attack_range, self.agents
