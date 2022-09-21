@@ -211,21 +211,24 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             return attacked_agents
         return []
 
-    @abstractmethod
-    def _determine_attack(self, agent, attack):
+    def _basic_criteria(self, attacking_agent, candidate):
         """
-        Derived class to determine which agents are successfully attacked.
-        """
-        pass
+        Basic criteria shared among attack actors for attack success.
 
-    @abstractmethod
-    def _assign_space(self, agent):
-        """
-        Derived class to assign the agent's action space and null_action.
-        """
-        pass
+        The basic criteria shared amoung all attacking actors is the following:
+        1. The candidate must not be the same as the attacking agent.
+        2. The candidate must be active.
+        3. The candidate's encoding must be in the attacker's attack mapping.
+        4. Attempt the attack by rolling the dice against the attacker's accuracy.
 
-    def _criteria(self, attacking_agent, candidate):
+        If each of these criteria's is met, then the attack is succesful.
+
+        Args:
+            attacking_agent: The attacking agent.
+            candidate: The candidate agent.
+        Returns:
+            True if the attack is successful, otherwise False.
+        """
         if candidate.id == attacking_agent.id: # Cannot attack yourself
             return False
         elif not candidate.active: # Cannot attack inactive agents
@@ -239,12 +242,41 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         else:
             return True
 
-    def _subset_attackables(self, attack, attackables):
-        if not self.stacked_attacks and attack > len(attackables):
-            attack = len(attackables)
+    def _subset_attackables(self, attackable_agents, number_of_attacks):
+        """
+        Subset the list of attackable agents by the number of attacks.
+
+        If the number of attacks is greater than the list of agents and stacked
+        attacks is False, then return the entire list of agents. Otherwise, randomly
+        choose agents from the list of attackable_agents, using replacement if
+        stacked attacks is True.
+
+        Args:
+            attackable_agents: List of attackable agents.
+            number_of_attacks: The number agents to choose from the list. If stacked
+            attacks is True, then the same agent could be chosen multiple times.
+        Returns:
+            List of agents chosen from this list.
+        """
+        if not self.stacked_attacks and number_of_attacks > len(attackable_agents):
+            return attackable_agents
         return np.random.choice(
-            attackables, size=attack, replace=self.stacked_attacks
+            attackable_agents, size=number_of_attacks, replace=self.stacked_attacks
         )
+
+    @abstractmethod
+    def _determine_attack(self, agent, attack):
+        """
+        Derived class to determine which agents are successfully attacked.
+        """
+        pass
+
+    @abstractmethod
+    def _assign_space(self, agent):
+        """
+        Derived class to assign the agent's action space and null_action.
+        """
+        pass
 
 
 class BinaryAttackActor(AttackActorBaseComponent):
@@ -294,10 +326,10 @@ class BinaryAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if self._criteria(agent, other):
+                            if self._basic_criteria(agent, other):
                                 attackable_agents.append(other)
         if attackable_agents:
-            return self._subset_attackables(attack, attackable_agents)
+            return self._subset_attackables(attackable_agents, attack)
         else:
             return []
 
@@ -354,7 +386,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if self._criteria(agent, other):
+                            if self._basic_criteria(agent, other):
                                 attackable_agents[other.encoding].append(other)
 
         attacked_agents = []
@@ -362,7 +394,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
             if len(attackable_agents[encoding]) == 0:
                 continue
             attacked_agents.extend(
-                self._subset_attackables(num_attacks, attackable_agents[encoding])
+                self._subset_attackables(attackable_agents[encoding], num_attacks)
             )
         return attacked_agents
 
@@ -421,7 +453,7 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if not self._criteria(agent, other):
+                            if not self._basic_criteria(agent, other):
                                 continue
                             elif other in attacked_agents and not self.stacked_attacks:
                                 # Cannot attack this agent again.
@@ -485,11 +517,11 @@ class SelectiveAttackActor(AttackActorBaseComponent):
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
-                            if self._criteria(agent, other):
+                            if self._basic_criteria(agent, other):
                                 attackable_agents.append(other)
                 if attackable_agents:
                     num_attacks = attack[r, c]
                     attacked_agents.extend(
-                        self._subset_attackables(num_attacks, attackable_agents)
+                        self._subset_attackables(attackable_agents, num_attacks)
                     )
         return attacked_agents
