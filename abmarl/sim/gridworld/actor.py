@@ -113,6 +113,89 @@ class MoveActor(ActorBaseComponent):
                 return False
 
 
+class AttackActorBaseComponent(ActorBaseComponent, ABC):
+    def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
+        super().__init__(**kwargs)
+        self.attack_mapping = attack_mapping
+        self.stacked_attacks = stacked_attacks
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                self._assign_space(agent)
+
+    @property
+    def key(self):
+        """
+        This Actor's key is "attack".
+        """
+        return 'attack'
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Actor works with AttackingAgents.
+        """
+        return AttackingAgent
+
+    @property
+    def attack_mapping(self):
+        """
+        Dict that dictates which agents the attacking agent can attack.
+
+        The dictionary maps the attacking agents' encodings to a list of encodings
+        that they can attack.
+        """
+        return self._attack_mapping
+
+    @attack_mapping.setter
+    def attack_mapping(self, value):
+        assert type(value) is dict, "Attack mapping must be dictionary."
+        for k, v in value.items():
+            assert type(k) is int, "All keys in attack mapping must be integer."
+            assert type(v) is list, "All values in attack mapping must be list."
+            for i in v:
+                assert type(i) is int, \
+                    "All elements in the attack mapping values must be integers."
+        self._attack_mapping = value
+
+    @property
+    def stacked_attacks(self):
+        """
+        Allows an agent to attack the same agent multiple times per step.
+
+        When an agent has more than 1 attack per turn, this parameter allows
+        them to use more than one attack on the same agent. Otherwise, the attacks
+        will be applied to other agents, and if there are not enough attackable
+        agents, then the extra attacks will be wasted.
+        """
+        return self._stacked_attacks
+
+    @stacked_attacks.setter
+    def stacked_attacks(self, value):
+        assert type(value) is bool, "Stacked attacks must be a boolean."
+        self._stacked_attacks = value
+
+    def process_action(self, attacking_agent, action_dict, **kwargs):
+        if isinstance(attacking_agent, self.supported_agent_type):
+            action = action_dict[self.key]
+            if action: # Agent has chosen to attack
+                attacked_agents = self._determine_attack(attacking_agent, action)
+                for attacked_agent in attacked_agents:
+                    if not attacked_agent.active: continue # Skip this agent since it is dead
+                    attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
+                    if not attacked_agent.active:
+                        self.grid.remove(attacked_agent, attacked_agent.position)
+                return attacked_agents
+        return []
+
+    @abstractmethod
+    def _determine_attack(self, agent, attack):
+        pass
+
+    @abstractmethod
+    def _assign_space(self, agent):
+        pass
+
+
 class BinaryAttackActor(ActorBaseComponent):
     """
     Agents can attack other agents.
