@@ -328,6 +328,7 @@ class BinaryAttackActor(AttackActorBaseComponent):
                         for other in candidate_agents.values():
                             if self._basic_criteria(agent, other):
                                 attackable_agents.append(other)
+
         if attackable_agents:
             return self._subset_attackables(attackable_agents, attack)
         else:
@@ -396,6 +397,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
             attacked_agents.extend(
                 self._subset_attackables(attackable_agents[encoding], num_attacks)
             )
+
         return attacked_agents
 
 
@@ -463,6 +465,7 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
 
                 if attackable_agents:
                     attacked_agents.append(np.random.choice(attackable_agents))
+
         return attacked_agents
 
 
@@ -519,9 +522,10 @@ class SelectiveAttackActor(AttackActorBaseComponent):
                         for other in candidate_agents.values():
                             if self._basic_criteria(agent, other):
                                 attackable_agents.append(other)
+
                 if attackable_agents:
-                    num_attacks = attack[r, c]
                     attacked_agents.extend(
-                        self._subset_attackables(attackable_agents, num_attacks)
+                        self._subset_attackables(attackable_agents, attack[r, c])
                     )
+
         return attacked_agents
