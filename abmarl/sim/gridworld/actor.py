@@ -116,6 +116,11 @@ class MoveActor(ActorBaseComponent):
 class AttackActorBaseComponent(ActorBaseComponent, ABC):
     """
     Abstract class that provides the properties and structure for attack actors.
+
+    The agent chooses to attack other agents within its surrounding grid. The derived
+    attack actor interprets and implements the specific attack. Attacked agents
+    have their health reduced by the attacking agent's strength and possibly become
+    inactive if their health falls too low.
     """
     def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
@@ -178,6 +183,23 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         self._stacked_attacks = value
 
     def process_action(self, attacking_agent, action_dict, **kwargs):
+        """
+        Process the agent's attack.
+
+        The derived attack actor interprets and implements the action. In general,
+        an attack is successful if there are attackable agents such that:
+
+        1. The attackable agent is active.
+        2. The attackable agent is positioned at the attacked cell.
+        3. The attackable agent is valid according to the attack_mapping.
+        4. The attacking agent's accuracy is high enough.
+
+        Furthemore, a single agent may only be attacked once if stacked_attacks
+        is False. Additional attacks will be applied on other agents or wasted.
+
+        If the attack is successful, then the attacked agent's health is depleted
+        by the attacking agent's strength, possibly resulting in its death.
+        """
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
             attacked_agents = self._determine_attack(attacking_agent, action)
@@ -191,10 +213,16 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
 
     @abstractmethod
     def _determine_attack(self, agent, attack):
+        """
+        Derived class to determine which agents are successfully attacked.
+        """
         pass
 
     @abstractmethod
     def _assign_space(self, agent):
+        """
+        Derived class to assign the agent's action space and null_action.
+        """
         pass
 
 
