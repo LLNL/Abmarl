@@ -389,7 +389,6 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
         for r in range(2 * agent.attack_range + 1):
             for c in range(2 * agent.attack_range + 1):
                 if mask[r, c]: # We can see this cell
-                    # TODO: Variation for masked cell?
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
@@ -459,7 +458,6 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
                 c = int(raveled_cell / (2 * agent.attack_range + 1))
                 attackable_agents = []
                 if mask[r, c]: # We can see this cell
-                    # TODO: Variation for masked cell?
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():
@@ -524,7 +522,6 @@ class SelectiveAttackActor(AttackActorBaseComponent):
                 attackable_agents = []
                 if not attack[r, c]: continue # Agent did not attack here
                 if mask[r, c]: # We can see this cell
-                    # TODO: Variation for masked cell?
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is not None:
                         for other in candidate_agents.values():

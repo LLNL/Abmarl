@@ -260,9 +260,6 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         it specifies how many attacks this agent can carry out in a single step.
         See specific AttackActor documentation for more information.
         """
-        # TODO: The question of one vs all in the attack actors can be answered
-        # with this parameter. The agent can attack up to this many other agents
-        # per turn. Should update some actors to work with this parameter.
         return self._attack_count
 
     @attack_count.setter
