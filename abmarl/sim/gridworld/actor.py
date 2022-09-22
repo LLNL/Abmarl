@@ -219,7 +219,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         1. The candidate must not be the same as the attacking agent.
         2. The candidate must be active.
         3. The candidate's encoding must be in the attacker's attack mapping.
-        4. Attempt the attack by rolling the dice against the attacker's accuracy.
+        4. The attacker's accuracy must be higher than a random number.
 
         If each of these criteria's is met, then the attack is succesful.
 
@@ -247,16 +247,16 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         Subset the list of attackable agents by the number of attacks.
 
         If the number of attacks is greater than the list of agents and stacked
-        attacks is False, then return the entire list of agents. Otherwise, randomly
-        choose agents from the list of attackable_agents, using replacement if
-        stacked attacks is True.
+        attacks is False, then each attackable agent is attacked, and any extra
+        attacks are wasted. Otherwise,, randomly choose agents from the list of
+        attackable_agents, using replacement if stacked attacks is True.
 
         Args:
             attackable_agents: List of attackable agents.
             number_of_attacks: The number agents to choose from the list. If stacked
-            attacks is True, then the same agent could be chosen multiple times.
+                attacks is True, then the same agent could be chosen multiple times.
         Returns:
-            List of agents chosen from this list.
+            List of attacked agents chosen from the list of attackable agents.
         """
         if not self.stacked_attacks and number_of_attacks > len(attackable_agents):
             return attackable_agents
@@ -267,14 +267,14 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     @abstractmethod
     def _determine_attack(self, agent, attack):
         """
-        Derived class to determine which agents are successfully attacked.
+        The derived class should determine which agents are successfully attacked.
         """
         pass
 
     @abstractmethod
     def _assign_space(self, agent):
         """
-        Derived class to assign the agent's action space and null_action.
+        The derived class should assign the agent's action space and null_action.
         """
         pass
 
@@ -379,6 +379,12 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
         )
 
         # Randomly scan the local grid for attackable agents.
+        # This attack actor processes the attacking in the same way as the BinaryAttackActor;
+        # the only difference is that it does the processing for each encoding.
+        # We could have designed this differently to avoid code-duplication, but
+        # we left it as is (1) for clarity of code and (2) because we believe our
+        # implementation is more performant since we only have to scan the local
+        # grid a single time.
         attackable_agents = {encoding: [] for encoding in attack}
         for r in range(2 * agent.attack_range + 1):
             for c in range(2 * agent.attack_range + 1):
@@ -446,6 +452,8 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
                 # Agent has chosen not to use this attack
                 continue
             else:
+                # Agent has chosen to attack. We remove the "no attack" option
+                # and then unravel the number to get the cell that is attacked.
                 raveled_cell -= 1
                 r = raveled_cell % (2 * agent.attack_range + 1)
                 c = int(raveled_cell / (2 * agent.attack_range + 1))
