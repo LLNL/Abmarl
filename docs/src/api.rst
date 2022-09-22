@@ -211,9 +211,9 @@ Actors
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_actor_attack:
+.. _api_gridworld_actor_binary_attack:
 
-.. autoclass:: abmarl.sim.gridworld.actor.AttackActor
+.. autoclass:: abmarl.sim.gridworld.actor.BinaryAttackActor
 	:members:
 	:undoc-members:
 

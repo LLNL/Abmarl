@@ -201,11 +201,13 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     """
     Agents that can attack other agents.
     """
-    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, **kwargs):
+    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None,
+                 attack_count=1, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
         self.attack_accuracy = attack_accuracy
+        self.attack_count = attack_count
 
     @property
     def attack_range(self):
@@ -250,6 +252,24 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         self._attack_accuracy = value
 
     @property
+    def attack_count(self):
+        """
+        The number of attacks the agent can make per turn.
+
+        This parameter is interpreted differently by each attack actor, but generally
+        it specifies how many attacks this agent can carry out in a single step.
+        See specific AttackActor documentation for more information.
+        """
+        return self._attack_count
+
+    @attack_count.setter
+    def attack_count(self, value):
+        assert type(value) is int, "Number of attacks must be an integer."
+        assert value >= 0, "Number of attacks must be nonnegative."
+        self._attack_count = value
+
+    @property
     def configured(self):
         return super().configured and self.attack_range is not None and \
-            self.attack_strength is not None and self.attack_accuracy is not None
+            self.attack_strength is not None and self.attack_accuracy is not None and \
+            self.attack_count is not None
