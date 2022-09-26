@@ -199,11 +199,20 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
 
         If the attack is successful, then the attacked agent's health is depleted
         by the attacking agent's strength, possibly resulting in its death.
+
+        Args:
+            attacking_agent: The agent performing the attack.
+            action_dict: The attacking_agent's full action dictionary.
+        Returns:
+            If the agent is not an attacking agent or if it did not attack, then
+            we return False. Otherwise, we return a list of agents that were attacked.
+            An empty list means that the attacking agent attempted to attack, but
+            failed.
         """
         if isinstance(attacking_agent, self.supported_agent_type):
             return self._determine_attack(attacking_agent, action_dict[self.key])
         else:
-            return []
+            return False
 
     def _basic_criteria(self, attacking_agent, candidate):
         """
@@ -305,7 +314,7 @@ class BinaryAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not attack:
-            return []
+            return False
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -365,7 +374,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not any([num_attacks for num_attacks in attack.values()]):
-            return []
+            return False
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -432,7 +441,7 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not any(attack):
-            return []
+            return False
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -503,7 +512,7 @@ class SelectiveAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not np.any(attack):
-            return []
+            return False
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
