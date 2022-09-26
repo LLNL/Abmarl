@@ -201,15 +201,9 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         by the attacking agent's strength, possibly resulting in its death.
         """
         if isinstance(attacking_agent, self.supported_agent_type):
-            action = action_dict[self.key]
-            attacked_agents = self._determine_attack(attacking_agent, action)
-            for attacked_agent in attacked_agents:
-                if not attacked_agent.active: continue # Skip this agent since it is dead
-                attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
-                if not attacked_agent.active:
-                    self.grid.remove(attacked_agent, attacked_agent.position)
-            return attacked_agents
-        return []
+            return self._determine_attack(attacking_agent, action_dict[self.key])
+        else:
+            return []
 
     def _basic_criteria(self, attacking_agent, candidate):
         """
