@@ -152,8 +152,10 @@ def test_binary_attack_actor():
 
     position_state.reset()
     health_state.reset()
-    attack_actor.process_action(agents['agent1'], {'attack': 1})
-    attack_actor.process_action(agents['agent1'], {'attack': 1})
+    attacked_agents = attack_actor.process_action(agents['agent1'], {'attack': 1})
+    assert attacked_agents
+    attacked_agents = attack_actor.process_action(agents['agent1'], {'attack': 1})
+    assert attacked_agents
     assert not agents['agent0'].active
     assert not agents['agent3'].active
     assert agents['agent0'].health <= 0
@@ -161,7 +163,8 @@ def test_binary_attack_actor():
     assert not grid[4, 4]
     assert not grid[3, 2]
 
-    attack_actor.process_action(agents['agent1'], {'attack': 1})
+    attacked_agents = attack_actor.process_action(agents['agent1'], {'attack': 1})
+    assert attacked_agents == []
     assert agents['agent2'].active
     assert agents['agent2'].health > 0
     assert grid[2, 3]
@@ -228,20 +231,23 @@ def test_binary_attack_actor_attack_count():
     position_state.reset()
     health_state.reset()
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 0})
-    assert type(attacked_agents) is list
-    assert not attacked_agents
+    assert attacked_agents is False
 
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 1})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 1
 
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
 
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 3})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
 
     agents['agent0'].attack_strength = 1
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 3})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
     assert not agents['agent1'].active
     assert not agents['agent2'].active
@@ -289,6 +295,7 @@ def test_binary_attack_actor_stacked_attack():
     position_state.reset()
     health_state.reset()
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
     assert agents['agent1'] in attacked_agents
     assert agents['agent3'] in attacked_agents
@@ -306,18 +313,21 @@ def test_binary_attack_actor_stacked_attack():
     )
 
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 1})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 1
     assert attacked_agents[0] == agents['agent2']
     assert agents['agent2'].health == 0.5
 
     agents['agent0'].attack_strength = 0
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert agents['agent2'].health == 0.5
 
     agents['agent0'].attack_strength = 0.25
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert not agents['agent2'].active
@@ -469,7 +479,7 @@ def test_selective_attack_actor():
     ], dtype=int)}
     assert attack in agents['agent1'].action_space
     attacked_agents = attack_actor.process_action(agents['agent1'], attack)
-    assert not attacked_agents
+    assert attacked_agents is False
     assert agents['agent0'].active
     assert agents['agent1'].active
     assert agents['agent2'].active
@@ -529,7 +539,7 @@ def test_selective_attack_actor_attack_count():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
-    assert len(attacked_agents) == 0
+    assert attacked_agents is False
 
     attack = {'attack': np.array([
         [1, 0, 0],
@@ -538,6 +548,7 @@ def test_selective_attack_actor_attack_count():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
     assert agents['agent1'] in attacked_agents
 
@@ -548,6 +559,7 @@ def test_selective_attack_actor_attack_count():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
     assert agents['agent1'] in attacked_agents
 
@@ -558,6 +570,7 @@ def test_selective_attack_actor_attack_count():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 4
 
     agents['agent0'].attack_strength = 1
@@ -568,6 +581,7 @@ def test_selective_attack_actor_attack_count():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 4
     assert not agents['agent1'].active
     assert not agents['agent2'].active
@@ -619,6 +633,7 @@ def test_selective_attack_actor_stacked_attack():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
     assert agents['agent2'] in attacked_agents
     assert agents['agent4'] in attacked_agents
@@ -637,6 +652,7 @@ def test_selective_attack_actor_stacked_attack():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 4
     assert attacked_agents[0] == agents['agent1']
     assert attacked_agents[1] == agents['agent3']
@@ -652,6 +668,7 @@ def test_selective_attack_actor_stacked_attack():
     ], dtype=int)}
     assert attack in agents['agent0'].action_space
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
+    assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
     assert attacked_agents[0] == agents['agent1']
     assert attacked_agents[1] == agents['agent1']
@@ -756,8 +773,7 @@ def test_encoding_based_attack_actor_attack_count():
     position_state.reset()
     health_state.reset()
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1:0, 2: 0}})
-    assert type(attacked_agents) is list
-    assert not attacked_agents
+    assert attacked_agents is False
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1:1, 2: 0}})
     assert type(attacked_agents) is list
@@ -915,8 +931,7 @@ def test_restricted_selective_attack_actor():
     position_state.reset()
     health_state.reset()
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [0, 0]})
-    assert type(attacked_agents) is list
-    assert len(attacked_agents) == 0
+    assert attacked_agents is False
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [1, 1]})
     assert type(attacked_agents) is list
@@ -981,8 +996,7 @@ def test_restricted_selective_attack_actor_stacked_attacks():
     position_state.reset()
     health_state.reset()
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [0, 0]})
-    assert type(attacked_agents) is list
-    assert len(attacked_agents) == 0
+    assert attacked_agents is False
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [1, 1]})
     assert type(attacked_agents) is list

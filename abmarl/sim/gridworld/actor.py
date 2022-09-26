@@ -313,6 +313,7 @@ class BinaryAttackActor(AttackActorBaseComponent):
             on the attack.
         """
         # Return empty list if no attack is specified.
+        # TODO: Why not just check if the attack is the null action!?
         if not attack:
             return False
 
