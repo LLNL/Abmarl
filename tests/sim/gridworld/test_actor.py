@@ -154,8 +154,18 @@ def test_binary_attack_actor():
     health_state.reset()
     attacked_agents = attack_actor.process_action(agents['agent1'], {'attack': 1})
     assert attacked_agents
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
+
     attacked_agents = attack_actor.process_action(agents['agent1'], {'attack': 1})
     assert attacked_agents
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
+
     assert not agents['agent0'].active
     assert not agents['agent3'].active
     assert agents['agent0'].health <= 0
@@ -249,6 +259,10 @@ def test_binary_attack_actor_attack_count():
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 3})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not agents['agent1'].active
     assert not agents['agent2'].active
     assert not agents['agent3'].active
@@ -297,6 +311,10 @@ def test_binary_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert agents['agent1'] in attacked_agents
     assert agents['agent3'] in attacked_agents
     assert agents['agent2'] not in attacked_agents
@@ -315,6 +333,10 @@ def test_binary_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 1})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 1
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert attacked_agents[0] == agents['agent2']
     assert agents['agent2'].health == 0.5
 
@@ -322,6 +344,10 @@ def test_binary_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert attacked_agents[0] == attacked_agents[1]
     assert agents['agent2'].health == 0.5
 
@@ -329,6 +355,10 @@ def test_binary_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 2})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert attacked_agents[0] == attacked_agents[1]
     assert not agents['agent2'].active
     assert agents['agent2'].health <= 0
@@ -378,6 +408,10 @@ def test_selective_attack_actor():
     assert attack in agents['agent1'].action_space
     attacked_agents = attack_actor.process_action(agents['agent1'], attack)
     assert attacked_agents == [agents['agent0']]
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not agents['agent0'].active
     assert agents['agent0'].health <= 0
     assert not grid[4, 4]
@@ -393,6 +427,10 @@ def test_selective_attack_actor():
     assert attack in agents['agent1'].action_space
     attacked_agents = attack_actor.process_action(agents['agent1'], attack)
     assert attacked_agents == [agents['agent3']]
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not agents['agent3'].active
     assert agents['agent3'].health <= 0
     assert not grid[3, 2]
@@ -412,6 +450,10 @@ def test_selective_attack_actor():
     assert attack in agents['agent1'].action_space
     attacked_agents = attack_actor.process_action(agents['agent1'], attack)
     assert attacked_agents == [agents['agent3'], agents['agent0']]
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not agents['agent0'].active
     assert not agents['agent3'].active
     assert agents['agent0'].health <= 0
@@ -434,6 +476,10 @@ def test_selective_attack_actor():
     assert attack in agents['agent1'].action_space
     attacked_agents = attack_actor.process_action(agents['agent1'], attack)
     assert not attacked_agents
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert agents['agent0'].active
     assert agents['agent1'].active
     assert agents['agent2'].active
@@ -455,6 +501,10 @@ def test_selective_attack_actor():
     assert attack in agents['agent1'].action_space
     attacked_agents = attack_actor.process_action(agents['agent1'], attack)
     assert attacked_agents == [agents['agent3'], agents['agent0']]
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent1'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not agents['agent0'].active
     assert not agents['agent3'].active
     assert agents['agent1'].active
@@ -583,6 +633,10 @@ def test_selective_attack_actor_attack_count():
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 4
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not agents['agent1'].active
     assert not agents['agent2'].active
     assert not agents['agent3'].active
@@ -635,6 +689,10 @@ def test_selective_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert agents['agent2'] in attacked_agents
     assert agents['agent4'] in attacked_agents
     assert not agents['agent2'].active
@@ -654,6 +712,10 @@ def test_selective_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 4
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert attacked_agents[0] == agents['agent1']
     assert attacked_agents[1] == agents['agent3']
     assert attacked_agents[2] == agents['agent3']
@@ -670,6 +732,10 @@ def test_selective_attack_actor_stacked_attack():
     attacked_agents = attack_actor.process_action(agents['agent0'], attack)
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent0'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert attacked_agents[0] == agents['agent1']
     assert attacked_agents[1] == agents['agent1']
     assert attacked_agents[2] == agents['agent1']
@@ -720,6 +786,10 @@ def test_encoding_based_attack_actor():
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 1
     assert attacked_agents[0].encoding == 1
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1: 1, 2: 1}})
@@ -727,6 +797,10 @@ def test_encoding_based_attack_actor():
     assert len(attacked_agents) == 2
     assert attacked_agents[0].encoding == 1
     assert attacked_agents[1].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
     assert not attacked_agents[1].active
 
@@ -734,11 +808,19 @@ def test_encoding_based_attack_actor():
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 1
     assert attacked_agents[0].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1: 1, 2: 1}})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 0
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
 
 
 def test_encoding_based_attack_actor_attack_count():
@@ -819,6 +901,10 @@ def test_encoding_based_attack_actor_attack_count():
     assert len(attacked_agents) == 2
     assert attacked_agents[0].encoding == 1
     assert attacked_agents[1].encoding == 1
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
     assert not attacked_agents[1].active
 
@@ -827,12 +913,20 @@ def test_encoding_based_attack_actor_attack_count():
     assert len(attacked_agents) == 2
     assert attacked_agents[0].encoding == 2
     assert attacked_agents[1].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
     assert not attacked_agents[1].active
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1: 1, 2: 1}})
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 0
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
 
 
 def test_encoding_based_attack_actor_stacked_attack():
@@ -877,6 +971,10 @@ def test_encoding_based_attack_actor_stacked_attack():
     assert len(attacked_agents) == 2
     assert attacked_agents[0].encoding == 1
     assert attacked_agents[1].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
     assert not attacked_agents[1].active
 
@@ -885,6 +983,10 @@ def test_encoding_based_attack_actor_stacked_attack():
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert attacked_agents[0].encoding == 1
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1: 2, 2: 2}})
@@ -892,6 +994,10 @@ def test_encoding_based_attack_actor_stacked_attack():
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert attacked_agents[0].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
 
 
@@ -1003,6 +1109,10 @@ def test_restricted_selective_attack_actor_stacked_attacks():
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert attacked_agents[0].encoding == 1
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [2, 2]})
@@ -1010,6 +1120,10 @@ def test_restricted_selective_attack_actor_stacked_attacks():
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert attacked_agents[0].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
 
     attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': [4, 4]})
@@ -1017,4 +1131,8 @@ def test_restricted_selective_attack_actor_stacked_attacks():
     assert len(attacked_agents) == 2
     assert attacked_agents[0] == attacked_agents[1]
     assert attacked_agents[0].encoding == 2
+    for attacked_agent in attacked_agents:
+        attacked_agent.health -= agents['agent3'].attack_strength
+        if not attacked_agent.active: # Agent has died
+            grid.remove(attacked_agent, attacked_agent.position)
     assert not attacked_agents[0].active
