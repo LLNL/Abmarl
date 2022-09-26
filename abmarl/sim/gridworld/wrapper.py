@@ -1,5 +1,6 @@
 
 from abc import abstractmethod
+from typing import Dict
 
 from abmarl.sim.gridworld.actor import ActorBaseComponent
 from abmarl.sim.gridworld.observer import ObserverBaseComponent
@@ -100,6 +101,7 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
                 agent.action_space[self.key] = self.wrap_space(agent.action_space[self.key])
+        # TODO: Need to capture the null_point too!
 
     @property
     def wrapped_component(self):
@@ -184,3 +186,59 @@ class RavelActionWrapper(ActorWrapper):
         giving it to the actor.
         """
         return rdw.unravel(space, point)
+
+
+class ExclusiveRavelActionWrapper(ActorWrapper):
+    """
+    Convert space and points exclusively in a dict setting.
+
+    The ExclusiveRavelActionWrapper only works on Dict spaces, where each space
+    is to be ravelled independently and then combined so that that actions are
+    exclusive. The wrapping occurs in two steps. First, we use numpy's ravel capabilities
+    to convert each subspace to a Discrete space. Second, we add up the Discrete
+    spaces together, which imposes that actions among the subspaces are discrete.
+
+    For example, this action space undergoes the following transformation:
+    {'one': MultiDiscrete(3, 4, 2), 'two': MultiDiscrete(2, 2, 5)}
+    Each space is individually ravelled, which becomes:
+    {'one': Discrete(24), 'two': Discrete(20)}
+    Then the spaces are combined into Discrete(44). The first 24 options correspond
+    to the first subspace, and the second 20 correspond to the second subspace.
+    """
+    def check_space(self, space):
+        """
+        Ensure that the space is of type that can be ravelled to discrete value.
+        """
+        assert isinstance(space, Dict), "ExclusiveRavelActionWrapper only works on Dict spaces."
+        return rdw.check_space(space)
+
+    def wrap_space(self, space):
+        """
+        Convert the space into a Discrete space.
+
+        The wrapping occurs in two steps. First, we use numpy's ravel capabilities
+        to convert each subspace to a Discrete space. Second, we add up the Discrete
+        spaces together, which imposes that actions among the subspaces are discrete.
+        """
+        self.exclusive_channels = Dict({
+            key: rdw.ravel_space(subspace) for key, subspace in space.spaces.items()
+        })
+        return rdw.ravel_space(self.phase_one)
+
+    def wrap_point(self, space, point):
+        """
+        Unravel a single discrete point to a value in the space.
+
+        Recall that the action from the trainer arrives in the wrapped discrete
+        space, so we need to unravel it so that it is in the unwrapped space before
+        giving it to the actor.
+        """
+        for activated_key, activated_subspace in self.exclusive_channels.items():
+            if point < activated_subspace.n:
+                break
+            else:
+                point -= activated_subspace.n
+        unravelled_point = rdw.unravel(activated_subspace, point)
+        remaining_space = {} ...
+        return rdw.unravel(space, point)
+
