@@ -1,6 +1,7 @@
 
 from abc import abstractmethod
-from typing import Dict
+
+from gym.spaces import Discrete, Dict
 
 from abmarl.sim.gridworld.actor import ActorBaseComponent
 from abmarl.sim.gridworld.observer import ObserverBaseComponent
@@ -188,28 +189,32 @@ class RavelActionWrapper(ActorWrapper):
         return rdw.unravel(space, point)
 
 
-class ExclusiveRavelActionWrapper(ActorWrapper):
+class ExclusiveChannelActionWrapper(ActorWrapper):
     """
-    Convert space and points exclusively in a dict setting.
+    Ravel Dict space and points with top-level exclusion.
 
-    The ExclusiveRavelActionWrapper only works on Dict spaces, where each space
-    is to be ravelled independently and then combined so that that actions are
-    exclusive. The wrapping occurs in two steps. First, we use numpy's ravel capabilities
-    to convert each subspace to a Discrete space. Second, we add up the Discrete
-    spaces together, which imposes that actions among the subspaces are discrete.
+    This wrapper works with Dict spaces, where each subspace is to be ravelled
+    independently and then combined so that that actions are exclusive. The wrapping
+    occurs in two steps. First, we use numpy's ravel capabilities to convert each
+    subspace to a Discrete space. Second, we add up the Discrete spaces together,
+    which imposes exclusivity among the subspaces.
 
     For example, this action space undergoes the following transformation:
-    {'one': MultiDiscrete(3, 4, 2), 'two': MultiDiscrete(2, 2, 5)}
+        {'one': MultiDiscrete(3, 4, 2), 'two': MultiDiscrete(2, 2, 5)}
     Each space is individually ravelled, which becomes:
-    {'one': Discrete(24), 'two': Discrete(20)}
-    Then the spaces are combined into Discrete(44). The first 24 options correspond
+        {'one': Discrete(24), 'two': Discrete(20)}
+    Then the spaces are combined into Discrete(44) instead of Discrete(480), which
+    would be the case without exclusion. The first 24 options correspond
     to the first subspace, and the second 20 correspond to the second subspace.
+
+    The exclusion happens only on the top level, so a Dict nested within a Dict
+    will be ravelled without exclusion.
     """
     def check_space(self, space):
         """
         Ensure that the space is of type that can be ravelled to discrete value.
         """
-        assert isinstance(space, Dict), "ExclusiveRavelActionWrapper only works on Dict spaces."
+        assert isinstance(space, Dict), "ExclusiveRavelActionWrapper works on Dict spaces."
         return rdw.check_space(space)
 
     def wrap_space(self, space):
@@ -220,10 +225,10 @@ class ExclusiveRavelActionWrapper(ActorWrapper):
         to convert each subspace to a Discrete space. Second, we add up the Discrete
         spaces together, which imposes that actions among the subspaces are discrete.
         """
-        self.exclusive_channels = Dict({
+        self.exclusive_channels = {
             key: rdw.ravel_space(subspace) for key, subspace in space.spaces.items()
-        })
-        return rdw.ravel_space(self.phase_one)
+        }
+        return Discrete(sum([subspace.n for subspace in self.exclusive_channels.values()]))
 
     def wrap_point(self, space, point):
         """
@@ -233,12 +238,19 @@ class ExclusiveRavelActionWrapper(ActorWrapper):
         space, so we need to unravel it so that it is in the unwrapped space before
         giving it to the actor.
         """
-        for activated_key, activated_subspace in self.exclusive_channels.items():
-            if point < activated_subspace.n:
+        # Find the activated channel
+        for activated_channel, subspace in self.exclusive_channels.items():
+            if point < subspace.n:
                 break
             else:
-                point -= activated_subspace.n
-        unravelled_point = rdw.unravel(activated_subspace, point)
-        remaining_space = {} ...
-        return rdw.unravel(space, point)
+                point -= subspace.n
 
+        # Unravel the point for the activated channel. The other channels unravel 0.
+        output = {}
+        for key, value in space.items():
+            if key == activated_channel:
+                output[key] = rdw.unravel(value, point)
+            else:
+                output[key] = rdw.unravel(value, 0)
+
+        return output
