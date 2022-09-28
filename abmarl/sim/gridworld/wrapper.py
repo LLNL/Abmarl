@@ -225,13 +225,13 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
         to convert each subspace to a Discrete space. Second, we add up the Discrete
         spaces together, which imposes that actions among the subspaces are discrete.
         """
-        self.exclusive_channels = {
-            key: rdw.ravel_space(subspace) for key, subspace in space.spaces.items()
+        exclusive_channels = {
+            channel: rdw.ravel_space(subspace) for channel, subspace in space.spaces.items()
         }
-        # Using sum is the key difference between exclusive and non-exclusive.
+        # Using sum is the difference between exclusive and non-exclusive.
         # The rule is: sum for exclusive, prod for non-exclusive. The ravel function
         # uses prod by default, so we implement sum here directly to impose exclusivity.
-        return Discrete(sum([subspace.n for subspace in self.exclusive_channels.values()]))
+        return Discrete(sum([subspace.n for subspace in exclusive_channels.values()]))
 
     def wrap_point(self, space, point):
         """
@@ -242,7 +242,11 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
         giving it to the actor.
         """
         # Find the activated channel
-        for activated_channel, subspace in self.exclusive_channels.items():
+        exclusive_channels = {
+            channel: rdw.ravel_space(subspace) for channel, subspace in space.spaces.items()
+        }
+
+        for activated_channel, subspace in exclusive_channels.items():
             if point < subspace.n:
                 break
             else:
@@ -250,10 +254,10 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
 
         # Unravel the point for the activated channel. The other channels unravel 0.
         output = {}
-        for key, value in space.items():
-            if key == activated_channel:
-                output[key] = rdw.unravel(value, point)
+        for channel, subspace in space.items():
+            if channel == activated_channel:
+                output[channel] = rdw.unravel(subspace, point)
             else:
-                output[key] = rdw.unravel(value, 0)
+                output[channel] = rdw.unravel(subspace, 0)
 
         return output
