@@ -10,6 +10,7 @@ from abmarl.sim.gridworld.wrapper import RavelActionWrapper, ExclusiveChannelAct
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.agent import MovingAgent, HealthAgent, AttackingAgent
 
+
 class WrappingTestAgent(MovingAgent, HealthAgent, AttackingAgent):
     def __init__(self, **kwargs):
         super().__init__(
@@ -18,6 +19,7 @@ class WrappingTestAgent(MovingAgent, HealthAgent, AttackingAgent):
             attack_range=4,
             **kwargs
         )
+
 
 grid = Grid(5,6)
 
@@ -113,6 +115,7 @@ def test_exclusive_attack_wrapper_non_dict_space():
         # This will fail because the space is Discrete, not Dict
         ExclusiveChannelActionWrapper(ravelled_move_actor)
 
+
 def test_exclusive_attack_wrapper_properties():
     assert isinstance(exclusive_attack_actor, ActorWrapper)
     assert isinstance(exclusive_attack_actor, ActorBaseComponent)
@@ -125,11 +128,15 @@ def test_exclusive_attack_wrapper_properties():
 
 
 def test_exclusive_attack_wrapper_agent_spaces():
-    assert exclusive_attack_actor.from_space['agent0'] == Dict({1: Discrete(2), 2: Discrete(2), 3: Discrete(2)})
+    assert exclusive_attack_actor.from_space['agent0'] == Dict(
+        {1: Discrete(2), 2: Discrete(2), 3: Discrete(2)}
+    )
     assert exclusive_attack_actor.agents['agent0'].action_space['attack'] == Discrete(6)
     assert exclusive_attack_actor.from_space['agent1'] == Dict({1: Discrete(2), 3: Discrete(2)})
     assert exclusive_attack_actor.agents['agent1'].action_space['attack'] == Discrete(4)
-    assert exclusive_attack_actor.from_space['agent2'] == Dict({1: Discrete(2), 2: Discrete(2), 3: Discrete(2)})
+    assert exclusive_attack_actor.from_space['agent2'] == Dict(
+        {1: Discrete(2), 2: Discrete(2), 3: Discrete(2)}
+    )
     assert exclusive_attack_actor.agents['agent2'].action_space['attack'] == Discrete(6)
     assert exclusive_attack_actor.from_space['agent3'] == Dict({1: Discrete(2)})
     assert exclusive_attack_actor.agents['agent3'].action_space['attack'] == Discrete(2)
