@@ -228,6 +228,9 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
         self.exclusive_channels = {
             key: rdw.ravel_space(subspace) for key, subspace in space.spaces.items()
         }
+        # Using sum is the key difference between exclusive and non-exclusive.
+        # The rule is: sum for exclusive, prod for non-exclusive. The ravel function
+        # uses prod by default, so we implement sum here directly to impose exclusivity.
         return Discrete(sum([subspace.n for subspace in self.exclusive_channels.values()]))
 
     def wrap_point(self, space, point):
