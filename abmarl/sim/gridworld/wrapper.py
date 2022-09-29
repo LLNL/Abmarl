@@ -77,6 +77,17 @@ class ComponentWrapper(GridWorldBaseComponent):
         """
         pass
 
+    @abstractmethod
+    def unwrap_point(self, space, point):
+        """
+        Unwrap a point to the space.
+
+        Args:
+            space: The space from which to wrap the point.
+            point: The point to wrap.
+        """
+        pass
+
 
 class ActorWrapper(ComponentWrapper, ActorBaseComponent):
     """
@@ -102,7 +113,11 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
                 agent.action_space[self.key] = self.wrap_space(agent.action_space[self.key])
-        # TODO: Need to capture the null_point too!
+                if agent.null_action:
+                    agent.null_action = self.unwrap_point(
+                        self.from_space[agent.id],
+                        agent.null_action
+                    )
 
     @property
     def wrapped_component(self):
