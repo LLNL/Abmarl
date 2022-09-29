@@ -196,23 +196,14 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
     This wrapper works with Dict spaces, where each subspace is to be ravelled
     independently and then combined so that that actions are exclusive. The wrapping
     occurs in two steps. First, we use numpy's ravel capabilities to convert each
-    subspace to a Discrete space. Second, we add up the Discrete spaces together,
-    which imposes exclusivity among the subspaces.
-
-    For example, this action space undergoes the following transformation:
-        {'one': MultiDiscrete(3, 4, 2), 'two': MultiDiscrete(2, 2, 5)}
-    Each space is individually ravelled, which becomes:
-        {'one': Discrete(24), 'two': Discrete(20)}
-    Then the spaces are combined into Discrete(44) instead of Discrete(480), which
-    would be the case without exclusion. The first 24 options correspond
-    to the first subspace, and the second 20 correspond to the second subspace.
-
-    The exclusion happens only on the top level, so a Dict nested within a Dict
-    will be ravelled without exclusion.
+    subspace to a Discrete space. Second, we combine ehe Discrete spaces together
+    in such a way that imposes exclusivity among the subspaces. The exclusion happens
+    only on the top level, so a Dict nested within a Dict will be ravelled without
+    exclusion.
     """
     def check_space(self, space):
         """
-        Ensure that the space is of type that can be ravelled to discrete value.
+        Top level must be Dict and subspaces must be ravel-able.
         """
         assert isinstance(space, Dict), "ExclusiveRavelActionWrapper works on Dict spaces."
         return rdw.check_space(space)
@@ -222,8 +213,8 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
         Convert the space into a Discrete space.
 
         The wrapping occurs in two steps. First, we use numpy's ravel capabilities
-        to convert each subspace to a Discrete space. Second, we add up the Discrete
-        spaces together, which imposes that actions among the subspaces are discrete.
+        to convert each subspace to a Discrete space. Second, we combine the Discrete
+        spaces together, imposing that actions among the subspaces are exclusive.
         """
         exclusive_channels = {
             channel: rdw.ravel_space(subspace) for channel, subspace in space.spaces.items()
