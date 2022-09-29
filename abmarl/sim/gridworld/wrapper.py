@@ -233,7 +233,7 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
         # uses prod by default, so we implement sum here directly to impose exclusivity.
         dims = sum([subspace.n for subspace in exclusive_channels.values()])
         # We modify the wrapping process to suppress duplicate zero vectors
-        dims -= len(exclusive_channels) + 1
+        dims = dims - len(exclusive_channels) + 1
         return Discrete(dims)
 
     def wrap_point(self, space, point):
@@ -253,7 +253,7 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
             if point < subspace.n:
                 break
             else:
-                point -= subspace.n + 1 # Add one to avoid duplicate zero vector
+                point = point - subspace.n + 1 # Add one to avoid duplicate zero vector
 
         # Unravel the point for the activated channel. The other channels unravel 0.
         output = {}

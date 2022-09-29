@@ -131,40 +131,40 @@ def test_exclusive_attack_wrapper_agent_spaces():
     assert exclusive_attack_actor.from_space['agent0'] == Dict(
         {1: Discrete(2), 2: Discrete(2), 3: Discrete(2)}
     )
-    assert exclusive_attack_actor.agents['agent0'].action_space['attack'] == Discrete(6)
+    assert exclusive_attack_actor.agents['agent0'].action_space['attack'] == Discrete(4)
     assert exclusive_attack_actor.from_space['agent1'] == Dict({1: Discrete(2), 3: Discrete(2)})
-    assert exclusive_attack_actor.agents['agent1'].action_space['attack'] == Discrete(4)
+    assert exclusive_attack_actor.agents['agent1'].action_space['attack'] == Discrete(3)
     assert exclusive_attack_actor.from_space['agent2'] == Dict(
         {1: Discrete(2), 2: Discrete(2), 3: Discrete(2)}
     )
-    assert exclusive_attack_actor.agents['agent2'].action_space['attack'] == Discrete(6)
+    assert exclusive_attack_actor.agents['agent2'].action_space['attack'] == Discrete(4)
     assert exclusive_attack_actor.from_space['agent3'] == Dict({1: Discrete(2)})
     assert exclusive_attack_actor.agents['agent3'].action_space['attack'] == Discrete(2)
 
 
 def test_exclusive_attack_wrapper_process_action():
     action_sample = {
-        'agent0': {'attack': 4},
-        'agent1': {'attack': 1},
-        'agent2': {'attack': 5},
-        'agent3': {'attack': 0},
+        'agent0': {'attack': 0},
+        'agent1': {'attack': 2},
+        'agent2': {'attack': 2},
+        'agent3': {'attack': 1},
     }
     assert exclusive_attack_actor.wrap_point(
         Dict({1: Discrete(2), 2: Discrete(2), 3: Discrete(2)}),
-        4
+        0
     ) == {1: 0, 2: 0, 3: 0}
     assert exclusive_attack_actor.wrap_point(
         Dict({1: Discrete(2), 3: Discrete(2)}),
-        1
-    ) == {1: 1, 3: 0}
+        2
+    ) == {1: 0, 3: 1}
     assert exclusive_attack_actor.wrap_point(
         Dict({1: Discrete(2), 2: Discrete(2), 3: Discrete(2)}),
-        5
-    ) == {1: 0, 2: 0, 3: 1}
+        2
+    ) == {1: 0, 2: 1, 3: 0}
     assert exclusive_attack_actor.wrap_point(
         Dict({1: Discrete(2)}),
-        0
-    ) == {1: 0}
+        1
+    ) == {1: 1}
 
     position_state.reset()
     health_state.reset()
@@ -173,10 +173,12 @@ def test_exclusive_attack_wrapper_process_action():
     attack_result = exclusive_attack_actor.process_action(agents['agent1'], action_sample['agent1'])
     assert type(attack_result) == list
     assert len(attack_result) == 1
-    assert attack_result[0].encoding == 1
+    assert attack_result[0].encoding == 3
     attack_result = exclusive_attack_actor.process_action(agents['agent2'], action_sample['agent2'])
     assert type(attack_result) == list
     assert len(attack_result) == 1
-    assert attack_result[0].encoding == 3
+    assert attack_result[0].encoding == 2
     attack_result = exclusive_attack_actor.process_action(agents['agent3'], action_sample['agent3'])
-    assert attack_result == []
+    assert type(attack_result) == list
+    assert len(attack_result) == 1
+    assert attack_result[0].encoding == 1
