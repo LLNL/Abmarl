@@ -69,10 +69,10 @@ class ComponentWrapper(GridWorldBaseComponent):
     @abstractmethod
     def wrap_point(self, space, point):
         """
-        Wrap a point to the space.
+        Wrap a point using a reference space.
 
         Args:
-            space: The space into which to wrap the point.
+            space: The reference space for wrapping the point.
             point: The point to wrap.
         """
         pass
@@ -80,11 +80,11 @@ class ComponentWrapper(GridWorldBaseComponent):
     @abstractmethod
     def unwrap_point(self, space, point):
         """
-        Unwrap a point to the space.
+        Unwrap a point using a reference space.
 
         Args:
-            space: The space from which to wrap the point.
-            point: The point to wrap.
+            space: The reference space for unwrapping the point.
+            point: The point to unwrap.
         """
         pass
 
