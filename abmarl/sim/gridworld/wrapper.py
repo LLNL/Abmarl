@@ -114,9 +114,9 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
                 agent.action_space[self.key] = self.wrap_space(agent.action_space[self.key])
                 if agent.null_action:
-                    agent.null_action = self.unwrap_point(
+                    agent.null_action[self.key] = self.unwrap_point(
                         self.from_space[agent.id],
-                        agent.null_action
+                        agent.null_action[self.key]
                     )
 
     @property
