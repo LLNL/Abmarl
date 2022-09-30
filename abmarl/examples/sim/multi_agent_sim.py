@@ -40,9 +40,9 @@ class MultiAgentSim(EmptyABS):
         self.step_count = 0
         self.agents = {
             **{
-            'agent' + str(i): Agent(
-                id='agent'+str(i), observation_space=Discrete(2), action_space=Discrete(2)
-            ) for i in range(num_agents)
+                'agent' + str(i): Agent(
+                    id='agent'+str(i), observation_space=Discrete(2), action_space=Discrete(2)
+                ) for i in range(num_agents)
             },
             **{
                 'principle_agent' + str(i): PrincipleAgent(

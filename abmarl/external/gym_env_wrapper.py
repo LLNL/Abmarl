@@ -2,6 +2,7 @@ from gym import Env as GymEnv
 
 from abmarl.sim import Agent
 
+
 class GymWrapper(GymEnv):
     """
     Wrap an AgentBasedSimulation object with only a single agent to the gym.Env interface.
