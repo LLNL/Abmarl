@@ -49,7 +49,6 @@ attack_actor = EncodingBasedAttackActor(
 )
 ravelled_move_actor = RavelActionWrapper(move_actor)
 exclusive_attack_actor = ExclusiveChannelActionWrapper(attack_actor)
-# TODO: Tests for null space!
 
 
 def test_ravelled_move_wrapper_properties():
@@ -72,6 +71,40 @@ def test_ravelled_move_wrapper_agent_spaces():
     assert ravelled_move_actor.agents['agent2'].action_space['move'] == Discrete(9)
     assert ravelled_move_actor.from_space['agent3'] == Box(-3, 3, (2,), int)
     assert ravelled_move_actor.agents['agent3'].action_space['move'] == Discrete(49)
+
+
+def test_ravelled_move_wrapper_agent_null_action():
+    assert agents['agent0'].null_action['move'] == 4
+    np.testing.assert_array_equal(
+        ravelled_move_actor.wrap_point(
+            ravelled_move_actor.from_space['agent0'], agents['agent0'].null_action['move']
+        ),
+        np.array([0, 0], dtype=int)
+    )
+
+    assert agents['agent1'].null_action['move'] == 12
+    np.testing.assert_array_equal(
+        ravelled_move_actor.wrap_point(
+            ravelled_move_actor.from_space['agent1'], agents['agent1'].null_action['move']
+        ),
+        np.array([0, 0], dtype=int)
+    )
+
+    assert agents['agent2'].null_action['move'] == 4
+    np.testing.assert_array_equal(
+        ravelled_move_actor.wrap_point(
+            ravelled_move_actor.from_space['agent2'], agents['agent2'].null_action['move']
+        ),
+        np.array([0, 0], dtype=int)
+    )
+
+    assert agents['agent3'].null_action['move'] == 24
+    np.testing.assert_array_equal(
+        ravelled_move_actor.wrap_point(
+            ravelled_move_actor.from_space['agent2'], agents['agent2'].null_action['move']
+        ),
+        np.array([0, 0], dtype=int)
+    )
 
 
 def test_ravelled_move_wrapper_process_action():
@@ -140,6 +173,28 @@ def test_exclusive_attack_wrapper_agent_spaces():
     assert exclusive_attack_actor.agents['agent2'].action_space['attack'] == Discrete(4)
     assert exclusive_attack_actor.from_space['agent3'] == Dict({1: Discrete(2)})
     assert exclusive_attack_actor.agents['agent3'].action_space['attack'] == Discrete(2)
+
+
+def test_exclusive_attack_wrapper_agent_null_actions():
+    assert agents['agent0'].null_action['attack'] == 0
+    assert exclusive_attack_actor.wrap_point(
+        exclusive_attack_actor.from_space['agent0'], agents['agent0'].null_action['attack']
+    ) == {1: 0, 2: 0, 3: 0}
+
+    assert agents['agent1'].null_action['attack'] == 0
+    assert exclusive_attack_actor.wrap_point(
+        exclusive_attack_actor.from_space['agent1'], agents['agent1'].null_action['attack']
+    ) == {1: 0, 3: 0}
+
+    assert agents['agent2'].null_action['attack'] == 0
+    assert exclusive_attack_actor.wrap_point(
+        exclusive_attack_actor.from_space['agent2'], agents['agent2'].null_action['attack']
+    ) == {1: 0, 2: 0, 3: 0}
+
+    assert agents['agent3'].null_action['attack'] == 0
+    assert exclusive_attack_actor.wrap_point(
+        exclusive_attack_actor.from_space['agent3'], agents['agent3'].null_action['attack']
+    ) == {1: 0}
 
 
 def test_exclusive_attack_wrapper_process_action():
