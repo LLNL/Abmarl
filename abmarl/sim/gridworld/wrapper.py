@@ -203,6 +203,12 @@ class RavelActionWrapper(ActorWrapper):
         """
         return rdw.unravel(space, point)
 
+    def unwrap_point(self, space, point):
+        """
+        Ravel point to a single discrete value.
+        """
+        return rdw.ravel(space, point)
+
 
 class ExclusiveChannelActionWrapper(ActorWrapper):
     """
@@ -270,3 +276,28 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
                 output[channel] = rdw.unravel(subspace, 0)
 
         return output
+
+    def unwrap_point(self, space, point):
+        """
+        Ravel point to a single discrete value.
+        """
+        exclusive_channels = {
+            channel: rdw.ravel_space(subspace) for channel, subspace in space.spaces.items()
+        }
+
+        top_level_ravel = {
+            channel: rdw.ravel(subspace, point[channel]) for channel, subspace in space.items()
+        }
+
+        ravelled_point = 0
+        for channel, top_level_point in top_level_ravel.items():
+            if top_level_point != 0:
+                ravelled_point = ravelled_point + top_level_point
+                break
+            else:
+                ravelled_point = ravelled_point + exclusive_channels[channel].n - 1
+        # If the top level point is zero when we exit this loop, that means that
+        # every value in the dict was 0, so we should return 0. If the top level
+        # point is not zero, then we found a nonzero channel, so we should return
+        # the ravelled point.
+        return 0 if top_level_point == 0 else ravelled_point
