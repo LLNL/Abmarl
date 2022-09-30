@@ -34,21 +34,14 @@ class EmptyABS(AgentBasedSimulation):
 
 
 class MultiAgentSim(EmptyABS):
-    def __init__(self, num_agents=3, num_principle_agent=2):
+    def __init__(self, num_agents=3):
         self.rewards = [0, 1, 2, 3, 4, 5, 6]
         self.dones = [3, 12, 5, 34]
         self.step_count = 0
         self.agents = {
-            **{
             'agent' + str(i): Agent(
                 id='agent'+str(i), observation_space=Discrete(2), action_space=Discrete(2)
             ) for i in range(num_agents)
-            },
-            **{
-                'principle_agent' + str(i): PrincipleAgent(
-                    id='principle_agent'+str(i)
-                ) for i in range(num_principle_agent)
-            }
         }
 
     def reset(self):
