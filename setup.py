@@ -29,6 +29,7 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(),
     install_requires=[
+        'importlib-metadata<5.0',
         'tensorflow',
         'gym<0.22',
         'ray[rllib]==1.12.1',
