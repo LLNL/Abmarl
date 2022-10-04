@@ -1,6 +1,10 @@
-
 from abmarl.sim.gridworld.base import GridWorldSimulation
-from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
+from abmarl.sim.gridworld.agent import (
+    GridObservingAgent,
+    MovingAgent,
+    AttackingAgent,
+    HealthAgent,
+)
 from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
 from abmarl.sim.gridworld.observer import SingleGridObserver
@@ -21,7 +25,7 @@ class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
 
 class TeamBattleSim(GridWorldSimulation):
     def __init__(self, **kwargs):
-        self.agents = kwargs['agents']
+        self.agents = kwargs["agents"]
 
         # State Components
         self.position_state = PositionState(**kwargs)
@@ -50,12 +54,13 @@ class TeamBattleSim(GridWorldSimulation):
         # Process attacks:
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            attacked_agent = self.attack_actor.process_action(agent, action, **kwargs)
-            if attacked_agent is not None:
-                self.rewards[attacked_agent.id] -= 1
-                self.rewards[agent.id] += 1
-            else:
+            attacked_agents = self.attack_actor.process_action(agent, action, **kwargs)
+            if attacked_agents == []:
                 self.rewards[agent.id] -= 0.1
+            else:
+                for attacked_agent in attacked_agents:
+                    self.rewards[attacked_agent.id] -= 1
+                    self.rewards[agent.id] += 2
 
         # Process moves
         for agent_id, action in action_dict.items():
@@ -71,9 +76,7 @@ class TeamBattleSim(GridWorldSimulation):
 
     def get_obs(self, agent_id, **kwargs):
         agent = self.agents[agent_id]
-        return {
-            **self.grid_observer.get_obs(agent, **kwargs)
-        }
+        return {**self.grid_observer.get_obs(agent, **kwargs)}
 
     def get_reward(self, agent_id, **kwargs):
         reward = self.rewards[agent_id]
