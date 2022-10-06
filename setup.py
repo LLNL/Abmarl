@@ -32,7 +32,7 @@ setuptools.setup(
         'importlib-metadata<5.0',
         'tensorflow',
         'gym<0.22',
-        'ray[rllib]==1.12.1',
+        'ray[rllib]==2.0.0',
         'open-spiel',
         'matplotlib',
         'seaborn',
