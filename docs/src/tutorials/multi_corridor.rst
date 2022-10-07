@@ -314,7 +314,7 @@ into a parameters dictionary that will be read by Abmarl and used to launch RLli
            'verbose': 2,
            'config': {
                # --- Simulation ---
-               'disable_env_checking': True,
+               'disable_env_checking': False,
                'env': sim_name,
                'horizon': 200,
                'env_config': {},
@@ -331,10 +331,6 @@ into a parameters dictionary that will be read by Abmarl and used to launch RLli
            },
        }
    }
-
-.. WARNING::
-   We must set `disable_env_checking` to True. RLlib introduced environment checking
-   in version 1.10, but it doesn't work yet with our :ref:`TurnBasedManager <api_turn_based>`.
 
 Command Line interface
 ``````````````````````

@@ -35,7 +35,7 @@ params = {
         'verbose': 2,
         'config': {
             # --- Simulation ---
-            'disable_env_checking': True,
+            'disable_env_checking': False,
             'env': sim_name,
             'horizon': 200,
             'env_config': {},
