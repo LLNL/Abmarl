@@ -1,4 +1,6 @@
 
+import os
+
 import pytest
 from abmarl.policies.policy import RandomPolicy
 
@@ -113,10 +115,40 @@ def test_debug_trainer_policy_mapping_fn(tmpdir):
     )
 
 
+def test_debug_trainer_output_dir(tmpdir):
+    debug_trainer = DebugTrainer(
+        sim=sim,
+        policies=policies,
+        policy_mapping_fn=policy_mapping_fn,
+        output_dir=str(tmpdir)
+    )
+    output = os.path.join(
+        os.path.expanduser("~"),
+        'abmarl_results',
+        tmpdir
+    )
+    assert debug_trainer.output_dir.startswith(output)
+
+
 def test_debug_trainer_no_output_dir():
+    debug_trainer = DebugTrainer(
+        sim=sim,
+        policies=policies,
+        policy_mapping_fn=policy_mapping_fn
+    )
+    output = os.path.join(
+        os.path.expanduser("~"),
+        'abmarl_results',
+        'DEBUG_'
+    )
+    assert debug_trainer.output_dir.startswith(output)
+
+
+def test_debug_trainer_bad_output_dir():
     with pytest.raises(AssertionError):
         DebugTrainer(
             sim=sim,
             policies=policies,
-            policy_mapping_fn=policy_mapping_fn
+            policy_mapping_fn=policy_mapping_fn,
+            output_dir=123
         )
