@@ -60,7 +60,8 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         """
         assert type(file_name) is str, "The file_name must be the name of the file."
         assert type(object_registry) is dict, "The object_registry must be a dictionary."
-        assert 0 not in object_registry, "0 is reserved for empty space."
+        assert all([i not in object_registry for i in [0, '.', '_']]), \
+            "0, '.', and '_' are reserved for empty space."
         agents = {}
         n = 0
         with open(file_name, 'r') as fp:
