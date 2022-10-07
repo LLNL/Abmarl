@@ -821,7 +821,8 @@ def test_encoding_based_attack_actor_attack_count():
     assert attacked_agents[0].encoding == 1
     assert attacked_agents[1].encoding == 2
 
-    attack_status, attacked_agents = attack_actor.process_action(agents['agent3'], {'attack': {1:2, 2: 1}})
+    attack_status, attacked_agents = \
+        attack_actor.process_action(agents['agent3'], {'attack': {1:2, 2: 1}})
     assert attack_status
     assert type(attacked_agents) is list
     assert len(attacked_agents) == 3
