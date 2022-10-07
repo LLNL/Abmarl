@@ -215,7 +215,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         """
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
-            attack_status = attacked_agents = self._determine_attack(attacking_agent, action)
+            attack_status, attacked_agents = self._determine_attack(attacking_agent, action)
             for attacked_agent in attacked_agents:
                 if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
