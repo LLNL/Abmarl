@@ -90,6 +90,8 @@ def test_grid_query_overlap_with_inactive_agent():
     agent2 = GridWorldAgent(id='agent2', encoding=1)
     assert grid.place(agent1, (1, 0))
     agent1._active = False
+    assert not grid.query(agent2, (1, 0))
+    grid.remove(agent1, agent1.position)
     assert grid.query(agent2, (1, 0))
 
 

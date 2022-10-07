@@ -77,7 +77,7 @@ class Grid:
             try:
                 return all([
                     True if other.encoding in self._overlapping[agent.encoding] else False
-                    for other in self._internal[ndx].values() if other.active
+                    for other in self._internal[ndx].values()
                 ])
             except KeyError:
                 return False
