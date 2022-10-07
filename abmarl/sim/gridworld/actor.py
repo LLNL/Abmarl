@@ -342,7 +342,7 @@ class BinaryAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not attack:
-            return False, []
+            return []
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -361,9 +361,9 @@ class BinaryAttackActor(AttackActorBaseComponent):
                                 attackable_agents.append(other)
 
         if attackable_agents:
-            return True, self._subset_attackables(attackable_agents, attack)
+            return self._subset_attackables(attackable_agents, attack)
         else:
-            return True, []
+            return []
 
 
 class EncodingBasedAttackActor(AttackActorBaseComponent):
@@ -410,7 +410,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not any([num_attacks for num_attacks in attack.values()]):
-            return False, []
+            return []
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -442,7 +442,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
                 self._subset_attackables(attackable_agents[encoding], num_attacks)
             )
 
-        return True, attacked_agents
+        return attacked_agents
 
 
 class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
@@ -484,7 +484,7 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not any(attack):
-            return False, []
+            return []
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -518,7 +518,7 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
                 if attackable_agents:
                     attacked_agents.append(np.random.choice(attackable_agents))
 
-        return True, attacked_agents
+        return attacked_agents
 
 
 class SelectiveAttackActor(AttackActorBaseComponent):
@@ -563,7 +563,7 @@ class SelectiveAttackActor(AttackActorBaseComponent):
         """
         # Return empty list if no attack is specified.
         if not np.any(attack):
-            return False, []
+            return []
 
         # Generate local grid and an attack mask.
         local_grid, mask = gu.create_grid_and_mask(
@@ -587,4 +587,4 @@ class SelectiveAttackActor(AttackActorBaseComponent):
                         self._subset_attackables(attackable_agents, attack[r, c])
                     )
 
-        return True, attacked_agents
+        return attacked_agents
