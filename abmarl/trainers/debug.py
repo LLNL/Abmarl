@@ -42,14 +42,14 @@ class DebugTrainer(MultiPolicyTrainer):
         The directory for where to dump the episode data.
 
         The directory will be ~/abmarl_results/<output_dir>_<date>_<time>. If the output
-        dir is not specified, then we use "OUTPUT".
+        dir is not specified, then we use "DEBUG".
         """
         return self._output_dir
 
     @output_dir.setter
     def output_dir(self, value):
         if value is None:
-            value = 'OUTPUT'
+            value = 'DEBUG'
         else:
             assert type(value) is str, "Output directory must be a string."
         value_date = '{}_{}'.format(value, time.strftime('%Y-%m-%d_%H-%M'))
