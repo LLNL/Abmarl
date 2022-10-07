@@ -54,13 +54,17 @@ class TeamBattleSim(GridWorldSimulation):
         # Process attacks:
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
-            attacked_agents = self.attack_actor.process_action(agent, action, **kwargs)
-            if attacked_agents == []:
-                self.rewards[agent.id] -= 0.1
-            else:
-                for attacked_agent in attacked_agents:
-                    self.rewards[attacked_agent.id] -= 1
-                    self.rewards[agent.id] += 2
+            if agent.active:
+                attack_status, attacked_agents = \
+                    self.attack_actor.process_action(agent, action, **kwargs)
+                if attack_status: # Attack was attempted
+                    if not attacked_agents: # Attack failed
+                        self.rewards[agent_id] -= 0.1
+                    else:
+                        for attacked_agent in attacked_agents:
+                            if not attacked_agent.active: # Agent has died
+                                self.rewards[attacked_agent.id] -= 1
+                                self.rewards[agent_id] += 1
 
         # Process moves
         for agent_id, action in action_dict.items():
