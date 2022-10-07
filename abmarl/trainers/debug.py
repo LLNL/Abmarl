@@ -1,6 +1,8 @@
 
 import os
 from pprint import pprint
+import time
+
 from abmarl.policies.policy import RandomPolicy
 from abmarl.sim.agent_based_simulation import Agent
 
@@ -38,15 +40,24 @@ class DebugTrainer(MultiPolicyTrainer):
     def output_dir(self):
         """
         The directory for where to dump the episode data.
+
+        The directory will be ~/abmarl_results/<output_dir>_<date>_<time>. If the output
+        dir is not specified, then we use "OUTPUT".
         """
         return self._output_dir
 
     @output_dir.setter
     def output_dir(self, value):
-        assert type(value) is str, "Output directory must be a string."
-        if not os.path.exists(value):
-            os.makedirs(value)
-        self._output_dir = value
+        if value is None:
+            value = 'OUTPUT'
+        else:
+            assert type(value) is str, "Output directory must be a string."
+        value_date = '{}_{}'.format(value, time.strftime('%Y-%m-%d_%H-%M'))
+        base = os.path.join(os.path.expanduser("~"), 'abmarl_results')
+        output_dir = os.path.join(base, value_date)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        self._output_dir = output_dir
 
     def train(self, iterations=5, render=False, **kwargs):
         """

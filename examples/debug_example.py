@@ -27,13 +27,10 @@ policies = {
 policy_mapping_fn = lambda agent_id: agent_id
 
 # Setup the Debugger
-output_dir = os.path.join(
-    os.path.expanduser("~"),
-    'abmarl_results/Epsilon_Soft_Multi_Corridor_{}'.format(
-        time.strftime('%Y-%m-%d_%H-%M')
-    )
-)
 debugger = DebugTrainer(
-    sim=sim, policies=policies, policy_mapping_fn=policy_mapping_fn, output_dir=output_dir
+    sim=sim,
+    policies=policies,
+    policy_mapping_fn=policy_mapping_fn,
+    output_dir="Epsilon_Soft_Multi_Corridor"
 )
 debugger.train(iterations=4, render=True, horizon=20)
