@@ -122,16 +122,11 @@ class ReachTheTargetSim(GridWorldSimulation):
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if agent.active:
-                attack_status, attacked_agents = \
-                    self.attack_actor.process_action(agent, action, **kwargs)
-                if attack_status: # Attack was attempted
-                    if not attacked_agents: # Attack failed
-                        self.rewards[agent_id] -= 0.1
-                    else:
-                        for attacked_agent in attacked_agents:
-                            if not attacked_agent.active: # Agent has died
-                                self.rewards[attacked_agent.id] -= 1
-                                self.rewards[agent_id] += 1
+                attacked_agents = self.attack_actor.process_action(agent, action, **kwargs)
+                for attacked_agent in attacked_agents:
+                    if not attacked_agent.active: # Agent has died
+                        self.rewards[attacked_agent.id] -= 1
+                        self.rewards[agent_id] += 1
 
         # Process the moves
         for agent_id, action in action_dict.items():
