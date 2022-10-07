@@ -223,22 +223,17 @@ def test_exclusive_attack_wrapper_process_action():
 
     position_state.reset()
     health_state.reset()
-    attack_status, attacked_agents = \
-        exclusive_attack_actor.process_action(agents['agent0'], action_sample['agent0'])
-    assert not attack_status
-    assert not attacked_agents
-    attack_status, attacked_agents = \
-        exclusive_attack_actor.process_action(agents['agent1'], action_sample['agent1'])
-    assert attack_status
-    assert len(attacked_agents) == 1
-    assert attacked_agents[0].encoding == 3
-    attack_status, attacked_agents = \
-        exclusive_attack_actor.process_action(agents['agent2'], action_sample['agent2'])
-    assert attack_status
-    assert len(attacked_agents) == 1
-    assert attacked_agents[0].encoding == 2
-    attack_status, attacked_agents = \
-        exclusive_attack_actor.process_action(agents['agent3'], action_sample['agent3'])
-    assert attack_status
-    assert len(attacked_agents) == 1
-    assert attacked_agents[0].encoding == 1
+    attack_result = exclusive_attack_actor.process_action(agents['agent0'], action_sample['agent0'])
+    assert attack_result == []
+    attack_result = exclusive_attack_actor.process_action(agents['agent1'], action_sample['agent1'])
+    assert type(attack_result) == list
+    assert len(attack_result) == 1
+    assert attack_result[0].encoding == 3
+    attack_result = exclusive_attack_actor.process_action(agents['agent2'], action_sample['agent2'])
+    assert type(attack_result) == list
+    assert len(attack_result) == 1
+    assert attack_result[0].encoding == 2
+    attack_result = exclusive_attack_actor.process_action(agents['agent3'], action_sample['agent3'])
+    assert type(attack_result) == list
+    assert len(attack_result) == 1
+    assert attack_result[0].encoding == 1
