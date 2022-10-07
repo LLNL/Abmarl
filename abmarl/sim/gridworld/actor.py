@@ -199,6 +199,19 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
 
         If the attack is successful, then the attacked agent's health is depleted
         by the attacking agent's strength, possibly resulting in its death.
+
+        Args:
+            attacking_agent: The attacking agent.
+            action_dict: The agent's action in this step.
+
+        Returns:
+            Tuple of bool, list. The first value is False if the agent is not an
+            attacking agent or chose not to attack; otherwise it is True. The second
+            value is a list of attacked agents, which will be empty if there was
+            no attack or if the attack failed. Thus, there are three possible outcomes:
+                1. An attack was not attempted: False, []
+                2. An attack failed: True, []
+                3. An attack was successful: True, [non-empty]
         """
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
@@ -268,6 +281,16 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     def _determine_attack(self, agent, attack):
         """
         The derived class should determine which agents are successfully attacked.
+
+        This function should return two values: a boolean indicating if an attack
+        was attempted and a list of attacked agents. If the agent is not an attacking
+        agent or chose not to attack, then the first value will be False; otherwise
+        it will be True. The second value is a list of attacked agents, which will be
+        empty if there was no attack or if the attack failed. Thus, there are
+        three possible outcomes:
+            1. An attack was not attempted: False, []
+            2. An attack failed: True, []
+            3. An attack was successful: True, [non-empty]
         """
         pass
 
@@ -305,9 +328,16 @@ class BinaryAttackActor(AttackActorBaseComponent):
             agent: The attacking agent.
             attack: The number of attacks to perform.
         Returns:
-            List of attacked agents, up to the number of attacks the agent can
-            carry out per step. The agent's attack count is a total upper bound
-            on the attack.
+            Tuple of bool, list. The first value is False if the agent is not an
+            attacking agent or chose not to attack; otherwise it is True. The second
+            value is a list of attacked agents, which will be empty if there was
+            no attack or if the attack failed. Thus, there are three possible outcomes:
+                1. An attack was not attempted: False, []
+                2. An attack failed: True, []
+                3. An attack was successful: True, [non-empty]
+            The list of attacked agents will have length up to the number of attacks
+            that the attacking agent can carry out per step. The agent's attack
+            count is a total upper bound on the attack.
         """
         # Return empty list if no attack is specified.
         if not attack:
@@ -365,9 +395,17 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
             agent: The attacking agent.
             attack: The number of attacks to perform per each encoding.
         Returns:
-            List of attacked agents, up to the number of attacks the agent can
-            carry out per encoding per step. The agent's attack count is an upper bound
-            on the attack per encoding, not a total upper bound.
+            Tuple of bool, list. The first value is False if the agent is not an
+            attacking agent or chose not to attack; otherwise it is True. The second
+            value is a list of attacked agents, which will be empty if there was
+            no attack or if the attack failed. Thus, there are three possible outcomes:
+                1. An attack was not attempted: False, []
+                2. An attack failed: True, []
+                3. An attack was successful: True, [non-empty]
+            The list of attacked agents will have length up to the number of attacks
+            that the attacking agent can carry out per encoding per step. The agent's
+            attack count is an upper bound on the attack per encoding, not a total
+            upper bound.
         """
         # Return empty list if no attack is specified.
         if not any([num_attacks for num_attacks in attack.values()]):
@@ -432,9 +470,16 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
             agent: The attacking agent.
             attack: The nearby cells to attack.
         Returns:
-            List of attacked agents, up to the number of attacks the agent can
-            carry out per step. The agent's attack count is a total upper bound
-            on the attack.
+            Tuple of bool, list. The first value is False if the agent is not an
+            attacking agent or chose not to attack; otherwise it is True. The second
+            value is a list of attacked agents, which will be empty if there was
+            no attack or if the attack failed. Thus, there are three possible outcomes:
+                1. An attack was not attempted: False, []
+                2. An attack failed: True, []
+                3. An attack was successful: True, [non-empty]
+            The list of attacked agents will have length up to the number of attacks
+            that the attacking agent can carry out per step. The agent's attack
+            count is a total upper bound on the attack.
         """
         # Return empty list if no attack is specified.
         if not any(attack):
@@ -503,9 +548,17 @@ class SelectiveAttackActor(AttackActorBaseComponent):
             agent: The attacking agent.
             attack: The nearby cells to attack.
         Returns:
-            List of attacked agents, up to the number of attacks the agent can
-            carry out per cell per step. The agent's attack count is an upper bound
-            on the attack per cell, not a total upper bound.
+            Tuple of bool, list. The first value is False if the agent is not an
+            attacking agent or chose not to attack; otherwise it is True. The second
+            value is a list of attacked agents, which will be empty if there was
+            no attack or if the attack failed. Thus, there are three possible outcomes:
+                1. An attack was not attempted: False, []
+                2. An attack failed: True, []
+                3. An attack was successful: True, [non-empty]
+            The list of attacked agents will have length up to the number of attacks
+            that the attacking agent can carry out per cell per step. The agent's
+            attack count is an upper bound on the attack per cell, not a total
+            upper bound.
         """
         # Return empty list if no attack is specified.
         if not np.any(attack):
