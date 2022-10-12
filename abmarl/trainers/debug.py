@@ -41,6 +41,9 @@ class DebugTrainer(MultiPolicyTrainer):
     def name(self):
         """
         The name of the experiment.
+        
+        If name is not specified, then we just use "DEBUG". We append the name
+        with the date and time.
         """
         return self._name
 
@@ -57,8 +60,8 @@ class DebugTrainer(MultiPolicyTrainer):
         """
         The directory for where to dump the episode data.
 
-        If the output dir is not specified, then we use "~/abmarl/DEBUG".
-        We append the date and time to the end of the directory.
+        If the output dir is not specified, then we use "~/abmarl_results/". We
+        append the experiment name to the end of the directory.
         """
         return self._output_dir
 
@@ -68,9 +71,7 @@ class DebugTrainer(MultiPolicyTrainer):
             value = os.path.join(os.path.expanduser("~"), 'abmarl_results')
         else:
             assert type(value) is str, "Output directory must be a string."
-        value_date = '{}_{}'.format(value, time.strftime('%Y-%m-%d_%H-%M'))
-        base = os.path.join(os.path.expanduser("~"), 'abmarl_results')
-        output_dir = os.path.join(base, value_date)
+        output_dir = os.path.join(value, self.name)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         self._output_dir = output_dir
