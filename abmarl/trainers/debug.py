@@ -41,7 +41,7 @@ class DebugTrainer(MultiPolicyTrainer):
     def name(self):
         """
         The name of the experiment.
-        
+
         If name is not specified, then we just use "DEBUG". We append the name
         with the date and time.
         """
