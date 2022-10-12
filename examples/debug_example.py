@@ -28,6 +28,6 @@ debugger = DebugTrainer(
     sim=sim,
     policies=policies,
     policy_mapping_fn=policy_mapping_fn,
-    output_dir="Epsilon_Soft_Multi_Corridor"
+    name="Epsilon_Soft_Multi_Corridor"
 )
 debugger.train(iterations=4, render=True, horizon=20)

@@ -21,7 +21,7 @@ class DebugTrainer(MultiPolicyTrainer):
     random policy for each agent. This effectively debug the simulation without
     having to debug the policy setup too.
     """
-    def __init__(self, policies=None, output_dir=None, **kwargs):
+    def __init__(self, policies=None, name=None, output_dir=None, **kwargs):
         if not policies:
             self.sim = kwargs['sim']
             # Create random policies
@@ -34,27 +34,44 @@ class DebugTrainer(MultiPolicyTrainer):
             self.policy_mapping_fn = lambda agent_id: agent_id
         else:
             super().__init__(policies=policies, **kwargs)
+        self.name = name
         self.output_dir = output_dir
+
+    @property
+    def name(self):
+        """
+        The name of the experiment.
+
+        If name is not specified, then we just use "DEBUG". We append the name
+        with the date and time.
+        """
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        if value is None:
+            value = 'DEBUG'
+        else:
+            assert type(value) is str, "Name must be a string."
+        self._name = '{}_{}'.format(value, time.strftime('%Y-%m-%d_%H-%M'))
 
     @property
     def output_dir(self):
         """
         The directory for where to dump the episode data.
 
-        The directory will be ~/abmarl_results/<output_dir>_<date>_<time>. If the output
-        dir is not specified, then we use "DEBUG".
+        If the output dir is not specified, then we use "~/abmarl_results/". We
+        append the experiment name to the end of the directory.
         """
         return self._output_dir
 
     @output_dir.setter
     def output_dir(self, value):
         if value is None:
-            value = 'DEBUG'
+            value = os.path.join(os.path.expanduser("~"), 'abmarl_results')
         else:
             assert type(value) is str, "Output directory must be a string."
-        value_date = '{}_{}'.format(value, time.strftime('%Y-%m-%d_%H-%M'))
-        base = os.path.join(os.path.expanduser("~"), 'abmarl_results')
-        output_dir = os.path.join(base, value_date)
+        output_dir = os.path.join(value, self.name)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         self._output_dir = output_dir
