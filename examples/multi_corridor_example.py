@@ -33,6 +33,7 @@ params = {
             'episodes_total': 2000,
         },
         'verbose': 2,
+        'local_dir': 'testing_local_dir',
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,

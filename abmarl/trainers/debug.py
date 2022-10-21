@@ -71,6 +71,7 @@ class DebugTrainer(MultiPolicyTrainer):
             value = os.path.join(os.path.expanduser("~"), 'abmarl_results')
         else:
             assert type(value) is str, "Output directory must be a string."
+            value = os.path.join(value, 'abmarl_results')
         output_dir = os.path.join(value, self.name)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
