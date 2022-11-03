@@ -56,30 +56,36 @@ def flatten(space, point):
         return np.concatenate(
             [flatten(s, point[key]) for key, s in space.spaces.items()])
     elif isinstance(space, MultiBinary):
-        return np.asarray(point, dtype=int).flatten()
+        return point
     elif isinstance(space, MultiDiscrete):
-        return np.asarray(point, dtype=int).flatten()
-    else:
-        raise TypeError('space must be instance of gym.spaces')
+        return point
 
 
-def unflatten(space, x):
-    """Unflatten a data point from a space.
+def unflatten(space, point):
+    """
+    Unflatten a point to a space.
 
     This reverses the transformation applied by flatten(). You must ensure
     that the space argument is the same as for the flatten() call.
 
-    Accepts a space and a flattened point. Returns a point with a structure
-    that matches the space. Raises TypeError if the space is not
-    defined in gym.spaces.
+    Args:
+        space: The gym space to which to map the point.
+        point: The point to be unflattened.
+
+    Returns:
+        An unflattened representation of the point.
     """
     if isinstance(space, Box):
-        return np.asarray(x, dtype=space.dtype).reshape(space.shape)
+        return np.asarray(point, dtype=space.dtype).reshape(space.shape)
     elif isinstance(space, Discrete):
-        return int(np.nonzero(x)[0][0])
+        return point[0]
+    elif isinstance(space, MultiBinary):
+        return point
+    elif isinstance(space, MultiDiscrete):
+        return point
     elif isinstance(space, Tuple):
         dims = [flatdim(s) for s in space.spaces]
-        list_flattened = np.split(x, np.cumsum(dims)[:-1])
+        list_flattened = np.split(point, np.cumsum(dims)[:-1])
         list_unflattened = [
             unflatten(s, flattened)
             for flattened, s in zip(list_flattened, space.spaces)
@@ -87,7 +93,7 @@ def unflatten(space, x):
         return tuple(list_unflattened)
     elif isinstance(space, Dict):
         dims = [flatdim(s) for s in space.spaces.values()]
-        list_flattened = np.split(x, np.cumsum(dims)[:-1])
+        list_flattened = np.split(point, np.cumsum(dims)[:-1])
         list_unflattened = [
             (key, unflatten(s, flattened))
             for flattened, (key,
@@ -95,12 +101,6 @@ def unflatten(space, x):
         ]
         from collections import OrderedDict
         return OrderedDict(list_unflattened)
-    elif isinstance(space, MultiBinary):
-        return np.asarray(x, dtype=int).reshape(space.shape)
-    elif isinstance(space, MultiDiscrete):
-        return np.asarray(x, dtype=int).reshape(space.shape)
-    else:
-        raise TypeError
 
 
 def flatten_space(space):
@@ -110,40 +110,25 @@ def flatten_space(space):
     result always is a Box with flat boundaries. The box has exactly
     flatdim(space) dimensions. Flattening a sample of the original space
     has the same effect as taking a sample of the flattenend space.
+    
+    Args:
+        space: Gym space to be flattened.
 
-    Raises TypeError if the space is not defined in gym.spaces.
-
-    Example::
-
-        >>> box = Box(0.0, 1.0, shape=(3, 4, 5))
-        >>> box
-        Box(3, 4, 5)
-        >>> flatten_space(box)
-        Box(60,)
-        >>> flatten(box, box.sample()) in flatten_space(box)
-        True
-
-    Example that flattens a discrete space::
-
-        >>> discrete = Discrete(5)
-        >>> flatten_space(discrete)
-        Box(5,)
-        >>> flatten(box, box.sample()) in flatten_space(box)
-        True
-
-    Example that recursively flattens a dict::
-
-        >>> space = Dict({"position": Discrete(2),
-        ...               "velocity": Box(0, 1, shape=(2, 2))})
-        >>> flatten_space(space)
-        Box(6,)
-        >>> flatten(space, space.sample()) in flatten_space(space)
-        True
+    Returns:
+        Box with type and dimension according to the flattening.
     """
     if isinstance(space, Box):
         return Box(space.low.flatten(), space.high.flatten(), dtype=space.dtype)
     if isinstance(space, Discrete):
+        return Box(low=0, high=space.n - 1, shape=(1, ), dtype=int)
+    if isinstance(space, MultiBinary):
         return Box(low=0, high=1, shape=(space.n, ), dtype=int)
+    if isinstance(space, MultiDiscrete):
+        return Box(
+            low=np.zeros_like(space.nvec),
+            high=space.nvec - 1,
+            dtype=int
+        )
     if isinstance(space, Tuple):
         space = [flatten_space(s) for s in space.spaces]
         encapsulating_type = int \
@@ -164,15 +149,6 @@ def flatten_space(space):
             high=np.concatenate([s.high for s in space]),
             dtype=encapsulating_type
         )
-    if isinstance(space, MultiBinary):
-        return Box(low=0, high=1, shape=(space.n, ), dtype=int)
-    if isinstance(space, MultiDiscrete):
-        return Box(
-            low=np.zeros_like(space.nvec),
-            high=space.nvec,
-            dtype=int
-        )
-    raise TypeError
 
 
 class FlattenWrapper(SARWrapper):
