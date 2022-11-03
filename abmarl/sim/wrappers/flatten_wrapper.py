@@ -32,30 +32,33 @@ def flatdim(space):
         return int(sum([flatdim(s) for s in space.spaces.values()]))
 
 
-def flatten(space, x):
-    """Flatten a data point from a space.
+def flatten(space, point):
+    """
+    Flatten a point from a space.
 
     This is useful when e.g. points from spaces must be passed to a neural
     network, which only understands flat arrays of floats.
 
-    Accepts a space and a point from that space. Always returns a 1D array.
-    Raises TypeError if the space is not a gym space.
+    Args:
+        space: The gym space in which the point lives
+        point: The point to be flattened.
+
+    Returns:
+        A flattened representation of the point.
     """
     if isinstance(space, Box):
-        return np.asarray(x, dtype=space.dtype).flatten()
+        return np.asarray(point, dtype=space.dtype).flatten()
     elif isinstance(space, Discrete):
-        onehot = np.zeros(space.n, dtype=int)
-        onehot[x] = 1
-        return onehot
+        return np.array([point], dtype=int)
     elif isinstance(space, Tuple):
-        return np.concatenate([flatten(s, x_part) for x_part, s in zip(x, space.spaces)])
+        return np.concatenate([flatten(s, x_part) for x_part, s in zip(point, space.spaces)])
     elif isinstance(space, Dict):
         return np.concatenate(
-            [flatten(s, x[key]) for key, s in space.spaces.items()])
+            [flatten(s, point[key]) for key, s in space.spaces.items()])
     elif isinstance(space, MultiBinary):
-        return np.asarray(x, dtype=int).flatten()
+        return np.asarray(point, dtype=int).flatten()
     elif isinstance(space, MultiDiscrete):
-        return np.asarray(x, dtype=int).flatten()
+        return np.asarray(point, dtype=int).flatten()
     else:
         raise TypeError('space must be instance of gym.spaces')
 
