@@ -8,26 +8,28 @@ from .sar_wrapper import SARWrapper
 
 
 def flatdim(space):
-    """Return the number of dimensions a flattened equivalent of this space
+    """
+    Return the number of dimensions a flattened equivalent of this space
     would have.
 
-    Accepts a space and returns an integer. Raises TypeError if
-    the space is not defined in gym.spaces.
+    Args:
+        space: A gym Space.
+
+    Returns:
+        The number of dimensions in the flattened space.
     """
     if isinstance(space, Box):
         return int(np.prod(space.shape))
     elif isinstance(space, Discrete):
+        return 1
+    elif isinstance(space, MultiBinary):
         return int(space.n)
+    elif isinstance(space, MultiDiscrete):
+        return len(space)
     elif isinstance(space, Tuple):
         return int(sum([flatdim(s) for s in space.spaces]))
     elif isinstance(space, Dict):
         return int(sum([flatdim(s) for s in space.spaces.values()]))
-    elif isinstance(space, MultiBinary):
-        return int(space.n)
-    elif isinstance(space, MultiDiscrete):
-        return int(np.prod(space.shape))
-    else:
-        raise TypeError
 
 
 def flatten(space, x):
