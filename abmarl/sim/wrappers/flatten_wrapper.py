@@ -110,7 +110,7 @@ def flatten_space(space):
     result always is a Box with flat boundaries. The box has exactly
     flatdim(space) dimensions. Flattening a sample of the original space
     has the same effect as taking a sample of the flattenend space.
-    
+
     Args:
         space: Gym space to be flattened.
 
