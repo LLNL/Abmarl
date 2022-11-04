@@ -330,3 +330,9 @@ def test_flatten_action_null_points():
     np.testing.assert_array_equal(agents['agent1'].null_action, [0, 0, 0])
     np.testing.assert_array_equal(agents['agent2'].null_action, [0, 0, 0])
     np.testing.assert_array_equal(agents['agent3'].null_action, [0, 0, 0, 0])
+
+
+def test_flatten_sample_in_space():
+    flattened_combo_sample = flatten_space(combo).sample()
+    unflattened_combo_sample = unflatten(combo, flattened_combo_sample)
+    assert unflattened_combo_sample in combo
