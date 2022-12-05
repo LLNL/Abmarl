@@ -496,11 +496,38 @@ Attacking
 `````````
 
 `Health` becomes more interesting when we let agents attack one another.
-:ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with the
-:ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`. They have an `attack range`, which dictates
+:ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with 
+an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
-attack being successful; and an `attack strength`, which dictates how much `health`
-is depleted from the attacked agent. An agent's choice to attack is a boolean--either
+attack being successful; an `attack strength`, which dictates how much `health`
+is depleted from the attacked agent, and an `attack count`, which dictates the
+number of attacks an agent can make per turn. An AttackActor interprets these properties
+according to their own internal design. In general, each AttackActor determines
+some set of attackable agents within the attacking agent's vicinity and selects
+from that set based on the attacking agent's number of attacks per turn and attack
+accuracy. When an agent is successfully attacked, its health is depleted by the
+attacking agent's attack strength, which may result in the agent's death. AttackActors
+can be configured to allow multiple attacks against a single agent per attacking
+agent and per turn. The following four AttackActors are built into Abmarl:
+
+Binary Attack Actor
+~~~~~~~~~~~~~~~~~
+
+The :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`
+
+Encoding Based Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SelectiveAttackActor
+~~~~~~~~~~~~~~~~~~~~
+
+RestrictedSelectiveAttackActor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+An agent's choice to attack is a boolean--either
 attack or don't attack--and then the BinaryAttackActor determines the successfulness
 based on the state of the simulation and the attributes of the AttackingAgent.
 The BinaryAttackActor requires an `attack mapping` dictionary which determines
