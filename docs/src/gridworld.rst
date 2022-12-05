@@ -501,11 +501,22 @@ an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`,
 the range of their attack; an `attack accuracy`, which dictates the chances of the
 attack being successful; an `attack strength`, which dictates how much `health`
 is depleted from the attacked agent, and an `attack count`, which dictates the
-number of attacks an agent can make per turn. An AttackActor interprets these properties
-according to their own internal design. In general, each AttackActor determines
-some set of attackable agents within the attacking agent's vicinity and selects
-from that set based on the attacking agent's number of attacks per turn and attack
-accuracy. When an agent is successfully attacked, its health is depleted by the
+number of attacks an agent can make per turn.
+
+An AttackActor interprets these properties and processes attack dynamics according
+to their own internal design. In general, each AttackActor determines some set of
+attackable agents according to:
+
+   #. The `attack mapping`, which is a dictionary that determines which `encodings`
+can attack other `encodings` (similar to the `overlapping` parameter for the
+:ref:`Grid <gridworld_grid>`)
+   #. The relative positions of the two agents must fall within the `attack range`.
+   #. If the attackable agent is masked (e.g. hiding behind a wall). The masking
+      is determined the same way as view blocking described above.
+   #. Any additional criteria for the specific Attack Actor.
+
+Then, it selects from that set based on the attacking agent's `attack count`.
+When an agent is successfully attacked, its health is depleted by the
 attacking agent's attack strength, which may result in the agent's death. AttackActors
 can be configured to allow multiple attacks against a single agent per attacking
 agent and per turn. The following four AttackActors are built into Abmarl:
@@ -513,26 +524,11 @@ agent and per turn. The following four AttackActors are built into Abmarl:
 Binary Attack Actor
 ~~~~~~~~~~~~~~~~~
 
-The :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`
-
-Encoding Based Attack Actor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-SelectiveAttackActor
-~~~~~~~~~~~~~~~~~~~~
-
-RestrictedSelectiveAttackActor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-An agent's choice to attack is a boolean--either
-attack or don't attack--and then the BinaryAttackActor determines the successfulness
-based on the state of the simulation and the attributes of the AttackingAgent.
-The BinaryAttackActor requires an `attack mapping` dictionary which determines
-which `encodings` can attack other `encodings`, similar to the `overlapping` parameter
-for the :ref:`Grid <gridworld_grid>`. Consider the following setup:
+Under the :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`,
+:ref:`AttackingAgents <api_gridworld_agent_attack>` can choose to use some number
+of their attacks or not to attack at all. For each attack, the Binary Attack Actor
+randomly searches the vicinity of the attacking actor for an agent according to
+the basic criteria listed above. Consider the following setup:
 
 .. code-block:: python
 
@@ -548,43 +544,57 @@ for the :ref:`Grid <gridworld_grid>`. Consider the following setup:
            encoding=1,
            initial_position=np.array([0, 0]),
            attack_range=1,
-           attack_strength=1,
-           attack_accuracy=1
+           attack_strength=0.4,
+           attack_accuracy=1,
+           attack_count=2
        ),
-       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0])),
-       'agent2': HealthAgent(id='agent2', encoding=3, initial_position=np.array([0, 1]))
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=0.3),
+       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]))
    }
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]})
+   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
 
    position_state.reset()
    health_state.reset()
-   attack_actor.process_action(agents['agent0'], {'attack': True})
-   attack_actor.process_action(agents['agent0'], {'attack': True})
+   attack_actor.process_action(agents['agent0'], {'attack': 2})
+   assert not agents['agent2'].active
+   assert agents['agent1'].active
+   assert agents['agent3'].active
+   attack_actor.process_action(agents['agent0'], {'attack': 2})
+   assert agents['agent1'].active
+   assert agents['agent3'].active
 
-Here, `agent0` attempts to make two attack actions. The first one is successful
-because `agent1` is within its `attack range` and is attackable according to the
-`attack mapping`. `agent1`'s `health` will be depleted by 1, and as a result its `health`
-will fall to 0 and it will be marked as `inactive`. The second attack fails because,
-although `agent2` is within range, it is not a type that `agent0` can attack.
 
-.. figure:: .images/gridworld_attacking.png
-   :width: 100 %
-   :alt: Agent attacking other agents
-
-   agent0 in blue performs two attacks. The first is successful, but the second is not.
-   agent1 in green is killed, but agent2 in red is still active.
-
-.. NOTE::
-
-   Attacks can be blocked by :ref:`blocking <gridworld_blocking>` agents. If an attackable agent is
-   masked from an attacking agent, then it cannot be attacked by that agent. The
-   masking is determined the same way as view blocking described above.
+`agent0` can attack `agent1` or `agent2` but not `agent3`. It can make two attacks
+per turn, but because the `stacked attacks` is False, it cannot attack the same
+agent twice in the same turn. Looking at the `attack strength` and `initial health`
+of the agents, we can see that `agent0` should be able to kill `agent2` with one
+attack but it will require three attacks to kill `agent1`. In each turn, `agent0`
+uses both of its attacks. In the first turn, both `agent1` and `agent2` are attacked
+and `agent2` dies. In the second turn, `agent0` attempts two attacks again, but
+because there is only one attackable agent in its vicinity and because `stacked attacks`
+are not allowed, only one of its attacks is successful: `agent1` is attacked,
+but it continues to live since it still has health. `agent3` was never attacked
+because although it is within `agent0`'s `attack range`, it is not in the `attack mapping`.
 
 The :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>` automatically
 assigns a `null action` of 0, indicating no attack.
+
+Encoding Based Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SelectiveAttackActor
+~~~~~~~~~~~~~~~~~~~~
+
+RestrictedSelectiveAttackActor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
 
 
 RavelActionWrapper
