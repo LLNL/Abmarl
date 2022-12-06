@@ -392,6 +392,10 @@ The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assi
 a `null observation` as a view matrix of all -2s, indicating that everything is
 masked.
 
+
+# TODO: Maybe blocking should be a feature we describe apart from observations
+since it is used for attack and move blocking too.
+
 .. _gridworld_blocking:
 
 Blocking
@@ -491,6 +495,7 @@ Consider the following setup:
 
 `agent0` will be assigned a random `health` value between 0 and 1.
 
+.. _gridworld_attacking:
 
 Attacking
 `````````
@@ -505,9 +510,10 @@ attack being successful; an `attack strength`, which dictates how much `health`
 is depleted from the attacked agent, and an `attack count`, which dictates the
 number of attacks an agent can make per turn.
 
-An AttackActor interprets these properties and processes attack dynamics according
-to its own internal design. In general, each AttackActor determines some set of
-attackable agents according to the following criteria:
+An :ref:`AttackActor <api_gridworld_actor_attack>` interprets these properties
+and processes the attacks according to its own internal design. In general, each
+AttackActor determines some set of attackable agents according to the following
+criteria:
 
    #. The `attack mapping`, which is a dictionary that determines which `encodings`
       can attack other `encodings` (similar to the `overlapping` parameter for the
@@ -515,24 +521,25 @@ attackable agents according to the following criteria:
    #. The relative positions of the two agents must fall within the attacking agent's
       `attack range`.
    #. The attackable agent must not be masked (e.g. hiding behind a wall). The masking
-      is determined the same way as view blocking described above.
-   #. Any additional criteria for the specific Attack Actor.
+      is determined the same way as :ref:`blocking <gridworld_blocking>` described above.
 
-Then, the AttackActor selects agents from that set based on the attacking agent's `attack count`.
-When an agent is successfully attacked, its health is depleted by the
-attacking agent's `attack strength`, which may result in the attacked agent's death. AttackActors
-can be configured to allow multiple attacks against a single agent per attacking
-agent and per turn via the `stacked attacks` property. The following four AttackActors
-are built into Abmarl:
+Then, the :ref:`AttackActor <api_gridworld_actor_attack>` selects agents from that
+set based on the attacking agent's `attack count`. When an agent is successfully
+attacked, its health is depleted by the attacking agent's `attack strength`, which
+may result in the attacked agent's death. AttackActors can be configured to allow
+multiple attacks against a single agent per attacking agent and per turn via the
+`stacked attacks` property. The following four AttackActors are built into Abmarl:
+
+.. _gridworld_binary_attack:
 
 Binary Attack Actor
 ~~~~~~~~~~~~~~~~~~~
 
-Under the :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`,
-:ref:`AttackingAgents <api_gridworld_agent_attack>` can choose to use some number
-of their attacks or not to attack at all. For each attack, the Binary Attack Actor
+With the :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`,
+:ref:`AttackingAgents <api_gridworld_agent_attack>` can choose to launch attacks
+up to its `attack count` or not to attack at all. For each attack, the BinaryAttackActor
 randomly searches the vicinity of the attacking agent for an attackble agent according to
-the basic criteria listed above. Consider the following setup:
+the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the following setup:
 
 .. code-block:: python
 
@@ -588,6 +595,7 @@ it still has health. `agent3` was never attacked because although it is within
 The :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>` automatically
 assigns a `null action` of 0, indicating no attack.
 
+.. _gridworld_encoding_based_attack:
 
 Encoding Based Attack Actor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -595,9 +603,10 @@ Encoding Based Attack Actor
 The :ref:`EncodingBasedAttackActor <api_gridworld_actor_encoding_attack>` allows
 :ref:`AttackingAgents <api_gridworld_agent_attack>` to choose some number of attacks
 *per each encoding*. For each attack, the EncodingBasedAttackActor randomly searches
-the vicinity of the attacking agent for an attackble agent according to the basic
-criteria listed above. Contrast this actor with the BinaryAttackActor above, which
-does not allow agents to specify attack by encoding. Consider the following setup:
+the vicinity of the attacking agent for an attackble agent according to the
+:ref:`basic criteria listed above <gridworld_attacking>`. Contrast this actor with the
+:ref:`BinaryAttackActor <gridworld_binary_attack>` above, which does not allow
+agents to specify attack by encoding. Consider the following setup:
 
 .. code-block:: python
 
@@ -639,8 +648,8 @@ attacks on encoding 3 per turn), and because the `stacked attacks` property
 is True, it can attack the same agent twice in the same turn. Looking at the
 `attack strength` and `initial health` of the agents, we can see that `agent0`
 should be able to kill `agent3` with only two attacks. `agent0` launches no attacks
-on encoding 2 and two attacks on encoding  3. Because `agent3` is the only agent of encoding
-3 and because `stacked attacks` is True, it gets attacked twice in one turn,
+on encoding 2 and two attacks on encoding 3. Because `agent3` is the only agent of encoding
+3 and because `stacked attacks` are allowed, it gets attacked twice in one turn,
 resulting in its death. Even though `agent1` and `agent2` are in `agent0`'s `attack mapping`
 and `attack range`, neither of them is attacked because `agent0` specified zero
 attacks on encoding 2.
@@ -648,20 +657,23 @@ attacks on encoding 2.
 The :ref:`EncodingBasedAttackActor <api_gridworld_actor_encoding_attack>` automatically
 assigns a `null action` of 0 for each encoding, indicating no attack.
 
+.. _gridworld_selective_attack:
 
-SelectiveAttackActor
-~~~~~~~~~~~~~~~~~~~~
+Selective Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`SelectiveAttackActor <api_gridworld_actor_selective_attack>` allows agents
-to specify some number of attacks on each of the grid cells in some local grid
-defined by the attacking agent's `attack range`. In contrast to the BinaryAttackActor
-and EncodingBasedAttackActor above, the SelectiveAttackActor does not randomly
-search for agents in the vicinity because it looks up the attacked cells directly.
-The attacking agent can attack each cell up to its `attack count`. Attackable agents
-are defined according to the basic criteria listed above. If there are multiple
-attackable agents on a the same cell, the actor randomly picks from among them
-based on the number of attacks on that cell and whether or not `stacked attacks`
-are allowed. Consider the following setup:
+The :ref:`SelectiveAttackActor <api_gridworld_actor_selective_attack>` allows
+:ref:`AttackingAgents <api_gridworld_agent_attack>` to specify some number of attacks
+on each of the cells in some local grid defined by the agent's `attack range`.
+In contrast to the :ref:`BinaryAttackActor <gridworld_binary_attack>` and
+:ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>` above, the
+SelectiveAttackActor does not randomly search for agents in the vicinity because
+it receives the attacked cells directly. The attacking agent can attack each cell
+up to its `attack count`. Attackable agents are defined according to the
+:ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
+attackable agents on the same cell, the actor randomly picks from among them based
+on the number of attacks on that cell and whether or not `stacked attacks` are
+allowed. Consider the following setup:
 
 .. code-block:: python
 
@@ -706,31 +718,34 @@ As per the `attack mapping`, `agent0` can attack `agent1` or `agent2` but not
 `agent3`. It can make two attacks per turn *per cell*, but because the `stacked attacks` property
 is False, it cannot attack the same agent twice in the same turn. Looking at the
 `attack strength` and `initial health` of the agents, we can see that `agent0`
-should be able to kill `agent1` and `agent2` with a single attack. `agent0` launches
+should be able to kill `agent1` and `agent2` with a single attack each. `agent0` launches
 5 attacks: one on the cell above, one on its own cell, one on the cell below,
 and two on the cell to the right. The attack above is on a cell that is out of bounds,
 so this attack does nothing. The attack on its own cell fails because there are
 no attackable agents there. `agent1` is on the cell below, and that attack succeeds.
-`agent2` and `agent3` are both on the cell to the right, and `stacked attacks` is
-False, but only `agent2` is attackable per the attack mapping, so only one of the
+`agent2` and `agent3` are both on the cell to the right, but only `agent2` is attackable
+per the attack mapping and `stacked attacks` are not allowed, so only one of the
 launched attacks is successful.
 
-The :ref:`SelectiveAttackActor <api_gridworld_actor_binary_attack>` automatically
+The :ref:`SelectiveAttackActor <api_gridworld_actor_selective_attack>` automatically
 assigns a grid of 0s as the `null action`, indicating no attack on any cell.
 
+.. _gridworld_restricted_selective_attack:
 
-RestrictedSelectiveAttackActor
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Restricted Selective Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
-allows agents to specify some number of attacks in some local grid defined by the
-attacking agent's `attack range`. This actor is more *restricted* than its counterpart,
-the SelectiveAttackActor, because rather than issuing attacks up to its `attack count`
-*per cell*, the attacking agent can only issue that many attacks in the *whole local
-grid*. Attackable agents are defined according to the basic criteria listed above.
-If there are multiple attackable agents on a the same cell, the actor randomly
-picks from among them based on the number of attacks on that cell and whether or
-not `stacked attacks` are allowed. Consider the following setup:
+allows :ref:`AttackingAgents <api_gridworld_agent_attack>` to specify some number
+of attacks in some local grid defined by the attacking agent's `attack range`.
+This actor is more *restricted* than its counterpart, the
+:ref:`SelectiveAttackActor <gridworld_selective_attack>`, because rather than issuing
+attacks up to its `attack count` *per cell*, the attacking agent can only issue
+that many attacks in the *whole local grid*. Attackable agents are defined according
+to the :ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
+attackable agents on a the same cell, the actor randomly picks from among them
+based on the number of attacks on that cell and whether or not `stacked attacks`
+are allowed. Consider the following setup:
 
 .. code-block:: python
 
@@ -774,20 +789,23 @@ issue up to three attacks per turn. `stacked attacks` is False, so the same agen
 cannot be attacked twice in the same turn. Looking at the `attack strength` and
 `initial health` of the agents, we can see that `agent0` should be able to kill
 `agent1` and `agent2` with a single attack each but will need two attacks to kill
-`agent3` In the first turn, `agent0` launches two attacks to the bottom right cell
-and chooses not to use its third attack. `agent3` is on this cell, but because
-`stacked attacks` is False, it only gets attacked once. In the next turn, `agent0`
-issues an attack on each of the three occupied cells, and each attack is succesful.
+`agent3`. In the first turn, `agent0` launches two attacks to the bottom right cell
+and chooses not to use its third attack. `agent3` is the only attackable agent
+on this cell, but because `stacked attacks` are not allowed, it only gets attacked
+once. In the next turn, `agent0` issues an attack on each of the three occupied
+cells, and each attack is succesful.
 
 The :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
-automatically assigns a list of 0s as the `null action`, indicating no attack on any cell.
+automatically assigns an array of 0s as the `null action`, indicating no attack on any cell.
 
 .. NOTE::
-   The form of the attack in the RestrictedSelectiveAttackActor is the most difficult
-   for humans to interpret. The number of entries in the list reflects the agent's
-   `attack count`. The attack appears as the cell's id, which is determined
-   from ravelling the local grid, where 0 means no attack, 1 is the top left cell,
-   2 is to the right of that, and so on through the whole local grid.
+   The form of the attack in the
+   :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
+   is the most difficult for humans to interpret. The number of entries in the
+   array reflects the agent's `attack count`. The attack appears as the cell's id,
+   which is determined from ravelling the local grid, where 0 means no attack,
+   1 is the top left cell, 2 is to the right of that, and so on through the whole
+   local grid.
 
 
 RavelActionWrapper
