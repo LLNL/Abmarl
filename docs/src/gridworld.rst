@@ -708,10 +708,10 @@ is False, it cannot attack the same agent twice in the same turn. Looking at the
 `attack strength` and `initial health` of the agents, we can see that `agent0`
 should be able to kill `agent1` and `agent2` with a single attack. `agent0` launches
 5 attacks: one on the cell above, one on its own cell, one on the cell below,
-and two on the cell to the left. The attack above is on a cell that is out of bounds,
+and two on the cell to the right. The attack above is on a cell that is out of bounds,
 so this attack does nothing. The attack on its own cell fails because there are
 no attackable agents there. `agent1` is on the cell below, and that attack succeeds.
-`agent2` and `agent3` are both on the cell to the left, and `stacked attacks` is
+`agent2` and `agent3` are both on the cell to the right, and `stacked attacks` is
 False, but only `agent2` is attackable per the attack mapping, so only one of the
 launched attacks is successful.
 
@@ -719,13 +719,75 @@ The :ref:`SelectiveAttackActor <api_gridworld_actor_binary_attack>` automaticall
 assigns a grid of 0s as the `null action`, indicating no attack on any cell.
 
 
-
 RestrictedSelectiveAttackActor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
+allows agents to specify some number of attacks in some local grid defined by the
+attacking agent's `attack range`. This actor is more *restricted* than its counterpart,
+the SelectiveAttackActor, because rather than issuing attacks up to its `attack count`
+*per cell*, the attacking agent can only issue that many attacks in the *whole local
+grid*. Attackable agents are defined according to the basic criteria listed above.
+If there are multiple attackable agents on a the same cell, the actor randomly
+picks from among them based on the number of attacks on that cell and whether or
+not `stacked attacks` are allowed. Consider the following setup:
 
+.. code-block:: python
 
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import RestrictedSelectiveAttackActor
 
+   agents = {
+       'agent0': AttackingAgent(
+           id='agent0',
+           encoding=1,
+           initial_position=np.array([0, 0]),
+           attack_range=1,
+           attack_strength=0.6,
+           attack_accuracy=1,
+           attack_count=3
+       ),
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=0.1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=0.1),
+       'agent3': HealthAgent(id='agent3', encoding=2, initial_position=np.array([1, 1]), initial_health=1)
+   }
+   grid = Grid(2, 2)
+   position_state = PositionState(agents=agents, grid=grid)
+   health_state = HealthState(agents=agents, grid=grid)
+   attack_actor = RestrictedSelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+
+   position_state.reset()
+   health_state.reset()
+   out = attack_actor.process_action(agents['agent0'], {'attack': [9, 9, 0]})
+   assert agents['agent3'].active
+   assert agents['agent3'].health == 0.4
+   out = attack_actor.process_action(agents['agent0'], {'attack': [9, 6, 8]})
+   assert not agents['agent1'].active
+   assert not agents['agent2'].active
+   assert not agents['agent3'].active
+
+As per the `attack mapping`, `agent0` can attack all the other agents, and it can
+issue up to three attacks per turn. `stacked attacks` is False, so the same agent
+cannot be attacked twice in the same turn. Looking at the `attack strength` and
+`initial health` of the agents, we can see that `agent0` should be able to kill
+`agent1` and `agent2` with a single attack each but will need two attacks to kill
+`agent3` In the first turn, `agent0` launches two attacks to the bottom right cell
+and chooses not to use its third attack. `agent3` is on this cell, but because
+`stacked attacks` is False, it only gets attacked once. In the next turn, `agent0`
+issues an attack on each of the three occupied cells, and each attack is succesful.
+
+The :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
+automatically assigns a list of 0s as the `null action`, indicating no attack on any cell.
+
+.. NOTE::
+   The form of the attack in the RestrictedSelectiveAttackActor is the most difficult
+   for humans to interpret. The number of entries in the list reflects the agent's
+   `attack count`. The attack appears as the cell's id, which is determined
+   from ravelling the local grid, where 0 means no attack, 1 is the top left cell,
+   2 is to the right of that, and so on through the whole local grid.
 
 
 RavelActionWrapper
