@@ -590,6 +590,61 @@ assigns a `null action` of 0, indicating no attack.
 Encoding Based Attack Actor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+The :ref:`EncodingBasedAttackActor <api_gridworld_actor_encoding_attack>` allows
+:ref:`AttackingAgents <api_gridworld_agent_attack>` to choose some number of attacks
+*per each encoding*. For each attack, the EncodingBasedAttackActor randomly searches
+the vicinity of the attacking agent for an attackble agent according to the basic
+criteria listed above. Contrast this actor with the BinaryAttackActor above, which
+does not allow agents to specify attack by encoding. Consider the following setup:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import EncodingBasedAttackActor
+
+   agents = {
+       'agent0': AttackingAgent(
+           id='agent0',
+           encoding=1,
+           initial_position=np.array([0, 0]),
+           attack_range=1,
+           attack_strength=0.4,
+           attack_accuracy=1,
+           attack_count=2
+       ),
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=1),
+       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]), initial_health=0.5)
+   }
+   grid = Grid(2, 2)
+   position_state = PositionState(agents=agents, grid=grid)
+   health_state = HealthState(agents=agents, grid=grid)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
+
+   position_state.reset()
+   health_state.reset()
+   attack_actor.process_action(agents['agent0'], {'attack': {2: 0, 3: 2}})
+   assert agents['agent1'].health == agents['agent1'].initial_health
+   assert agents['agent2'].health == agents['agent2'].initial_health
+   assert not agents['agent3'].active
+
+As per the `attack mapping`, `agent0` can attack all the other agents. It can make
+up to two attacks per turn *per encoding* (e.g. two attacks on encoding 2 and two
+attacks on encoding 3 per turn), and because the `stacked attacks` property
+is True, it can attack the same agent twice in the same turn. Looking at the
+`attack strength` and `initial health` of the agents, we can see that `agent0`
+should be able to kill `agent3` with only two attacks. `agent0` launches no attacks
+on encoding 2 and two attacks on encoding  3. Because `agent3` is the only agent of encoding
+3 and because `stacked attacks` is True, it gets attacked twice in one turn,
+resulting in its death. Even though `agent1` and `agent2` are in `agent0`'s `attack mapping`
+and `attack range`, neither of them is attacked because `agent0` specified zero
+attacks on encoding 2.
+
+The :ref:`EncodingBasedAttackActor <api_gridworld_actor_encoding_attack>` automatically
+assigns a `null action` of 0 for each encoding, indicating no attack.
 
 
 SelectiveAttackActor

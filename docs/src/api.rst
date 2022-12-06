@@ -223,6 +223,12 @@ Actors
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_actor_encoding_attack:
+
+.. autoclass:: abmarl.sim.gridworld.actor.EncodingBasedAttackActor
+	:members:
+	:undoc-members:
+
 
 Observers
 `````````
