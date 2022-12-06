@@ -495,6 +495,8 @@ Consider the following setup:
 Attacking
 `````````
 
+TODO: I should add images for all of the code examples below.
+
 `Health` becomes more interesting when we let agents attack one another.
 :ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with 
 an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
@@ -649,6 +651,74 @@ assigns a `null action` of 0 for each encoding, indicating no attack.
 
 SelectiveAttackActor
 ~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`SelectiveAttackActor <api_gridworld_actor_selective_attack>` allows agents
+to specify some number of attacks on each of the grid cells in some local grid
+defined by the attacking agent's `attack range`. In contrast to the BinaryAttackActor
+and EncodingBasedAttackActor above, the SelectiveAttackActor does not randomly
+search for agents in the vicinity because it looks up the attacked cells directly.
+The attacking agent can attack each cell up to its `attack count`. Attackable agents
+are defined according to the basic criteria listed above. If there are multiple
+attackable agents on a the same cell, the actor randomly picks from among them
+based on the number of attacks on that cell and whether or not `stacked attacks`
+are allowed. Consider the following setup:
+
+.. code-block:: python
+
+  import numpy as np
+  from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+  from abmarl.sim.gridworld.grid import Grid
+  from abmarl.sim.gridworld.state import PositionState, HealthState
+  from abmarl.sim.gridworld.actor import SelectiveAttackActor
+
+  agents = {
+      'agent0': AttackingAgent(
+          id='agent0',
+          encoding=1,
+          initial_position=np.array([0, 0]),
+          attack_range=1,
+          attack_strength=1,
+          attack_accuracy=1,
+          attack_count=2
+      ),
+      'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+      'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=1),
+      'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]))
+  }
+  grid = Grid(2, 2, overlapping={2: [3], 3: [2]})
+  position_state = PositionState(agents=agents, grid=grid)
+  health_state = HealthState(agents=agents, grid=grid)
+  attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+
+  position_state.reset()
+  health_state.reset()
+  attack = np.array([
+      [0, 1, 0],
+      [0, 1, 2],
+      [0, 1, 0]
+  ])
+  attack_actor.process_action(agents['agent0'], {'attack': attack})
+  assert not agents['agent1'].active
+  assert not agents['agent2'].active
+  assert agents['agent3'].active
+
+As per the `attack mapping`, `agent0` can attack `agent1` or `agent2` but not
+`agent3`. It can make two attacks per turn *per cell*, but because the `stacked attacks` property
+is False, it cannot attack the same agent twice in the same turn. Looking at the
+`attack strength` and `initial health` of the agents, we can see that `agent0`
+should be able to kill `agent1` and `agent2` with a single attack. `agent0` launches
+5 attacks: one on the cell above, one on its own cell, one on the cell below,
+and two on the cell to the left. The attack above is on a cell that is out of bounds,
+so this attack does nothing. The attack on its own cell fails because there are
+no attackable agents there. `agent1` is on the cell below, and that attack succeeds.
+`agent2` and `agent3` are both on the cell to the left, and `stacked attacks` is
+False, but only `agent2` is attackable per the attack mapping, so only one of the
+launched attacks is successful.
+
+The :ref:`SelectiveAttackActor <api_gridworld_actor_binary_attack>` automatically
+assigns a grid of 0s as the `null action`, indicating no attack on any cell.
+
+
 
 RestrictedSelectiveAttackActor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

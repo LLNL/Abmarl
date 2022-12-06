@@ -229,6 +229,12 @@ Actors
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_actor_selective_attack:
+
+.. autoclass:: abmarl.sim.gridworld.actor.SelectiveAttackActor
+	:members:
+	:undoc-members:
+
 
 Observers
 `````````
