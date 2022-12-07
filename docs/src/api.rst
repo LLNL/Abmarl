@@ -7,7 +7,7 @@ Abmarl API Specification
 Abmarl Simulations
 ------------------
 
-.. _api_agent:
+.. _api_principle_agent:
 
 .. autoclass:: abmarl.sim.PrincipleAgent
 	:members:
@@ -24,6 +24,8 @@ Abmarl Simulations
 .. autoclass:: abmarl.sim.ActingAgent
 	:members:
 	:undoc-members:
+
+.. _api_agent:
 
 .. autoclass:: abmarl.sim.Agent
 	:members:
