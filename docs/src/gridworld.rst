@@ -392,10 +392,6 @@ The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assi
 a `null observation` as a view matrix of all -2s, indicating that everything is
 masked.
 
-
-# TODO: Maybe blocking should be a feature we describe apart from observations
-since it is used for attack and move blocking too.
-
 .. _gridworld_blocking:
 
 Blocking
@@ -499,8 +495,6 @@ Consider the following setup:
 
 Attacking
 `````````
-
-TODO: I should add images for all of the code examples below.
 
 `Health` becomes more interesting when we let agents attack one another.
 :ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with 
