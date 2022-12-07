@@ -578,6 +578,13 @@ the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the follo
    assert agents['agent1'].active
    assert agents['agent3'].active
 
+.. figure:: .images/gridworld_attack_binary.png
+   :width: 100 %
+   :alt: Binary attack demonstration
+
+   `agent0` in red launches four attacks over two turns. `agent1` and `agent2`,
+   blue and green respectively, are attackable. `agent2` dies because its health
+   falls to zero, but `agent1` continues living even after two attacks.
 
 As per the `attack mapping`, `agent0` can attack `agent1` or `agent2` but not
 `agent3`. It can make two attacks per turn, but because the `stacked attacks` property
@@ -641,6 +648,14 @@ agents to specify attack by encoding. Consider the following setup:
    assert agents['agent1'].health == agents['agent1'].initial_health
    assert agents['agent2'].health == agents['agent2'].initial_health
    assert not agents['agent3'].active
+
+.. figure:: .images/gridworld_attack_encoding.png
+   :width: 100 %
+   :alt: Encoding Based attack demonstration
+
+   `agent0` in red launches two attacks against encoding 3. Because stacked attacks
+   are allowed, both attacks fall on `agent3` in the same turn, resulting in its
+   death.
 
 As per the `attack mapping`, `agent0` can attack all the other agents. It can make
 up to two attacks per turn *per encoding* (e.g. two attacks on encoding 2 and two
@@ -714,6 +729,13 @@ allowed. Consider the following setup:
   assert not agents['agent2'].active
   assert agents['agent3'].active
 
+.. figure:: .images/gridworld_attack_selective.png
+   :width: 100 %
+   :alt: Selective attack demonstration
+
+   `agent0` in red launches five attacks in the highlighted cells, resulting in
+   `agent1` and `agent2` dying.
+
 As per the `attack mapping`, `agent0` can attack `agent1` or `agent2` but not
 `agent3`. It can make two attacks per turn *per cell*, but because the `stacked attacks` property
 is False, it cannot attack the same agent twice in the same turn. Looking at the
@@ -783,6 +805,13 @@ are allowed. Consider the following setup:
    assert not agents['agent1'].active
    assert not agents['agent2'].active
    assert not agents['agent3'].active
+
+.. figure:: .images/gridworld_attack_restricted_selective.png
+   :width: 100 %
+   :alt: Restricted Selective attack demonstration
+
+   `agent0` in red launches two attacks against the bottom right cell, catching
+   `agent3` with one of them. Then it finishes off all the agents in the next turn.
 
 As per the `attack mapping`, `agent0` can attack all the other agents, and it can
 issue up to three attacks per turn. `stacked attacks` is False, so the same agent
