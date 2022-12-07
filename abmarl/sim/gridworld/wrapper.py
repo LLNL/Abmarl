@@ -217,7 +217,7 @@ class ExclusiveChannelActionWrapper(ActorWrapper):
     This wrapper works with Dict spaces, where each subspace is to be ravelled
     independently and then combined so that that actions are exclusive. The wrapping
     occurs in two steps. First, we use numpy's ravel capabilities to convert each
-    subspace to a Discrete space. Second, we combine ehe Discrete spaces together
+    subspace to a Discrete space. Second, we combine the Discrete spaces together
     in such a way that imposes exclusivity among the subspaces. The exclusion happens
     only on the top level, so a Dict nested within a Dict will be ravelled without
     exclusion.

@@ -305,6 +305,12 @@ Wrappers
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_exclusive_channel_action_wrappers:
+
+.. autoclass:: abmarl.sim.gridworld.wrapper.ExclusiveChannelActionWrapper
+	:members:
+	:undoc-members:
+
 
 .. _api_multi_policy_trainer:
 

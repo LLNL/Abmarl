@@ -879,3 +879,95 @@ The actions from the unwrapped actor are in the original `Box` space, whereas af
 we apply the wrapper, the actions from the wrapped actor are in the transformed
 `Discrete` space. The actor will receive move actions in the `Discrete` space and convert
 them to the `Box` space before passing them to the MoveActor.
+
+
+Exclusive Channel Action Wrapper
+````````````````````````````````
+
+The :ref:`ExclusiveChannelActionWrapper <api_gridworld_exclusive_channel_action_wrappers>`
+works with `Dict` action spaces, where each subspace is to be ravelled independently
+and then combined so that that action channels are exclusive. The wrapping occurs in two
+steps. First, we use numpy's `ravel` capabilities to convert each subspace to a
+`Discrete` space. Second, we combine the `Discrete` spaces together in such a way
+that imposes exclusivity among the subspaces. The exclusion happens only on the
+top level, so a `Dict` nested within a `Dict` will be ravelled without exclusion.
+
+We can apply the
+:ref:`ExclusiveChannelActionWrapper <api_gridworld_exclusive_channel_action_wrappers>`
+with the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>` to
+force the agent to only attack one encoding per turn, like so:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import EncodingBasedAttackActor
+   from abmarl.sim.gridworld.wrapper import ExclusiveChannelActionWrapper
+   from gym.spaces import Dict, Discrete
+
+   agents = {
+       'agent0': AttackingAgent(
+           id='agent0',
+           encoding=1,
+           initial_position=np.array([0, 0]),
+           attack_range=1,
+           attack_strength=0.4,
+           attack_accuracy=1,
+           attack_count=2
+       ),
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=1),
+       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]), initial_health=0.5)
+   }
+   grid = Grid(2, 2)
+   position_state = PositionState(agents=agents, grid=grid)
+   health_state = HealthState(agents=agents, grid=grid)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
+   print(agents['agent0'].action_space)
+   >>> {'attack': Dict(2:Discrete(3), 3:Discrete(3))}
+   
+   wrapped_attack_actor = ExclusiveChannelActionWrapper(attack_actor)
+   print(agents['agent0'].action_space)
+   >>> {'attack': Discrete(5)}
+
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 0))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 1))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 2))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 3))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 4))
+   >>> {2: 0, 3: 0}
+   >>> {2: 1, 3: 0}
+   >>> {2: 2, 3: 0}
+   >>> {2: 0, 3: 1}
+   >>> {2: 0, 3: 2}
+
+With just the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`,
+the agent's action space is ``{'attack': Dict(2:Discrete(3), 3:Discrete(3))}``
+and there are 9 possible actions:
+
+   #. ``{2: 0, 3: 0}``
+   #. ``{2: 0, 3: 1}``
+   #. ``{2: 0, 3: 2}``
+   #. ``{2: 1, 3: 0}``
+   #. ``{2: 1, 3: 1}``
+   #. ``{2: 1, 3: 2}``
+   #. ``{2: 2, 3: 0}``
+   #. ``{2: 2, 3: 1}``
+   #. ``{2: 2, 3: 2}``
+
+When we apply the
+:ref:`ExclusiveChannelActionWrapper <api_gridworld_exclusive_channel_action_wrappers>`,
+the action space becomes ``{'attack': Discrete(5)}``, which is a result of the
+channel exlcusion and the ravelling. When unwrapped to the original space, the
+five possible actions become
+
+   #. ``{2: 0, 3: 0}``
+   #. ``{2: 1, 3: 0}``
+   #. ``{2: 2, 3: 0}``
+   #. ``{2: 0, 3: 1}``
+   #. ``{2: 0, 3: 2}``
+   
+We can see that the channels are exclusive, so that the agent cannot attack both
+encodings in the same turn.
