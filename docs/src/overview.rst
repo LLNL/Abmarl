@@ -483,8 +483,10 @@ simple corridor simulation with multiple agents.
                'episodes_total': 2000,
            },
            'verbose': 2,
+           'local_dir': 'output_dir',
            'config': {
                # --- simulation ---
+               'disable_env_checking': False,
                'env': sim_name,
                'horizon': 200,
                'env_config': {},
@@ -519,7 +521,7 @@ may not behave as expected.
 
 The experiment parameters also contains information that will be passed directly
 to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
-`list of common configuration parameters <https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters>`_.
+`list of common configuration parameters <https://docs.ray.io/en/releases-2.0.0/rllib/rllib-training.html#configuration>`_.
 
 Command Line
 ````````````
@@ -529,7 +531,7 @@ where `multi_corridor_example.py` is the name of our configuration file. This wi
 Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
-in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
+in real time in tensorboard with ``tensorboard --logdir output_dir/abmarl_results``.
 
 .. NOTE::
 
