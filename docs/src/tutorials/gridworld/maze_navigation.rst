@@ -128,14 +128,14 @@ each agent type in the grid. We will use `maze.txt`, which looks like this:
 
 .. code-block::
 
-   0 0 0 0 W 0 W W 0 W W 0 0 W W 0 W 0
-   W 0 W 0 N 0 0 0 0 0 W 0 W W 0 0 0 0
-   W W W W 0 W W 0 W 0 0 0 0 W W 0 W W
-   0 W 0 0 0 W W 0 W 0 W W 0 0 0 0 0 0
-   0 0 0 W 0 0 W W W 0 W 0 0 W 0 W W 0
-   W W W W 0 W W W W W W W 0 W 0 T W 0
-   0 0 0 0 0 W 0 0 0 0 0 0 0 W 0 W W 0
-   0 W 0 W 0 W W W 0 W W 0 W W 0 W 0 0
+   _ _ _ _ W _ W W _ W W _ _ W W _ W _
+   W _ W _ N _ _ _ _ _ W _ W W _ _ _ _
+   W W W W _ W W _ W _ _ _ _ W W _ W W
+   _ W _ _ _ W W _ W _ W W _ _ _ _ _ _
+   _ _ _ W _ _ W W W _ W _ _ W _ W W _
+   W W W W _ W W W W W W W _ W _ T W _
+   _ _ _ _ _ W _ _ _ _ _ _ _ W _ W W _
+   _ W _ W _ W W W _ W W _ W W _ W _ _
 
 In order to assign meaning to the values in the grid file, we must create an `object
 registry` that maps the values in the files to objects. We will use ``W`` for WallAgents,
