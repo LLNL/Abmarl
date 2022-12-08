@@ -558,7 +558,7 @@ to the directory it creates for 2 episodes and a horizon of 20, as well as rende
 each step in each episode.
 
 Check out the
-`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>_`
+`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>`_
 to see how to debug within a python script.
 
 
