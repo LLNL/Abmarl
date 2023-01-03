@@ -360,12 +360,13 @@ library and the underlying simulation.
 OpenAI Gym
 ~~~~~~~~~~
 
-The :ref:`GymWrapper <api_gym_wrapper>` can be used for single-agent simulations
+The :ref:`GymWrapper <api_gym_wrapper>` can be used for simulations with a single learning agent.
 This wrapper allows integration with OpenAI's `gym.Env` class with which many RL
-practitioners are familiar, and many RL libraries support it. The simulation must contain only
-a single agent in the `agents` dict. The `observation space` and `action space`
-is then inferred from that agent. The `reset` and `step` functions operate on the values
-themselves as opposed to a dictionary mapping the agents' ids to the values.
+practitioners are familiar, and many RL libraries support it. There are no restrictions
+on the number of entities in the simulation, but there can only be a *single* learning
+agent. The `observation space` and `action space` is then inferred from that agent.
+The `reset` and `step` functions operate on the values themselves as opposed to
+a dictionary mapping the agents' ids to the values.
 
 
 .. _rllib_external:

@@ -5,9 +5,9 @@ from abmarl.sim import Agent
 
 class GymWrapper(GymEnv):
     """
-    Wrap an AgentBasedSimulation object with only a single agent to the gym.Env interface.
-    This wrapper exposes the single agent's observation and action space directly
-    in the simulation.
+    Wrap an AgentBasedSimulation object with only a single learning agent to the
+    gym.Env interface. This wrapper exposes the single agent's observation and
+    action space directly in the simulation.
     """
     def __init__(self, sim):
         from abmarl.managers import SimulationManager
