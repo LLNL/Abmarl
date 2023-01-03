@@ -200,7 +200,8 @@ wrapper is itself a component, and so it must implement the same interface as th
 wrapped component to ensure that it works within the framework. A component wrapper
 also defines additional functions for wrapping spaces and data to and from those
 spaces: ``check_space`` for ensuring the space can be transformed, ``wrap_space`` to
-perform the transformation, and ``wrap_point`` to map data to the transformed space.
+perform the transformation, ``wrap_point`` to map data to the transformed space,
+and ``unwrap_point`` to map transformed data back to the original space.
 
 As its name suggests, a :ref:`Component Wrapper <api_gridworld_wrappers>` stands
 between the underlying component and other
@@ -212,7 +213,7 @@ the direction of data flow, which we detail below.
 Actor Wrappers
 ~~~~~~~~~~~~~~
 
-An :ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receives actions in the
+:ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receive actions in the
 `wrapped_space` through the ``process_action``
 function. It can modify the data before sending it to the underlying Actor to
 process. An Actor Wrapper may need to modify the action spaces of corresponding agents
