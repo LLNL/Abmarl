@@ -532,7 +532,7 @@ where `multi_corridor_example.py` is the name of our configuration file. This wi
 Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
-in real time in tensorboard with ``tensorboard --logdir local_dir/abmarl_results``.
+in real time in tensorboard with ``tensorboard --logdir <local_dir>/abmarl_results``.
 
 .. NOTE::
 
@@ -542,7 +542,7 @@ in real time in tensorboard with ``tensorboard --logdir local_dir/abmarl_results
    can be a full path, like ``'local_dir': '/usr/local/scratch'``, or it can be
    a relative path, like ``'local_dir': output_dir``, where the path is relative
    from the directory where Abmarl was launched, not from the configuration file.
-   If a path is given, the output will be under ``local_dir/abmarl_results``.
+   If a path is given, the output will be under ``<local_dir>/abmarl_results``.
 
 
 Debugging
