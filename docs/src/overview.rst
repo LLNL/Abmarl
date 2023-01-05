@@ -187,7 +187,7 @@ several built-in wrappers.
 Ravel Discrete Wrapper
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts complex observation
+The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts observation
 and action spaces into Discrete spaces and automatically maps data to and from
 those spaces. It can convert Discrete, MultiBinary, MultiDiscrete, bounded integer
 Box, and any nesting of these observations and actions into Discrete observations
@@ -244,10 +244,9 @@ Flatten Wrapper
 ~~~~~~~~~~~~~~~
 
 The :ref:`FlattenWrapper <api_flatten_wrapper>` flattens observation and action spaces
-into continuous Box spaces and automatically maps data to and from it. The wrapper
-is largely based on OpenAI's own flatten wrapper, with some modifications for maintaining
-if the resuting `Box` space can have integer `dtype` or if it must use `float`. See
-how the following nested space is flattened:
+into Box spaces and automatically maps data to and from it. The FlattenWrapper
+attempts to keep the dtype of the resulting Box space as integer if it can; otherwise
+it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
 
@@ -286,6 +285,16 @@ how the following nested space is flattened:
    flatten(my_space, point)
    >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 0, 0, 1, 1, 3, 1, 0, 4, 1, 1,
               0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+
+Because every subspace has integer type, the resulting Box space has dtype integer.
+
+.. WARNING::
+   Sampling from the flattened space will not produce the same results as
+   sampling from the original space and then flattening. There may be an issue
+   with casting a float to an integer. Furthermore, the distribution of points
+   when sampling is not uniform in the original space, which may skew the learning
+   process. It is best practice to first generate samples using the original space
+   and then to flatten them.
 
 .. _super_agent_wrapper:
 

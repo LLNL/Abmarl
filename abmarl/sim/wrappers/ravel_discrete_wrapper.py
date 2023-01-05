@@ -144,7 +144,7 @@ def check_space(space):
 
 class RavelDiscreteWrapper(SARWrapper):
     """
-    Convert complex observations and action spaces into Discrete spaces.
+    Convert observation and action spaces into a Discrete space.
 
     Convert Discrete, MultiBinary, MultiDiscrete, bounded integer Box, and any nesting of these
     observations and actions into Discrete observations and actions by "ravelling" their values
