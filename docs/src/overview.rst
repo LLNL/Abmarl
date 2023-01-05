@@ -198,6 +198,9 @@ is ravelled to a Discrete space:
 
 .. code-block:: python
 
+   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Box, Tuple
+   import numpy as np
+   from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, ravel
    my_space = Dict({
        'a': MultiDiscrete([5, 3]),
        'b': MultiBinary(4),
@@ -245,7 +248,7 @@ Flatten Wrapper
 
 The :ref:`FlattenWrapper <api_flatten_wrapper>` flattens observation and action spaces
 into Box spaces and automatically maps data to and from it. The FlattenWrapper
-attempts to keep the dtype of the resulting Box space as integer if it can; otherwise
+attempts to keep the `dtype` of the resulting Box space as integer if it can; otherwise
 it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
@@ -276,15 +279,12 @@ it will cast up to float. See how the following nested space is flattened:
        'f': 1
    }
    flatten_space(my_space)
-   >>> Box(low=[0, 0, 0, 0, 0, 0, -2,  6, 3, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-           high=[5, 3, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 1, 1, 1, 3, 3, 4, 1, 5, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-           (39,),
+   >>> Box(low=[0, 0, 0, 0, 0, 0, -2, 6, 3, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+           high=[4, 2, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 2, 3, 3, 3, 0, 4, 1, 1, 10, 5],
+           (22,),
            int64) # We maintain the integer type instead of needlessly casting to float.
    flatten(my_space, point)
-   >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 0, 0, 1, 1, 3, 1, 0, 4, 1, 1,
-              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+   >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 2, 1, 3, 1, 0, 4, 1, 1, 5, 1])
 
 Because every subspace has integer type, the resulting Box space has dtype integer.
 
@@ -294,7 +294,7 @@ Because every subspace has integer type, the resulting Box space has dtype integ
    with casting a float to an integer. Furthermore, the distribution of points
    when sampling is not uniform in the original space, which may skew the learning
    process. It is best practice to first generate samples using the original space
-   and then to flatten them.
+   and then to flatten them as needed.
 
 .. _super_agent_wrapper:
 
@@ -322,7 +322,7 @@ A super agent's reward is the sum of its covered agents' rewards. This is also
 a point of concern because the simulation may continue generating rewards or penalties
 for done agents. Therefore when a covered agent is done, the
 :ref:`SuperAgentWrapper <api_super_agent_wrapper>` will report a reward of zero
-so as to not affect the reward for the super agent.
+for done agents so as to not contaminate the reward for the super agent.
 
 Furthermore, super agents may still report actions for covered agents that
 are done. The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` filters out those
@@ -353,6 +353,7 @@ like so:
        )
    )
 
+Check out the `Super Agent Team Battle example <https://github.com/LLNL/Abmarl/blob/main/examples/team_battle_super_agent.py>`_ for more details.
 
 .. _external:
 
@@ -531,7 +532,7 @@ may not behave as expected.
 
 The experiment parameters also contains information that will be passed directly
 to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
-`list of common configuration parameters <https://docs.ray.io/en/releases-2.0.0/rllib/rllib-training.html#configuration>`_.
+`list of common configuration parameters <https://docs.ray.io/en/releases-2.0.0/rllib/rllib-training.html#common-parameters>`_.
 
 Command Line
 ````````````
