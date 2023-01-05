@@ -253,6 +253,12 @@ Observers
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_observer_absolute:
+
+.. autoclass:: abmarl.sim.gridworld.observer.AbsolutePositionObserver
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_observer_single:
 
 .. autoclass:: abmarl.sim.gridworld.observer.SingleGridObserver

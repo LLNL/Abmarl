@@ -328,14 +328,26 @@ The :ref:`MoveActor <api_gridworld_actor_move>` automatically assigns a `null ac
 of `[0, 0]`, indicating no move.
 
 
+.. _gridworld_absolute_position_observer:
+
+Absolute Position Observer
+``````````````````````````
+
+The :ref:`AbsolutePositionObserver <api_gridworld_observer_absolute>` enables
+:ref:`ObservingAgents <api_observing_agent>` to observe their own absolute position
+in the grid. The position is reported as a two-dimensional numpy array, whose lower
+bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
+observer does not provide information on any other agent in the grid.
+
 .. _gridworld_single_observer:
 
 Single Grid Observer
 ````````````````````
 
-:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state of the :ref:`Grid <gridworld_grid>` around them, namely which
-other agents are nearby, via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver generates
-a two-dimensional array sized by the agent's `view range` with the observing
+:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
+of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
+via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
+generates a two-dimensional array sized by the agent's `view range` with the observing
 agent located at the center of the array. All other agents within the `view range` will
 appear in the observation, shown as their `encoding`. For example, the following setup
 
