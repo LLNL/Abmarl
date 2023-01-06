@@ -205,13 +205,14 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             action_dict: The agent's action in this step.
 
         Returns:
-            Tuple of bool, list. The first value is False if the agent is not an
+            Tuple of (bool, list). The first value is False if the agent is not an
             attacking agent or chose not to attack; otherwise it is True. The second
             value is a list of attacked agents, which will be empty if there was
             no attack or if the attack failed. Thus, there are three possible outcomes:
-                1. An attack was not attempted: False, []
-                2. An attack failed: True, []
-                3. An attack was successful: True, [non-empty]
+
+            1. An attack was not attempted: False, []
+            2. An attack failed: True, []
+            3. An attack was successful: True, [non-empty]
         """
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
@@ -305,13 +306,13 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
 
 class BinaryAttackActor(AttackActorBaseComponent):
     """
-    Agents can attack other agents.
+    Launch attacks in a local grid.
 
-    Agents can choose to use up to some number of their attacks. For example,
-    if an agent has an attack count of 3, then it can choose no attack, attack
-    once, attack twice, or attack thrice. The BinaryAttackActor searches the
-    nearby local grid defined by the agent's attack range for attackable agents,
-    and randomly chooses from that set up to the number of attacks issued.
+    Agents can choose to launch attacks up to their `attack count` or not to attack
+    at all. For example, if an agent has an attack count of 3, then it can choose
+    no attack, attack once, attack twice, or attack thrice. The BinaryAttackActor
+    searches the nearby local grid defined by the agent's attack range for attackable
+    agents, and randomly chooses from that set up to the number of attacks issued.
     """
     def _assign_space(self, agent):
         agent.action_space[self.key] = Discrete(agent.attack_count + 1)
@@ -368,12 +369,12 @@ class BinaryAttackActor(AttackActorBaseComponent):
 
 class EncodingBasedAttackActor(AttackActorBaseComponent):
     """
-    Agents can attack other agents.
+    Launch attacks in a local grid based on encoding.
 
     The attacking agent specifies how many attacks it would like to use per available
     encoding, based on its attack count and the attack mapping. For example, if
     the agent can attack encodings 1 and 2 and has up to 3 attacks available, then
-    it may specify up to 3 attacks on encoding 1 and up to 3 attack on encoding 2.
+    it may launch up to 3 attacks on encoding 1 and up to 3 attack on encoding 2.
     Agents with those encodings in the surrounding grid are liable to be attacked.
     """
     def _assign_space(self, agent):
@@ -447,7 +448,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
 
 class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
     """
-    Agents can attack other agents.
+    Launch attacks in a local grid by cell.
 
     Agents choose to attack specific cells in the surrounding grid. The agent can
     attack up to its attack count. It can choose to attack different cells or the
@@ -523,9 +524,9 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
 
 class SelectiveAttackActor(AttackActorBaseComponent):
     """
-    Agents can attack other agents.
+    Launch attacks in a local grid by cell.
 
-    The attack is a grid centered on the agent's position, and its size depends
+    The attack is a local grid centered on the agent's position, and its size depends
     on the agent's attack range. Each cell in the grid has a nonnegative integer
     up to the agent's attack count, and it indicates how many attacks to use on
     that cell.

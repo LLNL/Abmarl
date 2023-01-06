@@ -7,7 +7,7 @@ Abmarl API Specification
 Abmarl Simulations
 ------------------
 
-.. _api_agent:
+.. _api_principle_agent:
 
 .. autoclass:: abmarl.sim.PrincipleAgent
 	:members:
@@ -24,6 +24,8 @@ Abmarl Simulations
 .. autoclass:: abmarl.sim.ActingAgent
 	:members:
 	:undoc-members:
+
+.. _api_agent:
 
 .. autoclass:: abmarl.sim.Agent
 	:members:
@@ -211,9 +213,33 @@ Actors
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_actor_attack:
+
+.. autoclass:: abmarl.sim.gridworld.actor.AttackActorBaseComponent
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_actor_binary_attack:
 
 .. autoclass:: abmarl.sim.gridworld.actor.BinaryAttackActor
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_encoding_attack:
+
+.. autoclass:: abmarl.sim.gridworld.actor.EncodingBasedAttackActor
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_selective_attack:
+
+.. autoclass:: abmarl.sim.gridworld.actor.SelectiveAttackActor
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_restricted_selective_attack:
+
+.. autoclass:: abmarl.sim.gridworld.actor.RestrictedSelectiveAttackActor
 	:members:
 	:undoc-members:
 
@@ -224,6 +250,12 @@ Observers
 .. _api_gridworld_observer:
 
 .. autoclass:: abmarl.sim.gridworld.observer.ObserverBaseComponent
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_observer_absolute:
+
+.. autoclass:: abmarl.sim.gridworld.observer.AbsolutePositionObserver
 	:members:
 	:undoc-members:
 
@@ -276,6 +308,12 @@ Wrappers
 .. _api_gridworld_ravel_action_wrappers:
 
 .. autoclass:: abmarl.sim.gridworld.wrapper.RavelActionWrapper
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_exclusive_channel_action_wrappers:
+
+.. autoclass:: abmarl.sim.gridworld.wrapper.ExclusiveChannelActionWrapper
 	:members:
 	:undoc-members:
 

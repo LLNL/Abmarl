@@ -153,7 +153,22 @@ def flatten_space(space):
 
 class FlattenWrapper(SARWrapper):
     """
-    Flattens all agents' action and observation spaces into continuous Boxes.
+    Flattens all agents' action and observation spaces into Boxes.
+
+    Nested spaces (e.g. Tuples and Dicts) are flattened element-wise, each element
+    being concatentated onto the previous. A Discrete space is converted to a Box
+    with a single element, whose bounds are 0 to ``space.n`` - 1. MultiBinary and MultiDiscrete
+    are simply converted to Box with the corresponding bounds and integer dtype.
+    A Box space is flattened to a one-dimensional array equivalent.
+
+    If the resulting Box can be made with dtype int, then it will be. Otherwise,
+    it will cast up to float.
+
+    If the agent has a null observation or a null action, that value is also flattened
+    into the new Box space.
+
+    NOTE: Sampling from the flattened space will not produce the same results as
+    sampling from the original space and then flattening.
     """
     def __init__(self, sim):
         super().__init__(sim)

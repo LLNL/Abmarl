@@ -187,7 +187,7 @@ several built-in wrappers.
 Ravel Discrete Wrapper
 ~~~~~~~~~~~~~~~~~~~~~~
 
-The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts complex observation
+The :ref:`RavelDiscreteWrapper <api_ravel_wrapper>` converts observation
 and action spaces into Discrete spaces and automatically maps data to and from
 those spaces. It can convert Discrete, MultiBinary, MultiDiscrete, bounded integer
 Box, and any nesting of these observations and actions into Discrete observations
@@ -198,6 +198,9 @@ is ravelled to a Discrete space:
 
 .. code-block:: python
 
+   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Box, Tuple
+   import numpy as np
+   from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, ravel
    my_space = Dict({
        'a': MultiDiscrete([5, 3]),
        'b': MultiBinary(4),
@@ -244,10 +247,9 @@ Flatten Wrapper
 ~~~~~~~~~~~~~~~
 
 The :ref:`FlattenWrapper <api_flatten_wrapper>` flattens observation and action spaces
-into continuous Box spaces and automatically maps data to and from it. The wrapper
-is largely based on OpenAI's own flatten wrapper, with some modifications for maintaining
-if the resuting `Box` space can have integer `dtype` or if it must use `float`. See
-how the following nested space is flattened:
+into Box spaces and automatically maps data to and from it. The FlattenWrapper
+attempts to keep the `dtype` of the resulting Box space as integer if it can; otherwise
+it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
 
@@ -277,15 +279,22 @@ how the following nested space is flattened:
        'f': 1
    }
    flatten_space(my_space)
-   >>> Box(low=[0, 0, 0, 0, 0, 0, -2,  6, 3, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-           high=[5, 3, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 1, 1, 1, 3, 3, 4, 1, 5, 1, 1,
-                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-           (39,),
+   >>> Box(low=[0, 0, 0, 0, 0, 0, -2, 6, 3, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+           high=[4, 2, 1, 1, 1, 1, 2, 12, 5, 2, 4, 2, 2, 3, 3, 3, 0, 4, 1, 1, 10, 5],
+           (22,),
            int64) # We maintain the integer type instead of needlessly casting to float.
    flatten(my_space, point)
-   >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 0, 0, 1, 1, 3, 1, 0, 4, 1, 1,
-              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+   >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 2, 1, 3, 1, 0, 4, 1, 1, 5, 1])
+
+Because every subspace has integer type, the resulting Box space has dtype integer.
+
+.. WARNING::
+   Sampling from the flattened space will not produce the same results as
+   sampling from the original space and then flattening. There may be an issue
+   with casting a float to an integer. Furthermore, the distribution of points
+   when sampling is not uniform in the original space, which may skew the learning
+   process. It is best practice to first generate samples using the original space
+   and then to flatten them as needed.
 
 .. _super_agent_wrapper:
 
@@ -313,7 +322,7 @@ A super agent's reward is the sum of its covered agents' rewards. This is also
 a point of concern because the simulation may continue generating rewards or penalties
 for done agents. Therefore when a covered agent is done, the
 :ref:`SuperAgentWrapper <api_super_agent_wrapper>` will report a reward of zero
-so as to not affect the reward for the super agent.
+for done agents so as to not contaminate the reward for the super agent.
 
 Furthermore, super agents may still report actions for covered agents that
 are done. The :ref:`SuperAgentWrapper <api_super_agent_wrapper>` filters out those
@@ -344,6 +353,7 @@ like so:
        )
    )
 
+Check out the `Super Agent Team Battle example <https://github.com/LLNL/Abmarl/blob/main/examples/team_battle_super_agent.py>`_ for more details.
 
 .. _external:
 
@@ -360,12 +370,13 @@ library and the underlying simulation.
 OpenAI Gym
 ~~~~~~~~~~
 
-The :ref:`GymWrapper <api_gym_wrapper>` can be used for single-agent simulations
-This wrapper allows integration with OpenAI's `gym.Env` class with which many RL
-practitioners are familiar, and many RL libraries support it. The simulation must contain only
-a single agent in the `agents` dict. The `observation space` and `action space`
-is then inferred from that agent. The `reset` and `step` functions operate on the values
-themselves as opposed to a dictionary mapping the agents' ids to the values.
+The :ref:`GymWrapper <api_gym_wrapper>` can be used for simulations with a single
+:ref:`learning agent <api_agent>`. This wrapper allows integration with OpenAI's
+`gym.Env` class with which many RL practitioners are familiar, and many RL libraries
+support it. There are no restrictions on the number of entities in the simulation,
+but there can only be a *single* learning agent. The `observation space` and `action space`
+is then inferred from that agent. The `reset` and `step` functions operate on the
+values themselves as opposed to a dictionary mapping the agents' ids to the values.
 
 
 .. _rllib_external:
@@ -483,8 +494,10 @@ simple corridor simulation with multiple agents.
                'episodes_total': 2000,
            },
            'verbose': 2,
+           'local_dir': 'output_dir',
            'config': {
                # --- simulation ---
+               'disable_env_checking': False,
                'env': sim_name,
                'horizon': 200,
                'env_config': {},
@@ -519,7 +532,7 @@ may not behave as expected.
 
 The experiment parameters also contains information that will be passed directly
 to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
-`list of common configuration parameters <https://docs.ray.io/en/releases-1.2.0/rllib-training.html#common-parameters>`_.
+`list of common configuration parameters <https://docs.ray.io/en/releases-2.0.0/rllib/rllib-training.html#common-parameters>`_.
 
 Command Line
 ````````````
@@ -529,14 +542,17 @@ where `multi_corridor_example.py` is the name of our configuration file. This wi
 Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
-in real time in tensorboard with ``tensorboard --logdir ~/abmarl_results``.
+in real time in tensorboard with ``tensorboard --logdir <local_dir>/abmarl_results``.
 
 .. NOTE::
 
    By default, the "base" of the output directory is the home directory, and Abmarl will
    create the `abmarl_results` directory there. The base directory can by configured
    in the `params` under `ray_tune` using the `local_dir` parameter. This value
-   should be a full path. For example, ``'local_dir': '/usr/local/scratch'``.
+   can be a full path, like ``'local_dir': '/usr/local/scratch'``, or it can be
+   a relative path, like ``'local_dir': output_dir``, where the path is relative
+   from the directory where Abmarl was launched, not from the configuration file.
+   If a path is given, the output will be under ``<local_dir>/abmarl_results``.
 
 
 Debugging
@@ -546,7 +562,8 @@ to ensure that the simulation mechanics work as expected. Abmarl's ``debug`` com
 will run the simulation with random actions
 and create an output directory, wherein it will copy the configuration file and
 output the observations, actions, rewards, and done conditions for each
-step. The data from each episode will be logged to its own file in the output directory.
+step. The data from each episode will be logged to its own file in the output directory,
+where the output directory is configured as above.
 For example, the command
 
 .. code-block::
@@ -558,7 +575,7 @@ to the directory it creates for 2 episodes and a horizon of 20, as well as rende
 each step in each episode.
 
 Check out the
-`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>_`
+`debugging example <https://github.com/LLNL/Abmarl/blob/main/examples/debug_example.py>`_
 to see how to debug within a python script.
 
 

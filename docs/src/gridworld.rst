@@ -66,7 +66,7 @@ Agent
 `````
 
 Every entity in the simulation is a :ref:`GridWorldAgent <api_gridworld_agent>`
-(e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_agent>` with specific parameters
+(e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_principle_agent>` with specific parameters
 that work with their respective components. Agents must be given
 an `encoding`, which is a positive integer that correlates to the type of agent and simplifies
 the logic for many components of the framework. GridWorldAgents can also be configured
@@ -200,7 +200,8 @@ wrapper is itself a component, and so it must implement the same interface as th
 wrapped component to ensure that it works within the framework. A component wrapper
 also defines additional functions for wrapping spaces and data to and from those
 spaces: ``check_space`` for ensuring the space can be transformed, ``wrap_space`` to
-perform the transformation, and ``wrap_point`` to map data to the transformed space.
+perform the transformation, ``wrap_point`` to map data to the transformed space,
+and ``unwrap_point`` to map transformed data back to the original space.
 
 As its name suggests, a :ref:`Component Wrapper <api_gridworld_wrappers>` stands
 between the underlying component and other
@@ -212,7 +213,7 @@ the direction of data flow, which we detail below.
 Actor Wrappers
 ~~~~~~~~~~~~~~
 
-An :ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receives actions in the
+:ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receive actions in the
 `wrapped_space` through the ``process_action``
 function. It can modify the data before sending it to the underlying Actor to
 process. An Actor Wrapper may need to modify the action spaces of corresponding agents
@@ -327,14 +328,26 @@ The :ref:`MoveActor <api_gridworld_actor_move>` automatically assigns a `null ac
 of `[0, 0]`, indicating no move.
 
 
+.. _gridworld_absolute_position_observer:
+
+Absolute Position Observer
+``````````````````````````
+
+The :ref:`AbsolutePositionObserver <api_gridworld_observer_absolute>` enables
+:ref:`ObservingAgents <api_observing_agent>` to observe their own absolute position
+in the grid. The position is reported as a two-dimensional numpy array, whose lower
+bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
+observer does not provide information on any other agent in the grid.
+
 .. _gridworld_single_observer:
 
 Single Grid Observer
 ````````````````````
 
-:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state of the :ref:`Grid <gridworld_grid>` around them, namely which
-other agents are nearby, via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver generates
-a two-dimensional array sized by the agent's `view range` with the observing
+:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
+of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
+via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
+generates a two-dimensional array sized by the agent's `view range` with the observing
 agent located at the center of the array. All other agents within the `view range` will
 appear in the observation, shown as their `encoding`. For example, the following setup
 
@@ -491,21 +504,49 @@ Consider the following setup:
 
 `agent0` will be assigned a random `health` value between 0 and 1.
 
+.. _gridworld_attacking:
 
 Attacking
 `````````
 
 `Health` becomes more interesting when we let agents attack one another.
-:ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with the
-:ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`. They have an `attack range`, which dictates
+:ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with 
+an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
-attack being successful; and an `attack strength`, which dictates how much `health`
-is depleted from the attacked agent. An agent's choice to attack is a boolean--either
-attack or don't attack--and then the BinaryAttackActor determines the successfulness
-based on the state of the simulation and the attributes of the AttackingAgent.
-The BinaryAttackActor requires an `attack mapping` dictionary which determines
-which `encodings` can attack other `encodings`, similar to the `overlapping` parameter
-for the :ref:`Grid <gridworld_grid>`. Consider the following setup:
+attack being successful; an `attack strength`, which dictates how much `health`
+is depleted from the attacked agent, and an `attack count`, which dictates the
+number of attacks an agent can make per turn.
+
+An :ref:`AttackActor <api_gridworld_actor_attack>` interprets these properties
+and processes the attacks according to its own internal design. In general, each
+AttackActor determines some set of attackable agents according to the following
+criteria:
+
+   #. The `attack mapping`, which is a dictionary that determines which `encodings`
+      can attack other `encodings` (similar to the `overlapping` parameter for the
+      :ref:`Grid <gridworld_grid>`), must allow the attack.
+   #. The relative positions of the two agents must fall within the attacking agent's
+      `attack range`.
+   #. The attackable agent must not be masked (e.g. hiding behind a wall). The masking
+      is determined the same way as :ref:`blocking <gridworld_blocking>` described above.
+
+Then, the :ref:`AttackActor <api_gridworld_actor_attack>` selects agents from that
+set based on the attacking agent's `attack count`. When an agent is successfully
+attacked, its health is depleted by the attacking agent's `attack strength`, which
+may result in the attacked agent's death. AttackActors can be configured to allow
+multiple attacks against a single agent per attacking agent and per turn via the
+`stacked attacks` property. The following four AttackActors are built into Abmarl:
+
+.. _gridworld_binary_attack:
+
+Binary Attack Actor
+~~~~~~~~~~~~~~~~~~~
+
+With the :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`,
+:ref:`AttackingAgents <api_gridworld_agent_attack>` can choose to launch attacks
+up to its `attack count` or not to attack at all. For each attack, the BinaryAttackActor
+randomly searches the vicinity of the attacking agent for an attackble agent according to
+the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the following setup:
 
 .. code-block:: python
 
@@ -521,43 +562,286 @@ for the :ref:`Grid <gridworld_grid>`. Consider the following setup:
            encoding=1,
            initial_position=np.array([0, 0]),
            attack_range=1,
-           attack_strength=1,
-           attack_accuracy=1
+           attack_strength=0.4,
+           attack_accuracy=1,
+           attack_count=2
        ),
-       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0])),
-       'agent2': HealthAgent(id='agent2', encoding=3, initial_position=np.array([0, 1]))
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=0.3),
+       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]))
    }
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]})
+   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
 
    position_state.reset()
    health_state.reset()
-   attack_actor.process_action(agents['agent0'], {'attack': True})
-   attack_actor.process_action(agents['agent0'], {'attack': True})
+   attack_actor.process_action(agents['agent0'], {'attack': 2})
+   assert not agents['agent2'].active
+   assert agents['agent1'].active
+   assert agents['agent3'].active
+   attack_actor.process_action(agents['agent0'], {'attack': 2})
+   assert agents['agent1'].active
+   assert agents['agent3'].active
 
-Here, `agent0` attempts to make two attack actions. The first one is successful
-because `agent1` is within its `attack range` and is attackable according to the
-`attack mapping`. `agent1`'s `health` will be depleted by 1, and as a result its `health`
-will fall to 0 and it will be marked as `inactive`. The second attack fails because,
-although `agent2` is within range, it is not a type that `agent0` can attack.
-
-.. figure:: .images/gridworld_attacking.png
+.. figure:: .images/gridworld_attack_binary.png
    :width: 100 %
-   :alt: Agent attacking other agents
+   :alt: Binary attack demonstration
 
-   agent0 in blue performs two attacks. The first is successful, but the second is not.
-   agent1 in green is killed, but agent2 in red is still active.
+   `agent0` in red launches four attacks over two turns. `agent1` and `agent2`,
+   blue and green respectively, are attackable. `agent2` dies because its health
+   falls to zero, but `agent1` continues living even after two attacks.
 
-.. NOTE::
-
-   Attacks can be blocked by :ref:`blocking <gridworld_blocking>` agents. If an attackable agent is
-   masked from an attacking agent, then it cannot be attacked by that agent. The
-   masking is determined the same way as view blocking described above.
+As per the `attack mapping`, `agent0` can attack `agent1` or `agent2` but not
+`agent3`. It can make two attacks per turn, but because the `stacked attacks` property
+is False, it cannot attack the same agent twice in the same turn. Looking at the
+`attack strength` and `initial health` of the agents, we can see that `agent0`
+should be able to kill `agent2` with one attack but it will require three attacks
+to kill `agent1`. In each turn, `agent0` uses both of its attacks. In the first
+turn, both `agent1` and `agent2` are attacked and `agent2` dies. In the second
+turn, `agent0` attempts two attacks again, but because there is only one attackable
+agent in its vicinity and because `stacked attacks` are not allowed, only one of
+its attacks is successful: `agent1` is attacked, but it continues to live since
+it still has health. `agent3` was never attacked because although it is within
+`agent0`'s `attack range`, it is not in the `attack mapping`.
 
 The :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>` automatically
 assigns a `null action` of 0, indicating no attack.
+
+.. _gridworld_encoding_based_attack:
+
+Encoding Based Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`EncodingBasedAttackActor <api_gridworld_actor_encoding_attack>` allows
+:ref:`AttackingAgents <api_gridworld_agent_attack>` to choose some number of attacks
+*per each encoding*. For each attack, the EncodingBasedAttackActor randomly searches
+the vicinity of the attacking agent for an attackble agent according to the
+:ref:`basic criteria listed above <gridworld_attacking>`. Contrast this actor with the
+:ref:`BinaryAttackActor <gridworld_binary_attack>` above, which does not allow
+agents to specify attack by encoding. Consider the following setup:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import EncodingBasedAttackActor
+
+   agents = {
+       'agent0': AttackingAgent(
+           id='agent0',
+           encoding=1,
+           initial_position=np.array([0, 0]),
+           attack_range=1,
+           attack_strength=0.4,
+           attack_accuracy=1,
+           attack_count=2
+       ),
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=1),
+       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]), initial_health=0.5)
+   }
+   grid = Grid(2, 2)
+   position_state = PositionState(agents=agents, grid=grid)
+   health_state = HealthState(agents=agents, grid=grid)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
+
+   position_state.reset()
+   health_state.reset()
+   attack_actor.process_action(agents['agent0'], {'attack': {2: 0, 3: 2}})
+   assert agents['agent1'].health == agents['agent1'].initial_health
+   assert agents['agent2'].health == agents['agent2'].initial_health
+   assert not agents['agent3'].active
+
+.. figure:: .images/gridworld_attack_encoding.png
+   :width: 100 %
+   :alt: Encoding Based attack demonstration
+
+   `agent0` in red launches two attacks against encoding 3. Because stacked attacks
+   are allowed, both attacks fall on `agent3` in the same turn, resulting in its
+   death.
+
+As per the `attack mapping`, `agent0` can attack all the other agents. It can make
+up to two attacks per turn *per encoding* (e.g. two attacks on encoding 2 and two
+attacks on encoding 3 per turn), and because the `stacked attacks` property
+is True, it can attack the same agent twice in the same turn. Looking at the
+`attack strength` and `initial health` of the agents, we can see that `agent0`
+should be able to kill `agent3` with only two attacks. `agent0` launches no attacks
+on encoding 2 and two attacks on encoding 3. Because `agent3` is the only agent of encoding
+3 and because `stacked attacks` are allowed, it gets attacked twice in one turn,
+resulting in its death. Even though `agent1` and `agent2` are in `agent0`'s `attack mapping`
+and `attack range`, neither of them is attacked because `agent0` specified zero
+attacks on encoding 2.
+
+The :ref:`EncodingBasedAttackActor <api_gridworld_actor_encoding_attack>` automatically
+assigns a `null action` of 0 for each encoding, indicating no attack.
+
+.. _gridworld_selective_attack:
+
+Selective Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`SelectiveAttackActor <api_gridworld_actor_selective_attack>` allows
+:ref:`AttackingAgents <api_gridworld_agent_attack>` to specify some number of attacks
+on each of the cells in some local grid defined by the agent's `attack range`.
+In contrast to the :ref:`BinaryAttackActor <gridworld_binary_attack>` and
+:ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>` above, the
+SelectiveAttackActor does not randomly search for agents in the vicinity because
+it receives the attacked cells directly. The attacking agent can attack each cell
+up to its `attack count`. Attackable agents are defined according to the
+:ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
+attackable agents on the same cell, the actor randomly picks from among them based
+on the number of attacks on that cell and whether or not `stacked attacks` are
+allowed. Consider the following setup:
+
+.. code-block:: python
+
+  import numpy as np
+  from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+  from abmarl.sim.gridworld.grid import Grid
+  from abmarl.sim.gridworld.state import PositionState, HealthState
+  from abmarl.sim.gridworld.actor import SelectiveAttackActor
+
+  agents = {
+      'agent0': AttackingAgent(
+          id='agent0',
+          encoding=1,
+          initial_position=np.array([0, 0]),
+          attack_range=1,
+          attack_strength=1,
+          attack_accuracy=1,
+          attack_count=2
+      ),
+      'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+      'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=1),
+      'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]))
+  }
+  grid = Grid(2, 2, overlapping={2: [3], 3: [2]})
+  position_state = PositionState(agents=agents, grid=grid)
+  health_state = HealthState(agents=agents, grid=grid)
+  attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+
+  position_state.reset()
+  health_state.reset()
+  attack = np.array([
+      [0, 1, 0],
+      [0, 1, 2],
+      [0, 1, 0]
+  ])
+  attack_actor.process_action(agents['agent0'], {'attack': attack})
+  assert not agents['agent1'].active
+  assert not agents['agent2'].active
+  assert agents['agent3'].active
+
+.. figure:: .images/gridworld_attack_selective.png
+   :width: 100 %
+   :alt: Selective attack demonstration
+
+   `agent0` in red launches five attacks in the highlighted cells, resulting in
+   `agent1` and `agent2` dying.
+
+As per the `attack mapping`, `agent0` can attack `agent1` or `agent2` but not
+`agent3`. It can make two attacks per turn *per cell*, but because the `stacked attacks` property
+is False, it cannot attack the same agent twice in the same turn. Looking at the
+`attack strength` and `initial health` of the agents, we can see that `agent0`
+should be able to kill `agent1` and `agent2` with a single attack each. `agent0` launches
+5 attacks: one on the cell above, one on its own cell, one on the cell below,
+and two on the cell to the right. The attack above is on a cell that is out of bounds,
+so this attack does nothing. The attack on its own cell fails because there are
+no attackable agents there. `agent1` is on the cell below, and that attack succeeds.
+`agent2` and `agent3` are both on the cell to the right, but only `agent2` is attackable
+per the attack mapping and `stacked attacks` are not allowed, so only one of the
+launched attacks is successful.
+
+The :ref:`SelectiveAttackActor <api_gridworld_actor_selective_attack>` automatically
+assigns a grid of 0s as the `null action`, indicating no attack on any cell.
+
+.. _gridworld_restricted_selective_attack:
+
+Restricted Selective Attack Actor
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
+allows :ref:`AttackingAgents <api_gridworld_agent_attack>` to specify some number
+of attacks in some local grid defined by the attacking agent's `attack range`.
+This actor is more *restricted* than its counterpart, the
+:ref:`SelectiveAttackActor <gridworld_selective_attack>`, because rather than issuing
+attacks up to its `attack count` *per cell*, the attacking agent can only issue
+that many attacks in the *whole local grid*. Attackable agents are defined according
+to the :ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
+attackable agents on a the same cell, the actor randomly picks from among them
+based on the number of attacks on that cell and whether or not `stacked attacks`
+are allowed. Consider the following setup:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import RestrictedSelectiveAttackActor
+
+   agents = {
+       'agent0': AttackingAgent(
+           id='agent0',
+           encoding=1,
+           initial_position=np.array([0, 0]),
+           attack_range=1,
+           attack_strength=0.6,
+           attack_accuracy=1,
+           attack_count=3
+       ),
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=0.1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=0.1),
+       'agent3': HealthAgent(id='agent3', encoding=2, initial_position=np.array([1, 1]), initial_health=1)
+   }
+   grid = Grid(2, 2)
+   position_state = PositionState(agents=agents, grid=grid)
+   health_state = HealthState(agents=agents, grid=grid)
+   attack_actor = RestrictedSelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+
+   position_state.reset()
+   health_state.reset()
+   out = attack_actor.process_action(agents['agent0'], {'attack': [9, 9, 0]})
+   assert agents['agent3'].active
+   assert agents['agent3'].health == 0.4
+   out = attack_actor.process_action(agents['agent0'], {'attack': [9, 6, 8]})
+   assert not agents['agent1'].active
+   assert not agents['agent2'].active
+   assert not agents['agent3'].active
+
+.. figure:: .images/gridworld_attack_restricted_selective.png
+   :width: 100 %
+   :alt: Restricted Selective attack demonstration
+
+   `agent0` in red launches two attacks against the bottom right cell, catching
+   `agent3` with one of them. Then it finishes off all the agents in the next turn.
+
+As per the `attack mapping`, `agent0` can attack all the other agents, and it can
+issue up to three attacks per turn. `stacked attacks` is False, so the same agent
+cannot be attacked twice in the same turn. Looking at the `attack strength` and
+`initial health` of the agents, we can see that `agent0` should be able to kill
+`agent1` and `agent2` with a single attack each but will need two attacks to kill
+`agent3`. In the first turn, `agent0` launches two attacks to the bottom right cell
+and chooses not to use its third attack. `agent3` is the only attackable agent
+on this cell, but because `stacked attacks` are not allowed, it only gets attacked
+once. In the next turn, `agent0` issues an attack on each of the three occupied
+cells, and each attack is succesful.
+
+The :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
+automatically assigns an array of 0s as the `null action`, indicating no attack on any cell.
+
+.. NOTE::
+   The form of the attack in the
+   :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
+   is the most difficult for humans to interpret. The number of entries in the
+   array reflects the agent's `attack count`. The attack appears as the cell's id,
+   which is determined from ravelling the local grid, where 0 means no attack,
+   1 is the top left cell, 2 is to the right of that, and so on through the whole
+   local grid.
 
 
 RavelActionWrapper
@@ -608,3 +892,96 @@ The actions from the unwrapped actor are in the original `Box` space, whereas af
 we apply the wrapper, the actions from the wrapped actor are in the transformed
 `Discrete` space. The actor will receive move actions in the `Discrete` space and convert
 them to the `Box` space before passing them to the MoveActor.
+
+.. _gridworld_exclusive_channel_action_wrapper:
+
+Exclusive Channel Action Wrapper
+````````````````````````````````
+
+The :ref:`ExclusiveChannelActionWrapper <api_gridworld_exclusive_channel_action_wrappers>`
+works with `Dict` action spaces, where each subspace is to be ravelled independently
+and then combined so that that action channels are exclusive. The wrapping occurs in two
+steps. First, we use numpy's `ravel` capabilities to convert each subspace to a
+`Discrete` space. Second, we combine the `Discrete` spaces together in such a way
+that imposes exclusivity among the subspaces. The exclusion happens only on the
+top level, so a `Dict` nested within a `Dict` will be ravelled without exclusion.
+
+We can apply the
+:ref:`ExclusiveChannelActionWrapper <api_gridworld_exclusive_channel_action_wrappers>`
+with the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>` to
+force the agent to only attack one encoding per turn, like so:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState, HealthState
+   from abmarl.sim.gridworld.actor import EncodingBasedAttackActor
+   from abmarl.sim.gridworld.wrapper import ExclusiveChannelActionWrapper
+   from gym.spaces import Dict, Discrete
+
+   agents = {
+       'agent0': AttackingAgent(
+           id='agent0',
+           encoding=1,
+           initial_position=np.array([0, 0]),
+           attack_range=1,
+           attack_strength=0.4,
+           attack_accuracy=1,
+           attack_count=2
+       ),
+       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
+       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=1),
+       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]), initial_health=0.5)
+   }
+   grid = Grid(2, 2)
+   position_state = PositionState(agents=agents, grid=grid)
+   health_state = HealthState(agents=agents, grid=grid)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
+   print(agents['agent0'].action_space)
+   >>> {'attack': Dict(2:Discrete(3), 3:Discrete(3))}
+   
+   wrapped_attack_actor = ExclusiveChannelActionWrapper(attack_actor)
+   print(agents['agent0'].action_space)
+   >>> {'attack': Discrete(5)}
+
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 0))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 1))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 2))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 3))
+   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 4))
+   >>> {2: 0, 3: 0}
+   >>> {2: 1, 3: 0}
+   >>> {2: 2, 3: 0}
+   >>> {2: 0, 3: 1}
+   >>> {2: 0, 3: 2}
+
+With just the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`,
+the agent's action space is ``{'attack': Dict(2:Discrete(3), 3:Discrete(3))}``
+and there are 9 possible actions:
+
+   #. ``{2: 0, 3: 0}``
+   #. ``{2: 0, 3: 1}``
+   #. ``{2: 0, 3: 2}``
+   #. ``{2: 1, 3: 0}``
+   #. ``{2: 1, 3: 1}``
+   #. ``{2: 1, 3: 2}``
+   #. ``{2: 2, 3: 0}``
+   #. ``{2: 2, 3: 1}``
+   #. ``{2: 2, 3: 2}``
+
+When we apply the
+:ref:`ExclusiveChannelActionWrapper <api_gridworld_exclusive_channel_action_wrappers>`,
+the action space becomes ``{'attack': Discrete(5)}``, which is a result of the
+channel exlcusion and the ravelling. When unwrapped to the original space, the
+five possible actions become
+
+   #. ``{2: 0, 3: 0}``
+   #. ``{2: 1, 3: 0}``
+   #. ``{2: 2, 3: 0}``
+   #. ``{2: 0, 3: 1}``
+   #. ``{2: 0, 3: 2}``
+   
+We can see that the channels are exclusive, so that the agent cannot attack both
+encodings in the same turn.

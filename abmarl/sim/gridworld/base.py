@@ -49,8 +49,8 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             file_name: Name of the file that specifies the initial grid setup. In the file, each
                 cell should be a single alphanumeric character indicating which agent
                 will be at that position (from the perspective of looking down on the
-                grid). That agent will be given that initial position. 0's are reserved for empty
-                space.
+                grid). That agent will be given that initial position. Zeros, periods,
+                and underscores are reserved for empty space.
             object_registry: A dictionary that maps characters from the file to a
                 function that generates the agent. This must be a function because
                 each agent must have unique id, which is generated here.

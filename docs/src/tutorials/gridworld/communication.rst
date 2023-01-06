@@ -200,7 +200,8 @@ to each agent's message.
    
            return receiving_from
 
-Then we define the BroadcastActor. Similar to attacking, broadcasting will be a
+Then we define the BroadcastActor. Similar to the
+:ref:`BinaryAttackActor <gridworld_binary_attack>`, broadcasting will be a
 boolean action--either broadcast or don't broadcast. We provide a `broadcast mapping`
 for determining to which encodings each agent can broadcast. The message will be
 successfully sent to every agent that (1) is within the `broadcast range`, (2) has
@@ -468,7 +469,7 @@ Now that all the components have been created, we can create the full simulation
    
 Let's initialize our simulation and run it. We initialize some BroadcastingAgents
 and some BlockingAgents. Then we initialize the simulation with a `broadcast mapping`
-that specifies that broadcasts can only be made amont agents with encoding 1, which
+that specifies that broadcasts can only be made amongst agents with encoding 1, which
 are the BroadcastingAgents.
 
 .. code-block:: python

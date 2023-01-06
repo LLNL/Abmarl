@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='abmarl',
-    version='0.2.4',
+    version='0.2.5',
     description='Agent Based Simulation and MultiAgent Reinforcement Learning',
     long_description=long_description,
     long_description_content_type='text/markdown',
