@@ -209,9 +209,10 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             attacking agent or chose not to attack; otherwise it is True. The second
             value is a list of attacked agents, which will be empty if there was
             no attack or if the attack failed. Thus, there are three possible outcomes:
-                1. An attack was not attempted: False, []
-                2. An attack failed: True, []
-                3. An attack was successful: True, [non-empty]
+
+            1. An attack was not attempted: False, []
+            2. An attack failed: True, []
+            3. An attack was successful: True, [non-empty]
         """
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
