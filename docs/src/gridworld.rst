@@ -893,6 +893,7 @@ we apply the wrapper, the actions from the wrapped actor are in the transformed
 `Discrete` space. The actor will receive move actions in the `Discrete` space and convert
 them to the `Box` space before passing them to the MoveActor.
 
+.. _gridworld_exclusive_channel_action_wrapper:
 
 Exclusive Channel Action Wrapper
 ````````````````````````````````

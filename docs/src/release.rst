@@ -3,135 +3,116 @@
 What's New in Abmarl
 ====================
 
-Abmarl version 0.2.4 has some exciting new capabilities. Among these is the ability to
-connect Abmarl Simulations with Open Spiel algorithms via the new
-:ref:`OpenSpielWrapper <open_spiel_external>`; a one-of-a-kind
-:ref:`SuperAgentWrapper <super_agent_wrapper>` for grouping agents; and a prototype
-of Abmarl's very own :ref:`Trainer <trainer>` framework for rapid algorithm
-development and testing.
+Abmarl version 0.2.5 features a new set of built-in :ref:`Attack Actors <gridworld_attacking>`
+for the :ref:`Grid World Simulation Framework <gridworld>`; an
+:ref:`exclusive channel action wrapper <gridworld_exclusive_channel_action_wrapper>`
+to allow users to isolate actions by channel; and an enahanced
+:ref:`FlattenWrapper <flatten_wrapper>` for dealing with Discrete spaces.
 
 
-OpenSpiel Wrapper
+New Attack Actors
 -----------------
 
-The :ref:`OpenSpielWrapper <open_spiel_external>` is an external wrapper alongside
-the :ref:`MultiAgentWrapper <rllib_external>` and the :ref:`GymWrapper <gym_external>`.
-The OpenSpiel Wrapper enables the connection between Abmarl's :ref:`SimulationManager <sim-man>`
-and OpenSpiel algorithms, increasing Abmarl's ease of use for MARL researchers.
+Abmarl's :ref:`Grid World Simulation Framework <gridworld>` now provides four built-in
+:ref:`Attack Actors <gridworld_attacking>` for greater flexibility in processing
+attacks. In addition to the already-supported :ref:`BinaryAttackActor <gridworld_binary_attack>`,
+Abmarl now supports an :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`,
+a :ref:`SelectiveAttackActor <gridworld_selective_attack>`, and a
+:ref:`RestrictedSelectiveAttackActor <gridworld_restricted_selective_attack>`.
+These attackors allow agents to specify attacks based on encodings and cells.
+:ref:`AttackingAgents <api_gridworld_agent_attack>` can now use multiple
+attacks per turn, up to their ``attack_count``, as interpreted by the Attack Actors.
 
-.. code-block:: python
+In addition, :ref:`Attack Actors <gridworld_attacking>` now output the attack status
+along with a list of attacked agents, allowing simulations to distinguish and issue
+rewards among three outcomes:
 
-   sim = OpenSpielWrapper(
-       AllStepManager(MultiCorridor())
-   ) # sim is ready to use with an open-spiel algorithm.
-   time_step = sim.reset()
-   for _ in range(20):
-       agents_output = [trainer.step(time_step) for trainer in trainers.values()]
-       action_list = [agent_output.action for agent_output in agents_output]
-       assert len(action_list) == 5
-       time_step = sim.step(action_list)
-       if time_step.last():
-           for trainer in trainers.values():
-               trainer.step(time_step)
-               break
-   for trainer in trainers.values():
-       trainer.step(time_step)
-
-Along with this feature, the :ref:`Simulation Managers <sim-man>` now explicity
-track the set of done agents.
-
-SuperAgentWrapper
------------------
-
-Users can setup Abmarl simulations such that multiple agents generate experiences
-that are all used to train a single policy. The policy itself is designed for a
-single agent's input and output. This method of multiple agents is a way to parallelize
-the data generation process and speed up training. It is the method of choice for
-collaborative agents.
-
-With the new :ref:`SuperAgentWrapper <super_agent_wrapper>`, users can define groupings
-of agents so that a single policy is responsible for digesting all the observations
-and generating all the actions for its agents in a single pass. To use the SuperAgentWrapper,
-simply provide a `super_agent_mapping`, which maps the super agent's id to a list
-of covered agents, like so:
-
-.. code-block:: python
-
-   AllStepManager(
-       SuperAgentWrapper(
-           TeamBattleSim.build_sim(
-               8, 8,
-               agents=agents,
-               overlapping=overlap_map,
-               attack_mapping=attack_map
-           ),
-           super_agent_mapping = {
-               'red': [agent.id for agent in agents.values() if agent.encoding == 1],
-               'blue': [agent.id for agent in agents.values() if agent.encoding == 2],
-               'green': [agent.id for agent in agents.values() if agent.encoding == 3],
-               'gray': [agent.id for agent in agents.values() if agent.encoding == 4],
-           }
-       )
-   )
+   #. No attack attempted
+   #. Attack attempted and failed
+   #. Attack attempted and successful
 
 
-Null Observations and Actions
------------------------------
+Exclusive Channel Action Wrapper
+--------------------------------
 
-To fully support integration with the RL loop, users can now specify
-:ref:`null observations and actions <overview_agent>` for agents. Up until now,
-any agent that finishes the simulation early will return its final experience and
-refrain from further interaction in the simulation. With the introduction of the
-:ref:`SuperAgentWrapper <super_agent_wrapper>` and the
-:ref:`OpenSpielWrapper <open_spiel_external>`, done agents may still be queried
-for their observations and even report actions. In order to keep the training data
-*clean*, users can now specify null observations and actions for agents, which
-will be used in these rare cases.
+Users can enforce exclusivity of actions among the channels within a single Actor,
+so that the agent must pick from one channel or the other. For example, the
+:ref:`ExclusiveChannelActionWrapper <gridworld_exclusive_channel_action_wrapper>`
+can be used with the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`
+for :ref:`AttackingAgents <api_gridworld_agent_attack>` to focus their attack on
+a specific encoding.
 
 
-Trainer Prototype
------------------
+Enhanced Flatten Wrapper
+------------------------
 
-The :ref:`Trainer <trainer>` prototype is a first attempt to support Abmarl's
-in-house algorithm development. The prototype is built off an on-policy monte-carlo
-algorithm and abstracts the data generation process, enabling the user to focus
-on developing the training rules. Abmarl's trainer framework is in its early design
-stages. Stay tuned for more developments.
+Sampling from a flattened space can result in
+`unexpected results <https://github.com/LLNL/Abmarl/issues/355>`_ when the sample
+is later unflattened because the sampling distribution in the flattened space is
+not the same as in the unflattened space. This is particularly important for Discrete
+spaces, which are typically flattened as one-hot-encodings. To overcome these issues,
+Abmarl's :ref:`FlattenWrapper <flatten_wrapper>` now flattens Discrete spaces as
+an integer-Box of a single element with bounds up to ``space.n``.
 
 
-Dynamic Order Manager and Simulation
-------------------------------------
+Easier-to-Read Grid Loading
+---------------------------
 
-The new :ref:`DynamicOrderSimulation <api_dynamic_sim>` and
-:ref:`DynamicOrderManager <api_dynamic_man>` combo allows users to create
-simulations where the simulation itself can determine the next agent(s) to act.
+When loading the grid from a file, empty spaces were previously represented as
+zeros. This made the file difficult for humans to read because the entities of
+concern were hard to locate. Now, empty spaces can be zeros, dots, or underscores.
+Here is a comparison:
+
+.. code-block::
+  
+   # Zeros
+   0 0 0 0 W 0 W W 0 W W 0 0 W W 0 W 0
+   W 0 W 0 N 0 0 0 0 0 W 0 W W 0 0 0 0
+   W W W W 0 W W 0 W 0 0 0 0 W W 0 W W
+   0 W 0 0 0 W W 0 W 0 W W 0 0 0 0 0 0
+   0 0 0 W 0 0 W W W 0 W 0 0 W 0 W W 0
+   W W W W 0 W W W W W W W 0 W 0 T W 0
+   0 0 0 0 0 W 0 0 0 0 0 0 0 W 0 W W 0
+   0 W 0 W 0 W W W 0 W W 0 W W 0 W 0 0
+
+   # Underscores
+   _ _ _ _ W _ W W _ W W _ _ W W _ W _
+   W _ W _ N _ _ _ _ _ W _ W W _ _ _ _
+   W W W W _ W W _ W _ _ _ _ W W _ W W
+   _ W _ _ _ W W _ W _ W W _ _ _ _ _ _
+   _ _ _ W _ _ W W W _ W _ _ W _ W W _
+   W W W W _ W W W W W W W _ W _ T W _
+   _ _ _ _ _ W _ _ _ _ _ _ _ W _ W W _
+   _ W _ W _ W W W _ W W _ W W _ W _ _
+
+   # Dots
+   . . . . W . W W . W W . . W W . W .
+   W . W . N . . . . . W . W W . . . .
+   W W W W . W W . W . . . . W W . W W
+   . W . . . W W . W . W W . . . . . .
+   . . . W . . W W W . W . . W . W W .
+   W W W W . W W W W W W W . W . T W .
+   . . . . . W . . . . . . . W . W W .
+   . W . W . W W W . W W . W W . W . .
+
+  
 
 
 Miscellaneous
 -------------
 
-* Checking the ``isinstance`` of an :ref:`Agent <api_agent>` now automatically
-  captures :ref:`ObservingAgents <api_observing_agent>` and
-  :ref:`ActingAgents <api_acting_agent>`, so that this code now works as expected:
-
-.. code-block:: python
-
-   class MyAgent(ObservingAgent, ActingAgent): pass
-   my_agent = MyAgent()
-   isinstance(my_agent, Agent)
-   >>> True
-
-* Example simulations have been centralized in ``abmarl.examples.sim``. These examples
-  are a store of useful simulations for testing, debugging, understanding RL, etc.
-* Updated ray dependency to version 1.12.1. This had the following side-effects:
-
-   * Update Abmarl :ref:`MultiAgentWrapper <rllib_external>` to work with new RLlib interface.
-   * Pinned the gym version to be less than 0.22. These versions of gym are not
-     as clever in deciding if a point is in a space, so `Box` spaces must now
-     explicitly output a list or array, even if there is only a single element.
-   * Users may want to make use of the new ``disable_env_checking`` flag available
-     in RLlib's configuration.
-
-* Done agents are not removed from the :ref:`Grid <gridworld_grid>`, so agents
-  that cannot overlap are needlessly restricted. Grid overlapping logic now checks
-  if an agent is done.
+* New :ref:`AbsolutePositionObserver <gridworld_absolute_position_observer>` reports
+  the agent's absolute position in the grid. This can be used in conjuction with the
+  already-supported :ref:`Observers <gridworld_single_observer>` because the key is
+  "position".
+* The ``local_dir`` parameter in the configuration files will create a directory for
+  the output files so that they are located under ``<local_dir>/abmarl_results/``.
+  This behavior is consistente between the trainer and debugger. If no parameter
+  is specified, Abmarl uses the home directory.
+* A :ref:`PrincipleAgent's <api_principle_agent>` ``active`` property can be now
+  directly set, giving components better control over the "done-state" of an agent.
+* :ref:`Component Wrappers <gridworld_wrappers>` now wrap the null observation
+  and null action of the agents in their underlying components.
+* The :ref:`GymWrapper <gym_external>` now works with simulations with multiple entities
+  as long as there is only a single :ref:`Learning Agent <api_agent>`.
+* Abmarl supports ray version 2.0.
