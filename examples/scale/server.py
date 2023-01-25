@@ -1,9 +1,10 @@
 
 import argparse
 
-import ray
 from ray import tune
 from ray.rllib.env.policy_server_input import PolicyServerInput
+
+from abmarl.tools import utils as adu
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -25,13 +26,14 @@ parser.add_argument(
     help="The number of workers to use. Each worker will create its own listening "
     "socket for incoming SAR data.",
 )
-parser.add_argument(
-    "--restore",
-    type=str,
-    default='',
-    help="Continue training from a previous run. Restore should be the full "
-    "path to the output directory file according to Abmarl's structure."
-)
+# TODO: Must do abmarl-360 first
+# parser.add_argument(
+#     "--restore",
+#     type=str,
+#     default='',
+#     help="Continue training from a previous run. Restore should be the full "
+#     "path to the output directory file according to Abmarl's structure."
+# )
 
 if __name__ == "__main__":
     args = parser.parse_args()
@@ -48,6 +50,9 @@ if __name__ == "__main__":
         # No InputReader (PolicyServerInput) needed.
         else:
             return None
+
+    # TODO: Scale should write out the full config path
+    experiment_mod = adu.custom_import_module(full_config_path)
 
     # Policies
     # TODO: Get the policies from the configuration file instead
@@ -71,38 +76,16 @@ if __name__ == "__main__":
         "input": _input,
         # Disable OPE, since the rollouts are coming from online clients.
         "off_policy_estimation_methods": {},
-        # Indicate that the Trainer we setup here doesn't need an actual env.
-        # Allow spaces to be determined by user (see below).
-        "env": None,
-
-        # The following should come from the configuration file
-        "multiagent": {
-            "policies": policies,
-            "policy_mapping_fn": policy_mapping_fn,
-        },
-        # checkpoint direcory
-        "output": "/usr/workspace/rusu1/decision_superiority/maze_results_sparse_reward_5/",
-        # Use n worker processes to listen on different ports.
-        "num_workers": args.num_workers,
-        # Set to INFO so we'll see the server's actual address:port.
-        "log_level": "INFO",
-        "train_batch_size": 50_000,
-        "rollout_fragment_length": 500,
+        **experiment_mod.params['ray_tune']
     }
 
-    # Attempt to restore from checkpoint, if possible.
-    if args.restore and os.path.exists(args.restore):
-        restore_from_path = open(args.restore).read()
-        # TODO: We need to dig into the directory to get the checkpoint from which to restore
-    else:
-        restore_from_path = None
+    # TODO: Must do abmarl-360 first
+    # # Attempt to restore from checkpoint, if possible.
+    # if args.restore and os.path.exists(args.restore):
+    #     restore_from_path = open(args.restore).read()
+    #     # TODO: We need to dig into the directory to get the checkpoint from which to restore
+    # else:
+    #     restore_from_path = None
 
     # Run with Tune for auto env and trainer creation and TensorBoard.
-    tune.run(
-        "A2C", # TODO: Get from configuration file
-        config=config,
-        stop={ # TODO: Get from configuration file
-            'episodes_total': 2000,
-        },
-        restore=restore_from_path
-    )
+    tune.run(**experiment_mod.params['ray_tune'])

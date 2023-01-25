@@ -1,34 +1,86 @@
 import os
 import shutil
 
-main_if_block_begin = """
+from abmarl.tools import utils as adu
+
+server_top_level = """
+import argparse
+
+from ray import tune
+from ray.rllib.env.policy_server_input import PolicyServerInput
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '--server_address',
+    type=str,
+    default='localhost',
+    help='The ip address of the remote server.'
+)
+parser.add_argument(
+    '--base-port',
+    type=int,
+    default=9900,
+    help='The base-port to use. Workers will increment from here.'
+)
+parser.add_argument(
+    "--num-workers",
+    type=int,
+    default=1,
+    help="The number of workers to use. Each worker will create its own listening "
+    "socket for incoming SAR data.",
+)
+# TODO: Must do abmarl-360 first
+# parser.add_argument(
+#     "--restore",
+#     type=str,
+#     default='',
+#     help="Continue training from a previous run. Restore should be the full "
+#     "path to the output directory file according to Abmarl's structure."
+# )
+
 if __name__ == "__main__":
-    # Create output directory and save to params
+    args = parser.parse_args()
+
+    def _input(ioctx):
+        # We are remote worker or we are local worker with num_workers=0:
+        # Create a PolicyServerInput.
+        if ioctx.worker_index > 0 or ioctx.worker.num_workers == 0:
+            return PolicyServerInput(
+                ioctx,
+                args.server_address,
+                args.base_port + ioctx.worker_index - (1 if ioctx.worker_index > 0 else 0),
+            )
+        # No InputReader (PolicyServerInput) needed.
+        else:
+            return None
+"""
+
+def run(full_config_path):
+    """
+    Generate scripts for running the experiment at scale.
+    """
+    # Load the experiment as a module
+    experiment_mod = adu.custom_import_module(full_config_path)
+    title = experiment_mod.params['experiment']['title']
+
+    # Copy the configuration module to the output directory
     import os
     import time
-    home = os.path.expanduser("~")
+    base = experiment_mod.params['ray_tune'].get('local_dir', os.path.expanduser("~"))
     output_dir = os.path.join(
-        home, 'abmarl_results/{}_{}'.format(
-            params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
+        base, 'abmarl_results/{}_{}'.format(
+            title, time.strftime('%Y-%m-%d_%H-%M')
         )
     )
-    params['ray_tune']['local_dir'] = output_dir
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    experiment_mod.params['ray_tune']['local_dir'] = output_dir
 
-    # Copy this configuration file to the output directory
-    import shutil
-    shutil.copy(os.path.join(os.getcwd(), __file__), output_dir)
-
-    # Initialize and run ray
+    # Train with ray
     import ray
     from ray import tune
-"""
-
-main_if_block_end = """
-    tune.run(**params['ray_tune'])
+    ray.init()
+    tune.run(**experiment_mod.params['ray_tune'])
     ray.shutdown()
-"""
+
 
 
 def _process_magpie_sbatch(config, full_runnable_config_path):
