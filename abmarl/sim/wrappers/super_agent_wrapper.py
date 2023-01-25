@@ -1,4 +1,6 @@
 
+import warnings
+
 from gym.spaces import Dict, Discrete
 
 from abmarl.sim.agent_based_simulation import Agent
@@ -18,6 +20,13 @@ class SuperAgentWrapper(Wrapper):
     agent would experience completely different simulation dynamcis for some of
     its covered agents with no indication as to why.
 
+    Unless handled carefully, the super agent will generate observations for done
+    covered agents. This may contaminate the training data with an unfair advantage.
+    For exmample, a dead covered agent should not be able to provide the super agent with
+    useful information. In order to correct this, the user may supply the null
+    observation for an ObservingAgent. When a covered agent is done, the SuperAgentWrapper
+    will try to use its null observation going forward.
+
     Furthermore, super agents may still report actions for covered agents that
     are done. This wrapper filters out those actions before passing them to the
     underlying sim. See step for more details.
@@ -25,6 +34,7 @@ class SuperAgentWrapper(Wrapper):
     def __init__(self, sim, super_agent_mapping=None, **kwargs):
         self.sim = sim
         self.super_agent_mapping = super_agent_mapping
+        self._warning_issued = False
 
     @property
     def super_agent_mapping(self):
@@ -32,7 +42,7 @@ class SuperAgentWrapper(Wrapper):
         A dictionary that maps from a super agent's id to a list of covered agent ids.
 
         Suppose our simulation has 5 agents and we use the following super agent mapping:
-            {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
+        {'super0': ['agent0', 'agent1'], 'super1': ['agent3', 'agent4']}
         The resulting agents dict would have keys 'super0', 'super1', and 'agent2';
         where 'agent0', 'agent1', 'agent3', and 'agent4' have been covered by the
         super agents and 'agent2' is left uncovered and therefore included in the
@@ -69,6 +79,17 @@ class SuperAgentWrapper(Wrapper):
         # ever changes
         self._construct_agents_from_super_agent_mapping()
 
+    def reset(self, **kwargs):
+        self._last_obs_reported = {
+            agent: False
+            for agent in self._covered_agents
+        }
+        self._last_reward_reported = {
+            agent: False
+            for agent in self._covered_agents
+        }
+        self.sim.reset(**kwargs)
+
     def step(self, action_dict, **kwargs):
         """
         Give actions to the simulation.
@@ -80,19 +101,19 @@ class SuperAgentWrapper(Wrapper):
 
         Args:
             action_dict: Dictionary that maps agent ids to the actions. Covered
-            agents should not be present.
+                agents should not be present.
         """
         unravelled_action_dict = {}
         for agent_id, action in action_dict.items():
             assert agent_id not in self._covered_agents, \
                 "We cannot receive actions from an agent that is covered by a super agent."
             if agent_id in self.super_agent_mapping: # A super agent action
+                # We can safely assume the format of the actions because we
+                # generated the action space
                 for covered_agent_id, covered_action in action.items():
-                    # We can safely assume the format of the actions because we
-                    # generated the action space
+                    # We don't want to send the simulation actions from covered
+                    # agents that are done
                     if not self.sim.get_done(covered_agent_id):
-                        # We don't want to send the simulation actions from covered
-                        # agents that are done
                         unravelled_action_dict[covered_agent_id] = covered_action
             else:
                 unravelled_action_dict[agent_id] = action
@@ -108,9 +129,15 @@ class SuperAgentWrapper(Wrapper):
         changing simulation dynamics for done agents (i.e. why actions from done
         agents don't do anything).
 
+        The super agent will report an observation for done covered agents. This may
+        result in an unfair advantage during training (e.g. dead agent should not
+        produce useful information), and Abmarl will issue a warning. To properly
+        handle this, the user can supply the null observation for each covered agent. In
+        that case, the super agent will use the null observation for any done covered agents.
+
         Args:
             agent_id: The id of the agent for whom to produce an observation. Should
-            not be a covered agent.
+                not be a covered agent.
 
         Returns:
             The requested observation. Super agent observations are collected from
@@ -123,8 +150,17 @@ class SuperAgentWrapper(Wrapper):
         if agent_id in self.super_agent_mapping:
             obs = {'mask': {}}
             for covered_agent in self.super_agent_mapping[agent_id]:
-                obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
-                obs['mask'][covered_agent] = False if self.sim.get_done(covered_agent) else True
+                if self.sim.get_done(covered_agent, **kwargs):
+                    if self._last_obs_reported[covered_agent]:
+                        obs[covered_agent] = self._get_null_obs(covered_agent, **kwargs)
+                        obs['mask'][covered_agent] = False
+                    else:
+                        obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
+                        obs['mask'][covered_agent] = False
+                        self._last_obs_reported[covered_agent] = True
+                else:
+                    obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
+                    obs['mask'][covered_agent] = True
             return obs
         else:
             return self.sim.get_obs(agent_id, **kwargs)
@@ -133,21 +169,28 @@ class SuperAgentWrapper(Wrapper):
         """
         Report the agent's reward.
 
+        A super agent's reward is the sum of all its active covered agents' rewards.
+
         Args:
             agent_id: The id of the agent for whom to report the reward. Should
-            not be a covered agent.
+                not be a covered agent.
 
         Returns:
-            The requested reward. Super agent rewards are summed from the covered
-            agents.
+            The requested reward. Super agent rewards are summed from the active covered
+                agents.
         """
         assert agent_id not in self._covered_agents, \
             "We cannot get rewards for an agent that is covered by a super agent."
         if agent_id in self.super_agent_mapping:
-            return sum([
-                self.sim.get_reward(covered_agent_id)
-                for covered_agent_id in self.super_agent_mapping[agent_id]
-            ])
+            sum = 0
+            for covered_agent in self.super_agent_mapping[agent_id]:
+                if self.sim.get_done(covered_agent, **kwargs):
+                    if not self._last_reward_reported[covered_agent]:
+                        sum += self.sim.get_reward(covered_agent, **kwargs)
+                        self._last_reward_reported[covered_agent] = True
+                else:
+                    sum += self.sim.get_reward(covered_agent, **kwargs)
+            return sum
         else:
             return self.sim.get_reward(agent_id, **kwargs)
 
@@ -163,11 +206,11 @@ class SuperAgentWrapper(Wrapper):
 
         Args:
             agent_id: The id of the agent for whom to report the done condition.
-            Should not be a covered agent.
+                Should not be a covered agent.
 
         Returns:
             The requested done conndition. Super agents are done when all their
-            covered agents are done.
+                covered agents are done.
         """
         assert agent_id not in self._covered_agents, \
             "We cannot get done for an agent that is covered by a super agent."
@@ -185,7 +228,7 @@ class SuperAgentWrapper(Wrapper):
 
         Args:
             agent_id: The id of the agent for whom to get info. Should not be a
-            covered agent.
+                covered agent.
 
         Returns:
             The requested info. Super agents info is collected from covered agents.
@@ -221,8 +264,23 @@ class SuperAgentWrapper(Wrapper):
                 action_space=Dict(action_mapping)
             )
 
-        # Add all uncovered agents to the dict of agetns
+        # Add all uncovered agents to the dict of agents
         for agent_id in self._uncovered_agents:
             agents[agent_id] = self.sim.agents[agent_id]
 
         self.agents = agents
+
+    def _get_null_obs(self, agent_id, **kwargs):
+        assert agent_id in self._covered_agents, "Can only use null obs for covered agents."
+        if self.sim.agents[agent_id].null_observation:
+            return self.sim.agents[agent_id].null_observation
+        # if agent_id in self.null_obs:
+        #     return self.null_obs[agent_id]
+        else:
+            if not self._warning_issued:
+                self._warning_issued = True
+                warnings.warn(
+                    "Some covered agents in the SuperAgentWrapper do not specify "
+                    "a null observation. This may corrupt the learning data.",
+                )
+            return self.sim.get_obs(agent_id, **kwargs)

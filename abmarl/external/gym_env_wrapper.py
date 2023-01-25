@@ -1,18 +1,24 @@
 from gym import Env as GymEnv
 
+from abmarl.sim import Agent
+
 
 class GymWrapper(GymEnv):
     """
-    Wrap an AgentBasedSimulation object with only a single agent to the gym.Env interface.
-    This wrapper exposes the single agent's observation and action space directly
-    in the simulation.
+    Wrap an AgentBasedSimulation object with only a single learning agent to the
+    gym.Env interface. This wrapper exposes the single agent's observation and
+    action space directly in the simulation.
     """
     def __init__(self, sim):
         from abmarl.managers import SimulationManager
         assert isinstance(sim, SimulationManager)
-        assert len(sim.agents) == 1 # Can only work with single agents
+        learning_agents = {
+            agent.id: agent for agent in sim.agents.values()
+            if isinstance(agent, Agent)
+        }
+        assert len(learning_agents) == 1 # Can only work with single agents
         self.sim = sim
-        self.agent_id, self.agent = next(iter(sim.agents.items()))
+        self.agent_id, self.agent = next(iter(learning_agents.items()))
 
     @property
     def action_space(self):

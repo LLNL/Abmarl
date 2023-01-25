@@ -5,11 +5,11 @@
 MultiCorridor
 =============
 
-MultiCorridor extends RLlib's `simple corridor <https://github.com/ray-project/ray/blob/master/rllib/examples/custom_env.py#L65>`_,
-wherein agents must learn to move to the right in a one-dimensonal corridor to reach the end.
-Our implementation provides the ability to instantiate multiple agents in the simulation
-and restricts agents from occupying the same square. Every agent is homogeneous:
-they all have the same action space, observation space, and objective function.
+MultiCorridor is a multi-agent-based simulation wherein agents must learn to move
+to the right in a one-dimensonal corridor to reach the end. Our implementation
+provides the ability to instantiate multiple agents in the simulation and restricts
+agents from occupying the same square. Every agent is homogeneous: they all have
+the same action space, observation space, and objective function.
 
 .. figure:: /.images/multicorridor.*
    :width: 80 %
@@ -17,7 +17,7 @@ they all have the same action space, observation space, and objective function.
 
    Animation of agents moving left and right in a corridor until they reach the end.
 
-This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/corridor/multi_corridor.py>`_
+This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/multi_corridor.py>`_
 and the `MultiCorridor configuration <https://github.com/LLNL/Abmarl/blob/main/examples/multi_corridor_example.py>`_.
 
 Creating the MultiCorridor Simulation
@@ -263,7 +263,7 @@ with RLlib.
 .. code-block:: python
 
    # MultiCorridor is the simulation we created above
-   from abmarl.sim.corridor import MultiCorridor
+   from abmarl.examples import MultiCorridor
    from abmarl.managers import TurnBasedManager
    # MultiAgentWrapper needed to connect with RLlib
    from abmarl.external import MultiAgentWrapper
@@ -314,6 +314,7 @@ into a parameters dictionary that will be read by Abmarl and used to launch RLli
            'verbose': 2,
            'config': {
                # --- Simulation ---
+               'disable_env_checking': False,
                'env': sim_name,
                'horizon': 200,
                'env_config': {},

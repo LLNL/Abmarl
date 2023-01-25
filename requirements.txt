@@ -1,5 +1,8 @@
+importlib-metadata<5.0
 tensorflow
-ray[rllib]==1.8.0
+gym<0.22
+ray[rllib]==2.0.0
+open-spiel
 matplotlib
 seaborn
 sphinx

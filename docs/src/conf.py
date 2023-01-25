@@ -10,10 +10,10 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 
 project = 'Abmarl'
 copyright = '2021, LLNL'
-author = 'Edward Rusu'
+author = 'Ephraim Rusu'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.2'
+release = '0.2.5'
 
 
 # -- General configuration ---------------------------------------------------

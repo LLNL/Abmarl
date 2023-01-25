@@ -160,7 +160,8 @@ class HealthAgent(GridWorldAgent):
     """
     Agents have health points and can die.
 
-    Health is bounded between 0 and 1.
+    Health is bounded between 0 and 1. Agents become inactive when the health
+    falls to 0.
     """
     def __init__(self, initial_health=None, **kwargs):
         super().__init__(**kwargs)
@@ -179,6 +180,7 @@ class HealthAgent(GridWorldAgent):
     def health(self, value):
         assert type(value) in [int, float], "Health must be a numeric value."
         self._health = min(max(value, 0), 1)
+        self.active = self.health > 0
 
     @property
     def initial_health(self):
@@ -194,23 +196,18 @@ class HealthAgent(GridWorldAgent):
             assert 0 < value <= 1, "Initial value must be between 0 and 1."
         self._initial_health = value
 
-    @property
-    def active(self):
-        """
-        The agent is active if its health is greater than 0.
-        """
-        return self.health > 0
-
 
 class AttackingAgent(ActingAgent, GridWorldAgent):
     """
     Agents that can attack other agents.
     """
-    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None, **kwargs):
+    def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None,
+                 attack_count=1, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
         self.attack_accuracy = attack_accuracy
+        self.attack_count = attack_count
 
     @property
     def attack_range(self):
@@ -255,6 +252,24 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         self._attack_accuracy = value
 
     @property
+    def attack_count(self):
+        """
+        The number of attacks the agent can make per turn.
+
+        This parameter is interpreted differently by each attack actor, but generally
+        it specifies how many attacks this agent can carry out in a single step.
+        See specific AttackActor documentation for more information.
+        """
+        return self._attack_count
+
+    @attack_count.setter
+    def attack_count(self, value):
+        assert type(value) is int, "Number of attacks must be an integer."
+        assert value >= 0, "Number of attacks must be nonnegative."
+        self._attack_count = value
+
+    @property
     def configured(self):
         return super().configured and self.attack_range is not None and \
-            self.attack_strength is not None and self.attack_accuracy is not None
+            self.attack_strength is not None and self.attack_accuracy is not None and \
+            self.attack_count is not None

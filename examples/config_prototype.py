@@ -68,6 +68,7 @@ params = {
         },
         'config': {
             # --- Simulation ---
+            'disable_env_checking': False,
             'sim': sim_name,
             'sim_config': sim_config,
             # --- Multiagent ---

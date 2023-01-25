@@ -7,10 +7,13 @@ from abmarl.tools import numpy_utils as npu
 
 class OnPolicyMonteCarloTrainer(SinglePolicyTrainer):
     def train(self, iterations=10_000, gamma=0.9, **kwargs):
+        """
+        Implements on-policy monte carlo.
+        """
         state_action_returns = {}
 
         for i in range(iterations):
-            states, actions, rewards = self.generate_episode(**kwargs)
+            states, actions, rewards, _ = self.generate_episode(**kwargs)
             states = next(iter(states.values()))
             states.pop() # Pop off the terminating state.
             states = np.stack(states)

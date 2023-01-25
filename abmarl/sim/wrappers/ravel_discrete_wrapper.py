@@ -2,7 +2,8 @@ import itertools
 
 import numpy as np
 from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Box, Dict, Tuple
-from gym.spaces.box import get_inf
+
+from abmarl.sim import Agent
 
 from .sar_wrapper import SARWrapper
 
@@ -118,10 +119,10 @@ def _isbounded(space):
     of that dtype. This function checks for min/max values of the dtype.
     """
     return space.is_bounded() and \
-        not (space.low == get_inf(int, '-')).any() and \
-        not (space.low == get_inf(int, '+')).any() and \
-        not (space.high == get_inf(int, '-')).any() and \
-        not (space.high == get_inf(int, '+')).any()
+        not (space.low == np.iinfo(space.dtype).min).any() and \
+        not (space.low == np.iinfo(space.dtype).max).any() and \
+        not (space.high == np.iinfo(space.dtype).min).any() and \
+        not (space.high == np.iinfo(space.dtype).max).any()
 
 
 def check_space(space):
@@ -143,21 +144,37 @@ def check_space(space):
 
 class RavelDiscreteWrapper(SARWrapper):
     """
+    Convert observation and action spaces into a Discrete space.
+
     Convert Discrete, MultiBinary, MultiDiscrete, bounded integer Box, and any nesting of these
     observations and actions into Discrete observations and actions by "ravelling" their values
     according to numpy's ravel_mult_index function. Thus, observations and actions that are
     represented by arrays are converted into unique numbers. This is useful for building Q
     tables where each observation and action is a row and column of the Q table, respectively.
+
+    If the agent has a null observation or a null action, that value is also ravelled
+    into the new Discrete space.
     """
     def __init__(self, sim):
         super().__init__(sim)
         for agent_id, wrapped_agent in self.agents.items():
+            if not isinstance(wrapped_agent, Agent): continue
             assert check_space(wrapped_agent.observation_space), \
                 f"{agent_id}: observation must be discretizable."
             assert check_space(wrapped_agent.action_space), \
                 f"{agent_id} action must be discretizable."
             self.agents[agent_id].observation_space = ravel_space(wrapped_agent.observation_space)
             self.agents[agent_id].action_space = ravel_space(wrapped_agent.action_space)
+            if self.agents[agent_id].null_observation:
+                self.agents[agent_id].null_observation = ravel(
+                    self.sim.agents[agent_id].observation_space,
+                    wrapped_agent.null_observation
+                )
+            if self.agents[agent_id].null_action:
+                self.agents[agent_id].null_action = ravel(
+                    self.sim.agents[agent_id].action_space,
+                    wrapped_agent.null_action
+                )
 
     def wrap_observation(self, from_agent, observation):
         return ravel(from_agent.observation_space, observation)

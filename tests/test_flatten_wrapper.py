@@ -1,10 +1,9 @@
 from gym.spaces import Dict, Tuple, Box, Discrete, MultiDiscrete, MultiBinary
 import numpy as np
 
-from abmarl.sim import Agent
-from abmarl.sim.wrappers import FlattenWrapper
+from abmarl.sim.wrappers import FlattenWrapper, FlattenActionWrapper
 from abmarl.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
-from .helpers import MultiAgentSim
+from abmarl.examples import MultiAgentContinuousGymSpaceSim
 
 # --- Test flatten helper commands --- #
 
@@ -27,12 +26,12 @@ def test_integer_sample():
 
 def test_flatdim():
     assert flatdim(box) == 12
-    assert flatdim(discrete) == 11
+    assert flatdim(discrete) == 1
     assert flatdim(multi_binary) == 7
     assert flatdim(multi_discrete) == 3
     assert flatdim(d) == 19
-    assert flatdim(t) == 26
-    assert flatdim(combo) == 30
+    assert flatdim(t) == 16
+    assert flatdim(combo) == 20
 
 
 def test_flatten_and_unflatten():
@@ -79,7 +78,7 @@ def test_flatten_and_unflatten():
         np.array([1, 1, 3])
     )
     flattened_t_sample = np.array([
-        0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 2.87808824, 9.4552803, 7.88634586,
+        6., 2.87808824, 9.4552803, 7.88634586,
         5.29544067, 15.22612667, 11.98857021, 3.28173542, 7.72929668, 12.40390491,
         8.25031185, 10.71484661, 9.24854946, 1., 1., 3.
     ])
@@ -96,7 +95,7 @@ def test_flatten_and_unflatten():
         np.array([1, 1, 1, 0, 1, 1, 0])
     )
     flattened_combo_sample = np.array([
-        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 15, 8, 10, 3, 14, 10, 7, 7, 7, 14, 4,
+        2, 15, 8, 10, 3, 14, 10, 7, 7, 7, 14, 4,
         10, 1, 1, 1, 0, 1, 1, 0
     ])
 
@@ -104,7 +103,7 @@ def test_flatten_and_unflatten():
     np.testing.assert_array_equal(flatten(box, box_sample), flattened_box_sample)
     assert np.allclose(flatten(box2, box2_sample), flattened_box2_sample, atol=1.e-6)
     np.testing.assert_array_equal(
-        flatten(discrete, 8), np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
+        flatten(discrete, 8), np.array([8])
     )
     np.testing.assert_array_equal(
         flatten(multi_binary, [0, 1, 0, 0, 1, 1, 1]), np.array([0, 1, 0, 0, 1, 1, 1])
@@ -117,7 +116,7 @@ def test_flatten_and_unflatten():
     # Test unflattens
     assert np.allclose(unflatten(box2, flattened_box2_sample), box2_sample, atol=1.e-6)
     np.testing.assert_array_equal(
-        unflatten(discrete, np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])), 8
+        unflatten(discrete, np.array([8])), 8
     )
     np.testing.assert_array_equal(
         unflatten(multi_binary, np.array([0, 1, 0, 0, 1, 1, 1])), [0, 1, 0, 0, 1, 1, 1]
@@ -141,12 +140,12 @@ def test_flatten_space():
     flattened_box2_space = flatten_space(box2)
     assert flattened_box2_space == Box(2.4, 16.1, (12,))
     flattened_discrete_space = flatten_space(discrete)
-    assert flattened_discrete_space == Box(0, 1, (11,), int)
+    assert flattened_discrete_space == Box(0, 10, (1,), int)
     flattened_multi_binary_space = flatten_space(multi_binary)
     assert flattened_multi_binary_space == Box(0, 1, (7,), int)
     flattened_multi_discrete_space = flatten_space(multi_discrete)
     assert flattened_multi_discrete_space == Box(
-        np.array([0, 0, 0]), np.array([2, 6, 4]), (3,), int
+        np.array([0, 0, 0]), np.array([1, 5, 3]), (3,), int
     )
     flattened_d_space = flatten_space(d)
     assert flattened_d_space == Box(
@@ -162,77 +161,31 @@ def test_flatten_space():
     flattened_t_space = flatten_space(t)
     assert flattened_t_space == Box(
         np.array([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4,
+            0, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4, 2.4,
             2.4, 0, 0, 0
         ]),
         np.array([
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1,
-            16.1, 16.1, 16.1, 2, 6, 4
+            10, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1, 16.1,
+            16.1, 16.1, 16.1, 1, 5, 3
         ]),
-        (26,)
+        (16,)
     )
     flattened_combo_space = flatten_space(combo)
     assert flattened_combo_space == Box(
         np.array([
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
+            0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0,
             0
         ]),
         np.array([
-            1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+            10, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
             16,  1,  1,  1,  1,  1,  1,  1
         ]),
-        (30,),
+        (20,),
         int
     )
 
 
-# -- Test flatten wrappers --- #
-class MultiAgentContinuousGymSpaceSim(MultiAgentSim):
-    def __init__(self):
-        self.params = {'params': "there are none"}
-        self.agents = {
-            'agent0': Agent(
-                id='agent0',
-                observation_space=MultiBinary(4),
-                action_space=Tuple((
-                    Dict({'first': Discrete(4), 'second': Box(low=-1, high=3, shape=(2,))}),
-                    MultiBinary(3)
-                ))
-            ),
-            'agent1': Agent(
-                id='agent1',
-                observation_space=Box(low=0, high=1, shape=(1,)),
-                action_space=MultiDiscrete([4, 6, 2])
-            ),
-            'agent2': Agent(
-                id='agent2',
-                observation_space=MultiDiscrete([2, 2]),
-                action_space=Dict({'alpha': MultiBinary(3)})
-            ),
-            'agent3': Agent(
-                id='agent3',
-                observation_space=Dict({
-                    'first': Discrete(4),
-                    'second': Box(low=-1, high=3, shape=(2,), dtype=int)
-                }),
-                action_space=Tuple((Discrete(3), MultiDiscrete([10, 10]), Discrete(2)))
-            )
-        }
-
-    def get_obs(self, agent_id, **kwargs):
-        if agent_id == 'agent0':
-            return [0, 1, 1, 0]
-        elif agent_id == 'agent1':
-            return [0.98]
-        elif agent_id == 'agent2':
-            return [1, 0]
-        elif agent_id == 'agent3':
-            return {'first': 1, 'second': [-1, 1]}
-
-    def get_info(self, agent_id, **kwargs):
-        return self.action[agent_id]
-
-
+# --- Test flatten wrappers --- #
 def test_flatten_wrapper():
     sim = MultiAgentContinuousGymSpaceSim()
     wrapped_sim = FlattenWrapper(sim)
@@ -256,7 +209,7 @@ def test_flatten_wrapper():
     np.testing.assert_array_equal(sim.get_obs('agent0'), [0, 1, 1, 0])
     assert sim.get_obs('agent1') == 0.98
     np.testing.assert_array_equal(sim.get_obs('agent2'), [1, 0])
-    np.testing.assert_array_equal(sim.get_obs('agent3'), np.array([0, 1, 0, 0, -1, 1]))
+    np.testing.assert_array_equal(sim.get_obs('agent3'), np.array([1, -1, 1]))
 
     assert sim.get_reward('agent0') == 'Reward from agent0'
     assert sim.get_reward('agent1') == 'Reward from agent1'
@@ -323,3 +276,63 @@ def test_flatten_wrapper():
     np.testing.assert_array_equal(sim.get_info('agent3')[0], action_2['agent3'][0])
     np.testing.assert_array_equal(sim.get_info('agent3')[1], action_2['agent3'][1])
     np.testing.assert_array_equal(sim.get_info('agent3')[2], action_2['agent3'][2])
+
+
+def test_flatten_null_points():
+    abs = MultiAgentContinuousGymSpaceSim()
+    agents = abs.agents
+    agents['agent0'].null_observation = [0, 0, 0, 0]
+    assert agents['agent0'].null_observation in agents['agent0'].observation_space
+    agents['agent0'].null_action = ({'first': 0, 'second': [0, 0]}, [0, 0, 0])
+    assert agents['agent0'].null_action in agents['agent0'].action_space
+    agents['agent1'].null_observation = [0]
+    assert agents['agent1'].null_observation in agents['agent1'].observation_space
+    agents['agent1'].null_action = [0, 0, 0]
+    assert agents['agent1'].null_action in agents['agent1'].action_space
+    agents['agent2'].null_observation = [0, 0]
+    assert agents['agent2'].null_observation in agents['agent2'].observation_space
+    agents['agent2'].null_action = {'alpha': [0, 0, 0]}
+    assert agents['agent2'].null_action in agents['agent2'].action_space
+    agents['agent3'].null_observation = {'first': 0, 'second': [0, 0]}
+    assert agents['agent3'].null_observation in agents['agent3'].observation_space
+    agents['agent3'].null_action = (0, [0, 0], 0)
+    assert agents['agent3'].null_action in agents['agent3'].action_space
+
+    sim = FlattenWrapper(abs)
+    agents = sim.agents
+
+    np.testing.assert_array_equal(agents['agent0'].null_observation, [0, 0, 0, 0])
+    np.testing.assert_array_equal(agents['agent0'].null_action, [0, 0, 0, 0, 0, 0])
+    np.testing.assert_array_equal(agents['agent1'].null_observation, [0])
+    np.testing.assert_array_equal(agents['agent1'].null_action, [0, 0, 0])
+    np.testing.assert_array_equal(agents['agent2'].null_observation, [0, 0])
+    np.testing.assert_array_equal(agents['agent2'].null_action, [0, 0, 0])
+    np.testing.assert_array_equal(agents['agent3'].null_observation, [0, 0, 0])
+    np.testing.assert_array_equal(agents['agent3'].null_action, [0, 0, 0, 0])
+
+
+def test_flatten_action_null_points():
+    abs = MultiAgentContinuousGymSpaceSim()
+    agents = abs.agents
+    agents['agent0'].null_action = ({'first': 0, 'second': [0, 0]}, [0, 0, 0])
+    assert agents['agent0'].null_action in agents['agent0'].action_space
+    agents['agent1'].null_action = [0, 0, 0]
+    assert agents['agent1'].null_action in agents['agent1'].action_space
+    agents['agent2'].null_action = {'alpha': [0, 0, 0]}
+    assert agents['agent2'].null_action in agents['agent2'].action_space
+    agents['agent3'].null_action = (0, [0, 0], 0)
+    assert agents['agent3'].null_action in agents['agent3'].action_space
+
+    sim = FlattenActionWrapper(abs)
+    agents = sim.agents
+
+    np.testing.assert_array_equal(agents['agent0'].null_action, [0, 0, 0, 0, 0, 0])
+    np.testing.assert_array_equal(agents['agent1'].null_action, [0, 0, 0])
+    np.testing.assert_array_equal(agents['agent2'].null_action, [0, 0, 0])
+    np.testing.assert_array_equal(agents['agent3'].null_action, [0, 0, 0, 0])
+
+
+def test_flatten_sample_in_space():
+    flattened_combo_sample = flatten_space(combo).sample()
+    unflattened_combo_sample = unflatten(combo, flattened_combo_sample)
+    assert unflattened_combo_sample in combo

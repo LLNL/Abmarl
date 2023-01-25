@@ -1,7 +1,9 @@
 
 import pytest
 
-from abmarl.sim import AgentBasedSimulation, PrincipleAgent, ActingAgent, ObservingAgent, Agent
+from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent, Agent, DynamicOrderSimulation
+
+from abmarl.examples import EmptyABS
 
 
 def test_principle_agent_id():
@@ -60,15 +62,27 @@ def test_acting_agent_action_space():
     assert agent.configured
 
 
+def test_acting_agent_null_action():
+    from gym.spaces import MultiBinary
+    agent1 = ActingAgent(id='agent1', action_space=MultiBinary(4), null_action=[0, 0, 0, 0])
+    agent1.finalize()
+
+    # This will not raise an assertion error because the test happens at finalize
+    agent2 = ActingAgent(id='agent2', action_space=MultiBinary(4), null_action=[0, 0, 0])
+
+    with pytest.raises(AssertionError):
+        agent2.finalize()
+
+
 def test_acting_agent_seed():
     from gym.spaces import Discrete
-    agent = ActingAgent(id='agent', seed=24, action_space={
+    agent = ActingAgent(id='agent', seed=17, action_space={
         1: Discrete(12),
         2: Discrete(3),
     })
     agent.finalize()
     assert agent.configured
-    assert agent.action_space.sample() == {1: 9, 2: 0}
+    assert agent.action_space.sample() == {1: 5, 2: 1}
 
 
 def test_observing_agent_observation_space():
@@ -88,6 +102,22 @@ def test_observing_agent_observation_space():
     assert agent.configured
 
 
+def test_observing_agent_null_observation():
+    from gym.spaces import MultiBinary
+    agent1 = ObservingAgent(
+        id='agent1', observation_space=MultiBinary(4), null_observation=[0, 0, 0, 0]
+    )
+    agent1.finalize()
+
+    # This will not raise an assertion error because the test happens at finalize
+    agent2 = ObservingAgent(
+        id='agent2', observation_space=MultiBinary(4), null_observation=[0, 0, 0]
+    )
+
+    with pytest.raises(AssertionError):
+        agent2.finalize()
+
+
 def test_agent():
     from gym.spaces import Discrete
     agent = Agent(
@@ -98,39 +128,21 @@ def test_agent():
     agent.finalize()
     assert agent.configured
 
-    assert agent.action_space.sample() == {'act': 1}
+    assert agent.action_space.sample() == {'act': 2}
     assert agent.observation_space.sample() == {'obs': 0}
 
 
+def test_agent_instance():
+    class TestAgent(ObservingAgent, ActingAgent): pass
+    agent_1 = TestAgent(id='agent1')
+    agent_2 = Agent(id='agent2')
+    assert isinstance(agent_1, ObservingAgent)
+    assert isinstance(agent_1, ActingAgent)
+    assert isinstance(agent_1, Agent)
+    assert isinstance(agent_2, Agent)
+
+
 def test_agent_based_simulation_agents():
-    class ABS(AgentBasedSimulation):
-        def __init__(self, agents):
-            self.agents = agents
-
-        def reset(self, **kwargs):
-            pass
-
-        def step(self, action, **kwargs):
-            pass
-
-        def render(self, **kwargs):
-            pass
-
-        def get_obs(self, agent_id, **kwargs):
-            pass
-
-        def get_reward(self, agent_id, **kwargs):
-            pass
-
-        def get_done(self, agent_id, **kwargs):
-            pass
-
-        def get_all_done(self, **kwargs):
-            pass
-
-        def get_info(self, agent_id, **kwargs):
-            pass
-
     agents_single_object = PrincipleAgent(id='just_a_simple_agent')
     agents_list = [PrincipleAgent(id=f'{i}') for i in range(3)]
     agents_dict_key_id_no_match = {f'{i-1}': PrincipleAgent(id=f'{i}') for i in range(3)}
@@ -138,18 +150,18 @@ def test_agent_based_simulation_agents():
     agents_dict = {f'{i}': PrincipleAgent(id=f'{i}') for i in range(3)}
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_single_object)
+        EmptyABS(agents=agents_single_object)
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_list)
+        EmptyABS(agents=agents_list)
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_dict_key_id_no_match)
+        EmptyABS(agents=agents_dict_key_id_no_match)
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_dict_bad_values)
+        EmptyABS(agents=agents_dict_bad_values)
 
-    sim = ABS(agents=agents_dict)
+    sim = EmptyABS(agents=agents_dict)
     assert sim.agents == agents_dict
     sim.finalize()
 
@@ -163,4 +175,52 @@ def test_agent_based_simulation_agents():
         sim.agents = agents_dict_key_id_no_match
 
     with pytest.raises(AssertionError):
-        ABS(agents=agents_dict_bad_values)
+        EmptyABS(agents=agents_dict_bad_values)
+
+
+def test_dynamic_order_simulation():
+    class SequentiallyFinishingSim(DynamicOrderSimulation):
+        def __init__(self, **kwargs):
+            self.agents = {f'agent{i}': PrincipleAgent(id=f'agent{i}') for i in range(4)}
+
+        def reset(self, **kwargs):
+            pass
+
+        def step(self, action_dict, **kwargs):
+            pass
+
+        def render(self, **kwargs):
+            pass
+
+        def get_obs(self, agent_id, **kwargs):
+            return {}
+
+        def get_reward(self, agent_id, **kwargs):
+            return {}
+
+        def get_done(self, agent_id, **kwargs):
+            return {}
+
+        def get_all_done(self, **kwargs):
+            return {}
+
+        def get_info(self, agent_id, **kwargs):
+            return {}
+
+    sim = SequentiallyFinishingSim()
+    sim.next_agent = 'agent0'
+    assert sim.next_agent == ['agent0']
+    sim.next_agent = ['agent1', 'agent2']
+    assert sim.next_agent == ['agent1', 'agent2']
+    sim.next_agent = ('agent3',)
+    assert sim.next_agent == ('agent3',)
+    sim.next_agent = set(('agent0', 'agent1'))
+    assert sim.next_agent == set(('agent0', 'agent1'))
+
+    # Expected to fail
+    with pytest.raises(AssertionError):
+        sim.next_agent = 3
+    with pytest.raises(AssertionError):
+        sim.next_agent = 'Agent4'
+    with pytest.raises(AssertionError):
+        sim.next_agent = ['agent0', 'agents1']

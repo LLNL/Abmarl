@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from gym.spaces import Box
 import numpy as np
 
+from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import GridObservingAgent
 import abmarl.sim.gridworld.utils as gu
@@ -68,6 +69,10 @@ class SingleGridObserver(ObserverBaseComponent):
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
                     -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), int
+                )
+                agent.null_observation[self.key] = -2 * np.ones(
+                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1),
+                    dtype=int
                 )
 
     @property
@@ -167,6 +172,10 @@ class MultiGridObserver(ObserverBaseComponent):
                     (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
                     int
                 )
+                agent.null_observation[self.key] = -2 * np.ones(
+                    (agent.view_range * 2 + 1, agent.view_range * 2 + 1, self.number_of_encodings),
+                    dtype=int
+                )
 
     @property
     def key(self):
@@ -225,3 +234,42 @@ class MultiGridObserver(ObserverBaseComponent):
                         obs[r, c, encoding] = -2
 
         return {self.key: obs}
+
+
+class AbsolutePositionObserver(ObserverBaseComponent):
+    """
+    Agents observe their absolute position.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.observation_space[self.key] = Box(
+                    np.array([0, 0], dtype=np.int),
+                    np.array([self.grid.rows - 1, self.grid.cols - 1], dtype=int),
+                    dtype=int
+                )
+                agent.null_observation[self.key] = np.zeros((2,), dtype=int)
+
+    @property
+    def key(self):
+        """
+        This Observer's key is "position".
+        """
+        return 'position'
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Observer works with ObservingAgents
+        """
+        return ObservingAgent
+
+    def get_obs(self, agent, **kwargs):
+        """
+        Agents observe their absolute position.
+        """
+        if not isinstance(agent, self.supported_agent_type):
+            return {}
+        else:
+            return {self.key: agent.position}

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections.abc import Container
 
 from abmarl.tools import gym_utils as gu
 
@@ -10,6 +11,7 @@ class PrincipleAgent:
     def __init__(self, id=None, seed=None, **kwargs):
         self.id = id
         self.seed = seed
+        self.active = True
 
     @property
     def id(self):
@@ -40,7 +42,12 @@ class PrincipleAgent:
         in our Simulation can die. Then active is True if the agents are alive
         or False if they're dead.
         """
-        return True
+        return self._active
+
+    @active.setter
+    def active(self, value):
+        assert type(value) is bool, "Active must be either True or False."
+        self._active = value
 
     @property
     def configured(self):
@@ -63,9 +70,10 @@ class ActingAgent(PrincipleAgent):
     The Trainer will produce actions for the agents and send them to the SimulationManager,
     which will process those actions in its step function.
     """
-    def __init__(self, action_space=None, **kwargs):
+    def __init__(self, action_space=None, null_action=None, **kwargs):
         super().__init__(**kwargs)
         self.action_space = action_space
+        self.null_action = null_action
 
     @property
     def action_space(self):
@@ -76,6 +84,17 @@ class ActingAgent(PrincipleAgent):
         assert value is None or gu.check_space(value), \
             "The action space must be None, a gym Space, or a dict of gym Spaces."
         self._action_space = {} if value is None else value
+
+    @property
+    def null_action(self):
+        """
+        The null point in the action space.
+        """
+        return self._null_action
+
+    @null_action.setter
+    def null_action(self, value):
+        self._null_action = {} if value is None else value
 
     @property
     def configured(self):
@@ -93,6 +112,9 @@ class ActingAgent(PrincipleAgent):
         if type(self.action_space) is dict:
             self.action_space = gu.make_dict(self.action_space)
         self.action_space.seed(self.seed)
+        if self.null_action:
+            assert self.null_action in self.action_space, \
+                "The null action must be in the action space."
 
 
 class ObservingAgent(PrincipleAgent):
@@ -102,9 +124,10 @@ class ObservingAgent(PrincipleAgent):
     The agent's observation must be *in* its observation space. The SimulationManager
     will send the observation to the Trainer, which will use it to produce actions.
     """
-    def __init__(self, observation_space=None, **kwargs):
+    def __init__(self, observation_space=None, null_observation=None, **kwargs):
         super().__init__(**kwargs)
         self.observation_space = observation_space
+        self.null_observation = null_observation
 
     @property
     def observation_space(self):
@@ -115,6 +138,17 @@ class ObservingAgent(PrincipleAgent):
         assert value is None or gu.check_space(value), \
             "The observation space must be None, a gym Space, or a dict of gym Spaces."
         self._observation_space = {} if value is None else value
+
+    @property
+    def null_observation(self):
+        """
+        The null point in the observation space.
+        """
+        return self._null_observation
+
+    @null_observation.setter
+    def null_observation(self, value):
+        self._null_observation = {} if value is None else value
 
     @property
     def configured(self):
@@ -132,9 +166,20 @@ class ObservingAgent(PrincipleAgent):
         if type(self.observation_space) is dict:
             self.observation_space = gu.make_dict(self.observation_space)
         self.observation_space.seed(self.seed)
+        if self.null_observation:
+            assert self.null_observation in self.observation_space, \
+                "The null observation must be in the observation space."
 
 
-class Agent(ObservingAgent, ActingAgent):
+class AgentMeta(type):
+    """
+    AgentMeta class defines an Agent as an instance of ObservingAgent and ActingAgent.
+    """
+    def __instancecheck__(self, instance):
+        return isinstance(instance, ObservingAgent) and isinstance(instance, ActingAgent)
+
+
+class Agent(ObservingAgent, ActingAgent, metaclass=AgentMeta):
     """
     An Agent that can both observe and act.
     """
@@ -163,7 +208,6 @@ class AgentBasedSimulation(ABC):
         multiple entries in the dictionary, whereas a single-agent simulation
         should only have a single entry in the dictionary.
         """
-
         return self._agents
 
     @agents.setter
@@ -243,3 +287,26 @@ class AgentBasedSimulation(ABC):
         Return the agent's info.
         """
         pass
+
+
+class DynamicOrderSimulation(AgentBasedSimulation):
+    """
+    An AgentBasedSimulation where the simulation chooses the agents' turns dynamically.
+    """
+    @property
+    def next_agent(self):
+        """
+        The next agent(s) in the game.
+        """
+        return self._next_agent
+
+    @next_agent.setter
+    def next_agent(self, value):
+        assert isinstance(value, (Container, str)), \
+            "The next agent must be a single string or a Container of strings."
+        if type(value) == str:
+            value = [value]
+        for agent_id in value:
+            assert agent_id in self.agents, \
+                "Every next agent must be an agent in the simulation."
+        self._next_agent = value

@@ -2,8 +2,8 @@ from gym.spaces import Discrete
 import numpy as np
 
 from abmarl.sim.wrappers import CommunicationHandshakeWrapper
-
-from .helpers import MultiAgentGymSpacesSim
+from abmarl.sim import Agent
+from abmarl.examples import MultiAgentGymSpacesSim
 
 
 class CommsSimulation(MultiAgentGymSpacesSim):
@@ -13,9 +13,9 @@ class CommsSimulation(MultiAgentGymSpacesSim):
         if 'agent1' in fusion_matrix and fusion_matrix['agent1']:
             agent_1_obs = self.get_obs('agent1')
             if my_id == 'agent0':
-                my_obs[0] += agent_1_obs
+                my_obs[0] += agent_1_obs[0]
             elif my_id == 'agent3':
-                my_obs['first'] = agent_1_obs
+                my_obs['first'] = agent_1_obs[0]
         elif 'agent2' in fusion_matrix and fusion_matrix['agent2']:
             agent_2_obs = self.get_obs('agent2')
             if my_id == 'agent0':
@@ -38,6 +38,7 @@ def test_communication_wrapper_init():
     assert wrapped_sim.unwrapped == sim
 
     for agent_id, agent in wrapped_sim.agents.items():
+        if not isinstance(agent, Agent): continue
         assert agent.action_space['action'] == sim.agents[agent_id].action_space
         assert agent.observation_space['obs'] == sim.agents[agent_id].observation_space
 
@@ -90,24 +91,25 @@ def test_communication_wrapper_step():
         }
     }
     sim.step(action_0)
-    for agent_id in sim.agents:
+    for agent_id, agent in sim.agents.items():
+        if not isinstance(agent, Agent): continue
         agent_info = sim.get_info(agent_id)
         assert 'send' not in agent_info and 'receive' not in agent_info
     assert sim.get_obs('agent0')['obs'] == [0, 0, 0, 1]
     assert sim.get_obs('agent0')['message_buffer'] == {
-        'agent1': True, 'agent2': True, 'agent3': False
+        'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
-    assert sim.get_obs('agent1')['obs'] == 0
+    assert sim.get_obs('agent1')['obs'] == [0]
     assert sim.get_obs('agent1')['message_buffer'] == {
-        'agent0': True, 'agent2': True, 'agent3': False
+        'agent0': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
     assert sim.get_obs('agent2')['obs'] == [1, 0]
     assert sim.get_obs('agent2')['message_buffer'] == {
-        'agent0': True, 'agent1': False, 'agent3': True
+        'agent0': True, 'agent1': False, 'agent3': True, 'agent4': False
     }
     assert sim.get_obs('agent3')['obs'] == {'first': 1, 'second': [3, 1]}
     assert sim.get_obs('agent3')['message_buffer'] == {
-        'agent0': True, 'agent1': False, 'agent2': False
+        'agent0': True, 'agent1': False, 'agent2': False, 'agent4': False
     }
 
     action_1 = {
@@ -135,19 +137,19 @@ def test_communication_wrapper_step():
     sim.step(action_1)
     assert sim.get_obs('agent0')['obs'] == [0, 0, 0, 1]
     assert sim.get_obs('agent0')['message_buffer'] == {
-        'agent1': True, 'agent2': True, 'agent3': False
+        'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
-    assert sim.get_obs('agent1')['obs'] == 0
+    assert sim.get_obs('agent1')['obs'] == [0]
     assert sim.get_obs('agent1')['message_buffer'] == {
-        'agent0': False, 'agent2': True, 'agent3': True
+        'agent0': False, 'agent2': True, 'agent3': True, 'agent4': False
     }
     assert sim.get_obs('agent2')['obs'] == [1, 0]
     assert sim.get_obs('agent2')['message_buffer'] == {
-        'agent0': False, 'agent1': False, 'agent3': True
+        'agent0': False, 'agent1': False, 'agent3': True, 'agent4': False
     }
     assert sim.get_obs('agent3')['obs'] == {'first': 1, 'second': [3, 1]}
     assert sim.get_obs('agent3')['message_buffer'] == {
-        'agent0': False, 'agent1': True, 'agent2': False
+        'agent0': False, 'agent1': True, 'agent2': False, 'agent4': False
     }
 
     action_2 = {
@@ -175,17 +177,17 @@ def test_communication_wrapper_step():
     sim.step(action_2)
     assert sim.get_obs('agent0')['obs'] == [0, 0, 1, 0, 0, 1]
     assert sim.get_obs('agent0')['message_buffer'] == {
-        'agent1': True, 'agent2': True, 'agent3': False
+        'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
-    assert sim.get_obs('agent1')['obs'] == 0
+    assert sim.get_obs('agent1')['obs'] == [0]
     assert sim.get_obs('agent1')['message_buffer'] == {
-        'agent0': True, 'agent2': True, 'agent3': False
+        'agent0': True, 'agent2': True, 'agent3': False, 'agent4': False
     }
     assert sim.get_obs('agent2')['obs'] == [1, 0]
     assert sim.get_obs('agent2')['message_buffer'] == {
-        'agent0': True, 'agent1': False, 'agent3': True
+        'agent0': True, 'agent1': False, 'agent3': True, 'agent4': False
     }
     assert sim.get_obs('agent3')['obs'] == {'first': 0, 'second': [3, 1]}
     assert sim.get_obs('agent3')['message_buffer'] == {
-        'agent0': True, 'agent1': False, 'agent2': False
+        'agent0': True, 'agent1': False, 'agent2': False, 'agent4': False
     }

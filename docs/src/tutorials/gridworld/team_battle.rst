@@ -11,7 +11,8 @@ The goal of each team is to be the last team alive, at which point the simulatio
 Each agent can move around the grid and attack agents from other teams. Each agent
 can observe the grid around its position. We will reward each agent for successful
 kills and penalize them for bad moves. This tutorial can be found in full
-`in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/gridworld/examples/team_battle_example.py>`_.
+`in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/team_battle_example.py>`_.
+
 
 .. figure:: /.images/gridworld_tutorial_team_battle.*
    :width: 75 %
@@ -30,7 +31,7 @@ First, we import the components that we need. Each component is
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
    from abmarl.sim.gridworld.state import HealthState, PositionState
-   from abmarl.sim.gridworld.actor import MoveActor, AttackActor
+   from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
    from abmarl.sim.gridworld.observer import SingleGridObserver
    from abmarl.sim.gridworld.done import OneTeamRemainingDone
 
@@ -66,7 +67,7 @@ simulation.
    
            # Action Components
            self.move_actor = MoveActor(**kwargs)
-           self.attack_actor = AttackActor(**kwargs)
+           self.attack_actor = BinaryAttackActor(**kwargs)
    
            # Observation Components
            self.grid_observer = SingleGridObserver(**kwargs)
@@ -105,13 +106,18 @@ rewards.
            # Process attacks:
            for agent_id, action in action_dict.items():
                agent = self.agents[agent_id]
-               attacked_agent = self.attack_actor.process_action(agent, action, **kwargs)
-               if attacked_agent is not None:
-                   self.rewards[attacked_agent.id] -= 1
-                   self.rewards[agent.id] += 1
-               else:
-                   self.rewards[agent.id] -= 0.1
-   
+               if agent.active:
+                   attack_status, attacked_agents = \
+                       self.attack_actor.process_action(agent, action, **kwargs)
+                   if attack_status: # Attack was attempted
+                       if not attacked_agents: # Attack failed
+                           self.rewards[agent_id] -= 0.1
+                       else:
+                           for attacked_agent in attacked_agents:
+                               if not attacked_agent.active: # Agent has died
+                                   self.rewards[attacked_agent.id] -= 1
+                                   self.rewards[agent_id] += 1
+
            # Process moves
            for agent_id, action in action_dict.items():
                agent = self.agents[agent_id]
@@ -119,7 +125,7 @@ rewards.
                    move_result = self.move_actor.process_action(agent, action, **kwargs)
                    if not move_result:
                        self.rewards[agent.id] -= 0.1
-           
+
            # Entropy penalty
            for agent_id in action_dict:
                self.rewards[agent_id] -= 0.01

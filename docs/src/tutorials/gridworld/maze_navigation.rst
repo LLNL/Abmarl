@@ -8,7 +8,7 @@ Using the same components as we did in the :ref:`Team Battle tutorial <gridworld
 we can create a Maze Navigation Simulation that contains a single moving agent navigating a maze
 defined by wall agents in the grid. The moving agent's goal is to reach a target
 agent. We will construct the Grid by :ref:`reading a grid file <api_gridworld_sim>`.
-This tutorial can be found in full `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/sim/gridworld/examples/maze_navigation.py>`_.
+This tutorial can be found in full `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/maze_navigation.py>`_.
 
 .. figure:: /.images/gridworld_tutorial_maze_navigation.*
    :width: 75 %
@@ -128,14 +128,14 @@ each agent type in the grid. We will use `maze.txt`, which looks like this:
 
 .. code-block::
 
-   0 0 0 0 W 0 W W 0 W W 0 0 W W 0 W 0
-   W 0 W 0 N 0 0 0 0 0 W 0 W W 0 0 0 0
-   W W W W 0 W W 0 W 0 0 0 0 W W 0 W W
-   0 W 0 0 0 W W 0 W 0 W W 0 0 0 0 0 0
-   0 0 0 W 0 0 W W W 0 W 0 0 W 0 W W 0
-   W W W W 0 W W W W W W W 0 W 0 T W 0
-   0 0 0 0 0 W 0 0 0 0 0 0 0 W 0 W W 0
-   0 W 0 W 0 W W W 0 W W 0 W W 0 W 0 0
+   _ _ _ _ W _ W W _ W W _ _ W W _ W _
+   W _ W _ N _ _ _ _ _ W _ W W _ _ _ _
+   W W W W _ W W _ W _ _ _ _ W W _ W W
+   _ W _ _ _ W W _ W _ W W _ _ _ _ _ _
+   _ _ _ W _ _ W W W _ W _ _ W _ W W _
+   W W W W _ W W W W W W W _ W _ T W _
+   _ _ _ _ _ W _ _ _ _ _ _ _ W _ W W _
+   _ W _ W _ W W W _ W W _ W W _ W _ _
 
 In order to assign meaning to the values in the grid file, we must create an `object
 registry` that maps the values in the files to objects. We will use ``W`` for WallAgents,

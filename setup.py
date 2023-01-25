@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='abmarl',
-    version='0.2.2',
+    version='0.2.5',
     description='Agent Based Simulation and MultiAgent Reinforcement Learning',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -29,8 +29,11 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(),
     install_requires=[
+        'importlib-metadata<5.0',
         'tensorflow',
-        'ray[rllib]>=1.8.0',
+        'gym<0.22',
+        'ray[rllib]==2.0.0',
+        'open-spiel',
         'matplotlib',
         'seaborn',
     ],

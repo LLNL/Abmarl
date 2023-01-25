@@ -49,8 +49,8 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             file_name: Name of the file that specifies the initial grid setup. In the file, each
                 cell should be a single alphanumeric character indicating which agent
                 will be at that position (from the perspective of looking down on the
-                grid). That agent will be given that initial position. 0's are reserved for empty
-                space.
+                grid). That agent will be given that initial position. Zeros, periods,
+                and underscores are reserved for empty space.
             object_registry: A dictionary that maps characters from the file to a
                 function that generates the agent. This must be a function because
                 each agent must have unique id, which is generated here.
@@ -60,7 +60,8 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         """
         assert type(file_name) is str, "The file_name must be the name of the file."
         assert type(object_registry) is dict, "The object_registry must be a dictionary."
-        assert 0 not in object_registry, "0 is reserved for empty space."
+        assert all([i not in object_registry for i in [0, '.', '_']]), \
+            "0, '.', and '_' are reserved for empty space."
         agents = {}
         n = 0
         with open(file_name, 'r') as fp:
