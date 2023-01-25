@@ -12,6 +12,26 @@ parser.add_argument(
     default='localhost',
     help='The ip address of the remote server.'
 )
+parser.add_argument(
+    '--base-port',
+    type=int,
+    default=9900,
+    help='The base-port to use. Workers will increment from here.'
+)
+parser.add_argument(
+    "--num-workers",
+    type=int,
+    default=1,
+    help="The number of workers to use. Each worker will create its own listening "
+    "socket for incoming SAR data.",
+)
+parser.add_argument(
+    "--checkpoint",
+    type=str,
+    default='',
+    help="Continue training from a previous run. Checkpoiint should be the full "
+    "path to the output directory file according to Abmarl's structure."
+)
 
 if __name__ == "__main__":
     args = parser.parse_args()
