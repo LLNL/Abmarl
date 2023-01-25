@@ -51,23 +51,7 @@ if __name__ == "__main__":
         else:
             return None
 
-    # TODO: Scale should write out the full config path
-    experiment_mod = adu.custom_import_module(full_config_path)
-
-    # Policies
-    # TODO: Get the policies from the configuration file instead
-    # NOTE: This is a temporary work around until rllib can get the spaces
-    # from the client.
-    from abmarl.examples.sim.multi_corridor import MultiCorridor
-    agents = MultiCorridor().agents
-    policies = {
-        'target': (None, agents['target'].observation_space, agents['target'].action_space, {}),
-        'runner': (None, agents['runner0'].observation_space, agents['runner0'].action_space, {}),
-    }
-
-    def policy_mapping_fn(agent_id):
-        return 'runner' if agent_id.startswith('runner') else 'target'
-
+    experiment_mod = adu.custom_import_module('/Users/rusu1/Abmarl/examples/reach_the_target_example.py')
 
     # Trainer config.
     # Get the config from the configuration file
@@ -88,4 +72,5 @@ if __name__ == "__main__":
     #     restore_from_path = None
 
     # Run with Tune for auto env and trainer creation and TensorBoard.
-    tune.run(**experiment_mod.params['ray_tune'])
+    tune.run(config)
+
