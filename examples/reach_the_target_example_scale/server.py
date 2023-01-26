@@ -19,13 +19,6 @@ parser.add_argument(
     default=9900,
     help='The base-port to use. Workers will increment from here.'
 )
-parser.add_argument(
-    "--num-workers",
-    type=int,
-    default=1,
-    help="The number of workers to use. Each worker will create its own listening "
-    "socket for incoming SAR data.",
-)
 # TODO: Must do abmarl-360 first
 # parser.add_argument(
 #     "--restore",
