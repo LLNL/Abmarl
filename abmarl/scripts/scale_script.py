@@ -34,7 +34,7 @@ def create_parser(subparsers):
         '--base-port', type=int, help='Worker nodes will communicate with clients '
         'over ports. Each worker-client pair will use the part that is the base '
         'port + its id.',
-        defulat=9900
+        default=9900
     )
     scale_parser.add_argument(
         "--inference-mode", type=str, default="local", choices=["local", "remote"]
