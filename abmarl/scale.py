@@ -226,22 +226,21 @@ def run(full_config_path, parameters):
         file_writer.write(f"    experiment_mod = adu.custom_import_module('{full_config_path}')")
         file_writer.write(client_bottom_script)
 
-    # Write the shell script if the user wants to launch via slurm
-    if parameters.slurm:
-        with open(os.path.join(output_dir, 'client_server.sh'), 'w') as file_writer:
-            file_writer.write(slurm_01)
-            file_writer.write(f"#SBATCH --nodes={parameters.nodes}")
-            file_writer.write(slurm_02)
-            file_writer.write(f"#SBATCH --time={parameters.time}")
-            file_writer.write(f"#SBATCH --partition={parameters.partition}")
-            file_writer.write(slurm_03)
-            file_writer.write(f"source {parameters.virtual_env_path}")
-            file_writer.write(slurm_04)
-            file_writer.write(f"  --base-port {parameters.base_port} &")
-            file_writer.write(slurm_05)
-            file_writer.write(f"      --port $(({parameters.base_port} + $node_i)) \\")
-            file_writer.write(f"      --inference-mode {parameters.inference_mode} &")
-            file_writer.write(slurm_06)
+    # Write the slurm script
+    with open(os.path.join(output_dir, 'client_server.sh'), 'w') as file_writer:
+        file_writer.write(slurm_01)
+        file_writer.write(f"#SBATCH --nodes={parameters.nodes}")
+        file_writer.write(slurm_02)
+        file_writer.write(f"#SBATCH --time={parameters.time}:00:00")
+        file_writer.write(f"#SBATCH --partition={parameters.partition}")
+        file_writer.write(slurm_03)
+        file_writer.write(f"source {parameters.virtual_env_path}")
+        file_writer.write(slurm_04)
+        file_writer.write(f"  --base-port {parameters.base_port} &")
+        file_writer.write(slurm_05)
+        file_writer.write(f"      --port $(({parameters.base_port} + $node_i)) \\")
+        file_writer.write(f"      --inference-mode {parameters.inference_mode} &")
+        file_writer.write(slurm_06)
 
 # DEBUG:
 if __name__ == '__main__':
