@@ -5,14 +5,17 @@ import os
 import sys
 
 from abmarl.scripts import train_script as train
+from abmarl.scripts import scale_script as scale
 from abmarl.scripts import analyze_script as analyze
 from abmarl.scripts import visualize_script as visualize
 from abmarl.scripts import debug_script as debug
-from abmarl.scripts import make_runnable_script as runnable
 
 EXAMPLE_USAGE = """
 Example usage for training:
     abmarl train my_experiment.py
+
+Example usage for training at scale:
+    abmarl scale my_experiment.py --some-args
 
 Example usage for analysis:
     abmarl analyze my_experiment_directory/ my_analysis_script.py
@@ -22,9 +25,6 @@ Example usage for visualizing:
 
 Example usage for debugging simulation:
     abmarl debug my_experiment.py --some-args
-
-Example usage for converting to runnable script:
-    abmarl make-runnable my_experiment.py --some-args
 """
 
 
@@ -41,7 +41,7 @@ def cli():
     analyze.create_parser(subparsers)
     visualize.create_parser(subparsers)
     debug.create_parser(subparsers)
-    runnable.create_parser(subparsers)
+    scale.create_parser(subparsers)
 
     if len(sys.argv) == 1: # Print out the help message if no arguments are given.
         parser.print_help(sys.stderr)
@@ -59,7 +59,7 @@ def cli():
         visualize.run(path_config, parameters)
     elif parameters.command == 'debug':
         debug.run(path_config, parameters)
-    elif parameters.command == 'make-runnable':
-        runnable.run(path_config, parameters)
+    elif parameters.command == 'scale':
+        scale.run(path_config, parameters)
     else:
         parser.print_help()
