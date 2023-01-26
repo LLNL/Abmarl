@@ -43,8 +43,7 @@ fi
 
 echo "Starting server at $server_node"
 srun --nodes=1 --ntasks=1 -w "$server_node" --output="slurm-%j-SERVER.out" \
-  python3 -u ./server.py --server-address $server_node_ip --base-port <base_port> \
-  --num-workers <num_workers> &
+  python3 -u ./server.py --server-address $server_node_ip --base-port <base_port> &
 
 # TODO: Do we still need this?
 # # Give the computer time to launch the server node before launching the clients.
@@ -58,7 +57,7 @@ for ((i = 1; i <= clients_num; i++)); do
     node_i=${nodes_array[$i]}
     echo "Starting client $i at $node_i"
     srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
-      python3 -u ./client.py --server-address $server_node_ip --port <base_port+node_i> \
+      python3 -u ./client.py --server-address $server_node_ip --port $(({parameters.base_port + $node_i})) \
       --inference-mode <inference_mode> &
     sleep 5
 done

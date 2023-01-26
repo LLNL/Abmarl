@@ -139,8 +139,69 @@ client_bottom_script="""
         client.end_episode(eid, obs)
 """
 
+slurm_01 = """#!/bin/bash
+#SBATCH --job-name=abmarl-scale-training
+"""
 
-def run(full_config_path):
+slurm_02 = """#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=1
+"""
+
+slurm_03 = """#SBATCH --exclusive
+#SBATCH --no-kill
+#SBATCH --output="slurm-%j.out"
+#SBATCH --ip-isolate yes
+
+# Run command: sbatch client_server.sh
+
+# Source the virtual environment
+"""
+
+slurm_04 = """
+# Getting the node names
+nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
+nodes_array=($nodes)
+
+server_node=${nodes_array[0]}
+server_node_ip=$(srun --nodes=1 --ntasks=1 -w "$server_node" hostname --ip-address)
+
+# if we detect a space character in the server node IP, we'll
+# convert it to an ipv4 address. This step is optional.
+if [[ "$server_node_ip" == *" "* ]]; then
+IFS=' ' read -ra ADDR <<<"$server_node_ip"
+if [[ ${#ADDR[0]} -gt 16 ]]; then
+  server_node_ip=${ADDR[1]}
+else
+  server_node_ip=${ADDR[0]}
+fi
+echo "IPV6 address detected. We split the IPV4 address as $server_node_ip"
+fi
+
+echo "Starting server at $server_node"
+srun --nodes=1 --ntasks=1 -w "$server_node" --output="slurm-%j-SERVER.out" \
+  python3 -u ./server.py --server-address $server_node_ip \
+"""
+
+slurm_05 = """
+# number of nodes other than the head node
+echo "SLURM JOB NUM NODES " $SLURM_JOB_NUM_NODES
+clients_num=$((SLURM_JOB_NUM_NODES - 1))
+
+for ((i = 1; i <= clients_num; i++)); do
+    node_i=${nodes_array[$i]}
+    echo "Starting client $i at $node_i"
+    srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
+      python3 -u ./client.py --server-address $server_node_ip \
+"""
+
+slurm_06 = """
+    sleep 5
+done
+
+wait
+"""
+
+def run(full_config_path, parameters):
     """
     Generate scripts for running the experiment at scale.
     """
@@ -165,6 +226,22 @@ def run(full_config_path):
         file_writer.write(f"    experiment_mod = adu.custom_import_module('{full_config_path}')")
         file_writer.write(client_bottom_script)
 
+    # Write the shell script if the user wants to launch via slurm
+    if parameters.slurm:
+        with open(os.path.join(output_dir, 'client_server.sh'), 'w') as file_writer:
+            file_writer.write(slurm_01)
+            file_writer.write(f"#SBATCH --nodes={parameters.nodes}")
+            file_writer.write(slurm_02)
+            file_writer.write(f"#SBATCH --time={parameters.time}")
+            file_writer.write(f"#SBATCH --partition={parameters.partition}")
+            file_writer.write(slurm_03)
+            file_writer.write(f"source {parameters.virtual_env_path}")
+            file_writer.write(slurm_04)
+            file_writer.write(f"  --base-port {parameters.base_port} &")
+            file_writer.write(slurm_05)
+            file_writer.write(f"      --port $(({parameters.base_port} + $node_i)) \\")
+            file_writer.write(f"      --inference-mode {parameters.inference_mode} &")
+            file_writer.write(slurm_06)
 
 # DEBUG:
 if __name__ == '__main__':
