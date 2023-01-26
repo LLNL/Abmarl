@@ -43,5 +43,5 @@ def create_parser(subparsers):
 
 
 def run(full_config_path, parameters):
-    from abmarl import make_runnable
-    make_runnable.run(full_config_path, parameters)
+    from abmarl import scale
+    scale.run(full_config_path, parameters)
