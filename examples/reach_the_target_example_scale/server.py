@@ -50,7 +50,7 @@ if __name__ == "__main__":
         # No InputReader (PolicyServerInput) needed.
         else:
             return None
-    # TODO: Use the number of workers from the experiment mod
+
     experiment_mod = adu.custom_import_module('/Users/rusu1/Abmarl/examples/reach_the_target_example.py')
 
     # Trainer config.

@@ -34,7 +34,7 @@ if __name__ == "__main__":
         f"http://{args.server_address}:{args.port}",
         inference_mode=args.inference_mode
     )
-    
+
     # Start data generation
     for i in range(experiment_mod.params['ray_tune']['stop']['episodes_total']):
         eid = client.start_episode(training_enabled=True)

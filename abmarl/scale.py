@@ -178,9 +178,8 @@ echo "IPV6 address detected. We split the IPV4 address as $server_node_ip"
 fi
 
 echo "Starting server at $server_node"
-srun --nodes=1 --ntasks=1 -w "$server_node" --output="slurm-%j-SERVER.out" \
-  python3 -u ./server.py --server-address $server_node_ip \
-"""
+srun --nodes=1 --ntasks=1 -w "$server_node" --output="slurm-%j-SERVER.out" \\
+  python3 -u ./server.py --server-address $server_node_ip """
 
 slurm_05 = """
 # number of nodes other than the head node
@@ -190,9 +189,8 @@ clients_num=$((SLURM_JOB_NUM_NODES - 1))
 for ((i = 1; i <= clients_num; i++)); do
     node_i=${nodes_array[$i]}
     echo "Starting client $i at $node_i"
-    srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
-      python3 -u ./client.py --server-address $server_node_ip \
-"""
+    srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \\
+      python3 -u ./client.py --server-address $server_node_ip """
 
 slurm_06 = """
     sleep 5
@@ -229,15 +227,15 @@ def run(full_config_path, parameters):
     # Write the slurm script
     with open(os.path.join(output_dir, 'client_server.sh'), 'w') as file_writer:
         file_writer.write(slurm_01)
-        file_writer.write(f"#SBATCH --nodes={parameters.nodes}")
+        file_writer.write(f"#SBATCH --nodes={parameters.nodes}\n")
         file_writer.write(slurm_02)
-        file_writer.write(f"#SBATCH --time={parameters.time}:00:00")
-        file_writer.write(f"#SBATCH --partition={parameters.partition}")
+        file_writer.write(f"#SBATCH --time={parameters.time}:00:00\n")
+        file_writer.write(f"#SBATCH --partition={parameters.partition}\n")
         file_writer.write(slurm_03)
-        file_writer.write(f"source {parameters.virtual_env_path}")
+        file_writer.write(f"source {parameters.virtual_env_path}\n")
         file_writer.write(slurm_04)
-        file_writer.write(f"  --base-port {parameters.base_port} &")
+        file_writer.write(f"--base-port {parameters.base_port} &\n")
         file_writer.write(slurm_05)
-        file_writer.write(f"      --port $(({parameters.base_port} + $node_i)) \\")
-        file_writer.write(f"      --inference-mode {parameters.inference_mode} &")
+        file_writer.write(f"--port $(({parameters.base_port} + $node_i)) \\\n")
+        file_writer.write(f'        --inference-mode "{parameters.inference_mode}" &')
         file_writer.write(slurm_06)

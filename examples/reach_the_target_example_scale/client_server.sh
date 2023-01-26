@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=abmarl-scale-training
-#SBATCH --nodes=<nodes>
+#SBATCH --nodes=2
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=<time>
-#SBATCH --partition=<partition>
+#SBATCH --time=2:00:00
+#SBATCH --partition=pbatch
 #SBATCH --exclusive
 #SBATCH --no-kill
 #SBATCH --output="slurm-%j.out"
@@ -13,8 +13,8 @@
 # Run command: sbatch client_server.sh
 
 # Source the virtual environment
-source <virtual_env>
-source /usr/WS1/rusu1/decision_superiority/v_pybind/bin/activate
+# TODO: Confirm if I need this
+source None
 
 # Getting the node names
 nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
@@ -35,19 +35,9 @@ fi
 echo "IPV6 address detected. We split the IPV4 address as $server_node_ip"
 fi
 
-# TODO: I don't think I need these lines
-# port=6379
-# ip_head=$server_node_ip:$port
-# export ip_head # TODO: Is this needed?
-# echo "Ray dashboard configured to run on: $ip_head"
-
 echo "Starting server at $server_node"
 srun --nodes=1 --ntasks=1 -w "$server_node" --output="slurm-%j-SERVER.out" \
-  python3 -u ./server.py --server-address $server_node_ip --base-port <base_port> &
-
-# TODO: Do we still need this?
-# # Give the computer time to launch the server node before launching the clients.
-# sleep 180
+  python3 -u ./server.py --server-address $server_node_ip --base-port 9900 &
 
 # number of nodes other than the head node
 echo "SLURM JOB NUM NODES " $SLURM_JOB_NUM_NODES
@@ -57,8 +47,8 @@ for ((i = 1; i <= clients_num; i++)); do
     node_i=${nodes_array[$i]}
     echo "Starting client $i at $node_i"
     srun --nodes=1 --ntasks=1 -w "$node_i" --output="slurm-%j-$node_i.out" \
-      python3 -u ./client.py --server-address $server_node_ip --port $(({parameters.base_port + $node_i})) \
-      --inference-mode <inference_mode> &
+      python3 -u ./client.py --server-address $server_node_ip --port $((9900 + $node_i)) \
+        --inference-mode "local" &
     sleep 5
 done
 
