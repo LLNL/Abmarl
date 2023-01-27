@@ -44,17 +44,13 @@ if __name__ == "__main__":
         else:
             return None
 
-    experiment_mod = adu.custom_import_module('/Users/rusu1/Abmarl/examples/reach_the_target_example.py')
+    experiment_mod = adu.custom_import_module('/usr/WS1/rusu1/Abmarl/examples/reach_the_target_example.py')
 
     # Trainer config.
-    # Get the config from the configuration file
-    config = {
-        # Use the `PolicyServerInput` to generate experiences.
-        "input": _input,
-        # Disable OPE, since the rollouts are coming from online clients.
-        "off_policy_estimation_methods": {},
-        **experiment_mod.params['ray_tune']
-    }
+    # Use the `PolicyServerInput` to generate experiences.
+    experiment_mod.params['ray_tune']['config']['input'] = _input
+    # Disable OPE, since the rollouts are coming from online clients.
+    experiment_mod.params['ray_tune']['config']['off_policy_estimation_methods'] = {}
 
     # TODO: Must do abmarl-360 first
     # # Attempt to restore from checkpoint, if possible.
@@ -65,4 +61,4 @@ if __name__ == "__main__":
     #     restore_from_path = None
 
     # Run with Tune for auto env and trainer creation and TensorBoard.
-    tune.run(config)
+    tune.run(**experiment_mod.params['ray_tune'])
