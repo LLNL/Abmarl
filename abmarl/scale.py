@@ -54,14 +54,10 @@ if __name__ == "__main__":
 server_bottom_script="""
 
     # Trainer config.
-    # Get the config from the configuration file
-    config = {
-        # Use the `PolicyServerInput` to generate experiences.
-        "input": _input,
-        # Disable OPE, since the rollouts are coming from online clients.
-        "off_policy_estimation_methods": {},
-        **experiment_mod.params['ray_tune']
-    }
+    # Use the `PolicyServerInput` to generate experiences.
+    experiment_mod.params['ray_tune']['config']['input'] = _input
+    # Disable OPE, since the rollouts are coming from online clients.
+    experiment_mod.params['ray_tune']['config']['off_policy_estimation_methods'] = {}
 
     # TODO: Must do abmarl-360 first
     # # Attempt to restore from checkpoint, if possible.
@@ -72,7 +68,7 @@ server_bottom_script="""
     #     restore_from_path = None
 
     # Run with Tune for auto env and trainer creation and TensorBoard.
-    tune.run(config)
+    tune.run(**experiment_mod.params['ray_tune'])
 """
 
 client_top_script="""
@@ -196,6 +192,11 @@ def run(full_config_path, parameters):
     """
     Generate scripts for running the experiment at scale.
     """
+    # TODO: Instead of writing these files from scratch, we can create objects
+    # to support some of these operations. For example, for the client, we can
+    # create an rllib_client_trainer that runs this loop so that we don't have
+    # to write it out every time.
+
     # Create the directory that will hold the scripts. We name the directory as
     # the full_config_path name appended by "_scale".
     output_dir = os.path.join(

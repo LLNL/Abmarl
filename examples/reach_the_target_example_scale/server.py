@@ -44,7 +44,7 @@ if __name__ == "__main__":
         else:
             return None
 
-    experiment_mod = adu.custom_import_module('/usr/WS1/rusu1/Abmarl/examples/reach_the_target_example.py')
+    experiment_mod = adu.custom_import_module('/Users/rusu1/Abmarl/examples/reach_the_target_example.py')
 
     # Trainer config.
     # Use the `PolicyServerInput` to generate experiences.
