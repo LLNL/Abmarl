@@ -38,15 +38,8 @@ class OpenSpielWrapper:
     def __init__(self, sim, discounts=1.0, **kwargs):
         assert isinstance(sim, SimulationManager)
 
-        # We keep track of the learning agents separately so that we can append
-        # observations and rewards for each of these agents. OpenSpiel expects
-        # them to all be present in every time_step.
-        self._learning_agents = {
-            agent.id: agent for agent in sim.agents.values() if isinstance(agent, Agent)
-        }
-
         # The wrapper assumes that each space is discrete, so we check for that.
-        for agent in self._learning_agents.values():
+        for agent in sim.learning_agents.values():
             assert isinstance(agent.observation_space, Discrete) and \
                 isinstance(agent.action_space, Discrete), \
                 "OpenSpielWrapper can only work with simulations that have all Discrete spaces."
@@ -72,16 +65,16 @@ class OpenSpielWrapper:
             "The discounts must be either a number or a dict."
         if type(value) in (float, int):
             self._discounts = {
-                agent_id: value for agent_id in self._learning_agents
+                agent_id: value for agent_id in self.sim.learning_agents
             }
         else: # type(value) == dict
             for discount_id, discount in value.items():
-                assert discount_id in self._learning_agents, \
+                assert discount_id in self.sim.learning_agents, \
                     "id for the discount must be an agent id."
                 assert type(discount) in (float, int), \
                     "discount values must be a number."
             assert all([
-                True if agent_id in value.keys() else False for agent_id in self._learning_agents
+                True if agent_id in value.keys() else False for agent_id in self.sim.learning_agents
             ]), "All agents must be given a discount."
             self._discounts = value
 
@@ -90,7 +83,7 @@ class OpenSpielWrapper:
         """
         The number of learning agents in the simulation.
         """
-        return sum([1 for _ in self._learning_agents])
+        return sum([1 for _ in self.sim.learning_agents])
 
     @property
     def is_turn_based(self):
@@ -114,7 +107,7 @@ class OpenSpielWrapper:
 
     @current_player.setter
     def current_player(self, value):
-        assert value in self._learning_agents, "Current player must be an agent in the simulation."
+        assert value in self.sim.learning_agents, "Current player must be an agent in the simulation."
         self._current_player = value
 
     def reset(self, **kwargs):
@@ -173,12 +166,12 @@ class OpenSpielWrapper:
         if self.is_turn_based:
             action_dict = {self.current_player: action_list[0]}
         else:
-            assert len(action_list) == len(self._learning_agents), \
+            assert len(action_list) == len(self.sim.learning_agents), \
                 "The number of actions must match the number of learning agents " + \
                 "in a simultaneous simulation."
             action_dict = {
                 agent_id: action_list[i]
-                for i, agent_id in enumerate(self._learning_agents)
+                for i, agent_id in enumerate(self.sim.learning_agents)
             }
         # OpenSpiel can send actions for agents that are already done, which doesn't
         # work with our simulation managers. So we filter out these actions before
@@ -225,7 +218,7 @@ class OpenSpielWrapper:
                 'info_state': (agent.observation_space.n,),
                 'legal_actions': (agent.action_space.n,),
                 'current_player': ()
-            } for agent in self._learning_agents.values()
+            } for agent in self.sim.learning_agents.values()
         }
 
     def action_spec(self):
@@ -241,7 +234,7 @@ class OpenSpielWrapper:
                 'min': 0,
                 'max': agent.action_space.n - 1,
                 'dtype': int
-            } for agent in self._learning_agents.values()
+            } for agent in self.sim.learning_agents.values()
         }
 
     def get_legal_actions(self, agent_id):
@@ -252,13 +245,13 @@ class OpenSpielWrapper:
         as its legal actions in each time step. This function can be overwritten in a derived class
         to add logic for obtaining the actual legal actions available.
         """
-        return [*range(self._learning_agents[agent_id].action_space.n)]
+        return [*range(self.sim.learning_agents[agent_id].action_space.n)]
 
     def _append_obs(self, obs):
         # OpenSpiel expects every agent to appear in the observation at every
         # time step. The simulation manager won't produce an observation for a
         # done agent, so we have to add it ourselves.
-        for agent_id in self._learning_agents:
+        for agent_id in self.sim.learning_agents:
             if agent_id not in obs:
                 obs[agent_id] = self.sim.sim.get_obs(agent_id)
         return obs
@@ -267,7 +260,7 @@ class OpenSpielWrapper:
         # OpenSpiel expects every agent to appear in the reward at every
         # time step. The simulation manager won't produce a reward for a
         # done agent, so we have to add it ourselves.
-        for agent_id in self._learning_agents:
+        for agent_id in self.sim.learning_agents:
             if agent_id not in reward:
                 reward[agent_id] = 0
         return reward
@@ -276,7 +269,7 @@ class OpenSpielWrapper:
         # Shorcut function for getting all the legal actions
         return {
             agent_id: self.get_legal_actions(agent_id)
-            for agent_id in self._learning_agents
+            for agent_id in self.sim.learning_agents
         }
 
     def _take_fake_step(self):

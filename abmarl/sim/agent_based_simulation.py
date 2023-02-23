@@ -220,12 +220,23 @@ class AgentBasedSimulation(ABC):
                 "Keys of agents dict must be the same as the Agent's id."
         self._agents = value_agents
 
+    @property
+    def learning_agents(self):
+        """
+        A subset of agents that includes only those agents which are learning agents,
+        i.e. which observe and act. This dict is generated at finalize.
+        """
+        return self._learning_agents
+
     def finalize(self):
         """
-        Finalize the initialization process. At this point, every agent should
+        Finalize the initialization process. At this point, every learning agent should
         be configured with action and observation spaces, which we convert into
         Dict spaces for interfacing with the trainer.
         """
+        self._learning_agents = {
+            agent.id: agent for agent in self.agents.values() if isinstance(agent, Agent)
+        }
         for agent in self.agents.values():
             agent.finalize()
             assert agent.configured
@@ -307,6 +318,6 @@ class DynamicOrderSimulation(AgentBasedSimulation):
         if type(value) == str:
             value = [value]
         for agent_id in value:
-            assert agent_id in self.agents, \
-                "Every next agent must be an agent in the simulation."
+            assert agent_id in self.learning_agents, \
+                "Every next agent must be a learning agent in the simulation."
         self._next_agent = value

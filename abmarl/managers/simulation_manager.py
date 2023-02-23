@@ -14,6 +14,7 @@ class SimulationManager(ABC):
     Attributes:
         sim: The AgentBasedSimulation.
         agents: The agents that are in the AgentBasedSimulation.
+        learning_agents: The learning_agents that are in the AgentBasedSimulation.
         done_agents: Set of agents that are done.
     """
     def __init__(self, sim):
@@ -21,6 +22,7 @@ class SimulationManager(ABC):
             "SimulationManager can only interface with AgentBasedSimulation."
         self.sim = sim
         self.agents = sim.agents
+        self.learning_agents = sim.learning_agents
         self.done_agents = set()
 
     @abstractmethod

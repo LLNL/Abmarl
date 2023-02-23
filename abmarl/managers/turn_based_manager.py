@@ -14,10 +14,7 @@ class TurnBasedManager(SimulationManager):
     """
     def __init__(self, sim):
         super().__init__(sim)
-        self.agent_order = cycle({
-            agent_id: agent for agent_id, agent in self.agents.items()
-            if isinstance(agent, Agent)
-        })
+        self.agent_order = cycle(self.learning_agents)
 
     def reset(self, **kwargs):
         """
@@ -45,7 +42,7 @@ class TurnBasedManager(SimulationManager):
 
         obs, rewards, dones, infos = {}, {}, {'__all__': self.sim.get_all_done()}, {}
         if dones['__all__']: # The simulation is done. Get output for all non-done learning agents
-            for agent in [agent.id for agent in self.agents.values() if isinstance(agent, Agent)]:
+            for agent in self.learning_agents:
                 if agent in self.done_agents:
                     continue
                 else:
@@ -73,7 +70,7 @@ class TurnBasedManager(SimulationManager):
                     self.done_agents.add(next_agent)
 
                     # All agents could potentially be done now, so we check for that
-                    if any([True for agent in self.agents if agent not in self.done_agents]):
+                    if any([True for agent in self.learning_agents if agent not in self.done_agents]):
                         continue
                     else:
                         # All agents are done

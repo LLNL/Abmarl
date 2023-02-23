@@ -50,7 +50,7 @@ class MultiCorridor(AgentBasedSimulation):
             self.corridor[location_sample[i]] = agent
 
         # Track the agents' rewards over multiple steps.
-        self.reward = {agent_id: 0 for agent_id in self.agents}
+        self.reward = {agent_id: 0 for agent_id in self.learning_agents}
 
     def step(self, action_dict, **kwargs):
         """

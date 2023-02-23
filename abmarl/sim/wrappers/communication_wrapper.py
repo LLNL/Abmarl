@@ -30,8 +30,7 @@ class CommunicationHandshakeWrapper(Wrapper):
         # T/F at some indicies. We would need additional mapping information to
         # map from the index of the MultiBinary observation/action to the respective
         # agent. Using a dict gives us that information automatically.
-        for agent in self.agents.values():
-            if not isinstance(agent, Agent): continue
+        for agent in self.learning_agents.values():
             action_space_helper = {'action': agent.action_space}
             action_space_helper['send'] = Dict({
                 other_id: Discrete(2) for other_id in self.agents if other_id != agent.id

@@ -1,4 +1,4 @@
-from abmarl.sim import AgentBasedSimulation
+from abmarl.sim import AgentBasedSimulation, Agent
 
 
 class Wrapper(AgentBasedSimulation):
@@ -16,6 +16,9 @@ class Wrapper(AgentBasedSimulation):
 
         import copy
         self.agents = copy.deepcopy(sim.agents)
+        self.learning_agents = {
+            agent.id: agent for agent in self.agents.values() if isinstance(agent, Agent)
+        }
 
     def reset(self, **kwargs):
         self.sim.reset(**kwargs)

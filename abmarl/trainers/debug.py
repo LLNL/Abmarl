@@ -4,7 +4,6 @@ from pprint import pprint
 import time
 
 from abmarl.policies.policy import RandomPolicy
-from abmarl.sim.agent_based_simulation import Agent
 
 from abmarl.trainers.base import MultiPolicyTrainer
 
@@ -29,7 +28,7 @@ class DebugTrainer(MultiPolicyTrainer):
                 agent.id: RandomPolicy(
                     action_space=agent.action_space,
                     observation_space=agent.observation_space
-                ) for agent in self.sim.agents.values() if isinstance(agent, Agent)
+                ) for agent in self.sim.learning_agents.values()
             }
             self.policy_mapping_fn = lambda agent_id: agent_id
         else:

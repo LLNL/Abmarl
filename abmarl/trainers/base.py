@@ -191,8 +191,7 @@ class MultiPolicyTrainer(ABC):
         policy align.
         """
         # Quick assertion that all the spaces lines up
-        for agent in self.sim.agents.values():
-            if not isinstance(agent, Agent): continue
+        for agent in self.sim.learning_agents.values():
             policy_id = self.policy_mapping_fn(agent.id)
             policy = self.policies[policy_id]
             assert agent.action_space == policy.action_space, \

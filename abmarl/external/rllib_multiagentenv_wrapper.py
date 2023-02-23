@@ -22,18 +22,15 @@ class MultiAgentWrapper(MultiAgentEnv):
         self.sim = sim
 
         self._agent_ids = set(
-            agent.id for agent in self.sim.agents.values()
-            if isinstance(agent, Agent)
+            agent.id for agent in self.sim.learning_agents.values()
         )
         self.observation_space = Dict({
             agent.id: agent.observation_space
-            for agent in self.sim.agents.values()
-            if isinstance(agent, ObservingAgent)
+            for agent in self.sim.learning_agents.values()
         })
         self.action_space = Dict({
             agent.id: agent.action_space
-            for agent in self.sim.agents.values()
-            if isinstance(agent, ActingAgent)
+            for agent in self.sim.learning_agents.values()
         })
 
     def reset(self):

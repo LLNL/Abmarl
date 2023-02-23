@@ -66,12 +66,10 @@ class SuperAgentWrapper(Wrapper):
             assert type(v) is list, "The values in super agent mapping must be lists of agent ids."
             for covered_agent in v:
                 assert type(covered_agent) is str, "The covered agents list must be agent ids."
-                assert covered_agent in self.sim.agents, \
+                assert covered_agent in self.sim.learning_agents, \
                     "The covered agent must be an agent in the underlying sim."
                 assert covered_agent not in self._covered_agents, \
                     "The agent is already covered by another super agent."
-                assert isinstance(self.sim.agents[covered_agent], Agent), \
-                    "Covered agents must be learning Agents."
                 self._covered_agents.add(covered_agent)
         self._uncovered_agents = self.sim.agents.keys() - self._covered_agents
         self._super_agent_mapping = value

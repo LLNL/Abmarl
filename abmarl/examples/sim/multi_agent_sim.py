@@ -51,6 +51,8 @@ class MultiAgentSim(EmptyABS):
             }
         }
 
+        # TODO: self.finalize()
+
     def reset(self):
         self.step_count = 0
         self.action = {

@@ -44,7 +44,7 @@ class DynamicOrderManager(SimulationManager):
 
         obs, rewards, dones, infos = {}, {}, {'__all__': self.sim.get_all_done()}, {}
         if dones['__all__']: # The simulation is done. Get output for all non-done agents
-            for agent in [agent.id for agent in self.agents.values() if isinstance(agent, Agent)]:
+            for agent in self.learning_agents:
                 if agent in self.done_agents:
                     continue
                 else:
@@ -71,7 +71,9 @@ class DynamicOrderManager(SimulationManager):
                     self.done_agents.add(next_agent)
 
                     # All agents could potentially be done now, so we check for that
-                    if any([True for agent in self.agents if agent not in self.done_agents]):
+                    if any([
+                        True for agent in self.learning_agents if agent not in self.done_agents
+                    ]):
                         continue
                     else:
                         # All agents are done
