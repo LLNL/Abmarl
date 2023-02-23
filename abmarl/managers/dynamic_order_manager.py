@@ -1,4 +1,5 @@
 
+from abmarl.sim import Agent
 from abmarl.sim import DynamicOrderSimulation
 
 from .simulation_manager import SimulationManager
@@ -43,7 +44,7 @@ class DynamicOrderManager(SimulationManager):
 
         obs, rewards, dones, infos = {}, {}, {'__all__': self.sim.get_all_done()}, {}
         if dones['__all__']: # The simulation is done. Get output for all non-done agents
-            for agent in self.agents:
+            for agent in [agent.id for agent in self.agents.values() if isinstance(agent, Agent)]:
                 if agent in self.done_agents:
                     continue
                 else:
