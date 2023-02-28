@@ -62,7 +62,7 @@ class AllStepManager(SimulationManager):
         if self.randomize_action_input:
             action_list = list(action_dict.items())
             random.shuffle(action_list)
-            action_dict= dict(action_list)
+            action_dict = dict(action_list)
         self.sim.step(action_dict, **kwargs)
 
         obs = {

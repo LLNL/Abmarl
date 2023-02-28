@@ -234,6 +234,7 @@ def test_reset_and_step():
     assert reward == {'agent3': 100}
     assert done == {'agent3': True, '__all__': True}
 
+
 def test_randomized_order():
     random.seed(24)
     np.random.seed(24)
@@ -291,7 +292,7 @@ def test_randomized_order():
         'agent3': MultiCorridor.Actions.STAY,
         'agent4': MultiCorridor.Actions.LEFT,
     })
-    assert sim.sim._last_action== {
+    assert sim.sim._last_action == {
         'agent4': MultiCorridor.Actions.LEFT,
         'agent0': MultiCorridor.Actions.RIGHT,
         'agent3': MultiCorridor.Actions.STAY,
