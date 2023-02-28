@@ -1,3 +1,5 @@
+import random
+
 from abmarl.sim import Agent
 
 from .simulation_manager import SimulationManager
@@ -9,6 +11,29 @@ class AllStepManager(SimulationManager):
     the observations of all the agents that are not done. Once all the agents
     are done, the manager returns all done.
     """
+    def __init__(self, sim, randomize_action_input=False, **kwargs):
+        super().__init__(sim, **kwargs)
+        self.randomize_action_input = randomize_action_input
+
+    @property
+    def randomize_action_input(self):
+        """
+        Randomize the order of the action input at each step.
+
+        Multiple agents will report actions within a single step. Depending on
+        how those actions are generated, the ordering within the action_dict may
+        always be the same, which may result in unintended imposed-ordering in
+        the simulation. For example, agent0's action may always come before agent1's.
+        If randomize_action_input is set to True, then the agent ordering in the
+        action dict is randomized each step.
+        """
+        return self._randomize_action_input
+
+    @randomize_action_input.setter
+    def randomize_action_input(self, value):
+        assert type(value) is bool, "Randomize action input must be True or False."
+        self._randomize_action_input = value
+
     def reset(self, **kwargs):
         """
         Reset the simulation and return the observation of all the agents.
@@ -34,6 +59,10 @@ class AllStepManager(SimulationManager):
         for agent_id in action_dict:
             assert agent_id not in self.done_agents, \
                 "Received an action for an agent that is already done."
+        if self.randomize_action_input:
+            action_list = list(action_dict.items())
+            random.shuffle(action_list)
+            action_dict= dict(action_list)
         self.sim.step(action_dict, **kwargs)
 
         obs = {
