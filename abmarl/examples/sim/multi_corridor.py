@@ -52,6 +52,9 @@ class MultiCorridor(AgentBasedSimulation):
         # Track the agents' rewards over multiple steps.
         self.reward = {agent_id: 0 for agent_id in self.agents}
 
+        # Track the last actions that were given to the simulation.
+        self._last_action = {agent_id: None for agent_id in self.agents}
+
     def step(self, action_dict, **kwargs):
         """
         The agents can choose to move left, move right, or stay where they are. If
@@ -59,6 +62,7 @@ class MultiCorridor(AgentBasedSimulation):
         The offending agent receives a larger penalty than the offended agent.
         The agent is done when it reaches the end of the corridor.
         """
+        self._last_action = action_dict
         for agent_id, action in action_dict.items():
             agent = self.agents[agent_id]
             if action == self.Actions.LEFT:
