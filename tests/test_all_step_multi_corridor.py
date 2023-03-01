@@ -245,7 +245,7 @@ def test_randomized_order():
     sim = AllStepManager(MultiCorridor())
     assert not sim.randomize_action_input
     sim.reset()
-    _, _, _, info = sim.step({
+    sim.step({
         'agent0': MultiCorridor.Actions.RIGHT,
         'agent1': MultiCorridor.Actions.STAY,
         'agent2': MultiCorridor.Actions.LEFT,
