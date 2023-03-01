@@ -16,7 +16,7 @@ class SimulationManager(ABC):
         agents: The agents that are in the AgentBasedSimulation.
         done_agents: Set of agents that are done.
     """
-    def __init__(self, sim):
+    def __init__(self, sim, **kwargs):
         assert isinstance(sim, AgentBasedSimulation), \
             "SimulationManager can only interface with AgentBasedSimulation."
         self.sim = sim

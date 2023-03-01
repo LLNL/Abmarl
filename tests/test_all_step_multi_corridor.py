@@ -1,3 +1,5 @@
+import random
+
 import numpy as np
 import pytest
 
@@ -231,3 +233,75 @@ def test_reset_and_step():
     assert obs == {'agent3': {'left': [False], 'position': [9], 'right': [False]}}
     assert reward == {'agent3': 100}
     assert done == {'agent3': True, '__all__': True}
+
+
+def test_randomized_order():
+    random.seed(24)
+    np.random.seed(24)
+
+    with pytest.raises(AssertionError):
+        AllStepManager(MultiCorridor(), randomize_action_input=0)
+
+    sim = AllStepManager(MultiCorridor())
+    assert not sim.randomize_action_input
+    sim.reset()
+    sim.step({
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent4': MultiCorridor.Actions.LEFT,
+    })
+    assert sim.sim._last_action == {
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent4': MultiCorridor.Actions.LEFT,
+    }
+
+    sim = AllStepManager(MultiCorridor(), randomize_action_input=True)
+    assert sim.randomize_action_input
+    sim.reset()
+    sim.step({
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent4': MultiCorridor.Actions.LEFT,
+    })
+    assert sim.sim._last_action == {
+        'agent4': MultiCorridor.Actions.LEFT,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent3': MultiCorridor.Actions.STAY,
+    }
+    sim.step({
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent4': MultiCorridor.Actions.LEFT,
+    })
+    assert sim.sim._last_action == {
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent4': MultiCorridor.Actions.LEFT,
+        'agent1': MultiCorridor.Actions.STAY,
+    }
+    sim.step({
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent1': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent4': MultiCorridor.Actions.LEFT,
+    })
+    assert sim.sim._last_action == {
+        'agent4': MultiCorridor.Actions.LEFT,
+        'agent0': MultiCorridor.Actions.RIGHT,
+        'agent3': MultiCorridor.Actions.STAY,
+        'agent2': MultiCorridor.Actions.LEFT,
+        'agent1': MultiCorridor.Actions.STAY,
+    }
