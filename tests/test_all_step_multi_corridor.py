@@ -238,7 +238,12 @@ def test_reset_and_step():
 def test_randomized_order():
     random.seed(24)
     np.random.seed(24)
+
+    with pytest.raises(AssertionError):
+        AllStepManager(MultiCorridor(), randomize_action_input=0)
+
     sim = AllStepManager(MultiCorridor())
+    assert not sim.randomize_action_input
     sim.reset()
     _, _, _, info = sim.step({
         'agent0': MultiCorridor.Actions.RIGHT,
@@ -256,6 +261,7 @@ def test_randomized_order():
     }
 
     sim = AllStepManager(MultiCorridor(), randomize_action_input=True)
+    assert sim.randomize_action_input
     sim.reset()
     sim.step({
         'agent0': MultiCorridor.Actions.RIGHT,
