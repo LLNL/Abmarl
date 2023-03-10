@@ -245,7 +245,7 @@ class AbsolutePositionObserver(ObserverBaseComponent):
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
-                    np.array([0, 0], dtype=np.int),
+                    np.array([0, 0], dtype=int),
                     np.array([self.grid.rows - 1, self.grid.cols - 1], dtype=int),
                     dtype=int
                 )
