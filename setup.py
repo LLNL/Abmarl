@@ -21,6 +21,8 @@ setuptools.setup(
         'Operating System :: Unix',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     project_urls={
@@ -37,7 +39,7 @@ setuptools.setup(
         'matplotlib',
         'seaborn',
     ],
-    python_requires='>=3.7, <3.9',
+    python_requires='>=3.7, <3.11',
     entry_points={
         'console_scripts': [
             'abmarl=abmarl.scripts.scripts:cli'
