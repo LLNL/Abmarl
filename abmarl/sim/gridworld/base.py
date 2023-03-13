@@ -119,8 +119,8 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         color = [agent.render_color for agent in self.agents.values() if agent.active]
         mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
 
-        plt.plot()
-        plt.pause(1e-6)
+        # plt.plot()
+        # plt.pause(1e-6)
 
 
 class GridWorldBaseComponent(ABC):

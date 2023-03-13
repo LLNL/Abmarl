@@ -56,6 +56,7 @@ agents = {
     },
 }
 
+reward_type = 'neighbor'
 sim = DiversifySim.build_sim(
     24, 4, agents=agents,
     reward_type='neighbor',
@@ -63,18 +64,16 @@ sim = DiversifySim.build_sim(
     # reward_type='distance',
 )
 
-min_reward = 10
-minimizing_sim = None
-for _ in range(10):
-    sim.reset()
-    sim.render(fig=plt.figure())
-    reward = sim.get_reward()
-    if reward < min_reward:
-        minimizing_sim = deepcopy(sim)
-    # sim.render(fig=plt.figure())
-    # plt.show()
+for trial in range(3): # Number of trials
+    min_reward = 10
+    minimizing_sim = None
+    for _ in range(1000):
+        sim.reset()
+        reward = sim.get_reward()
+        if reward < min_reward:
+            min_reward = reward
+            minimizing_sim = deepcopy(sim)
 
-sim.reset()
-sim.render(fig=plt.figure())
-minimizing_sim.render(fig=plt.figure())
-plt.show()
+    fig = plt.figure(figsize=(8, 10), dpi=80)
+    minimizing_sim.render(fig=fig)
+    fig.savefig(f'{reward_type}_t-{trial}_r-{min_reward:.3f}.png', dpi=80)
