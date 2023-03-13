@@ -64,10 +64,11 @@ sim = DiversifySim.build_sim(
     # reward_type='distance',
 )
 
-for trial in range(3): # Number of trials
+for trial in range(10): # Number of trials
     min_reward = 10
     minimizing_sim = None
-    for _ in range(1000):
+    for i in range(10_000):
+        if i % 1000 == 0: print(f"Trial {trial}, {i/1000}/10 through")
         sim.reset()
         reward = sim.get_reward()
         if reward < min_reward:
