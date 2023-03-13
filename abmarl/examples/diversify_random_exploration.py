@@ -4,7 +4,7 @@ from copy import deepcopy
 from matplotlib import pyplot as plt
 import numpy as np
 
-from abmarl.examples.sim.diversify import BlankSpace, Apple, Peach, Pear, Plum, Cherry, DiversifySim
+from abmarl.examples.sim.diversify import BlankSpace, Apple, Peach, Pear, Plum, Cherry, DiversifySim, FutureTree
 
 agents = {
     **{
@@ -50,6 +50,9 @@ agents = {
     },
     **{
         f'cherry{n}': Cherry(id=f'cherry{n}') for n in range(4)
+    },
+    **{
+        f'future{n}': FutureTree(id=f'future{n}') for n in range(16)
     },
 }
 

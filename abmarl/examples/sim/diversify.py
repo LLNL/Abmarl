@@ -50,6 +50,14 @@ class Cherry(GridWorldAgent):
             render_color='red',
             **kwargs
         )
+class FutureTree(GridWorldAgent):
+    def __init__(self, **kwargs):
+        super().__init__(
+            encoding=7,
+            render_color='brown',
+            render_shape='x',
+            **kwargs
+        )
 
 class DiversifySim(GridWorldSimulation):
     def __init__(self, reward_type='neighbor', **kwargs):
@@ -82,10 +90,10 @@ class DiversifySim(GridWorldSimulation):
     def _get_reward_neighbors(self, *args, **kwargs):
         rewards = {
             agent.id: 0 for agent in self.agents.values()
-            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry))
+            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree))
         }
         for agent in self.agents.values():
-            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry)):
+            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree)):
                 local_grid, _ = gu.create_grid_and_mask(
                     agent, self.grid, 1, self.agents
                 )
@@ -105,10 +113,10 @@ class DiversifySim(GridWorldSimulation):
     def _get_reward_neighbors_2(self, *args, **kwargs):
         rewards = {
             agent.id: 0 for agent in self.agents.values()
-            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry))
+            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree))
         }
         for agent in self.agents.values():
-            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry)):
+            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree)):
                 local_grid, _ = gu.create_grid_and_mask(
                     agent, self.grid, 2, self.agents
                 )
@@ -129,10 +137,10 @@ class DiversifySim(GridWorldSimulation):
     def _get_reward_distance(self, *args, **kwargs):
         rewards = {
             agent.id: 0 for agent in self.agents.values()
-            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry))
+            if isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree))
         }
         for agent in self.agents.values():
-            if not isinstance(agent, (Apple, Peach, Pear, Plum, Cherry)):
+            if not isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree)):
                 continue
             for other in self.agents.values():
                 if other == agent: continue # Don't need because distance is 0
