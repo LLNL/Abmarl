@@ -54,13 +54,17 @@ agents = {
 }
 
 sim = DiversifySim.build_sim(
-    24, 4, agents=agents
+    24, 4, agents=agents,
+    reward_type='neighbor',
+    # reward_type='neighbor2',
+    # reward_type='distance',
 )
 
 min_reward = 10
 minimizing_sim = None
 for _ in range(10):
     sim.reset()
+    sim.render(fig=plt.figure())
     reward = sim.get_reward()
     if reward < min_reward:
         minimizing_sim = deepcopy(sim)
