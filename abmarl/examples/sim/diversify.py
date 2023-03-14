@@ -71,6 +71,10 @@ class DiversifySim(GridWorldSimulation):
             'neighbor2': self._get_reward_neighbors_2,
             'distance': self._get_reward_distance,
         }[reward_type]
+        # TODO: Need to update rewards to penalize for configurations where a single
+        # type of tree is too far away from another type. For example, it's not
+        # good for a peach tree to be more than 100 ft away from another peach
+        # tree.
         
         self.finalize()
 
@@ -121,9 +125,10 @@ class DiversifySim(GridWorldSimulation):
                     agent, self.grid, 2, self.agents
                 )
                 for candidate_agent in [
-                    local_grid[1, 1], # 17 ft away
-                    local_grid[3, 1], # 17 ft away
-                    local_grid[1, 3], # 17 ft away
+                    local_grid[1, 1], # 20 ft away
+                    local_grid[3, 1], # 20 ft away
+                    local_grid[1, 3], # 20 ft away
+                    local_grid[3, 3], # 20 ft away
                     local_grid[0, 2], # 20 ft away
                     local_grid[4, 2], # 20 ft away
                 ]:
@@ -142,12 +147,14 @@ class DiversifySim(GridWorldSimulation):
         for agent in self.agents.values():
             if not isinstance(agent, (Apple, Peach, Pear, Plum, Cherry, FutureTree)):
                 continue
+            dist = []
             for other in self.agents.values():
                 if other == agent: continue # Don't need because distance is 0
                 if other.encoding == agent.encoding:
-                    rewards[agent.id] += np.linalg.norm(agent.position - other.position)
+                    dist.append(np.linalg.norm(agent.position - other.position))
+            rewards[agent.id] = np.mean(dist)
         
-        return np.mean([*rewards.values()])
+        return -np.mean([*rewards.values()]) # Returning negative distance because the algorithm minimizes and we want to maximize distance
     
     def get_done(self, agent_id, **kwargs):
         return True

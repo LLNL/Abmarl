@@ -56,20 +56,25 @@ agents = {
     },
 }
 
-reward_type = 'neighbor'
+# reward_type = 'neighbor'
+# reward_type = 'neighbor2'
+reward_type = 'distance'
 sim = DiversifySim.build_sim(
     24, 4, agents=agents,
-    reward_type='neighbor',
-    # reward_type='neighbor2',
-    # reward_type='distance',
+    reward_type=reward_type
 )
 
+num_trials = 10
 for trial in range(10): # Number of trials
-    min_reward = 10
+    min_reward = 10_000
     minimizing_sim = None
     for i in range(10_000):
-        if i % 1000 == 0: print(f"Trial {trial}, {i/1000}/10 through")
+        if i % 1000 == 0: print(f"Trial {trial}/{num_trials}, {i/1000}/10 through")
         sim.reset()
+            
+        # DEUBGGING:
+        # sim.render(fig=plt.figure(figsize=(8, 10), dpi=80))
+        
         reward = sim.get_reward()
         if reward < min_reward:
             min_reward = reward
