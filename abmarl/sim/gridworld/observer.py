@@ -123,7 +123,8 @@ class AbsoluteGridObserver(ObserverBaseComponent):
                     elif not candidate_agents: # In bounds empty cell
                         convolved_grid[r, c] = 0
                     else: # Observe one of the agents at this cell
-                        # TODO: Remove some of this logic since the agent will observe itself as a -1
+                        # TODO: Adjust some of this logic since the agent will observe itself as a -1
+                        self.observe_self = True
                         if self.observe_self:
                             convolved_grid[r, c] = np.random.choice([
                                 other.encoding for other in candidate_agents.values()
@@ -148,7 +149,7 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         r_upper = min([self.grid.rows - 1, r + agent.view_range]) + 1
         c_lower = max([0, c - agent.view_range])
         c_upper = min([self.grid.cols - 1, c + agent.view_range]) + 1
-        obs[r_lower:r_upper, c_lower:c_upper] = local_grid[:,:]
+        obs[r_lower:r_upper, c_lower:c_upper] = convolved_grid[:,:] # TODO: resolve the indices issue
 
         return {self.key: convolved_grid}
 
