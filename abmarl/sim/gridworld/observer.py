@@ -149,9 +149,12 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         r_upper = min([self.grid.rows - 1, r + agent.view_range]) + 1
         c_lower = max([0, c - agent.view_range])
         c_upper = min([self.grid.cols - 1, c + agent.view_range]) + 1
-        obs[r_lower:r_upper, c_lower:c_upper] = convolved_grid[:,:] # TODO: resolve the indices issue
+        obs[r_lower:r_upper, c_lower:c_upper] = convolved_grid[
+            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
+            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
+        ]
 
-        return {self.key: convolved_grid}
+        return {self.key: obs}
 
 class SingleGridObserver(ObserverBaseComponent):
     """
