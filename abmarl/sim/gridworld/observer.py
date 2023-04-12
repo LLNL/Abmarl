@@ -119,26 +119,19 @@ class AbsoluteGridObserver(ObserverBaseComponent):
                 if mask[r, c]: # We can see this cell
                     candidate_agents = local_grid[r, c]
                     if candidate_agents is None: # This cell is out of bounds
-                        convolved_grid[r, c] = -1 # TODO: I think I can skip this since these cells will be cropped out
+                        continue # Skip this since these cells will be cropped out
                     elif not candidate_agents: # In bounds empty cell
                         convolved_grid[r, c] = 0
                     else: # Observe one of the agents at this cell
-                        # TODO: Adjust some of this logic since the agent will observe itself as a -1
-                        self.observe_self = True
-                        if self.observe_self:
-                            convolved_grid[r, c] = np.random.choice([
-                                other.encoding for other in candidate_agents.values()
-                            ])
+                        # Prioritize observing yourself
+                        if agent.id in candidate_agents:
+                            convolved_grid[r, c] = -1
                         else:
-                            choices = [
+                            convolved_grid[r, c] = np.random.choice([
                                 other.encoding
                                 for other in candidate_agents.values()
                                 if other.id != agent.id
-                            ]
-                            # It may be that the observing agent is the only agent
-                            # at this location but it cannot observe itself, which
-                            # makes choices an empty list.
-                            convolved_grid[r, c] = np.random.choice(choices) if choices else 0
+                            ])
                 else: # Cell blocked by agent. Indicate invisible with -2
                     convolved_grid[r, c] = -2
 
@@ -155,6 +148,7 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         ]
 
         return {self.key: obs}
+
 
 class SingleGridObserver(ObserverBaseComponent):
     """
