@@ -83,14 +83,14 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         This Observer's key is "absolute_grid".
         """
         return 'absolute_grid'
-    
+
     @property
     def supported_agent_type(self):
         """
         This Observer work with GridObservingAgents
         """
         return GridObservingAgent
-    
+
     def get_obs(self, agent, **kwargs):
         """
         The agent observes the entire grid.
@@ -102,11 +102,11 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         """
         if not isinstance(agent, self.supported_agent_type):
             return {}
-        
+
         # To generate the observation, we first create a local grid and mask using
         # the agent's view_range. Then we convolve local grid and mask together.
         # Finally, we convolve the masked local grid with the full grid.
- 
+
         # Generate a local grid and an observation mask
         local_grid, mask = gu.create_grid_and_mask(
             agent, self.grid, agent.view_range, self.agents
