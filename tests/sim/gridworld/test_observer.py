@@ -11,7 +11,7 @@ from abmarl.sim.gridworld.grid import Grid
 
 
 def test_absolute_grid_observer():
-    grid = Grid(5, 5)
+    grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
     agents = {
         'agent0': GridObservingAgent(
             id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
@@ -30,6 +30,9 @@ def test_absolute_grid_observer():
         ),
         'agent5': GridWorldAgent(
             id='agent5', encoding=6, initial_position=np.array([2, 1])
+        ),
+        'agent6': GridWorldAgent(
+            id='agent6', encoding=6, initial_position=np.array([2, 2])
         ),
     }
 
@@ -63,7 +66,7 @@ def test_absolute_grid_observer():
         np.array([
             [ 2,  0,  0,  0,  0],
             [ 0,  4,  0,  0,  0],
-            [ 0,  6,  1,  0,  0],
+            [ 0,  6,  6,  0,  0],
             [ 0,  0,  0,  5,  0],
             [ 0,  0,  0,  0, -1]
         ])
@@ -71,7 +74,7 @@ def test_absolute_grid_observer():
 
 
 def test_absolute_grid_observer_blocking():
-    grid = Grid(5, 5)
+    grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
     agents = {
         'agent0': GridObservingAgent(
             id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
@@ -90,6 +93,9 @@ def test_absolute_grid_observer_blocking():
         ),
         'agent5': GridWorldAgent(
             id='agent5', encoding=6, initial_position=np.array([2, 1]), blocking=True
+        ),
+        'agent6': GridWorldAgent(
+            id='agent6', encoding=6, initial_position=np.array([2, 2])
         ),
     }
 
