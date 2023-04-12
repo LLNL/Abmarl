@@ -56,13 +56,13 @@ class AbsoluteGridObserver(ObserverBaseComponent):
     """
     Observe the entire grid.
 
-    This observation shows agents located on cells by encoding for the entire grid.
+    This Observer shows agents located on cells by encoding for the entire grid.
     If there are multiple agents on a single cell with different encodings, only
     a single randomly chosen encoding will be observed. To be consistent with other
     built-in observers, masked cells are indicated as -2. Typially, -1 is reserved
-    for out of bounds distinction, but because this Observer reports the entire
+    for out of bounds encoding, but because this Observer reports the entire
     grid, we don't need an out of bounds distinction. Instead, in order for the
-    agent to identify itself distinct from other agents of the same encoding, the
+    agent to identify itself distinctly from other agents of the same encoding, the
     observing agent is reported as a -1.
     """
     def __init__(self, **kwargs):
@@ -95,17 +95,17 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         """
         The agent observes the entire grid.
 
-        The observation may include the agent itself, indicated by a -1; other
-        agents; empty space; and masked cells, indicated as -2, which are masked
-        either because they are too far away or because they are blocked from view
-        by view-blocking entities.
+        The observation may include the agent itself indicated by a -1, other
+        agents indicated by their encodings, empty space indicated with a 0, and
+        masked cells indicated as -2, which are masked either because they are
+        too far away or because they are blocked from view by view-blocking agents.
         """
         if not isinstance(agent, self.supported_agent_type):
             return {}
 
         # To generate the observation, we first create a local grid and mask using
         # the agent's view_range. Then we convolve local grid and mask together.
-        # Finally, we convolve the masked local grid with the full grid.
+        # Finally, we subsitute a portion of the full grid with the local grid.
 
         # Generate a local grid and an observation mask
         local_grid, mask = gu.create_grid_and_mask(
@@ -130,7 +130,6 @@ class AbsoluteGridObserver(ObserverBaseComponent):
                             convolved_grid[r, c] = np.random.choice([
                                 other.encoding
                                 for other in candidate_agents.values()
-                                if other.id != agent.id
                             ])
                 else: # Cell blocked by agent. Indicate invisible with -2
                     convolved_grid[r, c] = -2
