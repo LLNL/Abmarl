@@ -11,6 +11,7 @@ from abmarl.sim.gridworld.grid import Grid
 
 
 def test_absolute_grid_observer():
+    np.random.seed(24)
     grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
     agents = {
         'agent0': GridObservingAgent(
@@ -66,7 +67,7 @@ def test_absolute_grid_observer():
         np.array([
             [ 2,  0,  0,  0,  0],
             [ 0,  4,  0,  0,  0],
-            [ 0,  6,  6,  0,  0],
+            [ 0,  6,  1,  0,  0],
             [ 0,  0,  0,  5,  0],
             [ 0,  0,  0,  0, -1]
         ])
@@ -74,6 +75,7 @@ def test_absolute_grid_observer():
 
 
 def test_absolute_grid_observer_blocking():
+    np.random.seed(24)
     grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
     agents = {
         'agent0': GridObservingAgent(
