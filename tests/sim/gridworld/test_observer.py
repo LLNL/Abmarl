@@ -3,11 +3,139 @@ from gym.spaces import Box
 import numpy as np
 
 from abmarl.sim.agent_based_simulation import ObservingAgent
-from abmarl.sim.gridworld.observer import ObserverBaseComponent, SingleGridObserver, \
-    MultiGridObserver, AbsolutePositionObserver
+from abmarl.sim.gridworld.observer import ObserverBaseComponent, AbsoluteGridObserver, \
+    SingleGridObserver, MultiGridObserver, AbsolutePositionObserver
 from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent, MovingAgent
 from abmarl.sim.gridworld.state import PositionState
 from abmarl.sim.gridworld.grid import Grid
+
+
+def test_absolute_grid_observer():
+    np.random.seed(24)
+    grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
+    agents = {
+        'agent0': GridObservingAgent(
+            id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
+        ),
+        'agent1': GridObservingAgent(
+            id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
+        ),
+        'agent2': GridObservingAgent(
+            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+        ),
+        'agent3': GridWorldAgent(
+            id='agent3', encoding=5, initial_position=np.array([3, 3])
+        ),
+        'agent4': GridWorldAgent(
+            id='agent4', encoding=4, initial_position=np.array([1, 1])
+        ),
+        'agent5': GridWorldAgent(
+            id='agent5', encoding=6, initial_position=np.array([2, 1])
+        ),
+        'agent6': GridWorldAgent(
+            id='agent6', encoding=6, initial_position=np.array([2, 2])
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    observer = AbsoluteGridObserver(agents=agents, grid=grid)
+    assert isinstance(observer, ObserverBaseComponent)
+    position_state.reset()
+
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent0'])['absolute_grid'],
+        np.array([
+            [ 2,  0,  0,  0,  0],
+            [ 0,  4,  0,  0,  0],
+            [ 0,  6, -1,  0,  0],
+            [ 0,  0,  0,  5,  0],
+            [ 0,  0,  0,  0,  3]
+        ])
+    )
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent1'])['absolute_grid'],
+        np.array([
+            [-1,  0, -2, -2, -2],
+            [ 0,  4, -2, -2, -2],
+            [-2, -2, -2, -2, -2],
+            [-2, -2, -2, -2, -2],
+            [-2, -2, -2, -2, -2]
+        ])
+    )
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent2'])['absolute_grid'],
+        np.array([
+            [ 2,  0,  0,  0,  0],
+            [ 0,  4,  0,  0,  0],
+            [ 0,  6,  1,  0,  0],
+            [ 0,  0,  0,  5,  0],
+            [ 0,  0,  0,  0, -1]
+        ])
+    )
+
+
+def test_absolute_grid_observer_blocking():
+    np.random.seed(24)
+    grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
+    agents = {
+        'agent0': GridObservingAgent(
+            id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
+        ),
+        'agent1': GridObservingAgent(
+            id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
+        ),
+        'agent2': GridObservingAgent(
+            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+        ),
+        'agent3': GridWorldAgent(
+            id='agent3', encoding=5, initial_position=np.array([3, 3]), blocking=True
+        ),
+        'agent4': GridWorldAgent(
+            id='agent4', encoding=4, initial_position=np.array([1, 1]), blocking=True
+        ),
+        'agent5': GridWorldAgent(
+            id='agent5', encoding=6, initial_position=np.array([2, 1]), blocking=True
+        ),
+        'agent6': GridWorldAgent(
+            id='agent6', encoding=6, initial_position=np.array([2, 2])
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    observer = AbsoluteGridObserver(agents=agents, grid=grid)
+    assert isinstance(observer, ObserverBaseComponent)
+    position_state.reset()
+
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent0'])['absolute_grid'],
+        np.array([
+            [-2, -2,  0,  0,  0],
+            [-2,  4,  0,  0,  0],
+            [-2,  6, -1,  0,  0],
+            [-2,  0,  0,  5, -2],
+            [ 0,  0,  0, -2, -2]
+        ])
+    )
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent1'])['absolute_grid'],
+        np.array([
+            [-1,  0, -2, -2, -2],
+            [ 0,  4, -2, -2, -2],
+            [-2, -2, -2, -2, -2],
+            [-2, -2, -2, -2, -2],
+            [-2, -2, -2, -2, -2]
+        ])
+    )
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent2'])['absolute_grid'],
+        np.array([
+            [-2, -2, -2,  0,  0],
+            [-2, -2, -2,  0,  0],
+            [-2, -2, -2, -2,  0],
+            [ 0,  0, -2,  5,  0],
+            [ 0,  0,  0,  0, -1]
+        ])
+    )
 
 
 def test_single_grid_observer():

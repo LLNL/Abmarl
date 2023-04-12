@@ -52,6 +52,103 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         pass
 
 
+class AbsoluteGridObserver(ObserverBaseComponent):
+    """
+    Observe the entire grid.
+
+    This Observer shows agents located on cells by encoding for the entire grid.
+    If there are multiple agents on a single cell with different encodings, only
+    a single randomly chosen encoding will be observed. To be consistent with other
+    built-in observers, masked cells are indicated as -2. Typially, -1 is reserved
+    for out of bounds encoding, but because this Observer reports the entire
+    grid, we don't need an out of bounds distinction. Instead, in order for the
+    agent to identify itself distinctly from other agents of the same encoding, the
+    observing agent is reported as a -1.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        max_encoding = max([agent.encoding for agent in self.agents.values()])
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.observation_space[self.key] = Box(
+                    -2, max_encoding, (self.rows, self.cols), int
+                )
+                agent.null_observation[self.key] = -2 * np.ones(
+                    (self.rows, self.cols), dtype=int
+                )
+
+    @property
+    def key(self):
+        """
+        This Observer's key is "absolute_grid".
+        """
+        return 'absolute_grid'
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Observer work with GridObservingAgents
+        """
+        return GridObservingAgent
+
+    def get_obs(self, agent, **kwargs):
+        """
+        The agent observes the entire grid.
+
+        The observation may include the agent itself indicated by a -1, other
+        agents indicated by their encodings, empty space indicated with a 0, and
+        masked cells indicated as -2, which are masked either because they are
+        too far away or because they are blocked from view by view-blocking agents.
+        """
+        if not isinstance(agent, self.supported_agent_type):
+            return {}
+
+        # To generate the observation, we first create a local grid and mask using
+        # the agent's view_range. Then we convolve local grid and mask together.
+        # Finally, we subsitute a portion of the full grid with the local grid.
+
+        # Generate a local grid and an observation mask
+        local_grid, mask = gu.create_grid_and_mask(
+            agent, self.grid, agent.view_range, self.agents
+        )
+
+        # Convolve the local grid observation with the mask.
+        convolved_grid = np.zeros((2 * agent.view_range + 1, 2 * agent.view_range + 1), dtype=int)
+        for r in range(2 * agent.view_range + 1):
+            for c in range(2 * agent.view_range + 1):
+                if mask[r, c]: # We can see this cell
+                    candidate_agents = local_grid[r, c]
+                    if candidate_agents is None: # This cell is out of bounds
+                        continue # Skip this since these cells will be cropped out
+                    elif not candidate_agents: # In bounds empty cell
+                        convolved_grid[r, c] = 0
+                    else: # Observe one of the agents at this cell
+                        # Prioritize observing yourself
+                        if agent.id in candidate_agents:
+                            convolved_grid[r, c] = -1
+                        else:
+                            convolved_grid[r, c] = np.random.choice([
+                                other.encoding
+                                for other in candidate_agents.values()
+                            ])
+                else: # Cell blocked by agent. Indicate invisible with -2
+                    convolved_grid[r, c] = -2
+
+        # Substitute the local grid in place in the full grid
+        obs = -2 * np.ones((self.rows, self.cols), dtype=int)
+        (r, c) = agent.position
+        r_lower = max([0, r - agent.view_range])
+        r_upper = min([self.grid.rows - 1, r + agent.view_range]) + 1
+        c_lower = max([0, c - agent.view_range])
+        c_upper = min([self.grid.cols - 1, c + agent.view_range]) + 1
+        obs[r_lower:r_upper, c_lower:c_upper] = convolved_grid[
+            (r_lower+agent.view_range-r):(r_upper+agent.view_range-r),
+            (c_lower+agent.view_range-c):(c_upper+agent.view_range-c)
+        ]
+
+        return {self.key: obs}
+
+
 class SingleGridObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's position.
