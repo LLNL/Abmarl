@@ -1,3 +1,4 @@
+setuptools<67.0
 importlib-metadata<5.0
 tensorflow
 gym<0.22
