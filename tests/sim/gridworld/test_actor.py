@@ -3,8 +3,9 @@ from gym.spaces import Box, Discrete, MultiDiscrete, Dict
 import numpy as np
 import pytest
 
-from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor, SelectiveAttackActor, \
-    EncodingBasedAttackActor, RestrictedSelectiveAttackActor, ActorBaseComponent
+from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, BinaryAttackActor, \
+    SelectiveAttackActor, EncodingBasedAttackActor, RestrictedSelectiveAttackActor, \
+    ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent
 from abmarl.sim.gridworld.grid import Grid
@@ -122,6 +123,118 @@ def test_move_actor_with_overlap():
     np.testing.assert_array_equal(agents['agent1'].position, np.array([2, 2]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 3]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+
+
+def test_cross_move_actor():
+    agents = {
+        'agent0': MovingAgent(
+            id='agent0', initial_position=np.array([3, 5]), encoding=1, move_range=1
+        ),
+        'agent1': MovingAgent(
+            id='agent1', initial_position=np.array([2, 2]), encoding=2, move_range=2
+        ),
+        'agent2': MovingAgent(
+            id='agent2', initial_position=np.array([0, 1]), encoding=1, move_range=1
+        ),
+        'agent3': MovingAgent(
+            id='agent3', initial_position=np.array([2, 3]), encoding=3, move_range=3
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    move_actor = CrossMoveActor(grid=grid, agents=agents)
+    assert isinstance(move_actor, ActorBaseComponent)
+    assert move_actor.key == 'move'
+    assert move_actor.supported_agent_type == MovingAgent
+    assert agents['agent0'].action_space['move'] == Discrete(5)
+    assert agents['agent1'].action_space['move'] == Discrete(5)
+    assert agents['agent2'].action_space['move'] == Discrete(5)
+    assert agents['agent3'].action_space['move'] == Discrete(5)
+
+    for agent in agents.values():
+        agent.finalize()
+        assert agent.null_action.keys() == set(('move',))
+        assert agent.null_action['move'] == 0
+
+    position_state.reset()
+    action = {
+        'agent0': {'move': 2},
+        'agent1': {'move': 4},
+        'agent2': {'move': 3},
+        'agent3': {'move': 1},
+    }
+    for agent_id, action in action.items():
+        move_actor.process_action(agents[agent_id], action)
+    np.testing.assert_array_equal(agents['agent0'].position, np.array([4, 5]))
+    np.testing.assert_array_equal(agents['agent1'].position, np.array([1, 2]))
+    np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 2]))
+    np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+
+    action = {
+        'agent0': {'move': 3},
+        'agent1': {'move': 0},
+        'agent2': {'move': 4},
+        'agent3': {'move': 4},
+    }
+    for agent_id, action in action.items():
+        move_actor.process_action(agents[agent_id], action)
+    np.testing.assert_array_equal(agents['agent0'].position, np.array([4, 5]))
+    np.testing.assert_array_equal(agents['agent1'].position, np.array([1, 2]))
+    np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 2]))
+    np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+
+
+def test_cross_move_actor_with_overlap():
+    overlapping = {
+        1: [1],
+        2: [3],
+        3: [2]
+    }
+    grid = Grid(5, 6, overlapping=overlapping)
+    agents = {
+        'agent0': MovingAgent(
+            id='agent0', initial_position=np.array([4, 4]), encoding=1, move_range=1
+        ),
+        'agent1': MovingAgent(
+            id='agent1', initial_position=np.array([2, 2]), encoding=2, move_range=2
+        ),
+        'agent2': MovingAgent(
+            id='agent2', initial_position=np.array([2, 4]), encoding=1, move_range=1
+        ),
+        'agent3': MovingAgent(
+            id='agent3', initial_position=np.array([3, 2]), encoding=3, move_range=3
+        ),
+    }
+
+    position_state = PositionState(grid=grid, agents=agents)
+    move_actor = CrossMoveActor(grid=grid, agents=agents)
+
+    position_state.reset()
+    action = {
+        'agent0': {'move': 4},
+        'agent1': {'move': 3},
+        'agent2': {'move': 2},
+        'agent3': {'move': 4},
+    }
+    for agent_id, action in action.items():
+        move_actor.process_action(agents[agent_id], action)
+    np.testing.assert_array_equal(agents['agent0'].position, np.array([3, 4]))
+    np.testing.assert_array_equal(agents['agent1'].position, np.array([2, 3]))
+    np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 4]))
+    np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+
+    action = {
+        'agent0': {'move': 4},
+        'agent1': {'move': 0},
+        'agent2': {'move': 1},
+        'agent3': {'move': 3},
+    }
+    for agent_id, action in action.items():
+        move_actor.process_action(agents[agent_id], action)
+    np.testing.assert_array_equal(agents['agent0'].position, np.array([2, 4]))
+    np.testing.assert_array_equal(agents['agent1'].position, np.array([2, 3]))
+    np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 3]))
+    np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 3]))
 
 
 def test_binary_attack_actor():

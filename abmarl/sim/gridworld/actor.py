@@ -113,6 +113,87 @@ class MoveActor(ActorBaseComponent):
                 return False
 
 
+class CrossMoveActor(ActorBaseComponent):
+    """
+    Agents can move up, down, left, right, or stay in place.
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.action_space[self.key] = Discrete(5)
+                agent.null_action[self.key] = 0
+
+    @property
+    def key(self):
+        """
+        This Actors key is "move".
+        """
+        return "move"
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Actor works with MovingAgent, but the move_range parameter is ignored.
+        """
+        return MovingAgent
+
+    def grid_action(self, cross_action):
+        """
+        Grid action converts the cross action to an action in the grid.
+
+        0: Stay
+        1: Move up
+        2: Move right
+        3; Move down
+        4: Move left
+        """
+        assert cross_action in [0, 1, 2, 3, 4], "Cross action must be 0, 1, 2, 3, or 4."
+        return {
+            0: np.array((0, 0)), # Stay
+            1: np.array([0, -1]), # Up
+            2: np.array([1, 0]), # Right
+            3: np.array([0, 1]), # Down
+            4: np.array([-1, 0]), # Left
+        }[cross_action]
+
+    def process_action(self, agent, action_dict, **kwargs):
+        """
+        The agent can move up, down, left, right, or stay in place.
+
+        The agent's new position must be within the grid and the cell-occupation rules
+        must be met.
+
+        Args:
+            agent: Move the agent if it is a MovingAgent.
+            action_dict: The action dictionary for this agent in this step. If
+                the agent is a MovingAgent, then the action dictionary will contain
+                the "move" entry.
+
+        Returns:
+            True if the move is successful, False otherwise.
+        """
+        if isinstance(agent, self.supported_agent_type):
+            cross_action = action_dict[self.key]
+            action = self.grid_action(cross_action)
+            new_position = agent.position + action
+            if 0 <= new_position[0] < self.rows and \
+                    0 <= new_position[1] < self.cols:
+                from_ndx = tuple(agent.position)
+                to_ndx = tuple(new_position)
+                if to_ndx == from_ndx:
+                    return True
+                elif self.grid.query(agent, to_ndx):
+                    self.grid.remove(agent, from_ndx)
+                    self.grid.place(agent, to_ndx)
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+
 class AttackActorBaseComponent(ActorBaseComponent, ABC):
     """
     Abstract class that provides the properties and structure for attack actors.
