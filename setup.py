@@ -32,8 +32,8 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         'importlib-metadata<5.0',
+        'numpy<1.24',
         'tensorflow',
-        'gym<0.22',
         'ray[rllib]==2.0.0',
         'open-spiel',
         'matplotlib',

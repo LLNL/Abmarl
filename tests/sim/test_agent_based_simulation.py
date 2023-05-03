@@ -82,7 +82,7 @@ def test_acting_agent_seed():
     })
     agent.finalize()
     assert agent.configured
-    assert agent.action_space.sample() == {1: 5, 2: 1}
+    assert agent.action_space.sample() == {1: 2, 2: 0}
 
 
 def test_observing_agent_observation_space():
@@ -128,7 +128,7 @@ def test_agent():
     agent.finalize()
     assert agent.configured
 
-    assert agent.action_space.sample() == {'act': 2}
+    assert agent.action_space.sample() == {'act': 1}
     assert agent.observation_space.sample() == {'obs': 0}
 
 
