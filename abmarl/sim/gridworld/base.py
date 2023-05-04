@@ -41,6 +41,29 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         return cls._build_sim(rows, cols, **kwargs)
 
     @classmethod
+    def build_sim_from_grid(cls, grid, **kwargs):
+        """
+        Build a GridSimluation from a Grid object.
+
+        Args:
+            grid: A Grid contains the all the agents index by location, so we can
+            construct a simluation from it.
+
+        Returns:
+            A GridSimulation built from the grid.
+        """
+        assert type(grid) is Grid, "Grid object required."
+        agents = {}
+        for r in range(grid.rows):
+            for c in range(grid.cols):
+                if grid[r, c] is not None:
+                    agents.update(grid[r, c])
+
+        kwargs['grid'] = grid
+        kwargs['agents'] = agents
+        return cls(**kwargs)
+
+    @classmethod
     def build_sim_from_file(cls, file_name, object_registry, **kwargs):
         """
         Build a GridSimulation from a text file.
