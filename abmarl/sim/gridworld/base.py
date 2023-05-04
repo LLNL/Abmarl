@@ -58,8 +58,11 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             for c in range(grid.cols):
                 if grid[r, c] is not None:
                     agents.update(grid[r, c])
-                    for agent in grid[r,c]:
-                        agent.initial_position = np.array([r, c])
+                    for agent in grid[r,c].values():
+                        np.testing.assert_array_equal(
+                            agent.initial_position,
+                            np.array([r, c])
+                        ), "The initial position of the agent must match its position in the grid."
 
         kwargs['grid'] = grid
         kwargs['agents'] = agents
@@ -82,7 +85,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             A GridSimulation built from the array.
         """
         # TODO: Support arrays that contain an iterable of characters per cell
-        assert type(array) is np.array, "The array must be a numpy array."
+        assert type(array) is np.ndarray, "The array must be a numpy array."
         assert type(object_registry) is dict, "The object_registry must be a dictionary."
         assert all([i not in object_registry for i in [0, '.', '_']]), \
             "0, '.', and '_' are reserved for empty space."
