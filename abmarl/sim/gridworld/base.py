@@ -58,7 +58,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             for c in range(grid.cols):
                 if grid[r, c] is not None:
                     agents.update(grid[r, c])
-                    for agent in grid[r,c].values():
+                    for agent in grid[r, c].values():
                         np.testing.assert_array_equal(
                             agent.initial_position,
                             np.array([r, c])
@@ -103,7 +103,6 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                     n += 1
 
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
-
 
     @classmethod
     def build_sim_from_file(cls, file_name, object_registry, **kwargs):

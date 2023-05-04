@@ -5,7 +5,8 @@ import pytest
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.examples.sim import MultiAgentGridSim
-    
+
+
 def test_build():
     sim = MultiAgentGridSim.build_sim(3, 4, agents={})
     assert sim.agents == {}
@@ -34,6 +35,7 @@ def test_build():
 
     with pytest.raises(AssertionError):
         MultiAgentGridSim.build_sim(3, '4')
+
 
 def test_build_from_grid():
     grid = Grid(2, 2)
@@ -135,27 +137,27 @@ def test_build_sim_from_array():
     assert sim.agents['A-class-barrier0'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier0'].initial_position,
-        np.array([0, 0])    
+        np.array([0, 0])
     )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])    
+        np.array([0, 2])
     )
     assert sim.agents['B-class-barrier2'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier2'].initial_position,
-        np.array([1, 0])    
+        np.array([1, 0])
     )
     assert sim.agents['C-class-barrier3'].encoding == 3
     np.testing.assert_array_equal(
         sim.agents['C-class-barrier3'].initial_position,
-        np.array([1, 3])    
+        np.array([1, 3])
     )
     assert sim.agents['A-class-barrier4'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier4'].initial_position,
-        np.array([1, 4])    
+        np.array([1, 4])
     )
 
     # Testin what happens when one of the keys is not in the registry
@@ -181,22 +183,22 @@ def test_build_sim_from_array():
     assert sim.agents['A-class-barrier0'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier0'].initial_position,
-        np.array([0, 0])    
+        np.array([0, 0])
     )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])    
+        np.array([0, 2])
     )
     assert sim.agents['B-class-barrier2'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier2'].initial_position,
-        np.array([1, 0])    
+        np.array([1, 0])
     )
     assert sim.agents['A-class-barrier3'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier3'].initial_position,
-        np.array([1, 4])    
+        np.array([1, 4])
     )
 
     # Bad array
@@ -209,7 +211,7 @@ def test_build_sim_from_array():
     with pytest.raises(AssertionError):
         obj_registry.update({
             '_': lambda n: GridWorldAgent(
-                id=f'invalid_underscore!',
+                id='invalid_underscore!',
                 encoding=0,
             ),
         })
@@ -253,27 +255,27 @@ def test_build_sim_from_file():
     assert sim.agents['A-class-barrier0'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier0'].initial_position,
-        np.array([0, 0])    
+        np.array([0, 0])
     )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])    
+        np.array([0, 2])
     )
     assert sim.agents['B-class-barrier2'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier2'].initial_position,
-        np.array([1, 0])    
+        np.array([1, 0])
     )
     assert sim.agents['C-class-barrier3'].encoding == 3
     np.testing.assert_array_equal(
         sim.agents['C-class-barrier3'].initial_position,
-        np.array([1, 3])    
+        np.array([1, 3])
     )
     assert sim.agents['A-class-barrier4'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier4'].initial_position,
-        np.array([1, 4])    
+        np.array([1, 4])
     )
 
     # Testin what happens when one of the keys is not in the registry
@@ -299,22 +301,22 @@ def test_build_sim_from_file():
     assert sim.agents['A-class-barrier0'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier0'].initial_position,
-        np.array([0, 0])    
+        np.array([0, 0])
     )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])    
+        np.array([0, 2])
     )
     assert sim.agents['B-class-barrier2'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier2'].initial_position,
-        np.array([1, 0])    
+        np.array([1, 0])
     )
     assert sim.agents['A-class-barrier3'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier3'].initial_position,
-        np.array([1, 4])    
+        np.array([1, 4])
     )
 
     # Bad array
@@ -327,7 +329,7 @@ def test_build_sim_from_file():
     with pytest.raises(AssertionError):
         obj_registry.update({
             '_': lambda n: GridWorldAgent(
-                id=f'invalid_underscore!',
+                id='invalid_underscore!',
                 encoding=0,
             ),
         })

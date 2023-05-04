@@ -2,6 +2,7 @@
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.state import PositionState
 
+
 class MultiAgentGridSim(GridWorldSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
