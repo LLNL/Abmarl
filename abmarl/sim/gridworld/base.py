@@ -58,10 +58,49 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             for c in range(grid.cols):
                 if grid[r, c] is not None:
                     agents.update(grid[r, c])
+                    for agent in grid[r,c]:
+                        agent.initial_position = np.array([r, c])
 
         kwargs['grid'] = grid
         kwargs['agents'] = agents
         return cls(**kwargs)
+
+    @classmethod
+    def build_sim_from_array(cls, array, object_registry, **kwargs):
+        """
+        Build a GridSimulation from an array.
+
+        Args:
+            array: An array from which to build the initial grid. Each entry should
+                be an alphanumeric character indicating which agent will be at that
+                location. The agent will be given that initial position.
+            object_registry: A dictionary that maps the characters in the array
+                to a function that generates the agent with its unique id. Zeros,
+                periods, and underscores are reserved for empty space.
+
+        Returns:
+            A GridSimulation built from the array.
+        """
+        # TODO: Support arrays that contain an iterable of characters per cell
+        assert type(array) is np.array, "The array must be a numpy array."
+        assert type(object_registry) is dict, "The object_registry must be a dictionary."
+        assert all([i not in object_registry for i in [0, '.', '_']]), \
+            "0, '.', and '_' are reserved for empty space."
+        agents = {}
+        n = 0
+        rows = array.shape[0]
+        cols = array.shape[1]
+        for r in range(rows):
+            for c in range(cols):
+                char = array[r, c]
+                if char in object_registry:
+                    agent = object_registry[char](n)
+                    agent.initial_position = np.array([r, c])
+                    agents[agent.id] = agent
+                    n += 1
+
+        return cls._build_sim(rows, cols, agents=agents, **kwargs)
+
 
     @classmethod
     def build_sim_from_file(cls, file_name, object_registry, **kwargs):
@@ -72,11 +111,11 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             file_name: Name of the file that specifies the initial grid setup. In the file, each
                 cell should be a single alphanumeric character indicating which agent
                 will be at that position (from the perspective of looking down on the
-                grid). That agent will be given that initial position. Zeros, periods,
-                and underscores are reserved for empty space.
+                grid). That agent will be given that initial position.
             object_registry: A dictionary that maps characters from the file to a
                 function that generates the agent. This must be a function because
-                each agent must have unique id, which is generated here.
+                each agent must have unique id, which is generated here. Zeros,
+                periods, and underscores are reserved for empty space.
 
         Returns:
             A GridSimulation built from the file.
