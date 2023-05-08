@@ -47,7 +47,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
         Args:
             grid: A Grid contains the all the agents index by location, so we can
-            construct a simluation from it.
+                construct a simluation from it.
 
         Returns:
             A GridSimulation built from the grid.
