@@ -1,4 +1,6 @@
 
+import os
+
 import numpy as np
 import pytest
 
@@ -219,7 +221,10 @@ def test_build_sim_from_array():
 
 
 def test_build_sim_from_file():
-    file_name = 'grid_file.txt'
+    file_name = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
+        'grid_file.txt'
+    )
     obj_registry = {
         'A': lambda n: GridWorldAgent(
             id=f'A-class-barrier{n}',
