@@ -19,16 +19,16 @@ class MultiAgentGridSim(GridWorldSimulation):
         pass
 
     def get_obs(self, agent_id, **kwargs):
-        pass
+        return {}
 
     def get_reward(self, agent_id, **kwargs):
-        pass
+        return 0
 
     def get_done(self, agent_id, **kwargs):
-        pass
+        return False
 
     def get_all_done(self, **kwargs):
-        pass
+        return False
 
     def get_info(self, agent_id, **kwargs):
-        pass
+        return {}
