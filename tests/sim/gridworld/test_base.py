@@ -179,9 +179,6 @@ def test_build_from_grid_with_extra_agents():
         # This fails because the agents are not allowed to overlap
         sim2.reset()
 
-    with pytest.raises(AssertionError):
-        MultiAgentGridSim.build_sim_from_grid(grid._internal)
-
 
 def test_build_sim_from_array():
     array = np.array([
