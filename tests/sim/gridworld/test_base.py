@@ -54,6 +54,10 @@ def test_build_from_grid():
     grid.place(agents['agent3'], (1, 1))
 
     sim = MultiAgentGridSim.build_sim_from_grid(grid)
+    assert sim.grid.rows == 2
+    assert sim.grid.cols == 2
+    np.testing.assert_array_equal(sim.grid._internal, np.empty((2, 2), dtype=object))
+
     sim.reset()
     assert sim.agents == {
         'agent0': agents['agent0'],
@@ -298,6 +302,134 @@ def test_build_sim_from_array():
             ),
         })
         MultiAgentGridSim.build_sim_from_array(array, obj_registry)
+
+
+def test_build_sim_from_array_with_extra_agents():
+    np.random.seed(24)
+    array = np.array([
+        ['A', '.', 'B', '0', ''],
+        ['B', '_', '', 'C', 'A']
+    ])
+    obj_registry = {
+        'A': lambda n: GridWorldAgent(
+            id=f'A-class-barrier{n}',
+            encoding=1,
+        ),
+        'B': lambda n: GridWorldAgent(
+            id=f'B-class-barrier{n}',
+            encoding=2,
+        ),
+        'C': lambda n: GridWorldAgent(
+            id=f'C-class-barrier{n}',
+            encoding=3,
+        ),
+    }
+    # B-class-barrier2 exists in the array, so the builder should not use the one
+    # in extra_agents
+    # extra_agent0 and 1 will exist because they can overlap
+    # extra_agent2 will exist because it occupies an empty space
+    extra_agents = {
+        'B-class-barrier2': GridWorldAgent(
+            id='B-class-barrier2',
+            encoding=4,
+            initial_position=np.array([1, 0])
+        ),
+        'extra_agent0': GridWorldAgent(
+            id='extra_agent0',
+            encoding=5,
+            initial_position=np.array([0, 0])
+        ),
+        'extra_agent1': GridWorldAgent(
+            id='extra_agent1',
+            encoding=5,
+            initial_position=np.array([0, 0])
+        ),
+        'extra_agent2': GridWorldAgent(
+            id='extra_agent2',
+            encoding=6,
+            initial_position=np.array([0, 4])
+        )
+    }
+    sim = MultiAgentGridSim.build_sim_from_array(
+        array,
+        obj_registry,
+        extra_agents=extra_agents,
+        overlapping={1: [5], 5: [1, 5]}
+    )
+    sim.reset()
+    assert 'A-class-barrier0' in sim.grid[0, 0]
+    assert 'extra_agent0' in sim.grid[0, 0]
+    assert 'extra_agent1' in sim.grid[0, 0]
+    assert sim.grid[0, 1] == {}
+    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert sim.grid[0, 3] == {}
+    assert next(iter(sim.grid[0, 4].values())) == extra_agents['extra_agent2']
+    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert next(iter(sim.grid[1, 0].values())).encoding == 2
+    assert sim.grid[1, 1] == {}
+    assert sim.grid[1, 2] == {}
+    assert 'C-class-barrier3' in sim.grid[1, 3]
+    assert 'A-class-barrier4' in sim.grid[1, 4]
+
+    assert len(sim.agents) == 8
+    assert sim.agents['A-class-barrier0'].encoding == 1
+    np.testing.assert_array_equal(
+        sim.agents['A-class-barrier0'].initial_position,
+        np.array([0, 0])
+    )
+    assert sim.agents['B-class-barrier1'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier1'].initial_position,
+        np.array([0, 2])
+    )
+    assert sim.agents['B-class-barrier2'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier2'].initial_position,
+        np.array([1, 0])
+    )
+    assert sim.agents['C-class-barrier3'].encoding == 3
+    np.testing.assert_array_equal(
+        sim.agents['C-class-barrier3'].initial_position,
+        np.array([1, 3])
+    )
+    assert sim.agents['A-class-barrier4'].encoding == 1
+    np.testing.assert_array_equal(
+        sim.agents['A-class-barrier4'].initial_position,
+        np.array([1, 4])
+    )
+    assert sim.agents['extra_agent0'].encoding == 5
+    np.testing.assert_array_equal(
+        sim.agents['extra_agent0'].initial_position,
+        np.array([0, 0])
+    )
+    assert sim.agents['extra_agent1'].encoding == 5
+    np.testing.assert_array_equal(
+        sim.agents['extra_agent1'].initial_position,
+        np.array([0, 0])
+    )
+    assert sim.agents['extra_agent2'].encoding == 6
+    np.testing.assert_array_equal(
+        sim.agents['extra_agent2'].initial_position,
+        np.array([0, 4])
+    )
+
+    with pytest.raises(AssertionError):
+        # This fails because extra agents must be a dict
+        MultiAgentGridSim.build_sim_from_array(array, obj_registry, extra_agents=[])
+
+    with pytest.raises(AssertionError):
+        # This fails because the contents of the extra_agents dict is wrong.
+        MultiAgentGridSim.build_sim_from_array(array, obj_registry, extra_agents={0: 1})
+
+    sim2 = MultiAgentGridSim.build_sim_from_array(
+        array,
+        obj_registry,
+        extra_agents=extra_agents,
+        overlapping={1: [5], 5: [1]}
+    )
+    with pytest.raises(AssertionError):
+        # This fails because 5 cannot overlap with 5
+        sim2.reset()
 
 
 def test_build_sim_from_file():
