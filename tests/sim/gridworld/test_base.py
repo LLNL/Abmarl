@@ -94,6 +94,91 @@ def test_build_from_grid():
         MultiAgentGridSim.build_sim_from_grid(grid)
 
 
+def test_build_from_grid_with_extra_agents():
+    grid = Grid(2, 2)
+    grid.reset()
+    agents = {
+        'agent0': GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0])),
+        'agent1': GridWorldAgent(id='agent1', encoding=1, initial_position=np.array([0, 1])),
+        'agent2': GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([1, 0])),
+    }
+    grid.place(agents['agent0'], (0, 0))
+    grid.place(agents['agent1'], (0, 1))
+    grid.place(agents['agent2'], (1, 0))
+
+    # Agent 0 is already in the grid, so the builder should ignore agent0 in the
+    # extra agents. Agents 3 and 4 should be there because they are overlappable.
+    # Agent5 should be there because it can take the last empty spot on the map.
+    extra_agents = {
+        'agent0': GridWorldAgent(id='agent0', encoding=2, initial_position=np.array([0, 1])),
+        'agent3': GridWorldAgent(id='agent3', encoding=3, initial_position=np.array([0, 1])),
+        'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 0])),
+        'agent5': GridWorldAgent(id='agent5', encoding=5),
+    }
+
+    sim = MultiAgentGridSim.build_sim_from_grid(
+        grid,
+        extra_agents=extra_agents,
+        overlapping={1: [3, 4], 3: [1], 4: [1]}
+    )
+    sim.reset()
+    assert sim.agents == {
+        'agent0': agents['agent0'], # We use the agent already in the grid, not from extra agents.
+        'agent1': agents['agent1'],
+        'agent2': agents['agent2'],
+        'agent3': extra_agents['agent3'],
+        'agent4': extra_agents['agent4'],
+        'agent5': extra_agents['agent5'],
+    }
+    np.testing.assert_array_equal(
+        sim.agents['agent0'].initial_position,
+        np.array([0, 0])
+    )
+    np.testing.assert_array_equal(
+        sim.agents['agent1'].initial_position,
+        np.array([0, 1])
+    )
+    np.testing.assert_array_equal(
+        sim.agents['agent2'].initial_position,
+        np.array([1, 0])
+    )
+    np.testing.assert_array_equal(
+        sim.agents['agent3'].initial_position,
+        np.array([0, 1])
+    )
+    np.testing.assert_array_equal(
+        sim.agents['agent4'].initial_position,
+        np.array([1, 0])
+    )
+    assert sim.agents['agent5'].initial_position is None
+
+    assert next(iter(sim.grid[0, 0].values())) == agents['agent0']
+    assert agents['agent1'] in sim.grid[0, 1].values()
+    assert agents['agent2'] in sim.grid[1, 0].values()
+    assert extra_agents['agent3'] in sim.grid[0, 1].values()
+    assert extra_agents['agent4'] in sim.grid[1, 0].values()
+    assert next(iter(sim.grid[1, 1].values())) == extra_agents['agent5']
+
+    with pytest.raises(AssertionError):
+        # This fails because extra agents must be a dict
+        MultiAgentGridSim.build_sim_from_grid(grid, extra_agents=[])
+
+    with pytest.raises(AssertionError):
+        # This fails because the contents of the extra_agents dict is wrong.
+        MultiAgentGridSim.build_sim_from_grid(grid, extra_agents={0: 1})
+
+    sim2 = MultiAgentGridSim.build_sim_from_grid(
+        grid,
+        extra_agents=extra_agents
+    )
+    with pytest.raises(AssertionError):
+        # This fails because the agents are not allowed to overlap
+        sim2.reset()
+
+    with pytest.raises(AssertionError):
+        MultiAgentGridSim.build_sim_from_grid(grid._internal)
+
+
 def test_build_sim_from_array():
     array = np.array([
         ['A', '.', 'B', '0', ''],
