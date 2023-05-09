@@ -42,27 +42,24 @@ def test_build():
 def test_build_from_grid():
     grid = Grid(2, 2)
     grid.reset()
-    agents = [
-        GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0])),
-        GridWorldAgent(id='agent1', encoding=1, initial_position=np.array([0, 1])),
-        GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([1, 0])),
-        GridWorldAgent(id='agent3', encoding=1, initial_position=np.array([1, 1])),
-    ]
-    # Place 0th and 3rd agent in the grid according to their initial positions.
-    # Place 1st and 2nd agent in the grid swapped. We want to test how the
-    # initial positions gets defined during the build process.
-    grid.place(agents[0], (0, 0))
-    grid.place(agents[1], (0, 1))
-    grid.place(agents[2], (1, 0))
-    grid.place(agents[3], (1, 1))
+    agents = {
+        'agent0': GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0])),
+        'agent1': GridWorldAgent(id='agent1', encoding=1, initial_position=np.array([0, 1])),
+        'agent2': GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([1, 0])),
+        'agent3': GridWorldAgent(id='agent3', encoding=1, initial_position=np.array([1, 1])),
+    }
+    grid.place(agents['agent0'], (0, 0))
+    grid.place(agents['agent1'], (0, 1))
+    grid.place(agents['agent2'], (1, 0))
+    grid.place(agents['agent3'], (1, 1))
 
     sim = MultiAgentGridSim.build_sim_from_grid(grid)
     sim.reset()
     assert sim.agents == {
-        'agent0': agents[0],
-        'agent1': agents[1],
-        'agent2': agents[2],
-        'agent3': agents[3],
+        'agent0': agents['agent0'],
+        'agent1': agents['agent1'],
+        'agent2': agents['agent2'],
+        'agent3': agents['agent3'],
     }
     np.testing.assert_array_equal(
         sim.agents['agent0'].initial_position,
@@ -80,17 +77,20 @@ def test_build_from_grid():
         sim.agents['agent3'].initial_position,
         np.array([1, 1])
     )
-    assert next(iter(sim.grid[0, 0].values())) == agents[0]
-    assert next(iter(sim.grid[0, 1].values())) == agents[1]
-    assert next(iter(sim.grid[1, 0].values())) == agents[2]
-    assert next(iter(sim.grid[1, 1].values())) == agents[3]
+    assert next(iter(sim.grid[0, 0].values())) == agents['agent0']
+    assert next(iter(sim.grid[0, 1].values())) == agents['agent1']
+    assert next(iter(sim.grid[1, 0].values())) == agents['agent2']
+    assert next(iter(sim.grid[1, 1].values())) == agents['agent3']
 
     with pytest.raises(AssertionError):
+        # This fails because the grid must be a grid object, not an array
         MultiAgentGridSim.build_sim_from_grid(grid._internal)
 
     with pytest.raises(AssertionError):
-        agents[1].initial_position = np.array([1, 0])
-        agents[2].initial_position = np.array([0, 1])
+        # This fails becaue the agents' initial positions must match their index
+        # within the grid.
+        agents['agent1'].initial_position = np.array([1, 0])
+        agents['agent2'].initial_position = np.array([0, 1])
         MultiAgentGridSim.build_sim_from_grid(grid)
 
 
