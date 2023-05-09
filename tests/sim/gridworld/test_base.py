@@ -57,6 +57,7 @@ def test_build_from_grid():
     grid.place(agents[3], (1, 1))
 
     sim = MultiAgentGridSim.build_sim_from_grid(grid)
+    sim.reset()
     assert sim.agents == {
         'agent0': agents[0],
         'agent1': agents[1],
@@ -79,12 +80,6 @@ def test_build_from_grid():
         sim.agents['agent3'].initial_position,
         np.array([1, 1])
     )
-    assert next(iter(sim.grid[0, 0].values())) == agents[0]
-    assert next(iter(sim.grid[0, 1].values())) == agents[1]
-    assert next(iter(sim.grid[1, 0].values())) == agents[2]
-    assert next(iter(sim.grid[1, 1].values())) == agents[3]
-
-    sim.reset()
     assert next(iter(sim.grid[0, 0].values())) == agents[0]
     assert next(iter(sim.grid[0, 1].values())) == agents[1]
     assert next(iter(sim.grid[1, 0].values())) == agents[2]

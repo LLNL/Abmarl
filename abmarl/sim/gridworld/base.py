@@ -75,11 +75,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                             np.array([r, c])
                         ), "The initial position of the agent must match its position in the grid."
 
-        # TODO: Don't put these in kwargs, just pass them directly.
-        # TODO: Use _build_sim because it puts the grid in the correct start state.
-        kwargs['grid'] = grid
-        kwargs['agents'] = agents
-        return cls(**kwargs)
+        return cls._build_sim(grid.rows, grid.cols, agents=agents, **kwargs)
 
     @classmethod
     def build_sim_from_array(cls, array, object_registry, extra_agents=None, **kwargs):
@@ -181,8 +177,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
     @classmethod
     def _build_sim(cls, rows, cols, **kwargs):
         grid = Grid(rows, cols, **kwargs)
-        kwargs['grid'] = grid
-        return cls(**kwargs)
+        return cls(grid=grid, **kwargs)
 
     def render(self, fig=None, **kwargs):
         """
