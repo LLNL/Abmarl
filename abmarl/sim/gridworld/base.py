@@ -41,19 +41,30 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         return cls._build_sim(rows, cols, **kwargs)
 
     @classmethod
-    def build_sim_from_grid(cls, grid, **kwargs):
+    def build_sim_from_grid(cls, grid, extra_agents=None, **kwargs):
         """
         Build a GridSimluation from a Grid object.
 
         Args:
             grid: A Grid contains the all the agents index by location, so we can
                 construct a simluation from it.
+            extra_agents: A dictionary of agents which are not in the input grid
+                but which we want to be a part of the simulation. Note: if there
+                is an agent in the grid and in extra_agents, we will use the one
+                from the grid.
 
         Returns:
-            A GridSimulation built from the grid.
+            A GridSimulation built from the grid along with any extra agents.
         """
         assert type(grid) is Grid, "Grid object required."
-        agents = {}
+        if extra_agents is not None:
+            # We only check if it is a dictionary because that is the requirement
+            # here. The ABM agents property will further check the contents of the
+            # dictionary as needed.
+            assert type(extra_agents) is dict, "Extra agents must be a dictionary."
+            agents = extra_agents
+        else:
+            agents = {}
         for r in range(grid.rows):
             for c in range(grid.cols):
                 if grid[r, c] is not None:
@@ -64,12 +75,14 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                             np.array([r, c])
                         ), "The initial position of the agent must match its position in the grid."
 
+        # TODO: Don't put these in kwargs, just pass them directly.
+        # TODO: Use _build_sim because it puts the grid in the correct start state.
         kwargs['grid'] = grid
         kwargs['agents'] = agents
         return cls(**kwargs)
 
     @classmethod
-    def build_sim_from_array(cls, array, object_registry, **kwargs):
+    def build_sim_from_array(cls, array, object_registry, extra_agents=None, **kwargs):
         """
         Build a GridSimulation from an array.
 
@@ -80,16 +93,26 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             object_registry: A dictionary that maps the characters in the array
                 to a function that generates the agent with its unique id. Zeros,
                 periods, and underscores are reserved for empty space.
+            extra_agents: A dictionary of agents which are not in the input grid
+                but which we want to be a part of the simulation. Note: if there
+                is an agent in the array and in extra_agents, we will use the one
+                from the array.
 
         Returns:
-            A GridSimulation built from the array.
+            A GridSimulation built from the array along with any extra agents.
         """
-        # TODO: Support arrays that contain an iterable of characters per cell
         assert type(array) is np.ndarray, "The array must be a numpy array."
         assert type(object_registry) is dict, "The object_registry must be a dictionary."
         assert all([i not in object_registry for i in [0, '.', '_']]), \
             "0, '.', and '_' are reserved for empty space."
-        agents = {}
+        if extra_agents is not None:
+            # We only check if it is a dictionary because that is the requirement
+            # here. The ABM agents property will further check the contents of the
+            # dictionary as needed.
+            assert type(extra_agents) is dict, "Extra agents must be a dictionary."
+            agents = extra_agents
+        else:
+            agents = {}
         n = 0
         rows = array.shape[0]
         cols = array.shape[1]
@@ -105,7 +128,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
 
     @classmethod
-    def build_sim_from_file(cls, file_name, object_registry, **kwargs):
+    def build_sim_from_file(cls, file_name, object_registry, extra_agents=None, **kwargs):
         """
         Build a GridSimulation from a text file.
 
@@ -118,15 +141,26 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                 function that generates the agent. This must be a function because
                 each agent must have unique id, which is generated here. Zeros,
                 periods, and underscores are reserved for empty space.
+            extra_agents: A dictionary of agents which are not in the input grid
+                but which we want to be a part of the simulation. Note: if there
+                is an agent in the file and in extra_agents, we will use the one
+                from the file.
 
         Returns:
-            A GridSimulation built from the file.
+            A GridSimulation built from the file along with any extra agents.
         """
         assert type(file_name) is str, "The file_name must be the name of the file."
         assert type(object_registry) is dict, "The object_registry must be a dictionary."
         assert all([i not in object_registry for i in [0, '.', '_']]), \
             "0, '.', and '_' are reserved for empty space."
-        agents = {}
+        if extra_agents is not None:
+            # We only check if it is a dictionary because that is the requirement
+            # here. The ABM agents property will further check the contents of the
+            # dictionary as needed.
+            assert type(extra_agents) is dict, "Extra agents must be a dictionary."
+            agents = extra_agents
+        else:
+            agents = {}
         n = 0
         with open(file_name, 'r') as fp:
             lines = fp.read().splitlines()
