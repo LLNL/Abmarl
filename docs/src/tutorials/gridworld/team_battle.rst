@@ -184,10 +184,10 @@ if they are on different teams.
 .. code-block:: python
 
    overlap_map = {
-       1: [1],
-       2: [2],
-       3: [3],
-       4: [4]
+       1: {1},
+       2: {2},
+       3: {3},
+       4: {4}
    }
    attack_map = {
        1: [2, 3, 4],
