@@ -13,28 +13,14 @@ class Grid:
     Args:
         rows: The number of rows in the grid.
         cols: The number of columns in the grid.
-        overlapping: Dictionary that maps the agents' encodings to a list of encodings
-            with which they can occupy the same cell. To avoid undefined behavior, the
-            overlapping should be symmetric, so that if 2 can overlap with 3, then 3
-            can also overlap with 2.
+        overlapping: Overlapping matrix tracks agents can overlap based on their
+            encodings.
     """
     def __init__(self, rows, cols, overlapping=None, **kwargs):
         assert type(rows) is int and rows > 0, "Rows must be a positive integer."
         assert type(cols) is int and cols > 0, "Cols must be a positive integer."
         self._internal = np.empty((rows, cols), dtype=object)
-
-        # Overlapping matrix
-        if overlapping is not None:
-            assert type(overlapping) is dict, "Overlap mapping must be dictionary."
-            for k, v in overlapping.items():
-                assert type(k) is int, "All keys in overlap mapping must be integer."
-                assert type(v) is list, "All values in overlap mapping must be list."
-                for i in v:
-                    assert type(i) is int, \
-                        "All elements in the overlap mapping values must be integers."
-            self._overlapping = overlapping
-        else:
-            self._overlapping = {}
+        self.overlapping = overlapping
 
     @property
     def rows(self):
@@ -49,6 +35,33 @@ class Grid:
         The number of columns in the grid.
         """
         return self._internal.shape[1]
+
+    @property
+    def overlapping(self):
+        """
+        Overlapping matrix tracks agents can overlap based on their encodings.
+
+        Overlapping comes in the form of a dictionary that maps agents' encodings
+        to a set of encodings with which the can occupy the same cell. If the overlapping
+        matrix is not symmetrical, then we update it here to be symmetrical. That is,
+        if 2 can overlap with 3, then 3 can overlap with 2.
+        """
+        return self._overlapping
+
+    @overlapping.setter
+    def overlapping(self, value):
+        if value is not None:
+            assert type(value) is dict, "Overlap mapping must be dictionary."
+            for ndx, overlap_set in value.items():
+                assert type(ndx) is int, "All keys in overlap mapping must be integer."
+                assert type(overlap_set) is set, "All values in overlap mapping must be set."
+                for overlap_ndx in overlap_set:
+                    assert type(overlap_ndx) is int, \
+                        "All elements in the overlap mapping values must be integers."
+                    value[overlap_ndx].add(ndx) # Force symmetry in the overlapping
+            self._overlapping = value
+        else:
+            self._overlapping = {}
 
     def reset(self, **kwargs):
         """
