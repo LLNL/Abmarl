@@ -15,7 +15,7 @@ class Grid:
     Args:
         rows: The number of rows in the grid.
         cols: The number of columns in the grid.
-        overlapping: Overlapping matrix tracks agents can overlap based on their
+        overlapping: Overlapping matrix tracks which agents can overlap based on their
             encodings.
     """
     def __init__(self, rows, cols, overlapping=None, **kwargs):
@@ -41,26 +41,26 @@ class Grid:
     @property
     def overlapping(self):
         """
-        Overlapping matrix tracks agents can overlap based on their encodings.
+        Overlapping matrix tracks which agents can overlap based on their encodings.
 
-        Overlapping comes in the form of a dictionary that maps agents' encodings
-        to a set of encodings with which the can occupy the same cell. If the overlapping
-        matrix is not symmetrical, then we update it here to be symmetrical. That is,
-        if 2 can overlap with 3, then 3 can overlap with 2.
+        A dictionary that maps agents' encodings to a set of encodings with which
+        they can overlap. If the overlapping matrix is not symmetrical,
+        then we update it here to be symmetrical. That is, if 2 can overlap with
+        3, then 3 can overlap with 2.
         """
         return self._overlapping
 
     @overlapping.setter
     def overlapping(self, value):
         if value is not None:
-            assert type(value) is dict, "Overlap mapping must be dictionary."
+            assert type(value) is dict, "Overlaping must be dictionary."
             symmetric_value = copy.deepcopy(value)
             for ndx, overlap_set in value.items():
-                assert type(ndx) is int, "All keys in overlap mapping must be integer."
-                assert type(overlap_set) is set, "All values in overlap mapping must be set."
+                assert type(ndx) is int, "All keys in overlapping dict must be integers."
+                assert type(overlap_set) is set, "All values in overlapping dict must be sets."
                 for overlap_ndx in overlap_set:
                     assert type(overlap_ndx) is int, \
-                        "All elements in the overlap mapping values must be integers."
+                        "All elements in overlapping dict values must be integers."
                     # Force symmetry in the overlapping
                     if overlap_ndx not in symmetric_value:
                         symmetric_value[overlap_ndx] = {ndx}
