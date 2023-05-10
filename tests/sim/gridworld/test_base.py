@@ -10,8 +10,12 @@ from abmarl.examples.sim import MultiAgentGridSim
 
 
 def test_build():
-    sim = MultiAgentGridSim.build_sim(3, 4, agents={})
-    assert sim.agents == {}
+    agent = GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0]))
+    sim = MultiAgentGridSim.build_sim(
+        3, 4,
+        agents={'agent0': agent}
+    )
+    assert sim.agents == {'agent0': agent}
     assert isinstance(sim.grid, Grid)
     assert sim.grid.rows == 3
     assert sim.grid.cols == 4
@@ -20,7 +24,7 @@ def test_build():
     sim.reset()
     np.testing.assert_array_equal(
         sim.grid._internal,  np.array([
-            [{}, {}, {}, {}],
+            [{'agent0': agent}, {}, {}, {}],
             [{}, {}, {}, {}],
             [{}, {}, {}, {}]
         ])
@@ -123,7 +127,7 @@ def test_build_from_grid_with_extra_agents():
     sim = MultiAgentGridSim.build_sim_from_grid(
         grid,
         extra_agents=extra_agents,
-        overlapping={1: [3, 4], 3: [1], 4: [1]}
+        overlapping={1: {3, 4}, 3: {1}, 4: {1}}
     )
     sim.reset()
     assert sim.agents == {
@@ -350,7 +354,7 @@ def test_build_sim_from_array_with_extra_agents():
         array,
         obj_registry,
         extra_agents=extra_agents,
-        overlapping={1: [5], 5: [1, 5]}
+        overlapping={1: {5}, 5: {1, 5}}
     )
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
@@ -421,7 +425,7 @@ def test_build_sim_from_array_with_extra_agents():
         array,
         obj_registry,
         extra_agents=extra_agents,
-        overlapping={1: [5], 5: [1]}
+        overlapping={1: {5}, 5: {1}}
     )
     with pytest.raises(AssertionError):
         # This fails because 5 cannot overlap with 5
@@ -598,7 +602,7 @@ def test_build_sim_from_file_with_extra_agents():
         file_name,
         obj_registry,
         extra_agents=extra_agents,
-        overlapping={1: [5], 5: [1, 5]}
+        overlapping={1: {5}, 5: {1, 5}}
     )
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
@@ -669,7 +673,7 @@ def test_build_sim_from_file_with_extra_agents():
         file_name,
         obj_registry,
         extra_agents=extra_agents,
-        overlapping={1: [5], 5: [1]}
+        overlapping={1: {5}, 5: {1}}
     )
     with pytest.raises(AssertionError):
         # This fails because 5 cannot overlap with 5

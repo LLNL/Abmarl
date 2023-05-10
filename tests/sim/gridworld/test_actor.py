@@ -74,9 +74,9 @@ def test_move_actor():
 
 def test_move_actor_with_overlap():
     overlapping = {
-        1: [1],
-        2: [3],
-        3: [2]
+        1: {1},
+        2: {3},
+        3: {2}
     }
     grid = Grid(5, 6, overlapping=overlapping)
     agents = {
@@ -186,9 +186,9 @@ def test_cross_move_actor():
 
 def test_cross_move_actor_with_overlap():
     overlapping = {
-        1: [1],
-        2: [3],
-        3: [2]
+        1: {1},
+        2: {3},
+        3: {2}
     }
     grid = Grid(5, 6, overlapping=overlapping)
     agents = {
@@ -614,7 +614,7 @@ def test_selective_attack_actor():
 
 
 def test_selective_attack_actor_attack_count():
-    grid = Grid(2, 2, overlapping={1: [1, 2, 3], 2: [1, 2, 3], 3: [1, 2, 3]})
+    grid = Grid(2, 2, overlapping={1: {1, 2, 3}, 2: {1, 2, 3}, 3: {1, 2, 3}})
     agents = {
         'agent0': AttackingAgent(
             id='agent0',
@@ -715,7 +715,7 @@ def test_selective_attack_actor_attack_count():
 
 def test_selective_attack_actor_stacked_attack():
     np.random.seed(24)
-    grid = Grid(2, 2, overlapping={1: [1, 2, 3], 2: [1, 2, 3], 3: [1, 2, 3]})
+    grid = Grid(2, 2, overlapping={1: {1, 2, 3}, 2: {1, 2, 3}, 3: {1, 2, 3}})
     agents = {
         'agent0': AttackingAgent(
             id='agent0',
@@ -801,7 +801,7 @@ def test_selective_attack_actor_stacked_attack():
 
 
 def test_encoding_based_attack_actor():
-    grid = Grid(2, 2, overlapping={1: [3], 3: [1]})
+    grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
         'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
@@ -876,7 +876,7 @@ def test_encoding_based_attack_actor():
 
 
 def test_encoding_based_attack_actor_attack_count():
-    grid = Grid(2, 2, overlapping={1: [3], 3: [1]})
+    grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
         'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
@@ -991,7 +991,7 @@ def test_encoding_based_attack_actor_attack_count():
 
 
 def test_encoding_based_attack_actor_stacked_attack():
-    grid = Grid(2, 2, overlapping={1: [3], 3: [1]})
+    grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
         'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
@@ -1057,7 +1057,7 @@ def test_encoding_based_attack_actor_stacked_attack():
 
 
 def test_restricted_selective_attack_actor():
-    grid = Grid(2, 2, overlapping={1: [1]})
+    grid = Grid(2, 2, overlapping={1: {1}})
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
         'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
@@ -1128,7 +1128,7 @@ def test_restricted_selective_attack_actor():
 
 
 def test_restricted_selective_attack_actor_stacked_attacks():
-    grid = Grid(2, 2, overlapping={1: [1]})
+    grid = Grid(2, 2, overlapping={1: {1}})
     agents = {
         'agent0': HealthAgent(
             id='agent0', initial_position=np.array([0, 0]), encoding=1, initial_health=1

@@ -175,7 +175,7 @@ produces an animation like the one at the top of this page.
    sim = MazeNaviationSim.build_sim_from_file(
        file_name,
        object_registry,
-       overlapping={1: [3], 3: [1]}
+       overlapping={1: {3}, 3: {1}}
    )
    sim.reset()
    fig = plt.figure()

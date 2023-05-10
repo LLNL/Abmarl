@@ -104,7 +104,7 @@ The :ref:`Grid <api_gridworld_grid>` stores :ref:`Agents <gridworld_agent>` in a
 to be a certain size (rows and columns) and to allow types of Agents to overlap
 (occupy the same cell). For example, you may want a ForagingAgent to be able to overlap
 with a ResourceAgent but not a WallAgent. The `overlapping` parameter
-is a dictionary that maps the Agent's `encoding` to a list of other Agents' `encodings`
+is a dictionary that maps the Agent's `encoding` to a set of other Agents' `encodings`
 with which it can overlap. For example,
 
 .. code-block:: python
@@ -112,9 +112,9 @@ with which it can overlap. For example,
    from abmarl.sim.gridworld.grid import Grid
 
    overlapping = {
-       1: [2],
-       2: [1, 3],
-       3: [2, 3]
+       1: {2},
+       2: {1, 3},
+       3: {2, 3}
    }
    grid = Grid(5, 6, overlapping=overlapping)
 
@@ -122,10 +122,6 @@ means that agents whose `encoding` is 1 can overlap with other agents whose `enc
 is 2; agents whose `encoding` is 2 can overlap with other agents whose `encoding` is
 1 or 3; and agents whose `encoding` is 3 can overlap with other agents whose `encoding`
 is 2 or 3.
-
-.. WARNING::
-   To avoid undefined behavior, the `overlapping` should be symmetric, so that if
-   2 can overlap with 3, then 3 can also overlap with 2.
 
 .. NOTE::
    If `overlapping` is not specified, then no agents will be able to occupy the same
@@ -305,7 +301,7 @@ they are allowed to overlap. For example, in this setup
            id='agent1', encoding=1, move_range=2, initial_position=np.array([0, 2])
        )
    }
-   grid = Grid(5, 5, overlapping={1: [1]})
+   grid = Grid(5, 5, overlapping={1: {1}})
    position_state = PositionState(agents=agents, grid=grid)
    move_actor = MoveActor(agents=agents, grid=grid)
 
@@ -367,7 +363,7 @@ appear in the observation, shown as their `encoding`. For example, the following
        'agent4': GridWorldAgent(id='agent4', encoding=5, initial_position=np.array([4, 4])),
        'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([5, 5]))
    }
-   grid = Grid(6, 6, overlapping={4: [5], 5: [4]})
+   grid = Grid(6, 6, overlapping={4: {5}, 5: {4}})
    position_state = PositionState(agents=agents, grid=grid)
    observer = SingleGridObserver(agents=agents, grid=grid)
 
@@ -719,7 +715,7 @@ allowed. Consider the following setup:
       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=1),
       'agent3': HealthAgent(id='agent3', encoding=3, initial_position=np.array([0, 1]))
   }
-  grid = Grid(2, 2, overlapping={2: [3], 3: [2]})
+  grid = Grid(2, 2, overlapping={2: {3}, 3: {2}})
   position_state = PositionState(agents=agents, grid=grid)
   health_state = HealthState(agents=agents, grid=grid)
   attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)

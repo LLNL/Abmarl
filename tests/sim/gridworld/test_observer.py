@@ -12,7 +12,7 @@ from abmarl.sim.gridworld.grid import Grid
 
 def test_absolute_grid_observer():
     np.random.seed(24)
-    grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
+    grid = Grid(5, 5, overlapping={1: {6}, 6: {1}})
     agents = {
         'agent0': GridObservingAgent(
             id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
@@ -76,7 +76,7 @@ def test_absolute_grid_observer():
 
 def test_absolute_grid_observer_blocking():
     np.random.seed(24)
-    grid = Grid(5, 5, overlapping={1: [6], 6: [1]})
+    grid = Grid(5, 5, overlapping={1: {6}, 6: {1}})
     agents = {
         'agent0': GridObservingAgent(
             id='agent0', encoding=1, view_range=2, initial_position=np.array([2, 2])
@@ -315,7 +315,7 @@ def test_multi_grid_observer():
             id='agent5', encoding=6, initial_position=np.array([2, 1])
         ),
     }
-    grid = Grid(5, 5, overlapping={2: [3], 3: [2], 5: [5]})
+    grid = Grid(5, 5, overlapping={2: {3}, 3: {2}, 5: {5}})
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = MultiGridObserver(agents=agents, grid=grid)
@@ -579,7 +579,7 @@ def test_multi_grid_observer_blocking():
             id='agent5', encoding=6, initial_position=np.array([2, 1]), blocking=True
         ),
     }
-    grid = Grid(5, 5, overlapping={2: [3], 3: [2], 5: [5]})
+    grid = Grid(5, 5, overlapping={2: {3}, 3: {2}, 5: {5}})
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = MultiGridObserver(agents=agents, grid=grid)
@@ -797,7 +797,7 @@ def test_observe_self():
             id='agent2', encoding=2, view_range=1, initial_position=np.array([2, 2]), move_range=1
         ),
     }
-    grid = Grid(5, 5, overlapping={1: [2], 2: [1]})
+    grid = Grid(5, 5, overlapping={1: {2}, 2: {1}})
 
     position_state = PositionState(grid=grid, agents=agents)
     position_state.reset()
@@ -844,7 +844,7 @@ def test_observe_self():
 
 def test_absolute_position_observer():
     class PositionObservingAgent(ObservingAgent, GridWorldAgent): pass
-    grid = Grid(6, 7, overlapping={1: [5], 4: [6], 5: [1], 6: [4]})
+    grid = Grid(6, 7, overlapping={1: {5}, 4: {6}, 5: {1}, 6: {4}})
     agents = {
         'agent0': PositionObservingAgent(
             id='agent0',
@@ -923,7 +923,7 @@ def test_absolute_position_observer():
 
 
 def test_grid_and_absolute_position_observer_combined():
-    grid = Grid(6, 7, overlapping={1: [5], 4: [6], 5: [1], 6: [4]})
+    grid = Grid(6, 7, overlapping={1: {5}, 4: {6}, 5: {1}, 6: {4}})
     agents = {
         'agent0': GridObservingAgent(
             id='agent0',
