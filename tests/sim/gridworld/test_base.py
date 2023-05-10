@@ -10,8 +10,12 @@ from abmarl.examples.sim import MultiAgentGridSim
 
 
 def test_build():
-    sim = MultiAgentGridSim.build_sim(3, 4, agents={})
-    assert sim.agents == {}
+    agent = GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0]))
+    sim = MultiAgentGridSim.build_sim(
+        3, 4,
+        agents={'agent0': agent}
+    )
+    assert sim.agents == {'agent0': agent}
     assert isinstance(sim.grid, Grid)
     assert sim.grid.rows == 3
     assert sim.grid.cols == 4
@@ -20,7 +24,7 @@ def test_build():
     sim.reset()
     np.testing.assert_array_equal(
         sim.grid._internal,  np.array([
-            [{}, {}, {}, {}],
+            [{'agent0': agent}, {}, {}, {}],
             [{}, {}, {}, {}],
             [{}, {}, {}, {}]
         ])
