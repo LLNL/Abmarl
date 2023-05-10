@@ -28,20 +28,24 @@ def test_grid_internal():
 
 
 def test_grid_overlapping():
-    grid = Grid(3, 3, overlapping={1: [2], 2: [1], 3: [1, 2]})
-    assert grid._overlapping == {1: [2], 2: [1], 3: [1, 2]}
+    grid = Grid(3, 3, overlapping={1: {2}, 2: {1}, 3: {1, 2}})
+    assert grid.overlapping == {1: {2, 3}, 2: {1, 3}, 3: {1, 2}}
 
     with pytest.raises(AssertionError):
+        # This fails because overlapping must be a dictionary
         Grid(2, 2, overlapping=[1, 2, 3])
 
     with pytest.raises(AssertionError):
-        Grid(2, 2, overlapping={'1': [3], 2.0: [6]})
+        # This fails because the keys must be integers
+        Grid(2, 2, overlapping={'1': {3}, 2.0: {6}})
 
     with pytest.raises(AssertionError):
-        Grid(2, 2, overlapping={1: 3, 2: [6]})
+        # This fails because all the values must be sets
+        Grid(2, 2, overlapping={1: 3, 2: {6}})
 
     with pytest.raises(AssertionError):
-        Grid(2, 2, overlapping={1: ['2', 3], 2: [2, 3]})
+        # This fails because all the elements in the sets must be integers
+        Grid(2, 2, overlapping={1: {'2', 3}, 2: {2, 3}})
 
 
 def test_grid_reset():
@@ -74,7 +78,7 @@ def test_grid_query():
 
 
 def test_grid_query_with_overlap():
-    grid = Grid(3, 3, overlapping={1: [1]})
+    grid = Grid(3, 3, overlapping={1: {1}})
     grid.reset()
     agent1 = GridWorldAgent(id='agent1', encoding=1)
     agent2 = GridWorldAgent(id='agent2', encoding=1)
@@ -105,7 +109,7 @@ def test_grid_place():
 
 
 def test_grid_place_with_overlap():
-    grid = Grid(3, 3, overlapping={1: [2], 2: [1]})
+    grid = Grid(3, 3, overlapping={1: {2}, 2: {1}})
     grid.reset()
     agent1 = GridWorldAgent(id='agent1', encoding=1)
     agent2 = GridWorldAgent(id='agent2', encoding=2)
@@ -115,7 +119,7 @@ def test_grid_place_with_overlap():
 
 
 def test_grid_remove():
-    grid = Grid(3, 3, overlapping={1: [2], 2: [1]})
+    grid = Grid(3, 3, overlapping={1: {2}, 2: {1}})
     grid.reset()
     agent1 = GridWorldAgent(id='agent1', encoding=1)
     agent2 = GridWorldAgent(id='agent2', encoding=2)

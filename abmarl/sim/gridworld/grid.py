@@ -58,7 +58,11 @@ class Grid:
                 for overlap_ndx in overlap_set:
                     assert type(overlap_ndx) is int, \
                         "All elements in the overlap mapping values must be integers."
-                    value[overlap_ndx].add(ndx) # Force symmetry in the overlapping
+                    # Force symmetry in the overlapping
+                    if overlap_ndx not in value:
+                        value[overlap_ndx] = {ndx}
+                    else:
+                        value[overlap_ndx].add(ndx)
             self._overlapping = value
         else:
             self._overlapping = {}
