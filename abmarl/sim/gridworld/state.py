@@ -33,7 +33,7 @@ class PositionState(StateBaseComponent):
         max_encoding = max([agent.encoding for agent in self.agents.values()])
         ravelled_available_positions = {
             encoding: set(i for i in range(self.rows * self.cols))
-            for encoding in range(max_encoding)
+            for encoding in range(1, max_encoding + 1)
         }
         self.grid.reset()
         # First place agents with initial positions.
@@ -42,9 +42,9 @@ class PositionState(StateBaseComponent):
                 r, c = agent.initial_position
                 assert self.grid.place(agent, (r, c)), "All initial positions must " + \
                     "be unique or agents with the same initial positions must be overlappable."
-                for encoding in range(max_encoding):
+                for encoding in range(1, max_encoding + 1):
                     # Remove this cell from any encoding where overlapping is False
-                    if encoding not in self.grid.overlapping[agent.encoding]:
+                    if encoding not in self.grid.overlapping.get(agent.encoding, {}):
                         try:
                             ravelled_available_positions[encoding].remove(
                                 np.ravel_multi_index((r, c), (self.rows, self.cols))
@@ -63,9 +63,9 @@ class PositionState(StateBaseComponent):
                 n = np.random.choice([*ravelled_available_positions[agent.encoding]], 1)
                 r, c = np.unravel_index(n.item(), shape=(self.rows, self.cols))
                 assert self.grid.place(agent, (r, c))
-                for encoding in range(max_encoding):
+                for encoding in range(1, max_encoding + 1):
                     # Remove this cell from any encoding where overlapping is False
-                    if encoding not in self.grid.overlapping[agent.encoding]:
+                    if encoding not in self.grid.overlapping.get(agent.encoding, {}):
                         try:
                             ravelled_available_positions[encoding].remove(n.item())
                         except KeyError:
