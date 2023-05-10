@@ -1,4 +1,6 @@
 
+import copy
+
 import numpy as np
 
 
@@ -52,6 +54,7 @@ class Grid:
     def overlapping(self, value):
         if value is not None:
             assert type(value) is dict, "Overlap mapping must be dictionary."
+            symmetric_value = copy.deepcopy(value)
             for ndx, overlap_set in value.items():
                 assert type(ndx) is int, "All keys in overlap mapping must be integer."
                 assert type(overlap_set) is set, "All values in overlap mapping must be set."
@@ -59,11 +62,11 @@ class Grid:
                     assert type(overlap_ndx) is int, \
                         "All elements in the overlap mapping values must be integers."
                     # Force symmetry in the overlapping
-                    if overlap_ndx not in value:
-                        value[overlap_ndx] = {ndx}
+                    if overlap_ndx not in symmetric_value:
+                        symmetric_value[overlap_ndx] = {ndx}
                     else:
-                        value[overlap_ndx].add(ndx)
-            self._overlapping = value
+                        symmetric_value[overlap_ndx].add(ndx)
+            self._overlapping = symmetric_value
         else:
             self._overlapping = {}
 

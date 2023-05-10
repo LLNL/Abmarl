@@ -28,7 +28,7 @@ def test_grid_internal():
 
 
 def test_grid_overlapping():
-    grid = Grid(3, 3, overlapping={1: {1, 2}, 2: {1}, 3: {1, 2}})
+    grid = Grid(3, 3, overlapping={1: {1, 2}, 3: {1, 2}})
     assert grid.overlapping == {1: {1, 2, 3}, 2: {1, 3}, 3: {1, 2}}
 
     with pytest.raises(AssertionError):
