@@ -60,7 +60,10 @@ class PositionState(StateBaseComponent):
         # agent is placed.
         for agent in self.agents.values():
             if agent.initial_position is None:
-                n = np.random.choice([*ravelled_available_positions[agent.encoding]], 1)
+                try:
+                    n = np.random.choice([*ravelled_available_positions[agent.encoding]], 1)
+                except ValueError:
+                    raise RuntimeError(f"Could not find a cell for {agent.id}") from None
                 r, c = np.unravel_index(n.item(), shape=(self.rows, self.cols))
                 assert self.grid.place(agent, (r, c))
                 for encoding in range(1, max_encoding + 1):
