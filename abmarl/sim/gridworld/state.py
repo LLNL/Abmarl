@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from abmarl.sim.gridworld.base import GridWorldBaseComponent
+from abmarl.sim.gridworld.base import GridWorldBaseComponent, GridWorldAgent
 from abmarl.sim.gridworld.agent import HealthAgent
 
 
@@ -52,9 +52,9 @@ class PositionState(StateBaseComponent):
         place the agents in the grid.
         """
         self.grid.reset()
+
         # Build set of available positions
-        max_encoding = max([agent.encoding for agent in self.agents.values()])
-        self._build_available_positions(max_encoding=max_encoding)
+        self._build_available_positions()
 
         # Place agents with initial positions.
         for agent in self.agents.values():
@@ -66,13 +66,11 @@ class PositionState(StateBaseComponent):
             if agent.initial_position is None:
                 self._place_variable_position_agent(agent)
 
-    def _build_available_positions(self, max_encoding=0, **kwargs):
+    def _build_available_positions(self, **kwargs):
         """
         Define the positions that are available per encoding.
-
-        Args:
-            max_encoding: The maximum number of encodings in the simulation.
         """
+        max_encoding = max([agent.encoding for agent in self.agents.values()])
         self.ravelled_positions_available = {
             encoding: set(i for i in range(self.rows * self.cols))
             for encoding in range(1, max_encoding + 1)
