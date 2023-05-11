@@ -31,10 +31,8 @@ class PositionState(StateBaseComponent):
         place the agents in the grid.
         """
         max_encoding = max([agent.encoding for agent in self.agents.values()])
-        ravelled_available_positions = {
-            encoding: set(i for i in range(self.rows * self.cols))
-            for encoding in range(1, max_encoding + 1)
-        }
+        ravelled_available_positions = \
+            self.ravelled_positions_available_at_reset(max_encoding=max_encoding)
         self.grid.reset()
         # First place agents with initial positions.
         for agent in self.agents.values():
@@ -75,6 +73,22 @@ class PositionState(StateBaseComponent):
                             # Catch a key error because this cell might have already
                             # been removed from this encoding
                             continue
+
+    def ravelled_positions_available_at_reset(self, max_encoding=0, **kwargs):
+        """
+        Define the positions that are available per encoding.
+
+        Args:
+            max_encoding: The maximum number of encodings in the simulation.
+        Returns:
+            A dictionary mapping the enodings to a set of positions available to
+                agents of that encoding at reset. The set should be the cell represented
+                in its ravelled form.
+        """
+        return {
+            encoding: set(i for i in range(self.rows * self.cols))
+            for encoding in range(1, max_encoding + 1)
+        }
 
 
 class HealthState(StateBaseComponent):
