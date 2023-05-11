@@ -51,51 +51,20 @@ class PositionState(StateBaseComponent):
         We use the agent's initial position if it exists. Otherwise, we randomly
         place the agents in the grid.
         """
-        max_encoding = max([agent.encoding for agent in self.agents.values()])
-        ravelled_available_positions = \
-            self._build_available_positions(max_encoding=max_encoding)
         self.grid.reset()
-        # First place agents with initial positions.
+        # Build set of available positions
+        max_encoding = max([agent.encoding for agent in self.agents.values()])
+        self._build_available_positions(max_encoding=max_encoding)
+
+        # Place agents with initial positions.
         for agent in self.agents.values():
             if agent.initial_position is not None:
-                r, c = agent.initial_position
-                # TODO: Assert that the agent can be placed in this position according
-                # to ravelled positions available
-                assert self.grid.place(agent, (r, c)), "All initial positions must " + \
-                    "be unique or agents with the same initial positions must be overlappable."
-                for encoding in range(1, max_encoding + 1):
-                    # Remove this cell from any encoding where overlapping is False
-                    if encoding not in self.grid.overlapping.get(agent.encoding, {}):
-                        try:
-                            ravelled_available_positions[encoding].remove(
-                                np.ravel_multi_index((r, c), (self.rows, self.cols))
-                            )
-                        except KeyError:
-                            # Catch a key error because this cell might have already
-                            # been removed from this encoding
-                            continue
+                self._place_initial_position_agent(agent)
 
-        # Now place all the rest of the agents who did not have initial positions
-        # and block off those positions as well. We have to do this one agent at
-        # a time because the list of available positions is updated after each
-        # agent is placed.
+        # Now place agents with variable positions
         for agent in self.agents.values():
             if agent.initial_position is None:
-                try:
-                    n = np.random.choice([*ravelled_available_positions[agent.encoding]], 1)
-                except ValueError:
-                    raise RuntimeError(f"Could not find a cell for {agent.id}") from None
-                r, c = np.unravel_index(n.item(), shape=(self.rows, self.cols))
-                assert self.grid.place(agent, (r, c))
-                for encoding in range(1, max_encoding + 1):
-                    # Remove this cell from any encoding where overlapping is False
-                    if encoding not in self.grid.overlapping.get(agent.encoding, {}):
-                        try:
-                            ravelled_available_positions[encoding].remove(n.item())
-                        except KeyError:
-                            # Catch a key error because this cell might have already
-                            # been removed from this encoding
-                            continue
+                self._place_variable_position_agent(agent)
 
     def _build_available_positions(self, max_encoding=0, **kwargs):
         """
@@ -108,7 +77,7 @@ class PositionState(StateBaseComponent):
             encoding: set(i for i in range(self.rows * self.cols))
             for encoding in range(1, max_encoding + 1)
         }
-    
+
     def _update_available_positions(self, agent_just_placed, **kwargs):
         """
         Update the available positions based on the agent that was just placed.
