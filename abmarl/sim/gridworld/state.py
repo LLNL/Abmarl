@@ -240,6 +240,7 @@ class MazePlacementState(PositionState):
         n = np.random.randint(0, self.rows * self.cols)
         r, c = np.unravel_index(n, shape=(self.rows, self.cols))
         maze_start = (r, c)
+        ravelled_maze_start = np.ravel_multi_index(maze_start, (self.rows, self.cols))
         maze = gu.generate_maze(self.rows, self.cols, maze_start)
 
         ravelled_barrier_positions = set()
@@ -247,30 +248,21 @@ class MazePlacementState(PositionState):
         for ndx in range(barrier_positions[0]):
             r, c = barrier_positions[0][ndx], barrier_positions[1][ndx]
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
-            ravelled_barrier_positions.add(n)
+            ravelled_barrier_positions.append(n)
+        ravelled_barrier_positions.sort(key=lambda x: abs(x - ravelled_maze_start), reverse=True)
 
         ravelled_free_positions = set()
         free_positions = np.where(maze == 0)
         for ndx in range(free_positions[0]):
             r, c = free_positions[0][ndx], free_positions[1][ndx]
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
-            ravelled_free_positions.add(n)
+            ravelled_free_positions.append(n)
+        ravelled_free_positions.sort(key=lambda x: abs(x - ravelled_maze_start))
 
         self.ravelled_positions_available = {
             **{encoding: ravelled_barrier_positions for encoding in self.barrier_encodings},
             **{encoding: ravelled_free_positions for encoding in self.free_encoding}
         }
-
-        if self.barriers_near_target or self.free_agents_far_from_target:
-            ravelled_maze_start = np.ravel_multi_index(maze_start, (self.rows, self.cols))
-            self._ravelled_position_indexing = {
-                encoding: np.argsort(abs(positions - ravelled_maze_start))
-                for encoding, positions in self.ravelled_positions_available.items()
-            }
-            # Need to reverse the ordering for free agents
-            for encoding, positions in self._ravelled_position_indexing.items():
-                if encoding in self.free_encodings:
-                    self._ravelled_position_indexing[encoding] = positions[::-1]
 
     def _place_variable_position_agent(self, var_agent_to_place, **kwargs):
         """
@@ -286,46 +278,14 @@ class MazePlacementState(PositionState):
             or (var_agent_to_place.encoding in self.free_encodings \
                 and self.free_agents_far_from_target):
             try:
-                ravelled_position = self.ravelled_positions_available[var_agent_to_place.encoding][
-                    self._ravelled_position_indexing[0]
-                ]
+                ravelled_position = self.ravelled_positions_available[var_agent_to_place.encoding].pop()
             except ValueError:
                 raise RuntimeError(f"Could not find a cell for {var_agent_to_place.id}") from None
             else:
                 r, c = np.unravel_index(ravelled_position, shape=(self.rows, self.cols))
                 assert self.grid.place(var_agent_to_place, (r, c))
                 self._update_available_positions(var_agent_to_place)
-                self._ravelled_position_indexing.delete(0)
-                # TODO: Would need to udpate ravelled_position_indexing for all the
-                # other encodings too.... If I could use an ordered set and order
-                # the set based on the distance from the target, then that would
-                # work. But I don't think I can 
-
-
-
-            ravelled_maze_start = np.ravel_multi_index(maze_start, (self.rows, self.cols))
-            ndx = np.argmin(self.ravelled_positions_available[var_agent_to_place.encoding] - ravelled_maze_start)
-
-            available_position_unravelled = np.unravel_index(
-                self.ravelled_positions_available[var_agent_to_place.encoding],
-                (self.rows, self.cols)
-            )
-            # TODO: Should only do this once at the time when ravelled positions
-            # are created...
-            # Need to prioritize placing the barriers near the maze_start
-            dist_one = abs(available_position_unravelled[0] - maze_start[0]) + \
-                abs(available_position_unravelled[1] - maze_start[1])
-            barrier_order = np.argmin(dist_one)
-            else:
-                # Randomly place barriers
-                barrier_order = np.random.shuffle(range(len(barrier_indices[0])))
-        elif var_agent_to_place.encoding in self.free_encodigns and self.free_agents_far_from_target:
-            available_position_unravelled = np.unravel_index(
-                self.ravelled_positions_available[var_agent_to_place.encoding],
-                (self.rows, self.cols)
-            )
         else:
-            # Place the agent randomly
             super()._place_variable_position_agent(var_agent_to_place)
 
 
