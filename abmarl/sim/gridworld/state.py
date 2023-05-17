@@ -27,8 +27,8 @@ class PositionState(StateBaseComponent):
     @property
     def ravelled_positions_available(self):
         """
-        A dictionary mapping the enodings to a set of positions available to
-        agents of that encoding at reset. The set should contain cells represented
+        A dictionary mapping the enodings to a list of positions available to
+        agents of that encoding at reset. The list should contain cells represented
         in their ravelled form.
         """
         return self._ravelled_positions_available
@@ -38,8 +38,8 @@ class PositionState(StateBaseComponent):
         assert type(value) is dict, "Ravelled Positions available must be a dictionary."
         for encoding, ravelled_positions_available in value.items():
             assert type(encoding) is int, "Ravelled Position keys must be integers."
-            assert type(ravelled_positions_available) is set, \
-                "Ravelled Position values must be sets."
+            assert type(ravelled_positions_available) is list, \
+                "Ravelled Position values must be lists."
             for ravelled_cell in ravelled_positions_available:
                 assert type(ravelled_cell) is int, "Available cells must be integers. " \
                     "They should be the ravelled presentation of the cell."
@@ -54,7 +54,7 @@ class PositionState(StateBaseComponent):
         """
         self.grid.reset()
 
-        # Build set of available positions
+        # Build lists of available positions
         self._build_available_positions()
 
         # Place agents with initial positions.
@@ -73,7 +73,7 @@ class PositionState(StateBaseComponent):
         """
         max_encoding = max([agent.encoding for agent in self.agents.values()])
         self.ravelled_positions_available = {
-            encoding: set(i for i in range(self.rows * self.cols))
+            encoding: [i for i in range(self.rows * self.cols)]
             for encoding in range(1, max_encoding + 1)
         }
 
