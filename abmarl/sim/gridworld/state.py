@@ -152,16 +152,32 @@ class MazePlacementState(PositionState):
             the target.
     """
     def __init__(self,
+                 target_agent=None,
                  barrier_encodings=None,
                  free_encodings=None,
                  barriers_near_target=False,
                  free_agents_far_from_target=False,
                  **kwargs):
         super().__init__(**kwargs)
+        self.target_agent=target_agent
         self.barrier_encodings=barrier_encodings
         self.free_encodings=free_encodings
         self.barriers_near_target = barriers_near_target
         self.free_agents_far_from_target = free_agents_far_from_target
+
+    @property
+    def target_agent(self):
+        """
+        The target agent is the place from which to start the maze generation.
+        """
+        return self._target_agent
+    
+    @target_agent.setter
+    def target_agent(self, value):
+        if value is
+        assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
+        assert value in self.agents.values(), "The target agent must be an agent in the simulation."
+        self._target_agent = value
 
     @property
     def barrier_encodings(self):
@@ -236,10 +252,14 @@ class MazePlacementState(PositionState):
             "All agent encodings must be categorized as either free or barrier."
 
         # Grab a random position and use that as the maze start
-        # TODO: Support target agent
-        n = np.random.randint(0, self.rows * self.cols)
-        r, c = np.unravel_index(n, shape=(self.rows, self.cols))
-        maze_start = (r, c)
+        # TODO: Need to ensure that the target agent is actually placed at the maze
+        # start.
+        if self.target_agent.initial_position:
+            maze_start = self.target_agent.initial_position
+        else:
+            n = np.random.randint(0, self.rows * self.cols)
+            r, c = np.unravel_index(n, shape=(self.rows, self.cols))
+            maze_start = (r, c)
         ravelled_maze_start = np.ravel_multi_index(maze_start, (self.rows, self.cols))
         maze = gu.generate_maze(self.rows, self.cols, maze_start)
 
@@ -287,8 +307,6 @@ class MazePlacementState(PositionState):
                 self._update_available_positions(var_agent_to_place)
         else:
             super()._place_variable_position_agent(var_agent_to_place)
-
-
 
 
 class HealthState(StateBaseComponent):
