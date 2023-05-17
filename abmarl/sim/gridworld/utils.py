@@ -184,6 +184,7 @@ def generate_maze(rows, cols, start=None):
 
     if start is not None:
         assert type(start) is np.ndarray, "Starting cell must be a numpy array."
+        assert start.shape == (2,), "Starting cell must be a 2D coordinate."
         start += 1 # Need to increment the starting cell because we added borders
     else:
         start = np.random.randint(1, grid.shape() - 1) # Don't chose a border cell
