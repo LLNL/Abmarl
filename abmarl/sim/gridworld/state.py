@@ -5,6 +5,7 @@ import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent, GridWorldAgent
 from abmarl.sim.gridworld.agent import HealthAgent
+import abmarl.sim.gridworld.utils as gu
 
 
 class StateBaseComponent(GridWorldBaseComponent, ABC):
@@ -124,15 +125,15 @@ class PositionState(StateBaseComponent):
             self._update_available_positions(var_agent_to_place)
 
 
-class PrimsMazePlacementState(PositionState):
+class MazePlacementState(PositionState):
     """
     Place agents in the grid based on a maze generated around a target.
     # TODO: Add support for target agent?
 
-    Generate a maze using Prim's algorithm. If one of the agents is specified as
-    a target, then use that agent as the starting point of the maze. Specify available
-    positions as follows: barrier-encoded agents will be placed at the maze barriers,
-    free-encoded agents will be placed at free positions.
+    Partition the cells into two categories, either a free cell or a wall, based
+    on a maze. If one of the agents is specified as a target, then use that agent
+    as the starting point of the maze. Specify available positions as follows: barrier-encoded
+    agents will be placed at the maze walls, free-encoded agents will be placed at free positions.
 
     Note: Because the maze is randomly generated at the beginning of each episode
     and because the agents must be placed in either a free cell or barrier cell
@@ -224,7 +225,7 @@ class PrimsMazePlacementState(PositionState):
         """
         Define the positions available per encoding.
 
-        The avaiable positions is based on maze generated using Prim's algorithm
+        The avaiable positions is based on maze generated
         starting from the target's position, if it exists. This maze divides the
         cells into two categories: free and barrier. If an agent has a barrier encoding,
         then it can only be placed at a barrier cell. If an agent has a free encoding,
@@ -235,11 +236,12 @@ class PrimsMazePlacementState(PositionState):
             "All agent encodings must be categorized as either free or barrier."
 
         # Grab a random position and use that as the maze start
+        # TODO: Support target agent
         n = np.random.randint(0, self.rows * self.cols)
         r, c = np.unravel_index(n, shape=(self.rows, self.cols))
         maze_start = (r, c)
 
-        maze = PrimsMazeGenerator(self.rows, self.cols).generate(maze_start)
+        maze = gu.generate_maze(self.rows, self.cols, maze_start)
 
         ravelled_barrier_positions = set()
         barrier_positions = np.where(maze == 1)
