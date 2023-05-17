@@ -279,10 +279,23 @@ class MazePlacementState(PositionState):
             ravelled_free_positions.append(n)
         ravelled_free_positions.sort(key=lambda x: abs(x - ravelled_maze_start))
 
+        # TODO: In order to support a target position, I need to first allow the
+        # target agent to have its own category (not either free or barrier).
         self.ravelled_positions_available = {
             **{encoding: ravelled_barrier_positions for encoding in self.barrier_encodings},
             **{encoding: ravelled_free_positions for encoding in self.free_encoding}
         }
+
+        # NOTE: If target agent has initial position, then I don't need to worry
+        # about it being placed at maze start because it will be placed first (unless
+        # there is another agent at that location, in which case that is the user's
+        # fault).
+        # If the agent does not have initial position, I can place it here and update
+        # the encoding's available positions. However it will attempt to replace
+        # the target from the reset function. This would be fine if the target can
+        # overlap itself, but otherwise this will give an error. So I can modify
+        # reset function to place some variable-position agents before others, and
+        # the don't attempt to replace those agents.
 
     def _place_variable_position_agent(self, var_agent_to_place, **kwargs):
         """
