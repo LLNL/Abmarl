@@ -290,11 +290,11 @@ class MazePlacementState(PositionState):
 
         if self.target_agent.initial_position:
             self._maze_start = self.target_agent.initial_position
+            ravelled_maze_start = np.ravel_multi_index(self._maze_start, (self.rows, self.cols))
         else:
-            n = np.random.randint(0, self.rows * self.cols)
-            r, c = np.unravel_index(n, shape=(self.rows, self.cols))
+            ravelled_maze_start = np.random.randint(0, self.rows * self.cols)
+            r, c = np.unravel_index(ravelled_maze_start, shape=(self.rows, self.cols))
             self._maze_start = np.array([r, c])
-        ravelled_maze_start = np.ravel_multi_index(self._maze_start, (self.rows, self.cols))
         maze = gu.generate_maze(self.rows, self.cols, self._maze_start)
 
         ravelled_barrier_positions = []
