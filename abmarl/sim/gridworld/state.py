@@ -41,8 +41,8 @@ class PositionState(StateBaseComponent):
             assert type(ravelled_positions_available) is list, \
                 "Ravelled Position values must be lists."
             for ravelled_cell in ravelled_positions_available:
-                assert type(ravelled_cell) is int, "Available cells must be integers. " \
-                    "They should be the ravelled presentation of the cell."
+                assert type(ravelled_cell) in [int, np.int64], "Available cells must be " \
+                    "integers. They should be the ravelled presentation of the cell."
         self._ravelled_positions_available = value
 
     def reset(self, **kwargs):
@@ -88,8 +88,8 @@ class PositionState(StateBaseComponent):
                     positions_available.remove(
                         np.ravel_multi_index(agent_just_placed.position, (self.rows, self.cols))
                     )
-                except KeyError:
-                    # Catch a key error because this cell might have already
+                except ValueError:
+                    # Catch a value error because this cell might have already
                     # been removed from this encoding
                     continue
 
@@ -247,7 +247,7 @@ class MazePlacementState(PositionState):
 
         # Manually place target agent at the maze start
         assert self.grid.place(self.target_agent, self._maze_start), "Unable to place target agent."
-        self._update_available_positions(self.target)
+        self._update_available_positions(self.target_agent)
 
         # Place agents with initial positions.
         for agent in self.agents.values():
@@ -258,7 +258,7 @@ class MazePlacementState(PositionState):
 
         # Now place barrier + free agents with variable positions
         for agent in self.agents.values():
-            if agent.encoding not in {**self.free_encodings, **self.barrier_encodings}:
+            if agent.encoding not in {*self.free_encodings, *self.barrier_encodings}:
                 continue
             if agent == self.target_agent:
                 continue
@@ -267,7 +267,7 @@ class MazePlacementState(PositionState):
 
         # Now place all other agents with variable positions
         for agent in self.agents.values():
-            if agent.encoding in {**self.free_encodings, **self.barrier_encodings}:
+            if agent.encoding in {*self.free_encodings, *self.barrier_encodings}:
                 continue
             if agent == self.target_agent:
                 continue
@@ -293,21 +293,21 @@ class MazePlacementState(PositionState):
         else:
             n = np.random.randint(0, self.rows * self.cols)
             r, c = np.unravel_index(n, shape=(self.rows, self.cols))
-            self._maze_start = (r, c)
+            self._maze_start = np.array([r, c])
         ravelled_maze_start = np.ravel_multi_index(self._maze_start, (self.rows, self.cols))
         maze = gu.generate_maze(self.rows, self.cols, self._maze_start)
 
-        ravelled_barrier_positions = set()
+        ravelled_barrier_positions = []
         barrier_positions = np.where(maze == 1)
-        for ndx in range(barrier_positions[0]):
+        for ndx in range(len(barrier_positions[0])):
             r, c = barrier_positions[0][ndx], barrier_positions[1][ndx]
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
             ravelled_barrier_positions.append(n)
         ravelled_barrier_positions.sort(key=lambda x: abs(x - ravelled_maze_start), reverse=True)
 
-        ravelled_free_positions = set()
+        ravelled_free_positions = []
         free_positions = np.where(maze == 0)
-        for ndx in range(free_positions[0]):
+        for ndx in range(len(free_positions[0])):
             r, c = free_positions[0][ndx], free_positions[1][ndx]
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
             ravelled_free_positions.append(n)
@@ -316,7 +316,7 @@ class MazePlacementState(PositionState):
         # TODO: Update so that we only modify the encodings, don't build it from scratch.
         self.ravelled_positions_available = {
             **{encoding: ravelled_barrier_positions for encoding in self.barrier_encodings},
-            **{encoding: ravelled_free_positions for encoding in self.free_encoding}
+            **{encoding: ravelled_free_positions for encoding in self.free_encodings}
         }
 
     def _place_variable_position_agent(self, var_agent_to_place, **kwargs):

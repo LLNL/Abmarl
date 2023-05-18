@@ -2,7 +2,8 @@
 import numpy as np
 
 from abmarl.sim.gridworld.grid import Grid
-from abmarl.sim.gridworld.state import PositionState, HealthState, StateBaseComponent
+from abmarl.sim.gridworld.state import PositionState, MazePlacementState, HealthState, \
+     StateBaseComponent
 from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent
 import pytest
 
@@ -99,3 +100,42 @@ def test_health_state():
     assert agents['agent0'].active
     assert agents['agent1'].active
     assert agents['agent2'].active
+
+
+def test_maze_placement_state():
+    target_agent = GridWorldAgent(id='target', encoding=1, render_color='g')
+    ip_agent = GridWorldAgent(
+        id='ip_agent',
+        encoding=1,
+        initial_position=np.array([3, 2]),
+        render_color='b'
+    )
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents={
+        'target': target_agent,
+        'ip_agent': ip_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(4, 4, overlapping={1: {3}, 3: {3}})
+    state = MazePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent=target_agent,
+        barrier_encodings={2},
+        free_encodings={1, 3}
+    )
+
+    state.reset()
+test_maze_placement_state()
