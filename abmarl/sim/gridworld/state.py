@@ -147,23 +147,23 @@ class MazePlacementState(PositionState):
             the target agent here.
         barrier_encodings: A set of encodings corresponding to the maze's barrier cells.
         free_encodings: A set of encodigns corresponding to the maze's free cells.
-        barriers_near_target: Prioritize the placement of barriers near the target.
-        free_agents_far_from_target: Prioritize the placement of free agents away from
+        cluster_barriers: Prioritize the placement of barriers near the target.
+        scatter_free_agents: Prioritize the placement of free agents away from
             the target.
     """
     def __init__(self,
                  target_agent=None,
                  barrier_encodings=None,
                  free_encodings=None,
-                 barriers_near_target=False,
-                 free_agents_far_from_target=False,
+                 cluster_barriers=False,
+                 scatter_free_agents=False,
                  **kwargs):
         super().__init__(**kwargs)
         self.target_agent=target_agent
         self.barrier_encodings=barrier_encodings
         self.free_encodings=free_encodings
-        self.barriers_near_target = barriers_near_target
-        self.free_agents_far_from_target = free_agents_far_from_target
+        self.cluster_barriers = cluster_barriers
+        self.scatter_free_agents = scatter_free_agents
 
     @property
     def target_agent(self):
@@ -212,31 +212,29 @@ class MazePlacementState(PositionState):
         else:
             self._free_encodings = set()
 
-
-    # TODO: Change options to "cluster barriers" and "scatter free agents"
     @property
-    def barriers_near_target(self):
+    def cluster_barriers(self):
         """
         If True, then prioritize placing barriers near the target agent.
         """
-        return self._barriers_near_target
+        return self._cluster_barriers
 
-    @barriers_near_target.setter
-    def barriers_near_target(self, value):
+    @cluster_barriers.setter
+    def cluster_barriers(self, value):
         assert type(value) is bool, "Barriers near target must be a boolean."
-        self._barriers_near_target = value
+        self._cluster_barriers = value
 
     @property
-    def free_agents_far_from_target(self):
+    def scatter_free_agents(self):
         """
         If True, then prioritize placing free agents away from the target agent.
         """
-        return self._free_agents_far_from_target
+        return self._scatter_free_agents
 
-    @free_agents_far_from_target.setter
-    def free_agents_far_from_target(self, value):
+    @scatter_free_agents.setter
+    def scatter_free_agents(self, value):
         assert type(value) is bool, "Free agents far from target must be a boolean."
-        self._free_agents_far_from_target = value
+        self._scatter_free_agents = value
 
     def reset(self, **kwargs):
         """
@@ -327,13 +325,13 @@ class MazePlacementState(PositionState):
 
         This implementation places the agents according to their available positions,
         either a free cell or a barrier cell. Barriers agents will be clustered
-        around the maze's starting position if barriers_near_target is True. Free
+        around the maze's starting position if cluster_barriers is True. Free
         agents will be scattered far from the maze's starting position if
-        free_agents_far_from_target is True.
+        scatter_free_agents is True.
         """
-        if (var_agent_to_place.encoding in self.barrier_encodings and self.barriers_near_target) \
+        if (var_agent_to_place.encoding in self.barrier_encodings and self.cluster_barriers) \
             or (var_agent_to_place.encoding in self.free_encodings \
-                and self.free_agents_far_from_target):
+                and self.scatter_free_agents):
             try:
                 ravelled_position = self.ravelled_positions_available[var_agent_to_place.encoding].pop()
             except ValueError:
