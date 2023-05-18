@@ -1,5 +1,6 @@
 
 from abc import ABC, abstractmethod
+from copy import deepcopy
 
 import numpy as np
 
@@ -315,8 +316,10 @@ class MazePlacementState(PositionState):
 
         # TODO: Update so that we only modify the encodings, don't build it from scratch.
         self.ravelled_positions_available = {
-            **{encoding: ravelled_barrier_positions for encoding in self.barrier_encodings},
-            **{encoding: ravelled_free_positions for encoding in self.free_encodings}
+            **{encoding: deepcopy(
+                ravelled_barrier_positions) for encoding in self.barrier_encodings
+            },
+            **{encoding: deepcopy(ravelled_free_positions) for encoding in self.free_encodings}
         }
 
     def _place_variable_position_agent(self, var_agent_to_place, **kwargs):

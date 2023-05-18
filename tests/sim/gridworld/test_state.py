@@ -128,7 +128,7 @@ def test_maze_placement_state():
         **barrier_agents,
         **free_agents
     }
-    grid = Grid(4, 4, overlapping={1: {3}, 3: {3}})
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
     state = MazePlacementState(
         grid=grid,
         agents=agents,
@@ -136,6 +136,16 @@ def test_maze_placement_state():
         barrier_encodings={2},
         free_encodings={1, 3}
     )
+    # TODO: Check overlapping is working...
 
+
+    # TODO: Add test with target agent being the ip agent
+
+    # Test with barriers clustering and free scattering
+
+    # Test state breakdowns
+
+    state.reset()
+    # Test back-to-back-reset
     state.reset()
 test_maze_placement_state()
