@@ -174,7 +174,6 @@ class MazePlacementState(PositionState):
     
     @target_agent.setter
     def target_agent(self, value):
-        if value is
         assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
         assert value in self.agents.values(), "The target agent must be an agent in the simulation."
         self._target_agent = value
@@ -213,6 +212,8 @@ class MazePlacementState(PositionState):
         else:
             self._free_encodings = set()
 
+
+    # TODO: Change options to "cluster barriers" and "scatter free agents"
     @property
     def barriers_near_target(self):
         """
@@ -237,6 +238,44 @@ class MazePlacementState(PositionState):
         assert type(value) is bool, "Free agents far from target must be a boolean."
         self._free_agents_far_from_target = value
 
+    def reset(self, **kwargs):
+        """
+        Give the agents their starting positions.
+        """
+        self.grid.reset()
+
+        # Build lists of available encodings
+        self._build_available_positions()
+
+        # Manually place target agent at the maze start
+        assert self.grid.place(self.target_agent, self._maze_start), "Unable to place target agent."
+        self._update_available_positions(self.target)
+
+        # Place agents with initial positions.
+        for agent in self.agents.values():
+            if agent == self.target_agent:
+                continue
+            if agent.initial_position is not None:
+                self._place_initial_position_agent(agent)
+
+        # Now place barrier + free agents with variable positions
+        for agent in self.agents.values():
+            if agent.encoding not in {**self.free_encodings, **self.barrier_encodings}:
+                continue
+            if agent == self.target_agent:
+                continue
+            if agent.initial_position is None:
+                self._place_variable_position_agent(agent)
+
+        # Now place all other agents with variable positions
+        for agent in self.agents.values():
+            if agent.encoding in {**self.free_encodings, **self.barrier_encodings}:
+                continue
+            if agent == self.target_agent:
+                continue
+            if agent.initial_position is None:
+                self._place_variable_position_agent(agent)
+
     def _build_available_positions(self, **kwargs):
         """
         Define the positions available per encoding.
@@ -247,21 +286,18 @@ class MazePlacementState(PositionState):
         then it can only be placed at a barrier cell. If an agent has a free encoding,
         then it can only be placed at a free cell.
         """
-        max_encoding = max([agent.encoding for agent in self.agents.values()])
-        assert len(self.free_encodings) + len(self.barrier_encodings) == max_encoding, \
-            "All agent encodings must be categorized as either free or barrier."
+        # Start by setting the the whole grid as available for all the agents
+        # TODO: Support agents that are not just barrier or free
+        # super()._build_available_positions()
 
-        # Grab a random position and use that as the maze start
-        # TODO: Need to ensure that the target agent is actually placed at the maze
-        # start.
         if self.target_agent.initial_position:
-            maze_start = self.target_agent.initial_position
+            self._maze_start = self.target_agent.initial_position
         else:
             n = np.random.randint(0, self.rows * self.cols)
             r, c = np.unravel_index(n, shape=(self.rows, self.cols))
-            maze_start = (r, c)
-        ravelled_maze_start = np.ravel_multi_index(maze_start, (self.rows, self.cols))
-        maze = gu.generate_maze(self.rows, self.cols, maze_start)
+            self._maze_start = (r, c)
+        ravelled_maze_start = np.ravel_multi_index(self._maze_start, (self.rows, self.cols))
+        maze = gu.generate_maze(self.rows, self.cols, self._maze_start)
 
         ravelled_barrier_positions = set()
         barrier_positions = np.where(maze == 1)
@@ -279,23 +315,11 @@ class MazePlacementState(PositionState):
             ravelled_free_positions.append(n)
         ravelled_free_positions.sort(key=lambda x: abs(x - ravelled_maze_start))
 
-        # TODO: In order to support a target position, I need to first allow the
-        # target agent to have its own category (not either free or barrier).
+        # TODO: Update so that we only modify the encodings, don't build it from scratch.
         self.ravelled_positions_available = {
             **{encoding: ravelled_barrier_positions for encoding in self.barrier_encodings},
             **{encoding: ravelled_free_positions for encoding in self.free_encoding}
         }
-
-        # NOTE: If target agent has initial position, then I don't need to worry
-        # about it being placed at maze start because it will be placed first (unless
-        # there is another agent at that location, in which case that is the user's
-        # fault).
-        # If the agent does not have initial position, I can place it here and update
-        # the encoding's available positions. However it will attempt to replace
-        # the target from the reset function. This would be fine if the target can
-        # overlap itself, but otherwise this will give an error. So I can modify
-        # reset function to place some variable-position agents before others, and
-        # the don't attempt to replace those agents.
 
     def _place_variable_position_agent(self, var_agent_to_place, **kwargs):
         """
