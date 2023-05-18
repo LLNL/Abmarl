@@ -289,7 +289,7 @@ class MazePlacementState(PositionState):
         # TODO: Support agents that are not just barrier or free
         # super()._build_available_positions()
 
-        if self.target_agent.initial_position:
+        if self.target_agent.initial_position is not None:
             self._maze_start = self.target_agent.initial_position
             ravelled_maze_start = np.ravel_multi_index(self._maze_start, (self.rows, self.cols))
         else:
@@ -304,7 +304,13 @@ class MazePlacementState(PositionState):
             r, c = barrier_positions[0][ndx], barrier_positions[1][ndx]
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
             ravelled_barrier_positions.append(n)
-        ravelled_barrier_positions.sort(key=lambda x: abs(x - ravelled_maze_start), reverse=True)
+        if self.cluster_barriers:
+            ravelled_barrier_positions.sort(
+                key=lambda x: np.linalg.norm(
+                    np.array([np.unravel_index(x, (self. rows, self.cols))]) - self._maze_start
+                ),
+                reverse=True
+            )
 
         ravelled_free_positions = []
         free_positions = np.where(maze == 0)
@@ -312,7 +318,12 @@ class MazePlacementState(PositionState):
             r, c = free_positions[0][ndx], free_positions[1][ndx]
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
             ravelled_free_positions.append(n)
-        ravelled_free_positions.sort(key=lambda x: abs(x - ravelled_maze_start))
+        if self.scatter_free_agents:
+            ravelled_free_positions.sort(
+                key=lambda x: np.linalg.norm(
+                    np.array([np.unravel_index(x, (self. rows, self.cols))]) - self._maze_start
+                )
+            )
 
         # TODO: Update so that we only modify the encodings, don't build it from scratch.
         self.ravelled_positions_available = {
