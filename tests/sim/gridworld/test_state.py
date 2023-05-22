@@ -3,7 +3,7 @@ import numpy as np
 
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.state import PositionState, MazePlacementState, HealthState, \
-     StateBaseComponent
+    StateBaseComponent
 from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent
 import pytest
 
@@ -126,12 +126,6 @@ def test_health_state():
 
 def test_maze_placement_state():
     target_agent = GridWorldAgent(id='target', encoding=1)
-    ip_agent = GridWorldAgent(
-        id='ip_agent',
-        encoding=1,
-        initial_position=np.array([3, 2]),
-        render_color='b'
-    )
     barrier_agents = {
         f'barrier_agent{i}': GridWorldAgent(
             id=f'barrier_agent{i}',
@@ -144,7 +138,7 @@ def test_maze_placement_state():
             encoding=3
         ) for i in range(3)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
@@ -183,7 +177,7 @@ def test_maze_placement_state():
         if not np.array_equal(
                 agent.position,
                 state.target_agent.position
-            ):
+        ):
             # Free agent was placed at target, position won't be available to the
             # target
             assert np.ravel_multi_index(
@@ -213,7 +207,7 @@ def test_maze_placement_target_has_ip():
             encoding=3
         ) for i in range(3)
     }
-    agents={
+    agents = {
         'ip_agent': ip_agent,
         **barrier_agents,
         **free_agents
@@ -254,14 +248,14 @@ def test_maze_placement_nonoverlapping_ip_with_target():
             encoding=3
         ) for i in range(3)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
     }
     grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
     target_agent.initial_position = ip_agent.initial_position
-    agents={
+    agents = {
         'target': target_agent,
         'ip_agent': ip_agent,
         **barrier_agents,
@@ -298,7 +292,7 @@ def test_maze_placement_failures():
             encoding=3
         ) for i in range(3)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
@@ -313,7 +307,7 @@ def test_maze_placement_failures():
             free_encodings={1, 3}
         )
 
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
@@ -363,7 +357,7 @@ def test_maze_placement_state_no_barriers_no_free():
             encoding=3
         ) for i in range(3)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **free_agents
     }
@@ -388,7 +382,7 @@ def test_maze_placement_state_no_barriers_no_free():
             encoding=2
         ) for i in range(5)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
     }
@@ -422,7 +416,7 @@ def test_maze_placement_state_clustering_and_scattering():
             encoding=3
         ) for i in range(5)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
@@ -541,7 +535,7 @@ def test_maze_placement_state_clustering_and_scattering_no_overlap_at_reset():
             encoding=3
         ) for i in range(5)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
@@ -620,7 +614,7 @@ def test_maze_placement_state_too_many_agents():
             encoding=3
         ) for i in range(3)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents
@@ -645,7 +639,7 @@ def test_maze_placement_state_too_many_agents():
             encoding=3
         ) for i in range(20)
     }
-    agents={
+    agents = {
         'target': target_agent,
         **barrier_agents,
         **free_agents

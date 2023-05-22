@@ -4,6 +4,7 @@ import pytest
 
 from abmarl.sim.gridworld.utils import generate_maze
 
+
 def test_generate_maze():
     np.random.seed(24)
     maze = generate_maze(5, 9, start=np.array([1, 1]))
