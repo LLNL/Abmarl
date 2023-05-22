@@ -527,9 +527,83 @@ def test_maze_placement_state_clustering_and_scattering():
 
 
 def test_maze_placement_state_clustering_and_scattering_no_overlap_at_reset():
-    assert False
-    # TODO: Create ignore overlap feature that starts the agents on different
-    # cells, but those agents can overlap during gameplay.
+    np.random.seed(24)
+    target_agent = GridWorldAgent(id='target', encoding=1, initial_position=np.array([3, 2]))
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(5)
+    }
+    agents={
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    state = MazePlacementState(
+        grid=grid,
+        agents=agents,
+        no_overlap_at_reset=True,
+        target_agent=target_agent,
+        barrier_encodings={2},
+        free_encodings={1, 3},
+        cluster_barriers=True,
+        scatter_free_agents=True
+    )
+    # Barrier are close to target, free agents are far from it
+    # All agents start on different cells
+    state.reset()
+    np.testing.assert_array_equal(
+        target_agent.position,
+        np.array([3, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['barrier_agent0'].position,
+        np.array([4, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['barrier_agent1'].position,
+        np.array([2, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['barrier_agent2'].position,
+        np.array([4, 4])
+    )
+    np.testing.assert_array_equal(
+        agents['barrier_agent3'].position,
+        np.array([4, 0])
+    )
+    np.testing.assert_array_equal(
+        agents['barrier_agent4'].position,
+        np.array([2, 4])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent0'].position,
+        np.array([1, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent1'].position,
+        np.array([4, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent2'].position,
+        np.array([3, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent3'].position,
+        np.array([0, 6])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent4'].position,
+        np.array([1, 6])
+    )
 
 
 def test_maze_placement_state_too_many_agents():

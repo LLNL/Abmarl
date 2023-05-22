@@ -58,7 +58,7 @@ class PositionState(StateBaseComponent):
         Agents with initial positions will override this property.
         """
         return self._no_overlap_at_reset
-    
+
     @no_overlap_at_rest.setter
     def no_overlap_at_reset(self, value):
         assert type(value) is bool, "No overlap at reset must be a boolean."
