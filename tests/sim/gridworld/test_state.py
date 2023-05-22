@@ -28,6 +28,28 @@ def test_position_state():
     assert grid[2, 0] == {'agent2': agents['agent2']}
 
 
+def test_position_state_no_overlap_at_reset():
+    np.random.seed(24)
+    grid = Grid(1, 2, overlapping={1: {1}})
+    agents = {
+        'agent0': GridWorldAgent(id='agent0', encoding=1),
+        'agent1': GridWorldAgent(id='agent1', encoding=1),
+        'agent2': GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([0, 1]))
+    }
+
+    position_state = PositionState(grid=grid, agents=agents, no_overlap_at_reset=False)
+    position_state.reset()
+
+    np.testing.assert_equal(agents['agent0'].position, np.array([0, 0]))
+    np.testing.assert_equal(agents['agent1'].position, np.array([0, 1]))
+    np.testing.assert_equal(agents['agent2'].position, np.array([0, 1]))
+
+    position_state = PositionState(grid=grid, agents=agents, no_overlap_at_reset=True)
+    with pytest.raises(RuntimeError):
+        # This fails because we cannot place all agents because no overlap at reset
+        position_state.reset()
+
+
 def test_position_state_small_grid():
     grid = Grid(1, 2, overlapping={1: {1, 2}, 2: {1, 2}, 3: {3}})
     agents = {
@@ -504,7 +526,7 @@ def test_maze_placement_state_clustering_and_scattering():
     )
 
 
-def test_maze_placement_state_clustering_and_scattering_ignore_overlap():
+def test_maze_placement_state_clustering_and_scattering_no_overlap_at_reset():
     assert False
     # TODO: Create ignore overlap feature that starts the agents on different
     # cells, but those agents can overlap during gameplay.

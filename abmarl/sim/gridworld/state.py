@@ -25,6 +25,10 @@ class PositionState(StateBaseComponent):
     """
     Manage the agents' positions in the grid.
     """
+    def __init__(self, no_overlap_at_reset=False, **kwargs):
+        super().__init__(**kwargs)
+        self.no_overlap_at_reset = no_overlap_at_reset
+
     @property
     def ravelled_positions_available(self):
         """
@@ -45,6 +49,20 @@ class PositionState(StateBaseComponent):
                 assert type(ravelled_cell) in [int, np.int64], "Available cells must be " \
                     "integers. They should be the ravelled presentation of the cell."
         self._ravelled_positions_available = value
+
+    @property
+    def no_overlap_at_rest(self):
+        """
+        Attempt to place each agent on its own cell.
+
+        Agents with initial positions will override this property.
+        """
+        return self._no_overlap_at_reset
+    
+    @no_overlap_at_rest.setter
+    def no_overlap_at_reset(self, value):
+        assert type(value) is bool, "No overlap at reset must be a boolean."
+        self._no_overlap_at_reset = value
 
     def reset(self, **kwargs):
         """
@@ -84,7 +102,8 @@ class PositionState(StateBaseComponent):
         """
         for encoding, positions_available in self.ravelled_positions_available.items():
             # Remove this cell from any encoding where overlapping is False
-            if encoding not in self.grid.overlapping.get(agent_just_placed.encoding, {}):
+            if self.no_overlap_at_reset or \
+                    encoding not in self.grid.overlapping.get(agent_just_placed.encoding, {}):
                 try:
                     positions_available.remove(
                         np.ravel_multi_index(agent_just_placed.position, (self.rows, self.cols))
