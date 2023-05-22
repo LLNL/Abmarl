@@ -170,8 +170,8 @@ def generate_maze(rows, cols, start=None):
             for neighbor in [
                 (cell[0] - 1, cell[1]),
                 (cell[0] + 1, cell[1]),
-                (cell[0],     cell[1] - 1),
-                (cell[0],     cell[1] + 1),
+                (cell[0], cell[1] - 1),
+                (cell[0], cell[1] + 1),
             ]
         ])
 
@@ -195,14 +195,17 @@ def generate_maze(rows, cols, start=None):
     unvisited_walls = unvisited_neighboring_cells(start)
     while unvisited_walls:
         current_cell = unvisited_walls[np.random.randint(0, len(unvisited_walls))]
-        if ((grid[current_cell[0] - 1, current_cell[1]] == 2) ^ \
+        if ((grid[current_cell[0] - 1, current_cell[1]] == 2) ^
             (grid[current_cell[0] + 1, current_cell[1]] == 2)) or \
-           ((grid[current_cell[0], current_cell[1] - 1] == 2) ^ \
+           ((grid[current_cell[0], current_cell[1] - 1] == 2) ^
             (grid[current_cell[0], current_cell[1] + 1] == 2)):
+
             if sum_neighboring_free(current_cell) < 2:
                 grid[tuple(current_cell)] = 0
-                unvisited_walls = list(set(unvisited_walls + unvisited_neighboring_cells(current_cell)))
+                unvisited_walls = list(set(
+                    unvisited_walls + unvisited_neighboring_cells(current_cell)
+                ))
         unvisited_walls.remove(current_cell)
 
-    grid[grid==2] = 1 # Convert unvisited cells to walls
+    grid[grid == 2] = 1 # Convert unvisited cells to walls
     return grid[1:-1, 1:-1] # Lop of the borders

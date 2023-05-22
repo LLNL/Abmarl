@@ -179,9 +179,9 @@ class MazePlacementState(PositionState):
                  scatter_free_agents=False,
                  **kwargs):
         super().__init__(**kwargs)
-        self.target_agent=target_agent
-        self.barrier_encodings=barrier_encodings
-        self.free_encodings=free_encodings
+        self.target_agent = target_agent
+        self.barrier_encodings = barrier_encodings
+        self.free_encodings = free_encodings
         self.cluster_barriers = cluster_barriers
         self.scatter_free_agents = scatter_free_agents
 
@@ -191,7 +191,7 @@ class MazePlacementState(PositionState):
         The target agent is the place from which to start the maze generation.
         """
         return self._target_agent
-    
+
     @target_agent.setter
     def target_agent(self, value):
         assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
@@ -346,8 +346,9 @@ class MazePlacementState(PositionState):
 
         # TODO: Update so that we only modify the encodings, don't build it from scratch.
         self.ravelled_positions_available = {
-            **{encoding: deepcopy(
-                ravelled_barrier_positions) for encoding in self.barrier_encodings
+            **{
+                encoding: deepcopy(ravelled_barrier_positions)
+                for encoding in self.barrier_encodings
             },
             **{encoding: deepcopy(ravelled_free_positions) for encoding in self.free_encodings}
         }
@@ -363,10 +364,11 @@ class MazePlacementState(PositionState):
         scatter_free_agents is True.
         """
         if (var_agent_to_place.encoding in self.barrier_encodings and self.cluster_barriers) \
-            or (var_agent_to_place.encoding in self.free_encodings \
-                and self.scatter_free_agents):
+            or (var_agent_to_place.encoding in self.free_encodings and
+                self.scatter_free_agents):
             try:
-                ravelled_position = self.ravelled_positions_available[var_agent_to_place.encoding][-1]
+                ravelled_position = \
+                    self.ravelled_positions_available[var_agent_to_place.encoding][-1]
             except ValueError:
                 raise RuntimeError(f"Could not find a cell for {var_agent_to_place.id}") from None
             else:
