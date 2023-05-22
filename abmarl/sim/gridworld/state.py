@@ -369,7 +369,7 @@ class MazePlacementState(PositionState):
             try:
                 ravelled_position = \
                     self.ravelled_positions_available[var_agent_to_place.encoding][-1]
-            except ValueError:
+            except IndexError:
                 raise RuntimeError(f"Could not find a cell for {var_agent_to_place.id}") from None
             else:
                 r, c = np.unravel_index(ravelled_position, shape=(self.rows, self.cols))
