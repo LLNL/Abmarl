@@ -347,10 +347,7 @@ class MazePlacementState(PositionState):
             or (var_agent_to_place.encoding in self.free_encodings \
                 and self.scatter_free_agents):
             try:
-                # TODO: I pop these values off, but I shouldn't do that if the agents
-                # can overlap... So I should get the value at the end and then lean
-                # on the _update function to remove if overlapping is disabled
-                ravelled_position = self.ravelled_positions_available[var_agent_to_place.encoding].pop()
+                ravelled_position = self.ravelled_positions_available[var_agent_to_place.encoding][-1]
             except ValueError:
                 raise RuntimeError(f"Could not find a cell for {var_agent_to_place.id}") from None
             else:
