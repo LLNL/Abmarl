@@ -158,20 +158,45 @@ def test_maze_placement_state():
         assert np.ravel_multi_index(
             agent.position, (5, 8)
         ) in state.ravelled_positions_available[3]
-        assert np.ravel_multi_index(
-            agent.position, (5, 8)
-        ) in state.ravelled_positions_available[1]
+        if not np.array_equal(
+                agent.position,
+                state.target_agent.position
+            ):
+            # Free agent was placed at target, position won't be available to the
+            # target
+            assert np.ravel_multi_index(
+                agent.position, (5, 8)
+            ) in state.ravelled_positions_available[1]
     # None of the agents should have been given an initial position
     for agent in agents.values():
         assert not agent.initial_position
 
 
-    # Testing that the target agent is placed at the initial position
+def test_maze_placement_target_has_ip():
+    ip_agent = GridWorldAgent(
+        id='ip_agent',
+        encoding=1,
+        initial_position=np.array([3, 2]),
+        render_color='b'
+    )
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
     agents={
-        'target': ip_agent,
+        'ip_agent': ip_agent,
         **barrier_agents,
         **free_agents
     }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
     state = MazePlacementState(
         grid=grid,
         agents=agents,
@@ -187,7 +212,32 @@ def test_maze_placement_state():
     )
 
 
-    # Testing when an ip barrier is placed at the same spot as the target agent.
+def test_maze_placement_nonoverlapping_ip_with_target():
+    target_agent = GridWorldAgent(id='target', encoding=1)
+    ip_agent = GridWorldAgent(
+        id='ip_agent',
+        encoding=1,
+        initial_position=np.array([3, 2]),
+        render_color='b'
+    )
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents={
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
     target_agent.initial_position = ip_agent.initial_position
     agents={
         'target': target_agent,
@@ -206,6 +256,32 @@ def test_maze_placement_state():
         state.reset()
 
 
+def test_maze_placement_failures():
+    target_agent = GridWorldAgent(id='target', encoding=1)
+    ip_agent = GridWorldAgent(
+        id='ip_agent',
+        encoding=1,
+        initial_position=np.array([3, 2]),
+        render_color='b'
+    )
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents={
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
     with pytest.raises(AssertionError):
         # Fails because there is no target agent
         MazePlacementState(
@@ -214,7 +290,6 @@ def test_maze_placement_state():
             barrier_encodings={2},
             free_encodings={1, 3}
         )
-
 
     agents={
         'target': target_agent,
@@ -231,7 +306,6 @@ def test_maze_placement_state():
             free_encodings={1, 3}
         )
 
-
     with pytest.raises(AssertionError):
         # Fails because barrier is list
         MazePlacementState(
@@ -242,7 +316,6 @@ def test_maze_placement_state():
             free_encodings={1, 3}
         )
 
-
     with pytest.raises(AssertionError):
         # Fails because free is list
         MazePlacementState(
@@ -252,7 +325,7 @@ def test_maze_placement_state():
             barrier_encodings={2},
             free_encodings=[1, 3]
         )
-test_maze_placement_state()
+
 
 def test_maze_placement_state_no_barriers_no_free():
     target_agent = GridWorldAgent(id='target', encoding=1)
@@ -285,6 +358,8 @@ def test_maze_placement_state_no_barriers_no_free():
     assert state.free_encodings == {1, 3}
 
     state.reset()
+
+
     barrier_agents = {
         f'barrier_agent{i}': GridWorldAgent(
             id=f'barrier_agent{i}',
@@ -323,7 +398,7 @@ def test_maze_placement_state_clustering_and_scattering():
         f'free_agent{i}': GridWorldAgent(
             id=f'free_agent{i}',
             encoding=3
-        ) for i in range(2)
+        ) for i in range(5)
     }
     agents={
         'target': target_agent,
@@ -344,6 +419,7 @@ def test_maze_placement_state_clustering_and_scattering():
     assert state.scatter_free_agents
 
     # Barrier are close to target, free agents are far from it
+    # All the free agents start on the same cell
     state.reset()
     np.testing.assert_array_equal(
         target_agent.position,
@@ -375,7 +451,19 @@ def test_maze_placement_state_clustering_and_scattering():
     )
     np.testing.assert_array_equal(
         agents['free_agent1'].position,
-        np.array([4, 7])
+        np.array([1, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent2'].position,
+        np.array([1, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent3'].position,
+        np.array([1, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent4'].position,
+        np.array([1, 7])
     )
 
     # Agents randomly placed
@@ -414,6 +502,12 @@ def test_maze_placement_state_clustering_and_scattering():
         agents['free_agent1'].position,
         np.array([1, 7])
     )
+
+
+def test_maze_placement_state_clustering_and_scattering_ignore_overlap():
+    assert False
+    # TODO: Create ignore overlap feature that starts the agents on different
+    # cells, but those agents can overlap during gameplay.
 
 
 def test_maze_placement_state_too_many_agents():
