@@ -27,7 +27,7 @@ agents = {
 sim = MultiAgentWrapper(
     AllStepManager(
         MultiMazeNavigationSim.build_sim(
-            5, 5,
+            10, 10,
             agents=agents,
             overlapping={1: {3}, 3: {3}},
             target_agent=agents['target'],

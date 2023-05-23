@@ -51,7 +51,7 @@ class PositionState(StateBaseComponent):
         self._ravelled_positions_available = value
 
     @property
-    def no_overlap_at_rest(self):
+    def no_overlap_at_reset(self):
         """
         Attempt to place each agent on its own cell.
 
@@ -59,7 +59,7 @@ class PositionState(StateBaseComponent):
         """
         return self._no_overlap_at_reset
 
-    @no_overlap_at_rest.setter
+    @no_overlap_at_reset.setter
     def no_overlap_at_reset(self, value):
         assert type(value) is bool, "No overlap at reset must be a boolean."
         self._no_overlap_at_reset = value
@@ -122,10 +122,10 @@ class PositionState(StateBaseComponent):
             (self.rows, self.cols)
         )
         assert ravelled_initial_position in \
-            self.ravelled_positions_available[ip_agent_to_place.encoding], \
+            self.ravelled_positions_available[ip_agent_to_place.encoding]
+        assert self.grid.place(ip_agent_to_place, ip_agent_to_place.initial_position), \
             f"Cell {ip_agent_to_place.initial_position} is not available for " \
             f"{ip_agent_to_place.id}."
-        assert self.grid.place(ip_agent_to_place, ip_agent_to_place.initial_position)
         self._update_available_positions(ip_agent_to_place)
 
     def _place_variable_position_agent(self, var_agent_to_place, **kwargs):
@@ -148,12 +148,11 @@ class PositionState(StateBaseComponent):
 class MazePlacementState(PositionState):
     """
     Place agents in the grid based on a maze generated around a target.
-    # TODO: Add support for target agent?
 
-    Partition the cells into two categories, either a free cell or a wall, based
-    on a maze. If one of the agents is specified as a target, then use that agent
-    as the starting point of the maze. Specify available positions as follows: barrier-encoded
-    agents will be placed at the maze walls, free-encoded agents will be placed at free positions.
+    Partition the cells into two categories, either a free cell or a barrier, based
+    on a maze, which is generated starting at a target agent's position. Specify
+    available positions as follows: barrier-encoded agents will be placed at the
+    maze barriers, free-encoded agents will be placed at free positions.
 
     Note: Because the maze is randomly generated at the beginning of each episode
     and because the agents must be placed in either a free cell or barrier cell
@@ -241,7 +240,7 @@ class MazePlacementState(PositionState):
 
     @cluster_barriers.setter
     def cluster_barriers(self, value):
-        assert type(value) is bool, "Barriers near target must be a boolean."
+        assert type(value) is bool, "Cluster barriers must be a boolean."
         self._cluster_barriers = value
 
     @property
@@ -253,7 +252,7 @@ class MazePlacementState(PositionState):
 
     @scatter_free_agents.setter
     def scatter_free_agents(self, value):
-        assert type(value) is bool, "Free agents far from target must be a boolean."
+        assert type(value) is bool, "Scatter free agents must be a boolean."
         self._scatter_free_agents = value
 
     def reset(self, **kwargs):
@@ -285,29 +284,16 @@ class MazePlacementState(PositionState):
             if agent.initial_position is None:
                 self._place_variable_position_agent(agent)
 
-        # Now place all other agents with variable positions
-        for agent in self.agents.values():
-            if agent.encoding in {*self.free_encodings, *self.barrier_encodings}:
-                continue
-            if agent == self.target_agent:
-                continue
-            if agent.initial_position is None:
-                self._place_variable_position_agent(agent)
-
     def _build_available_positions(self, **kwargs):
         """
         Define the positions available per encoding.
 
-        The avaiable positions is based on maze generated
-        starting from the target's position, if it exists. This maze divides the
-        cells into two categories: free and barrier. If an agent has a barrier encoding,
-        then it can only be placed at a barrier cell. If an agent has a free encoding,
-        then it can only be placed at a free cell.
+        The avaiable positions is based on maze generated starting from the target's
+        position. This maze partitions the cells into two categories: free and barrier.
+        If an agent has a barrier encoding, then it can only be placed at a barrier
+        cell. If an agent has a free encoding, then it can only be placed at a free
+        cell.
         """
-        # Start by setting the the whole grid as available for all the agents
-        # TODO: Support agents that are not just barrier or free
-        # super()._build_available_positions()
-
         if self.target_agent.initial_position is not None:
             self._maze_start = self.target_agent.initial_position
             ravelled_maze_start = np.ravel_multi_index(self._maze_start, (self.rows, self.cols))
@@ -344,7 +330,6 @@ class MazePlacementState(PositionState):
                 )
             )
 
-        # TODO: Update so that we only modify the encodings, don't build it from scratch.
         self.ravelled_positions_available = {
             **{
                 encoding: deepcopy(ravelled_barrier_positions)

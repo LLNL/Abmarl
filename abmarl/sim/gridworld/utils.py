@@ -135,7 +135,7 @@ def generate_maze(rows, cols, start=None):
         Determine which of the neighboring cells is unvisted and marks them as walls.
 
         Args:
-            The cell in question.
+            cell: The cell in question.
 
         Returns:
             List of unvisted neighboring cells now marked as walls.
@@ -160,7 +160,8 @@ def generate_maze(rows, cols, start=None):
 
         We add this as a check to avoid open spaces in the maze.
 
-        Args: The cell in question.
+        Args:
+            cell: The cell in question.
 
         Returns:
             The nubmer of neighboring cells that are passages.
