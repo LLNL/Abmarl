@@ -1,7 +1,10 @@
 
 from abc import ABC, abstractmethod
 
+import numpy as np
+
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
+from abmarl.sim.gridworld.agent import GridWorldAgent
 
 
 class DoneBaseComponent(GridWorldBaseComponent, ABC):
@@ -51,6 +54,49 @@ class ActiveDone(DoneBaseComponent):
             if agent.active:
                 return False
         return True
+
+
+class TargetAgentDone(DoneBaseComponent):
+    """
+    Agents are done when they overlap their target.
+
+    The target is prescribed per agent.
+    """
+    def __init__(self, target_mapping=None, **kwargs):
+        super().__init__(**kwargs)
+        self.target_mapping = target_mapping
+
+    @property
+    def target_mapping(self):
+        """
+        Maps the agent to its respective target.
+
+        Mapping is done via the agents' ids.
+        """
+        return self._target_mapping
+
+    @target_mapping.setter
+    def target_mapping(self, value):
+        assert type(value) is dict, "Target mapping must be a dictionary."
+        for agent_id, target_id in value.items():
+            assert agent_id in self.agents, f"{agent_id} must be an agent in the simulation."
+            assert isinstance(self.agents[agent_id], GridWorldAgent), \
+                f"{agent_id} must be a GridWorldAgent."
+            assert target_id in self.agents, "Target must be an agent in the simulation."
+            assert isinstance(self.agents[target_id], GridWorldAgent), \
+                "Target must be a GridWorldAgent."
+        self._target_mapping = value
+
+    def get_done(self, agent, **kwarg):
+        return np.array_equal(
+            agent.position,
+            self.agents[self.target_mapping[agent.id]].position
+        )
+
+    def get_all_done(self, **kwargs):
+        return all([
+            self.get_done(self.agents[agent_id]) for agent_id in self.target_mapping
+        ])
 
 
 class OneTeamRemainingDone(ActiveDone):
