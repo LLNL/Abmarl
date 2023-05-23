@@ -1,42 +1,47 @@
 
-from abmarl.examples import MazeNavigationAgent, MazeNavigationSim
+from abmarl.examples import MultiMazeNavigationAgent, MultiMazeNavigationSim
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 
-object_registry = {
-    'N': lambda n: MazeNavigationAgent(
-        id='navigator',
-        encoding=1,
-        view_range=2,
-        render_color='blue',
-    ),
-    'T': lambda n: GridWorldAgent(
-        id='target',
-        encoding=3,
-        render_color='green'
-    ),
-    'W': lambda n: GridWorldAgent(
-        id=f'wall{n}',
-        encoding=2,
-        blocking=True,
-        render_shape='s'
-    )
+agents = {
+    'target': GridWorldAgent(id='target', encoding=1, render_color='g'),
+    **{
+        f'barrier{i}': GridWorldAgent(
+            id=f'barrier{i}',
+            encoding=2,
+            render_shape='s',
+            render_color='gray',
+        ) for i in range(20)
+    },
+    **{
+        f'navigator{i}': MultiMazeNavigationAgent(
+            id=f'navigator{i}',
+            encoding=3,
+            render_color='b',
+            view_range=5
+        ) for i in range(5)
+    }
 }
 
-file_name = 'maze.txt'
 sim = MultiAgentWrapper(
     AllStepManager(
-        MazeNavigationSim.build_sim_from_file(
-            file_name,
-            object_registry,
-            overlapping={1: {3}, 3: {1}}
+        MultiMazeNavigationSim.build_sim(
+            10, 10,
+            agents=agents,
+            overlapping={1: {3}, 3: {3}},
+            target_agent=agents['target'],
+            barrier_encodings={2},
+            free_encodings={1, 3},
+            cluster_barriers=True,
+            scatter_free_agents=True,
+            no_overlap_at_reset=True
         )
     )
 )
 
 
-sim_name = "MazeNavigation"
+sim_name = "MultiMazeNavigation"
 from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
@@ -44,8 +49,8 @@ register_env(sim_name, lambda sim_config: sim)
 policies = {
     'navigator': (
         None,
-        sim.sim.agents['navigator'].observation_space,
-        sim.sim.agents['navigator'].action_space,
+        sim.sim.agents['navigator0'].observation_space,
+        sim.sim.agents['navigator0'].action_space,
         {}
     )
 }

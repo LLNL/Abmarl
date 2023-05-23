@@ -13,7 +13,7 @@ class MazeNavigationAgent(GridObservingAgent, MovingAgent):
         super().__init__(move_range=1, **kwargs)
 
 
-class MazeNaviationSim(GridWorldSimulation):
+class MazeNavigationSim(GridWorldSimulation):
     def __init__(self, **kwargs):
         self.agents = kwargs['agents']
         self.navigator = kwargs['agents']['navigator']
