@@ -190,7 +190,7 @@ def generate_maze(rows, cols, start=None):
         # NOTE: We must not do start += 1 because that will affect the array outside
         # the scope of this function.
     else:
-        start = np.random.randint(1, grid.shape() - 1) # Don't chose a border cell
+        start = np.random.randint(1, np.array(grid.shape) - 1) # Don't chose a border cell
     grid[tuple(start)] = 0
 
     unvisited_walls = unvisited_neighboring_cells(start)
