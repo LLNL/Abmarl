@@ -29,25 +29,31 @@ def test_position_state():
 
 
 def test_position_state_no_overlap_at_reset():
-    np.random.seed(24)
-    grid = Grid(1, 2, overlapping={1: {1}})
+    grid = Grid(3, 3, overlapping={1: {1}})
     agents = {
         'agent0': GridWorldAgent(id='agent0', encoding=1),
         'agent1': GridWorldAgent(id='agent1', encoding=1),
-        'agent2': GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([0, 1]))
+        'agent2': GridWorldAgent(id='agent2', encoding=1),
+        'agent3': GridWorldAgent(id='agent3', encoding=1, initial_position=np.array([2, 2])),
+        'agent4': GridWorldAgent(id='agent4', encoding=1),
+        'agent5': GridWorldAgent(id='agent5', encoding=1),
+        'agent6': GridWorldAgent(id='agent6', encoding=1),
+        'agent7': GridWorldAgent(id='agent7', encoding=1),
+        'agent8': GridWorldAgent(id='agent8', encoding=1, initial_position=np.array([0, 0])),
+        'agent9': GridWorldAgent(id='agent9', encoding=1, initial_position=np.array([0, 0])),
     }
-
-    position_state = PositionState(grid=grid, agents=agents, no_overlap_at_reset=False)
+    position_state = PositionState(grid=grid, agents=agents, no_overlap_at_reset=True)
     position_state.reset()
 
-    np.testing.assert_equal(agents['agent0'].position, np.array([0, 0]))
-    np.testing.assert_equal(agents['agent1'].position, np.array([0, 1]))
-    np.testing.assert_equal(agents['agent2'].position, np.array([0, 1]))
-
-    position_state = PositionState(grid=grid, agents=agents, no_overlap_at_reset=True)
-    with pytest.raises(RuntimeError):
-        # This fails because we cannot place all agents because no overlap at reset
-        position_state.reset()
+    assert grid[0, 0] == {'agent8': agents['agent8'], 'agent9': agents['agent9']}
+    assert grid[2, 2] == {'agent3': agents['agent3']}
+    assert len(grid[0, 1]) == 1
+    assert len(grid[0, 2]) == 1
+    assert len(grid[1, 0]) == 1
+    assert len(grid[1, 1]) == 1
+    assert len(grid[1, 2]) == 1
+    assert len(grid[2, 0]) == 1
+    assert len(grid[2, 1]) == 1
 
 
 def test_position_state_small_grid():
@@ -527,6 +533,18 @@ def test_maze_placement_state_clustering_and_scattering():
     np.testing.assert_array_equal(
         agents['free_agent1'].position,
         np.array([1, 7])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent2'].position,
+        np.array([4, 5])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent3'].position,
+        np.array([4, 1])
+    )
+    np.testing.assert_array_equal(
+        agents['free_agent4'].position,
+        np.array([2, 2])
     )
 
 
