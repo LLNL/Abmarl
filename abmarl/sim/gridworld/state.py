@@ -261,6 +261,11 @@ class MazePlacementState(PositionState):
         """
         self.grid.reset()
 
+        # Assert that all encodings are captured
+        for agent in self.agents.values():
+            assert agent.encoding in {*self.barrier_encodings, *self.free_encodings}, \
+                "All agent encodings must be either barrier or free cell."
+
         # Build lists of available encodings
         self._build_available_positions()
 
@@ -277,8 +282,6 @@ class MazePlacementState(PositionState):
 
         # Now place barrier + free agents with variable positions
         for agent in self.agents.values():
-            if agent.encoding not in {*self.free_encodings, *self.barrier_encodings}:
-                continue
             if agent == self.target_agent:
                 continue
             if agent.initial_position is None:
@@ -307,6 +310,10 @@ class MazePlacementState(PositionState):
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
             ravelled_barrier_positions.append(n)
         if self.cluster_barriers:
+            # We sort the available positions according to their distance from target
+            # in reverse order becuase we will grab the last position in the list
+            # when selecting from the available cells, which will give us the closest
+            # cells first.
             ravelled_barrier_positions.sort(
                 key=lambda x: np.linalg.norm(
                     np.array([np.unravel_index(x, (self. rows, self.cols))]) - self._maze_start
@@ -321,6 +328,9 @@ class MazePlacementState(PositionState):
             n = np.ravel_multi_index((r, c), (self.rows, self.cols))
             ravelled_free_positions.append(n)
         if self.scatter_free_agents:
+            # We sort the available positions according to their distance from target
+            # becuase we will grab the last position in the list when selecting
+            # from the available cells, which will give us the furthest cells first.
             ravelled_free_positions.sort(
                 key=lambda x: np.linalg.norm(
                     np.array([np.unravel_index(x, (self. rows, self.cols))]) - self._maze_start

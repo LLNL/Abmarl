@@ -342,6 +342,17 @@ def test_maze_placement_failures():
             free_encodings=[1, 3]
         )
 
+    with pytest.raises(AssertionError):
+        # Fails becuase some agents are neither barrier nor free
+        state = MazePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent=target_agent,
+            barrier_encodings={2},
+            free_encodings={1}
+        )
+        state.reset()
+
 
 def test_maze_placement_state_no_barriers_no_free():
     target_agent = GridWorldAgent(id='target', encoding=1)
@@ -383,18 +394,17 @@ def test_maze_placement_state_no_barriers_no_free():
         ) for i in range(5)
     }
     agents = {
-        'target': target_agent,
+        'target': GridWorldAgent(id='target', encoding=2),
         **barrier_agents,
     }
     grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
     state = MazePlacementState(
         grid=grid,
         agents=agents,
-        target_agent=target_agent,
+        target_agent=agents['target'],
         barrier_encodings={2},
     )
     assert isinstance(state, PositionState)
-    assert state.target_agent == target_agent
     assert state.barrier_encodings == {2}
     assert state.free_encodings == set()
 
@@ -649,7 +659,8 @@ def test_maze_placement_state_too_many_agents():
         grid=grid,
         agents=agents,
         target_agent=target_agent,
-        free_encodings={3}
+        barrier_encodings={2},
+        free_encodings={1, 3}
     )
     with pytest.raises(RuntimeError):
         # Fails because cannot find cell
