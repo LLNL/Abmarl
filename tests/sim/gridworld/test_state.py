@@ -459,7 +459,7 @@ def test_maze_placement_state_clustering_and_scattering():
     )
     for barrier in barrier_agents.values():
         assert max(abs(target_agent.position - barrier.position)) <= 2
-    
+
     for free_agent in free_agents.values():
         np.testing.assert_array_equal(
             free_agent.position,
