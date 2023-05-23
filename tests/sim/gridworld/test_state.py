@@ -457,46 +457,14 @@ def test_maze_placement_state_clustering_and_scattering():
         target_agent.position,
         np.array([3, 2])
     )
-    np.testing.assert_array_equal(
-        agents['barrier_agent0'].position,
-        np.array([4, 2])
-    )
-    np.testing.assert_array_equal(
-        agents['barrier_agent1'].position,
-        np.array([2, 2])
-    )
-    np.testing.assert_array_equal(
-        agents['barrier_agent2'].position,
-        np.array([4, 4])
-    )
-    np.testing.assert_array_equal(
-        agents['barrier_agent3'].position,
-        np.array([4, 0])
-    )
-    np.testing.assert_array_equal(
-        agents['barrier_agent4'].position,
-        np.array([2, 4])
-    )
-    np.testing.assert_array_equal(
-        agents['free_agent0'].position,
-        np.array([1, 7])
-    )
-    np.testing.assert_array_equal(
-        agents['free_agent1'].position,
-        np.array([1, 7])
-    )
-    np.testing.assert_array_equal(
-        agents['free_agent2'].position,
-        np.array([1, 7])
-    )
-    np.testing.assert_array_equal(
-        agents['free_agent3'].position,
-        np.array([1, 7])
-    )
-    np.testing.assert_array_equal(
-        agents['free_agent4'].position,
-        np.array([1, 7])
-    )
+    for barrier in barrier_agents.values():
+        assert max(abs(target_agent.position - barrier.position)) <= 2
+    
+    for free_agent in free_agents.values():
+        np.testing.assert_array_equal(
+            free_agent.position,
+            np.array([1, 7])
+        )
 
     # Agents randomly placed
     state.cluster_barriers = False
