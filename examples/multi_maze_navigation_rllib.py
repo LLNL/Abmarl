@@ -41,7 +41,6 @@ sim = MultiAgentWrapper(
 )
 
 
-
 sim_name = "MultiMazeNavigation"
 from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
