@@ -117,12 +117,6 @@ class PositionState(StateBaseComponent):
         """
         Place an agent with an initial position.
         """
-        ravelled_initial_position = np.ravel_multi_index(
-            ip_agent_to_place.initial_position,
-            (self.rows, self.cols)
-        )
-        assert ravelled_initial_position in \
-            self.ravelled_positions_available[ip_agent_to_place.encoding]
         assert self.grid.place(ip_agent_to_place, ip_agent_to_place.initial_position), \
             f"Cell {ip_agent_to_place.initial_position} is not available for " \
             f"{ip_agent_to_place.id}."
