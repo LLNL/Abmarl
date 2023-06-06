@@ -1,7 +1,7 @@
 
 import warnings
 
-from gym.spaces import Dict, Discrete
+from gym.spaces import Dict, MultiBinary
 
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper
@@ -153,14 +153,14 @@ class SuperAgentWrapper(Wrapper):
                 if self.sim.get_done(covered_agent, **kwargs):
                     if self._last_obs_reported[covered_agent]:
                         obs[covered_agent] = self._get_null_obs(covered_agent, **kwargs)
-                        obs['mask'][covered_agent] = False
+                        obs['mask'][covered_agent] = [False]
                     else:
                         obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
-                        obs['mask'][covered_agent] = False
+                        obs['mask'][covered_agent] = [False]
                         self._last_obs_reported[covered_agent] = True
                 else:
                     obs[covered_agent] = self.sim.get_obs(covered_agent, **kwargs)
-                    obs['mask'][covered_agent] = True
+                    obs['mask'][covered_agent] = [True]
             return obs
         else:
             return self.sim.get_obs(agent_id, **kwargs)
@@ -253,7 +253,7 @@ class SuperAgentWrapper(Wrapper):
             obs_mapping = {'mask': {}}
             for covered_agent_id in covered_agent_list:
                 obs_mapping[covered_agent_id] = self.sim.agents[covered_agent_id].observation_space
-                obs_mapping['mask'][covered_agent_id] = Discrete(2)
+                obs_mapping['mask'][covered_agent_id] = MultiBinary(1)
             action_mapping = {
                 covered_agent_id: self.sim.agents[covered_agent_id].action_space
                 for covered_agent_id in covered_agent_list
