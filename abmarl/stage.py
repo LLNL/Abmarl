@@ -1,5 +1,8 @@
 import os
 
+import matplotlib
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import ray
@@ -135,10 +138,11 @@ def run_visualize(full_trained_directory, parameters):
 
         anim = FuncAnimation(
             fig, animate, frames=gen_frame_until_done, repeat=False,
-            interval=parameters.frame_delay
+            interval=parameters.frame_delay, save_count=15_000
         )
         if parameters.record:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.mp4'.format(episode)))
+            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+            # anim.save(os.path.join(full_trained_directory, 'Episode_{}.mp4'.format(episode)))
         plt.show(block=False)
         while not all_done:
             plt.pause(1)
