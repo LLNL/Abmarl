@@ -1,7 +1,7 @@
 
 import warnings
 
-from gym.spaces import Discrete, Dict
+from gym.spaces import MultiBinary, Dict
 import pytest
 
 from abmarl.sim.wrappers import SuperAgentWrapper
@@ -83,7 +83,7 @@ def test_agent_spaces():
     assert agents['super0'].observation_space == Dict({
         'agent0': original_agents['agent0'].observation_space,
         'agent3': original_agents['agent3'].observation_space,
-        'mask': Dict({'agent0': Discrete(2), 'agent3': Discrete(2)})
+        'mask': Dict({'agent0': MultiBinary(1), 'agent3': MultiBinary(1)})
     })
     assert agents['agent1'] == original_agents['agent1']
     assert agents['agent2'] == original_agents['agent2']
@@ -155,7 +155,7 @@ def test_sim_obs():
     assert obs == {
         'agent0': [0, 0, 0, 1],
         'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': False, 'agent3': True}
+        'mask': {'agent0': [False], 'agent3': [True]}
     }
 
     obs = sim.get_obs('agent1')
@@ -234,7 +234,7 @@ def test_double_wrap():
     assert sim2.agents['double0'].observation_space == Dict({
         'super0': sim2.sim.agents['super0'].observation_space,
         'agent1': sim2.sim.agents['agent1'].observation_space,
-        'mask': Dict({'super0': Discrete(2), 'agent1': Discrete(2)})
+        'mask': Dict({'super0': MultiBinary(1), 'agent1': MultiBinary(1)})
     })
     assert sim2.agents['agent2'] == original_agents['agent2']
     assert sim2.agents['agent4'] == original_agents['agent4']
@@ -270,10 +270,10 @@ def test_double_wrap():
         'super0': {
             'agent0': [0, 0, 0, 1],
             'agent3': {'first': 1, 'second': [3, 1]},
-            'mask': {'agent0': True, 'agent3': True}
+            'mask': {'agent0': [True], 'agent3': [True]}
         },
         'agent1': [0],
-        'mask': {'agent1': True, 'super0': True}
+        'mask': {'agent1': [True], 'super0': [True]}
     }
     obs = sim2.get_obs('agent2')
     assert obs in sim2.agents['agent2'].observation_space
@@ -303,7 +303,7 @@ def test_using_null_obs_when_done():
     assert obs == {
         'agent0': [0, 0, 0, 1],
         'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': True, 'agent3': True}
+        'mask': {'agent0': [True], 'agent3': [True]}
     }
 
 
@@ -320,12 +320,12 @@ def test_using_null_obs_when_done():
     assert sim.get_obs('super0') == {
         'agent0': [0, 0, 0, 1],
         'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': False, 'agent3': True}
+        'mask': {'agent0': [False], 'agent3': [True]}
     }
     assert sim.get_obs('super0') == {
         'agent0': [0, 0, 0, 0],
         'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': False, 'agent3': True}
+        'mask': {'agent0': [False], 'agent3': [True]}
     }
     assert sim.unwrapped.get_obs('agent0') == [0, 0, 0, 1]
 
@@ -342,12 +342,12 @@ def test_using_null_obs_when_done():
     assert sim.get_obs('super0') == {
         'agent0': [0, 0, 0, 0],
         'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': False, 'agent3': False}
+        'mask': {'agent0': [False], 'agent3': [False]}
     }
     assert sim.get_obs('super0') == {
         'agent0': [0, 0, 0, 0],
         'agent3': {'first': 1, 'second': [3, 1]},
-        'mask': {'agent0': False, 'agent3': False}
+        'mask': {'agent0': [False], 'agent3': [False]}
     }
     assert sim.get_reward('super0') == 7
     assert sim.get_reward('super0') == 0
