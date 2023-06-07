@@ -5,6 +5,7 @@ ray[rllib]==2.0.0
 open-spiel
 matplotlib
 seaborn
+PySide2
 sphinx
 sphinx-rtd-theme
 flake8
