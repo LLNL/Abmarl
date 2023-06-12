@@ -1,5 +1,7 @@
 import os
 
+import matplotlib
+
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import ray
@@ -71,6 +73,14 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
 
 def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
+    if parameters.record_only:
+        matplotlib.use("Agg")
+    else:
+        try:
+            matplotlib.use("macosx")
+        except ImportError:
+            matplotlib.use('TkAgg')
+
     sim, trainer = _start(full_trained_directory, parameters.checkpoint, seed=parameters.seed)
 
     # Determine if we are single- or multi-agent case.
@@ -122,7 +132,8 @@ def run_visualize(full_trained_directory, parameters):
         def animate(i):
             nonlocal obs, done
             sim.render(fig=fig)
-            plt.pause(1e-16)
+            if not parameters.record_only:
+                plt.pause(1e-16)
             action = _get_action(
                 obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
             )
@@ -131,15 +142,19 @@ def run_visualize(full_trained_directory, parameters):
                 nonlocal all_done
                 all_done = True
                 sim.render(fig=fig)
-                plt.pause(1e-16)
+                if not parameters.record_only:
+                    plt.pause(1e-16)
 
         anim = FuncAnimation(
             fig, animate, frames=gen_frame_until_done, repeat=False,
-            interval=parameters.frame_delay
+            interval=parameters.frame_delay, cache_frame_data=False
         )
         if parameters.record:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.mp4'.format(episode)))
-        plt.show(block=False)
+            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+            plt.show(block=False)
+        elif parameters.record_only:
+            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+
         while not all_done:
             plt.pause(1)
         plt.close(fig)
