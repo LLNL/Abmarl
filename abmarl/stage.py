@@ -1,7 +1,7 @@
 import os
 
 import matplotlib
-matplotlib.use("QtAgg")
+matplotlib.use("TkAgg")
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -141,7 +141,7 @@ def run_visualize(full_trained_directory, parameters):
             interval=parameters.frame_delay, cache_frame_data=False
         )
         if parameters.record:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+            anim.save(os.path.join(full_trained_directory, 'Episode_{}.mp4'.format(episode)))
         plt.show(block=False)
         while not all_done:
             plt.pause(1)
