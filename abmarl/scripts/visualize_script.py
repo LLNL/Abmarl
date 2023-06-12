@@ -16,7 +16,11 @@ def create_parser(subparsers):
     )
     visualize_parser.add_argument(
         '--record', action='store_true',
-        help='Record a video of the agent(s) interacting in the simulation.'
+        help='Record a video of the agent(s) interacting in the simulation and display it live.'
+    )
+    visualize_parser.add_argument(
+        '--record-only', action='store_true',
+        help='Only record a video of the agent(s) interacting in the simulation.'
     )
     visualize_parser.add_argument(
         '--frame-delay', type=int,
