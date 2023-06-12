@@ -27,6 +27,10 @@ def create_parser(subparsers):
         help='Combine all the animations into a single file.'
     )
     visualize_parser.add_argument(
+        '--name', type=str, default='Episode',
+        help='Name of the animation files. Default is "Episode".'
+    )
+    visualize_parser.add_argument(
         '--frame-delay', type=int,
         help='The number of milliseconds to delay between each frame in the animation.',
         default=200
