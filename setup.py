@@ -38,7 +38,6 @@ setuptools.setup(
         'open-spiel',
         'matplotlib',
         'seaborn',
-        'PySide2',
     ],
     python_requires='>=3.7, <3.11',
     entry_points={
