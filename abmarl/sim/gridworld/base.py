@@ -1,7 +1,6 @@
 
 from abc import ABC
 
-from matplotlib import pyplot as plt
 import numpy as np
 
 from abmarl.sim import AgentBasedSimulation

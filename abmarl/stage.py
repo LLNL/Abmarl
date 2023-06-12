@@ -78,7 +78,7 @@ def run_visualize(full_trained_directory, parameters):
     else:
         try:
             matplotlib.use("macosx")
-        except:
+        except ImportError:
             matplotlib.use('TkAgg')
 
     sim, trainer = _start(full_trained_directory, parameters.checkpoint, seed=parameters.seed)
