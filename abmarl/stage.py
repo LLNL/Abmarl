@@ -1,7 +1,6 @@
 import os
 
 import matplotlib
-matplotlib.use("TkAgg")
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -75,7 +74,6 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
 def run_visualize(full_trained_directory, parameters):
     """Visualize MARL policies from a saved policy"""
     if parameters.record_only:
-        import matplotlib
         matplotlib.use("Agg")
     else:
         try:
@@ -134,7 +132,8 @@ def run_visualize(full_trained_directory, parameters):
         def animate(i):
             nonlocal obs, done
             sim.render(fig=fig)
-            plt.pause(1e-16)
+            if not parameters.record_only:
+                plt.pause(1e-16)
             action = _get_action(
                 obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
             )
@@ -143,7 +142,8 @@ def run_visualize(full_trained_directory, parameters):
                 nonlocal all_done
                 all_done = True
                 sim.render(fig=fig)
-                plt.pause(1e-16)
+                if not parameters.record_only:
+                    plt.pause(1e-16)
 
         anim = FuncAnimation(
             fig, animate, frames=gen_frame_until_done, repeat=False,
