@@ -115,48 +115,86 @@ def run_visualize(full_trained_directory, parameters):
         _get_action = _single_get_action
         _get_done = _single_get_done
 
-    for episode in range(parameters.episodes):
-        print('Episode: {}'.format(episode))
-        obs = sim.reset()
-        done = None
-        all_done = False
-        fig = plt.figure()
-
+    if parameters.combine:
         def gen_frame_until_done():
             nonlocal all_done
             i = 0
             while not all_done:
                 i += 1
                 yield i
-
+        fig = plt.figure()
         def animate(i):
-            nonlocal obs, done
-            sim.render(fig=fig)
-            if not parameters.record_only:
-                plt.pause(1e-16)
-            action = _get_action(
-                obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
-            )
-            obs, _, done, _ = sim.step(action)
-            if _get_done(done) or i >= parameters.steps_per_episode:
-                nonlocal all_done
-                all_done = True
+            for episode in range(parameters.episodes):
+                print('Episode: {}'.format(episode))
+                obs = sim.reset()
+                done = None
+                all_done = False
+
                 sim.render(fig=fig)
                 if not parameters.record_only:
                     plt.pause(1e-16)
+                action = _get_action(
+                    obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
+                )
+                obs, _, done, _ = sim.step(action)
+                if _get_done(done) or i >= parameters.steps_per_episode:
+                    all_done = True
+                    sim.render(fig=fig)
+                    if not parameters.record_only:
+                        plt.pause(1e-16)
+
+                if parameters.record:
+                    plt.show(block=False)
 
         anim = FuncAnimation(
             fig, animate, frames=gen_frame_until_done, repeat=False,
             interval=parameters.frame_delay, cache_frame_data=False
         )
-        if parameters.record:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
-            plt.show(block=False)
-        elif parameters.record_only:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+        if parameters.record or parameters.record_only:
+            anim.save(os.path.join(full_trained_directory, 'Episode.gif'))
+    else:
+        for episode in range(parameters.episodes):
+            print('Episode: {}'.format(episode))
+            obs = sim.reset()
+            done = None
+            all_done = False
+            fig = plt.figure()
 
-        while not all_done:
-            plt.pause(1)
-        plt.close(fig)
+            def gen_frame_until_done():
+                nonlocal all_done
+                i = 0
+                while not all_done:
+                    i += 1
+                    yield i
+
+            def animate(i):
+                nonlocal obs, done
+                sim.render(fig=fig)
+                if not parameters.record_only:
+                    plt.pause(1e-16)
+                action = _get_action(
+                    obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
+                )
+                obs, _, done, _ = sim.step(action)
+                if _get_done(done) or i >= parameters.steps_per_episode:
+                    nonlocal all_done
+                    all_done = True
+                    sim.render(fig=fig)
+                    if not parameters.record_only:
+                        plt.pause(1e-16)
+
+            anim = FuncAnimation(
+                fig, animate, frames=gen_frame_until_done, repeat=False,
+                interval=parameters.frame_delay, cache_frame_data=False
+            )
+            if parameters.record:
+                anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+                plt.show(block=False)
+            elif parameters.record_only:
+                anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+
+            while not all_done:
+                plt.pause(1)
+            plt.close(fig)
 
     _finish()
