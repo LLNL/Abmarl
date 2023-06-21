@@ -169,8 +169,9 @@ Observer
 :ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
-Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>` generates an observation of the nearby grid and
-stores it in the 'grid' channel of the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
+Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>`
+generates an observation of the nearby grid and stores it in the 'grid' channel of
+the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
 
 
 .. _gridworld_done:
@@ -334,6 +335,74 @@ The :ref:`AbsolutePositionObserver <api_gridworld_observer_absolute>` enables
 in the grid. The position is reported as a two-dimensional numpy array, whose lower
 bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
 observer does not provide information on any other agent in the grid.
+
+
+Absolute Grid Observer
+``````````````````````
+
+:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` means that the
+:ref:`GridObservingAgent <api_gridworld_agent_observing>` observes the grid
+as though it were looking at it from the top down, from the grid's perspective,
+so to speak. As agents move around, the grid stays fixed and the observation shows
+each agent in their respective cells. Agents are represented by their `encodings`,
+and in order for the observing agent to distinguish itself from other entities of
+its same `encoding`, it sees itself as a -1.
+
+An agent's observation may be restricted by its own ``view_range`` and by other
+agents' :ref:`blocking <gridworld_blocking>`. This imposes a "fog of war" type masking
+on the observations. Cells that are not observable will be represented as a -2.
+For example, the following setup
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
+   from abmarl.sim.gridworld.grid import Grid
+   from abmarl.sim.gridworld.state import PositionState
+   from abmarl.sim.gridworld.observer import AbsoluteGridObserver
+
+   agents = {
+       'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=2),
+       'agent1': GridWorldAgent(id='agent1', encoding=2, initial_position=np.array([0, 1])),
+       'agent2': GridWorldAgent(id='agent2', encoding=3, initial_position=np.array([1, 0])),
+       'agent3': GridWorldAgent(id='agent3', encoding=4, initial_position=np.array([4, 4])),
+       'agent4': GridWorldAgent(id='agent4', encoding=5, initial_position=np.array([4, 4])),
+       'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([5, 5]))
+   }
+   grid = Grid(6, 6, overlapping={4: {5}, 5: {4}})
+   position_state = PositionState(agents=agents, grid=grid)
+   observer = AbsoluteGridObserver(agents=agents, grid=grid)
+
+   position_state.reset()
+   observer.get_obs(agents['agent0'])
+
+will position agents as below and output an observation for `agent0` (blue) like so:
+
+.. figure:: .images/gridworld_observation.png
+   :width: 50 %
+
+.. code-block::
+
+   [ 0,  2,  0,  0,  0, -2],
+   [ 3,  0,  0,  0,  0, -2],
+   [ 0,  0, -1,  0,  0, -2],
+   [ 0,  0,  0,  0,  0, -2],
+   [ 0,  0,  0,  0, 3*, -2],
+   [-2, -2, -2, -2, -2, -2],
+
+This is a ``6 x 6`` grid, so the observation is the same size. The observing agent
+is located at ``(2, 2)`` in the grid, just as its position indicates. Other agents appear
+in the grid represented as their encodings and located in their positions. Because
+the observing agent only has a ``view_range`` of 2, it cannot see the last row or
+column, so the observation masks those cells with the value of -2. There are two
+agents at position ``(4, 4)``, one with encoding 3 and another with encoding 4. The
+:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` randomly chooses
+from among those encodings.
+
+The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` automatically
+assigns a `null observation` as a matrix of all -2s, indicating that everything
+is masked.
+
 
 .. _gridworld_single_observer:
 
