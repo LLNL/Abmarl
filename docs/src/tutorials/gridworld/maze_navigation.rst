@@ -164,10 +164,11 @@ registry` that maps the values in the files to objects. We will use ``W`` for Wa
        )
    }
 
-Now we can create the simulation from the maze file using the `object registry`.
-We must allow the navigation agent and the target agent to overlap since that is
-our done condition, and without it the simulation would never end. The visualization
-produces an animation like the one at the top of this page.
+Now we can :ref:`build the simulation from the maze file <gridworld_building:>`
+using the `object registry`. We must allow the navigation agent and the target agent
+to overlap since that is our done condition, and without it the simulation would
+never end. The visualization produces an animation like the one at the top of this
+page.
 
 .. code-block:: python
 
