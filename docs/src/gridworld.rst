@@ -217,6 +217,15 @@ process. An Actor Wrapper may need to modify the action spaces of corresponding 
 to ensure that the action arrives in the correct format. 
 
 
+.. _gridworld_building:
+
+Building the Simulation
+```````````````````````
+
+The :ref:`GridWorldSimluation <api_gridworld_sim>` supports four methods of building
+a defined simulation.
+
+
 .. _gridworld_built_in_features:
 
 Built-in Features
