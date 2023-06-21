@@ -213,6 +213,12 @@ Actors
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_actor_cross_move:
+
+.. autoclass:: abmarl.sim.gridworld.actor.CrossMoveActor
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_actor_attack:
 
 .. autoclass:: abmarl.sim.gridworld.actor.AttackActorBaseComponent

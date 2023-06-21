@@ -325,6 +325,17 @@ The :ref:`MoveActor <api_gridworld_actor_move>` automatically assigns a `null ac
 of `[0, 0]`, indicating no move.
 
 
+Cross Move Actor
+````````````````
+
+The :ref:`CrossMoveActor <api_gridworld_actor_cross_move>` is very similar to the
+:ref:`MoveActor <gridworld_movement>`. Rather than moving to all nearby squares
+based on some ``move_range``, :ref:`MovingAgents <api_gridworld_agent_moving>`
+can move either up, down, left, right, or stay in place. The ``move_range`` parameter
+is ignored. The CrossMoveActor automatically assigns a `null_action` of 0, indicating
+the agent stays in place.
+
+
 .. _gridworld_absolute_position_observer:
 
 Absolute Position Observer
