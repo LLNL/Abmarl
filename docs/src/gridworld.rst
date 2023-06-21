@@ -222,8 +222,100 @@ to ensure that the action arrives in the correct format.
 Building the Simulation
 ```````````````````````
 
-The :ref:`GridWorldSimluation <api_gridworld_sim>` supports four methods of building
+The :ref:`GridWorldSimluation <api_gridworld_sim>` supports various methods of building
 a defined simulation.
+
+Build Sim
+~~~~~~~~~
+
+Users can build a simulation by supplying the number of rows, columns, and a dictionary
+of agents. The grid is initialized to the specified size and populated using information
+contained in the agents dictionary in conjunction with the simulation's state handlers.
+For example, the following simulation is built using information just from the dictionary
+of agents:
+
+.. code-block:: python
+
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
+   class MultiAgentGridSim(GridWorldSimulation):
+       def __init__(self, **kwargs):
+           self.agents = kwargs['agents']
+           self.grid = kwargs['grid']
+   
+           self.position_state = PositionState(**kwargs)
+   
+           self.finalize()
+
+   agent = GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0]))
+   sim = MultiAgentGridSim.build_sim(
+       3, 4,
+       agents={'agent0': agent}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(3 x 4)`` with a single agent with encoding
+1 placed at position ``(0, 0)``.
+
+Build Sim From Grid
+~~~~~~~~~~~~~~~~~~~
+
+Users can build a simulation by copying from an existing :ref:`grid <gridworld_grid>`.
+The builder will use the state of the grid as the initial state for the new grid
+for the simulation. Particularly, agents will be assigned initial positions based
+on their positions within the input grid. Extra agents can be included in the
+simulation via the ``extra_agents`` argument. For example, the following simulation
+is built using a pre-defined grid and extra agents:
+
+.. code-block:: python
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
+   class MultiAgentGridSim(GridWorldSimulation):
+       def __init__(self, **kwargs):
+           self.agents = kwargs['agents']
+           self.grid = kwargs['grid']
+   
+           self.position_state = PositionState(**kwargs)
+   
+           self.finalize()
+
+   grid = Grid(2, 2)
+   grid.reset()
+   agents = {
+       'agent0': GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0])),
+       'agent1': GridWorldAgent(id='agent1', encoding=1, initial_position=np.array([0, 1])),
+       'agent2': GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([1, 0])),
+   }
+   grid.place(agents['agent0'], (0, 0))
+   grid.place(agents['agent1'], (0, 1))
+   grid.place(agents['agent2'], (1, 0))
+
+   extra_agents = {
+       'agent0': GridWorldAgent(id='agent0', encoding=2, initial_position=np.array([0, 1])),
+       'agent3': GridWorldAgent(id='agent3', encoding=3, initial_position=np.array([0, 1])),
+       'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 0])),
+       'agent5': GridWorldAgent(id='agent5', encoding=5),
+   }
+
+   sim = MultiAgentGridSim.build_sim_from_grid(
+       grid,
+       extra_agents=extra_agents,
+       overlapping={1: {3, 4}, 3: {1}, 4: {1}}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(2 x 2)``. Agents 0-2 are positioned in the
+new grid according to their configuration in the original grid. Agents 3-5 are provided
+as extra agents, not from the original grid. Agent0 appears as both an extra agent
+and an agent in the original grid. If this happens, the builder prioritizes using
+the agent as it exist in the original grid.
+
+.. NOTE::
+   For consistency, the agents from the input grid should have their position in
+   the grid as their ``initial_position``.
+
+.. CAUTION::
+   The agents from the input grid are shallow-copied.
 
 
 .. _gridworld_built_in_features:
