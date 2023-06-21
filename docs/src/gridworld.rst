@@ -223,7 +223,9 @@ Building the Simulation
 ```````````````````````
 
 The :ref:`GridWorldSimluation <api_gridworld_sim>` supports various methods of building
-a defined simulation.
+a defined simulation. Each builder takes arguments specific to the builder. Additional
+arguments can be provided, and will be forwarded to the simulation for use in its
+components, for example.
 
 Build Sim
 ~~~~~~~~~
@@ -309,6 +311,10 @@ new grid according to their configuration in the original grid. Agents 3-5 are p
 as extra agents, not from the original grid. Agent0 appears as both an extra agent
 and an agent in the original grid. If this happens, the builder prioritizes using
 the agent as it exist in the original grid.
+
+.. NOTE::
+   The builder itself does not use the ``overlapping`` argument. That is passed
+   on to the simulation.
 
 .. NOTE::
    For consistency, the agents from the input grid should have their position in
@@ -397,6 +403,86 @@ the agent as is built from the array.
 .. NOTE::
    Dots, underscores, and zeros are reserved as empty space and cannot be used in
    the object registry.
+
+Build Sim From File
+~~~~~~~~~~~~~~~~~~~
+
+Building from a file works in the same way as building from an array. Here, the
+input is a file with alphanumeric ordered in a grid-like fashion. An object registry
+is used to interpret those characters into agents, and they are placed in the grid.
+As above, extra agents can be included. The following shows an example of building
+a simulation from file:
+
+.. code-block::
+   A . B 0 _
+   B _ _ C A
+
+This input file has two lines with 5 entries each, which will result in a ``2 x 5``
+grid. Each entry is seperated by space. Dots, underscores, and zeros are reserved
+for empty spaces.
+
+.. code-block:: python
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
+   class MultiAgentGridSim(GridWorldSimulation):
+       def __init__(self, **kwargs):
+           self.agents = kwargs['agents']
+           self.grid = kwargs['grid']
+   
+           self.position_state = PositionState(**kwargs)
+   
+           self.finalize()
+
+   file_name = 'grid_file.txt'
+   obj_registry = {
+       'A': lambda n: GridWorldAgent(
+           id=f'A-class-barrier{n}',
+           encoding=1,
+       ),
+       'B': lambda n: GridWorldAgent(
+           id=f'B-class-barrier{n}',
+           encoding=2,
+       ),
+       'C': lambda n: GridWorldAgent(
+           id=f'C-class-barrier{n}',
+           encoding=3,
+       ),
+   }
+   extra_agents = {
+       'B-class-barrier2': GridWorldAgent(
+           id='B-class-barrier2',
+           encoding=4,
+           initial_position=np.array([1, 0])
+       ),
+       'extra_agent0': GridWorldAgent(
+           id='extra_agent0',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent1': GridWorldAgent(
+           id='extra_agent1',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent2': GridWorldAgent(
+           id='extra_agent2',
+           encoding=6,
+           initial_position=np.array([0, 4])
+       )
+   }
+   sim = MultiAgentGridSim.build_sim_from_file(
+       file_name,
+       obj_registry,
+       extra_agents=extra_agents,
+       overlapping={1: {5}, 5: {1, 5}}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(2 x 5)``, matching the input file. There
+are 3 types of agents in the object registry corresponding with the characters in
+the input array. B-class-barrier2 appears in the extra agents, but it is also built
+from the input array. If this happens, the builder prioritizes using the agent as
+is built from the file.
 
 
 .. _gridworld_built_in_features:
