@@ -317,6 +317,87 @@ the agent as it exist in the original grid.
 .. CAUTION::
    The agents from the input grid are shallow-copied.
 
+Build Sim From Array
+~~~~~~~~~~~~~~~~~~~~
+
+Users can build a simulation by populating a grid based on an array. The array must
+be 2-dimensional and contain alphanumeric characters corresponding to entries in
+an object registry. The object registry is a dictionary that maps those entries
+to agent-building functions, assigning each agent a unique id. Agents will be placed
+within the grid according to its position in the array. As above, extra agents
+can be included. The following simulation is built using an array, object registry,
+and extra agents:
+
+.. code-block:: python
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
+   class MultiAgentGridSim(GridWorldSimulation):
+       def __init__(self, **kwargs):
+           self.agents = kwargs['agents']
+           self.grid = kwargs['grid']
+   
+           self.position_state = PositionState(**kwargs)
+   
+           self.finalize()
+
+   array = np.array([
+       ['A', '.', 'B', '0', ''],
+       ['B', '_', '', 'C', 'A']
+   ])
+   obj_registry = {
+       'A': lambda n: GridWorldAgent(
+           id=f'A-class-barrier{n}',
+           encoding=1,
+       ),
+       'B': lambda n: GridWorldAgent(
+           id=f'B-class-barrier{n}',
+           encoding=2,
+       ),
+       'C': lambda n: GridWorldAgent(
+           id=f'C-class-barrier{n}',
+           encoding=3,
+       ),
+   }
+   extra_agents = {
+       'B-class-barrier2': GridWorldAgent(
+           id='B-class-barrier2',
+           encoding=4,
+           initial_position=np.array([1, 0])
+       ),
+       'extra_agent0': GridWorldAgent(
+           id='extra_agent0',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent1': GridWorldAgent(
+           id='extra_agent1',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent2': GridWorldAgent(
+           id='extra_agent2',
+           encoding=6,
+           initial_position=np.array([0, 4])
+       )
+   }
+   sim = MultiAgentGridSim.build_sim_from_array(
+       array,
+       obj_registry,
+       extra_agents=extra_agents,
+       overlapping={1: {5}, 5: {1, 5}}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(2 x 5)``, matching the input array. There
+are 3 types of agents in the object registry corresponding with the characters in
+the input array. B-class-barrier2 appears in the extra agents, but it is also built
+from the input array. If this happens, the builder prioritizes using
+the agent as is built from the array.
+
+.. NOTE::
+   Dots, underscores, and zeros are reserved as empty space and cannot be used in
+   the object registry.
+
 
 .. _gridworld_built_in_features:
 
