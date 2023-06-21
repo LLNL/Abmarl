@@ -468,9 +468,9 @@ Now that all the components have been created, we can create the full simulation
            return {}
    
 Let's initialize our simulation and run it. We initialize some BroadcastingAgents
-and some BlockingAgents. Then we initialize the simulation with a `broadcast mapping`
-that specifies that broadcasts can only be made amongst agents with encoding 1, which
-are the BroadcastingAgents.
+and some BlockingAgents. Then we :ref:`initialize the simulation <gridworld_building>`
+with a `broadcast mapping` that specifies that broadcasts can only be made amongst
+agents with encoding 1, which are the BroadcastingAgents.
 
 .. code-block:: python
 
