@@ -337,6 +337,8 @@ bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
 observer does not provide information on any other agent in the grid.
 
 
+.. _gridworld_absolute_grid_observer:
+
 Absolute Grid Observer
 ``````````````````````
 
@@ -412,34 +414,13 @@ Single Grid Observer
 :ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
 of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
 via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
-generates a two-dimensional array sized by the agent's `view range` with the observing
-agent located at the center of the array. All other agents within the `view range` will
-appear in the observation, shown as their `encoding`. For example, the following setup
-
-.. code-block:: python
-
-   import numpy as np
-   from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
-   from abmarl.sim.gridworld.grid import Grid
-   from abmarl.sim.gridworld.state import PositionState
-   from abmarl.sim.gridworld.observer import SingleGridObserver
-
-   agents = {
-       'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=3),
-       'agent1': GridWorldAgent(id='agent1', encoding=2, initial_position=np.array([0, 1])),
-       'agent2': GridWorldAgent(id='agent2', encoding=3, initial_position=np.array([1, 0])),
-       'agent3': GridWorldAgent(id='agent3', encoding=4, initial_position=np.array([4, 4])),
-       'agent4': GridWorldAgent(id='agent4', encoding=5, initial_position=np.array([4, 4])),
-       'agent5': GridWorldAgent(id='agent5', encoding=6, initial_position=np.array([5, 5]))
-   }
-   grid = Grid(6, 6, overlapping={4: {5}, 5: {4}})
-   position_state = PositionState(agents=agents, grid=grid)
-   observer = SingleGridObserver(agents=agents, grid=grid)
-
-   position_state.reset()
-   observer.get_obs(agents['agent0'])
-
-will position agents as below and output an observation for `agent0` (blue) like so:
+generates a two-dimensional matrix sized by the agent's `view range` with the observing
+agent located at the center of the matrix. While the
+:ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes from the
+`grid`'s perspective, the SingleGridObserver observes from the `agent`'s perspective.
+All other agents within the `view range` will appear in the observation, shown as
+their `encoding`. For example, using the above setup with a ``view_range`` of 3
+will output an observation for `agent0` (blue) like so:
 
 .. figure:: .images/gridworld_observation.png
    :width: 50 %
@@ -459,8 +440,8 @@ Since `view range` is the number of cells away that can be observed, the observa
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to `agent0's` position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly select between their `encodings`
-for the observation.
+and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly
+select between their `encodings` for the observation.
 
 By setting `observe_self` to False, the :ref:`SingleGridObserver <api_gridworld_observer_single>`
 can be configured so that an agent doesn't observe itself and only observes
@@ -469,41 +450,6 @@ other agents, which may be helpful if overlapping is an important part of the si
 The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assigns
 a `null observation` as a view matrix of all -2s, indicating that everything is
 masked.
-
-.. _gridworld_blocking:
-
-Blocking
-~~~~~~~~
-
-Agents can block other agents' abilities and characteristics, such as blocking
-them from view, which masks out parts of the observation. For example,
-if `agent4` is configured with ``blocking=True``, then the observation would like
-like this:
-
-.. code-block::
-
-   [-1, -1, -1, -1, -1, -1, -1],
-   [-1,  0,  2,  0,  0,  0,  0],
-   [-1,  3,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  1,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0, 4*,  0],
-   [-1,  0,  0,  0,  0,  0, -2]
-
-The -2 indicates that the cell is masked, and the choice of displaying `agent3`
-over `agent4` is still a random choice. Which cells get masked by blocking
-agents is determined by drawing two lines
-from the center of the observing agent's cell to the corners of the blocking agent's
-cell. Any cell whose center falls between those two lines will be masked, as shown below.
-
-.. figure:: .images/gridworld_blocking.png
-   :width: 100 %
-   :alt: Masked cells from blocking agent
-
-   The black agent is a wall agent that masks part of the grid from the blue agent.
-   Cells whose centers fall betweent the lines are masked. Centers that fall directly
-   on the line or outside of the lines are not masked. Two setups are shown to 
-   demonstrate how the masking may change based on the agents' positions.
 
 
 Multi Grid Observer
@@ -545,6 +491,43 @@ there are many overlapping agents.
 
 The :ref:`MultiGridObserver <api_gridworld_observer_multi>` automatically assigns
 a `null observation` of a tensor of all -2s, indicating that everything is masked.
+
+
+.. _gridworld_blocking:
+
+Blocking
+~~~~~~~~
+
+Agents can block other agents' abilities and characteristics, such as blocking
+them from view, which masks out parts of the observation. For example,
+if `agent4` is configured with ``blocking=True``, then the observation would like
+like this:
+
+.. code-block::
+
+   [-1, -1, -1, -1, -1, -1, -1],
+   [-1,  0,  2,  0,  0,  0,  0],
+   [-1,  3,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  1,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0, 4*,  0],
+   [-1,  0,  0,  0,  0,  0, -2]
+
+The -2 indicates that the cell is masked, and the choice of displaying `agent3`
+over `agent4` is still a random choice. Which cells get masked by blocking
+agents is determined by drawing two lines
+from the center of the observing agent's cell to the corners of the blocking agent's
+cell. Any cell whose center falls between those two lines will be masked, as shown below.
+
+.. figure:: .images/gridworld_blocking.png
+   :width: 100 %
+   :alt: Masked cells from blocking agent
+
+   The black agent is a wall agent that masks part of the grid from the blue agent.
+   Cells whose centers fall betweent the lines are masked. Centers that fall directly
+   on the line or outside of the lines are not masked. Two setups are shown to 
+   demonstrate how the masking may change based on the agents' positions.
+
 
 Health
 ``````
