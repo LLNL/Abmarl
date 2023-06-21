@@ -455,11 +455,12 @@ masked.
 Multi Grid Observer
 ```````````````````
 
-Similar to the :ref:`SingleGridObserver <api_gridworld_observer_single>`, the :ref:`MultiGridObserver <api_gridworld_observer_multi>` displays a separate array
-for every `encoding`. Each array shows the relative positions of the agents and the
-number of those agents that occupy each cell. Out of bounds indicators (-1) and
-masked cells (-2) are present in every grid. For example, this setup would
-show an observation like so:
+Similar to the :ref:`SingleGridObserver <api_gridworld_observer_single>`,
+the :ref:`MultiGridObserver <api_gridworld_observer_multi>` observes the grid from
+the observing agent's perspective. It displays a separate matrix for every `encoding`.
+Each matrix shows the relative positions of the agents and the number of those agents
+that occupy each cell. Out of bounds indicators (-1) and masked cells (-2) are present
+in every matrix. For example, the above setup would show an observation like so:
 
 .. figure:: .images/gridworld_observation.png
    :width: 50 %
@@ -473,7 +474,7 @@ show an observation like so:
    [-1,  0,  0,  1,  0,  0,  0],
    [-1,  0,  0,  0,  0,  0,  0],
    [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0, -2]
+   [-1,  0,  0,  0,  0,  0,  0]
 
    # Encoding 2
    [-1, -1, -1, -1, -1, -1, -1],
@@ -482,7 +483,7 @@ show an observation like so:
    [-1,  0,  0,  0,  0,  0,  0],
    [-1,  0,  0,  0,  0,  0,  0],
    [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0, -2]
+   [-1,  0,  0,  0,  0,  0,  0]
    ...
 
 :ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to
@@ -500,7 +501,8 @@ Blocking
 
 Agents can block other agents' abilities and characteristics, such as blocking
 them from view, which masks out parts of the observation. For example,
-if `agent4` is configured with ``blocking=True``, then the observation would like
+if `agent4` above is configured with ``blocking=True``, then the
+:ref:`SingleGridObserver <gridworld_single_observer>` would produce an observation
 like this:
 
 .. code-block::
@@ -515,9 +517,9 @@ like this:
 
 The -2 indicates that the cell is masked, and the choice of displaying `agent3`
 over `agent4` is still a random choice. Which cells get masked by blocking
-agents is determined by drawing two lines
-from the center of the observing agent's cell to the corners of the blocking agent's
-cell. Any cell whose center falls between those two lines will be masked, as shown below.
+agents is determined by drawing two lines from the center of the observing agent's
+cell to the corners of the blocking agent's cell. Any cell whose center falls between
+those two lines will be masked, as shown below.
 
 .. figure:: .images/gridworld_blocking.png
    :width: 100 %
@@ -527,6 +529,8 @@ cell. Any cell whose center falls between those two lines will be masked, as sho
    Cells whose centers fall betweent the lines are masked. Centers that fall directly
    on the line or outside of the lines are not masked. Two setups are shown to 
    demonstrate how the masking may change based on the agents' positions.
+
+Blocking works with any of the built-in grid observers.
 
 
 Health
