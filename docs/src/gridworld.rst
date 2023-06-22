@@ -301,8 +301,8 @@ and an agent in the original grid. If this happens, the builder prioritizes usin
 the agent as it exist in the original grid.
 
 .. NOTE::
-   The builder itself does not use the ``overlapping`` argument. That is passed
-   on to the simulation.
+   In the example above, the builder itself does not use the ``overlapping`` argument.
+   That is passed on to the simulation.
 
 .. NOTE::
    For consistency, the agents from the input grid should have their position in
@@ -323,16 +323,10 @@ can be included. The following simulation is built using an array, object regist
 and extra agents:
 
 .. code-block:: python
-   from abmarl.sim.gridworld.agent import GridWorldAgent
 
-   class MultiAgentGridSim(GridWorldSimulation):
-       def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
-           self.grid = kwargs['grid']
-   
-           self.position_state = PositionState(**kwargs)
-   
-           self.finalize()
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
 
    array = np.array([
        ['A', '.', 'B', '0', ''],
@@ -384,7 +378,7 @@ and extra agents:
 
 This simulation has a grid of size ``(2 x 5)``, matching the input array. There
 are 3 types of agents in the object registry corresponding with the characters in
-the input array. B-class-barrier2 appears in the extra agents, but it is also built
+the input array. ``B-class-barrier2`` appears in the extra agents, but it is also built
 from the input array. If this happens, the builder prioritizes using
 the agent as is built from the array.
 
