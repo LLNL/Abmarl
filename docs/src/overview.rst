@@ -591,7 +591,7 @@ takes as argument the output directory from the training session stored in
 
 will load the experiment (notice that the directory name is the experiment
 title from the configuration file appended with a timestamp) and display an animation
-of 5 episodes. The ``--record`` flag will save the animations as `.mp4` videos in
+of 5 episodes. The ``--record`` flag will save the animations as `.gif` animations in
 the training directory.
 
 By default, each episode has a `horizon` of 200 steps (i.e. it will run for up to
@@ -599,6 +599,9 @@ By default, each episode has a `horizon` of 200 steps (i.e. it will run for up t
 You can control the `horizon` with ``-s`` or ``--steps-per-episode`` when running
 the visualize command.
 
+Using the ``--record`` flag will not only save the animations, but it will also
+play them live. The ``--record-only`` flag is useful when you only want to save
+the animations, such as if you're running headless or processing results in batch.
 
 
 Analyzing
