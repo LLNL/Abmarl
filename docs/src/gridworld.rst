@@ -390,30 +390,25 @@ Build Sim From File
 ~~~~~~~~~~~~~~~~~~~
 
 Building from a file works in the same way as building from an array. Here, the
-input is a file with alphanumeric ordered in a grid-like fashion. An object registry
+input is a file with alphanumeric characteres ordered in a grid-like fashion. An object registry
 is used to interpret those characters into agents, and they are placed in the grid.
 As above, extra agents can be included. The following shows an example of building
 a simulation from file:
 
 .. code-block::
+
    A . B 0 _
    B _ _ C A
 
 This input file has two lines with 5 entries each, which will result in a ``2 x 5``
-grid. Each entry is seperated by space. Dots, underscores, and zeros are reserved
+grid. Each entry is seperated by a space. Dots, underscores, and zeros are reserved
 for empty spaces.
 
 .. code-block:: python
-   from abmarl.sim.gridworld.agent import GridWorldAgent
 
-   class MultiAgentGridSim(GridWorldSimulation):
-       def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
-           self.grid = kwargs['grid']
-   
-           self.position_state = PositionState(**kwargs)
-   
-           self.finalize()
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
 
    file_name = 'grid_file.txt'
    obj_registry = {
@@ -460,11 +455,7 @@ for empty spaces.
    )
    sim.reset()
 
-This simulation has a grid of size ``(2 x 5)``, matching the input file. There
-are 3 types of agents in the object registry corresponding with the characters in
-the input array. B-class-barrier2 appears in the extra agents, but it is also built
-from the input array. If this happens, the builder prioritizes using the agent as
-is built from the file.
+This simulation is the same as the one above that we built from the array.
 
 
 .. _gridworld_built_in_features:
