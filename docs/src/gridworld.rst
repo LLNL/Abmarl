@@ -501,8 +501,8 @@ to make up a simulation.
 Position
 ````````
 
-:ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>` that are managed by the
-:ref:`PositionState <api_gridworld_state_position>`. Agents
+:ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>`
+that are managed by the :ref:`PositionState <api_gridworld_state_position>`. Agents
 can be configured with an `initial position`, which is where they will start at the
 beginning of each episode. If they are not given an `initial position`, then they
 will start at a random cell in the grid. Agents can overlap according to the
@@ -540,6 +540,37 @@ anywhere in the grid (except for (2,4) because they cannot overlap).
 
    agent0 in green starts at the same cell in every episode, and agent1 in blue
    starts at a random cell each time.
+
+
+Maze Placement State
+~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`MazePlacementState <api_gridworld_state_position_maze>` is a specialized
+state component used for positioning agents within mazes. The cells are partitioned
+into `free` and `barrier` cells. `Barrier-encoded` agents can be placed on `barrier`
+cells and `free-encoded` agents can be placed on `free` cells. There must be a `target
+agent`, which is used for clustering barriers and scattering free agents.
+
+.. Note::
+   Because the maze is randomly generated at the beginning of each episode
+   and because the agents must be placed in either a free cell or barrier cell
+   according to their encodings, it is highly recommended that none of your agents
+   be given initial positions, except for the target agent.
+
+The :ref:`MazePlacementState <api_gridworld_state_position_maze>` is very useful
+for randomly placing agents at the beginning of each episode while maintaining some
+desired structure. In this case, we can use this state component to keep barriers
+clustered around a target and scatter free agents away from it, regardless of where
+that target is positioned at the beginning of each episode. The clustering is such
+that all paths to the target are not blocked.
+
+.. figure:: /.images/gridworld_maze_placement.*
+   :width: 75 %
+   :alt: Animation showing starting states using Maze Placement State component.
+
+   Animation showing a target (green) starting at random positions at the beginning
+   of each episode. Barriers (grey squares) are clustered near the target without
+   blocking all paths to it. Free agents (blue) are scattered far from the target.
 
 
 .. _gridworld_movement:

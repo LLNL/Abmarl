@@ -191,6 +191,12 @@ State
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_state_position_maze:
+
+.. autoclass:: abmarl.sim.gridworld.state.MazePlacementState
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_state_health:
 
 .. autoclass:: abmarl.sim.gridworld.state.HealthState

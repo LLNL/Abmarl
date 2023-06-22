@@ -152,8 +152,6 @@ class MazePlacementState(PositionState):
     and because the agents must be placed in either a free cell or barrier cell
     according to their encodings, it is highly recommended that none of your agents
     be given initial positions, except for the target agent.
-    # TODO: If we don't force a complete division into two categories, then we can
-    # better support agents with initial positions that are neither free nor barrier.
 
     Args:
         target_agent: Start the maze generation at this agent's position and place
