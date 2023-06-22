@@ -117,7 +117,6 @@ class CrossMoveActor(ActorBaseComponent):
     """
     Agents can move up, down, left, right, or stay in place.
     """
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for agent in self.agents.values():

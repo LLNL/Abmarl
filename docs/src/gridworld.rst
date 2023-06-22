@@ -8,7 +8,7 @@ GridWorld Simulation Framework
 Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
 through Abmarl's :ref:`AgentBasedSimulation <abs>` interface. The GridWorld
-Simulation Framework is a `grey box`: we assume users have working knowledge of 
+Simulation Framework is a `gray box`: we assume users have working knowledge of 
 Python and object-oriented programming. Using the
 :ref:`built in features <gridworld_built_in_features>` requires minimal knowledge,
 but extending them and creating new features requires more knowledge.
@@ -169,8 +169,9 @@ Observer
 :ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
-Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>` generates an observation of the nearby grid and
-stores it in the 'grid' channel of the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
+Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>`
+generates an observation of the nearby grid and stores it in the 'grid' channel of
+the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
 
 
 .. _gridworld_done:
@@ -216,6 +217,247 @@ process. An Actor Wrapper may need to modify the action spaces of corresponding 
 to ensure that the action arrives in the correct format. 
 
 
+.. _gridworld_building:
+
+Building the Simulation
+```````````````````````
+
+The :ref:`GridWorldSimluation <api_gridworld_sim>` supports various methods of building
+a defined simulation. Each builder takes arguments specific to the builder. Additional
+arguments can be provided, and will be forwarded to the simulation for use in its
+components, for example.
+
+Build Sim
+~~~~~~~~~
+
+Users can build a simulation by supplying the number of rows, columns, and a dictionary
+of agents. The grid is initialized to the specified size and populated using information
+contained in the agents dictionary in conjunction with the simulation's state components.
+For example, the following simulation is built using information just from the dictionary
+of agents:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+   
+   agent = GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0]))
+   sim = MultiAgentGridSim.build_sim(
+       3, 4,
+       agents={'agent0': agent}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(3 x 4)`` with a single agent with encoding
+1 placed at position ``(0, 0)``.
+
+Build Sim From Grid
+~~~~~~~~~~~~~~~~~~~
+
+Users can build a simulation by copying from an existing :ref:`grid <gridworld_grid>`.
+The builder will use the state of the grid as the initial state for the new grid
+for the simulation. Particularly, agents will be assigned initial positions based
+on their positions within the input grid. Extra agents can be included in the
+simulation via the ``extra_agents`` argument. For example, the following simulation
+is built using a pre-defined grid and extra agents:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+   from abmarl.sim.gridworld.grid import Grid
+
+   grid = Grid(2, 2)
+   grid.reset()
+   agents = {
+       'agent0': GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0])),
+       'agent1': GridWorldAgent(id='agent1', encoding=1, initial_position=np.array([0, 1])),
+       'agent2': GridWorldAgent(id='agent2', encoding=1, initial_position=np.array([1, 0])),
+   }
+   grid.place(agents['agent0'], (0, 0))
+   grid.place(agents['agent1'], (0, 1))
+   grid.place(agents['agent2'], (1, 0))
+
+   extra_agents = {
+       'agent0': GridWorldAgent(id='agent0', encoding=2, initial_position=np.array([0, 1])),
+       'agent3': GridWorldAgent(id='agent3', encoding=3, initial_position=np.array([0, 1])),
+       'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 0])),
+       'agent5': GridWorldAgent(id='agent5', encoding=5),
+   }
+
+   sim = MultiAgentGridSim.build_sim_from_grid(
+       grid,
+       extra_agents=extra_agents,
+       overlapping={1: {3, 4}, 3: {1}, 4: {1}}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(2 x 2)``. Agents 0-2 are positioned in the
+new grid according to their configuration in the original grid. Agents 3-5 are provided
+as extra agents, not from the original grid. Agent0 appears as both an extra agent
+and an agent in the original grid. If this happens, the builder prioritizes using
+the agent as it exist in the original grid.
+
+.. NOTE::
+   In the example above, the builder itself does not use the ``overlapping`` argument.
+   That is passed on to the simulation.
+
+.. NOTE::
+   For consistency, the agents from the input grid should have their position in
+   the grid as their ``initial_position``.
+
+.. CAUTION::
+   The agents from the input grid are shallow-copied.
+
+Build Sim From Array
+~~~~~~~~~~~~~~~~~~~~
+
+Users can build a simulation by populating a grid based on an array. The array must
+be 2-dimensional and contain alphanumeric characters corresponding to entries in
+an object registry. The object registry is a dictionary that maps those entries
+to agent-building functions, assigning each agent a unique id. Agents will be placed
+within the grid according to its position in the array. As above, extra agents
+can be included. The following simulation is built using an array, object registry,
+and extra agents:
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
+   array = np.array([
+       ['A', '.', 'B', '0', ''],
+       ['B', '_', '', 'C', 'A']
+   ])
+   obj_registry = {
+       'A': lambda n: GridWorldAgent(
+           id=f'A-class-barrier{n}',
+           encoding=1,
+       ),
+       'B': lambda n: GridWorldAgent(
+           id=f'B-class-barrier{n}',
+           encoding=2,
+       ),
+       'C': lambda n: GridWorldAgent(
+           id=f'C-class-barrier{n}',
+           encoding=3,
+       ),
+   }
+   extra_agents = {
+       'B-class-barrier2': GridWorldAgent(
+           id='B-class-barrier2',
+           encoding=4,
+           initial_position=np.array([1, 0])
+       ),
+       'extra_agent0': GridWorldAgent(
+           id='extra_agent0',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent1': GridWorldAgent(
+           id='extra_agent1',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent2': GridWorldAgent(
+           id='extra_agent2',
+           encoding=6,
+           initial_position=np.array([0, 4])
+       )
+   }
+   sim = MultiAgentGridSim.build_sim_from_array(
+       array,
+       obj_registry,
+       extra_agents=extra_agents,
+       overlapping={1: {5}, 5: {1, 5}}
+   )
+   sim.reset()
+
+This simulation has a grid of size ``(2 x 5)``, matching the input array. There
+are 3 types of agents in the object registry corresponding with the characters in
+the input array. ``B-class-barrier2`` appears in the extra agents, but it is also built
+from the input array. If this happens, the builder prioritizes using
+the agent as is built from the array.
+
+.. NOTE::
+   Dots, underscores, and zeros are reserved as empty space and cannot be used in
+   the object registry.
+
+Build Sim From File
+~~~~~~~~~~~~~~~~~~~
+
+Building from a file works in the same way as building from an array. Here, the
+input is a file with alphanumeric characteres ordered in a grid-like fashion. An object registry
+is used to interpret those characters into agents, and they are placed in the grid.
+As above, extra agents can be included. The following shows an example of building
+a simulation from file:
+
+.. code-block::
+
+   A . B 0 _
+   B _ _ C A
+
+This input file has two lines with 5 entries each, which will result in a ``2 x 5``
+grid. Each entry is seperated by a space. Dots, underscores, and zeros are reserved
+for empty spaces.
+
+.. code-block:: python
+
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+
+   file_name = 'grid_file.txt'
+   obj_registry = {
+       'A': lambda n: GridWorldAgent(
+           id=f'A-class-barrier{n}',
+           encoding=1,
+       ),
+       'B': lambda n: GridWorldAgent(
+           id=f'B-class-barrier{n}',
+           encoding=2,
+       ),
+       'C': lambda n: GridWorldAgent(
+           id=f'C-class-barrier{n}',
+           encoding=3,
+       ),
+   }
+   extra_agents = {
+       'B-class-barrier2': GridWorldAgent(
+           id='B-class-barrier2',
+           encoding=4,
+           initial_position=np.array([1, 0])
+       ),
+       'extra_agent0': GridWorldAgent(
+           id='extra_agent0',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent1': GridWorldAgent(
+           id='extra_agent1',
+           encoding=5,
+           initial_position=np.array([0, 0])
+       ),
+       'extra_agent2': GridWorldAgent(
+           id='extra_agent2',
+           encoding=6,
+           initial_position=np.array([0, 4])
+       )
+   }
+   sim = MultiAgentGridSim.build_sim_from_file(
+       file_name,
+       obj_registry,
+       extra_agents=extra_agents,
+       overlapping={1: {5}, 5: {1, 5}}
+   )
+   sim.reset()
+
+This simulation is the same as the one above that was built from the array.
+
+
 .. _gridworld_built_in_features:
 
 Built-in Features
@@ -232,8 +474,8 @@ to make up a simulation.
 Position
 ````````
 
-:ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>` that are managed by the
-:ref:`PositionState <api_gridworld_state_position>`. Agents
+:ref:`Agents <gridworld_agent>` have `positions` in the :ref:`Grid <gridworld_grid>`
+that are managed by the :ref:`PositionState <api_gridworld_state_position>`. Agents
 can be configured with an `initial position`, which is where they will start at the
 beginning of each episode. If they are not given an `initial position`, then they
 will start at a random cell in the grid. Agents can overlap according to the
@@ -271,6 +513,39 @@ anywhere in the grid (except for (2,4) because they cannot overlap).
 
    agent0 in green starts at the same cell in every episode, and agent1 in blue
    starts at a random cell each time.
+
+
+.. _gridworld_position_maze_placement:
+
+Maze Placement State
+~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`MazePlacementState <api_gridworld_state_position_maze>` is a specialized
+state component used for positioning agents within mazes. The cells are partitioned
+into `free` and `barrier` cells. `Barrier-encoded` agents can be placed on `barrier`
+cells and `free-encoded` agents can be placed on `free` cells. There must be a `target
+agent`, which is used for clustering barriers and scattering free agents.
+
+.. Note::
+   Because the maze is randomly generated at the beginning of each episode
+   and because the agents must be placed in either a free cell or barrier cell
+   according to their encodings, it is highly recommended that none of your agents
+   be given initial positions, except for the target agent.
+
+The :ref:`MazePlacementState <api_gridworld_state_position_maze>` is very useful
+for randomly placing agents at the beginning of each episode while maintaining a
+desired structure. In this case, we can use this state component to keep barriers
+clustered around a target and scatter free agents away from it, regardless of where
+that target is positioned at the beginning of each episode. The clustering is such
+that all paths to the target are not blocked.
+
+.. figure:: /.images/gridworld_maze_placement.*
+   :width: 75 %
+   :alt: Animation showing starting states using Maze Placement State component.
+
+   Animation showing a target (green) starting at random positions at the beginning
+   of each episode. Barriers (gray squares) are clustered near the target without
+   blocking all paths to it. Free agents (blue) are scattered far from the target.
 
 
 .. _gridworld_movement:
@@ -323,6 +598,18 @@ at position (2, 3).
 The :ref:`MoveActor <api_gridworld_actor_move>` automatically assigns a `null action`
 of `[0, 0]`, indicating no move.
 
+.. _gridworld_movement_cross:
+
+Cross Move Actor
+````````````````
+
+The :ref:`CrossMoveActor <api_gridworld_actor_cross_move>` is very similar to the
+:ref:`MoveActor <gridworld_movement>`. Rather than moving to any nearby squares
+based on some ``move_range``, :ref:`MovingAgents <api_gridworld_agent_moving>`
+can move either up, down, left, right, or stay in place. The ``move_range`` parameter
+is ignored. The CrossMoveActor automatically assigns a `null_action` of 0, indicating
+the agent stays in place.
+
 
 .. _gridworld_absolute_position_observer:
 
@@ -335,17 +622,24 @@ in the grid. The position is reported as a two-dimensional numpy array, whose lo
 bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
 observer does not provide information on any other agent in the grid.
 
-.. _gridworld_single_observer:
 
-Single Grid Observer
-````````````````````
+.. _gridworld_absolute_grid_observer:
 
-:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
-of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
-via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
-generates a two-dimensional array sized by the agent's `view range` with the observing
-agent located at the center of the array. All other agents within the `view range` will
-appear in the observation, shown as their `encoding`. For example, the following setup
+Absolute Grid Observer
+``````````````````````
+
+:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` means that the
+:ref:`GridObservingAgent <api_gridworld_agent_observing>` observes the grid
+as though it were looking at it from the top down, "from the grid's perspective",
+so to speak. As agents move around, the grid stays fixed and the observation shows
+each agent according to their actual positions. Agents are represented by their `encodings`,
+and in order for the observing agent to distinguish itself from other entities of
+the same `encoding`, it sees itself as a -1.
+
+An agent's observation may be restricted by its own ``view_range`` and by other
+agents' :ref:`blocking <gridworld_blocking>`. This imposes a "fog of war" type masking
+on the observations. Cells that are not observable will be represented as a -2.
+For example, the following setup
 
 .. code-block:: python
 
@@ -353,10 +647,10 @@ appear in the observation, shown as their `encoding`. For example, the following
    from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
    from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import AbsoluteGridObserver
 
    agents = {
-       'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=3),
+       'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=2),
        'agent1': GridWorldAgent(id='agent1', encoding=2, initial_position=np.array([0, 1])),
        'agent2': GridWorldAgent(id='agent2', encoding=3, initial_position=np.array([1, 0])),
        'agent3': GridWorldAgent(id='agent3', encoding=4, initial_position=np.array([4, 4])),
@@ -365,12 +659,55 @@ appear in the observation, shown as their `encoding`. For example, the following
    }
    grid = Grid(6, 6, overlapping={4: {5}, 5: {4}})
    position_state = PositionState(agents=agents, grid=grid)
-   observer = SingleGridObserver(agents=agents, grid=grid)
+   observer = AbsoluteGridObserver(agents=agents, grid=grid)
 
    position_state.reset()
    observer.get_obs(agents['agent0'])
 
 will position agents as below and output an observation for `agent0` (blue) like so:
+
+.. figure:: .images/gridworld_observation.png
+   :width: 50 %
+
+.. code-block::
+
+   [ 0,  2,  0,  0,  0, -2],
+   [ 3,  0,  0,  0,  0, -2],
+   [ 0,  0, -1,  0,  0, -2],
+   [ 0,  0,  0,  0,  0, -2],
+   [ 0,  0,  0,  0, 3*, -2],
+   [-2, -2, -2, -2, -2, -2],
+
+This is a ``6 x 6`` grid, so the observation is the same size. The observing agent
+is located at ``(2, 2)`` in the grid, just as its position indicates. Other agents appear
+in the grid represented as their encodings and appear according to their actual positions. Because
+the observing agent only has a ``view_range`` of 2, it cannot see the last row or
+column, so the observation masks those cells with the value of -2. There are two
+agents at position ``(4, 4)``, one with encoding 3 and another with encoding 4. The
+:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` randomly chooses
+one from among those encodings.
+
+The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` automatically
+assigns a `null observation` as a matrix of all -2s, indicating that everything
+is masked.
+
+
+.. _gridworld_single_observer:
+
+Single Grid Observer
+````````````````````
+
+:ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
+of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
+via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
+generates a two-dimensional matrix sized by the agent's `view range` with the observing
+agent located at the center of the matrix. While the
+:ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes agents according
+to their actual positions, the SingleGridObserver observes agents according to their
+relative positions.
+All other agents within the `view range` will appear in the observation, shown as
+their `encoding`. For example, using the above setup with a ``view_range`` of 3
+will output an observation for `agent0` (blue) like so:
 
 .. figure:: .images/gridworld_observation.png
    :width: 50 %
@@ -390,16 +727,59 @@ Since `view range` is the number of cells away that can be observed, the observa
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to `agent0's` position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly select between their `encodings`
-for the observation.
+and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly
+select between their `encodings` for the observation.
 
 By setting `observe_self` to False, the :ref:`SingleGridObserver <api_gridworld_observer_single>`
 can be configured so that an agent doesn't observe itself and only observes
 other agents, which may be helpful if overlapping is an important part of the simulation.
 
 The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assigns
-a `null observation` as a view matrix of all -2s, indicating that everything is
+a `null observation` as a matrix of all -2s, indicating that everything is
 masked.
+
+
+Multi Grid Observer
+```````````````````
+
+Similar to the :ref:`SingleGridObserver <api_gridworld_observer_single>`,
+the :ref:`MultiGridObserver <api_gridworld_observer_multi>` observes the grid from
+the observing agent's perspective. It displays a separate matrix for every `encoding`.
+Each matrix shows the relative positions of the agents and the number of those agents
+that occupy each cell. Out of bounds indicators (-1) and masked cells (-2) are present
+in every matrix. For example, the above setup would show an observation like so:
+
+.. figure:: .images/gridworld_observation.png
+   :width: 50 %
+
+.. code-block::
+
+   # Encoding 1
+   [-1, -1, -1, -1, -1, -1, -1],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  1,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0]
+
+   # Encoding 2
+   [-1, -1, -1, -1, -1, -1, -1],
+   [-1,  0,  1,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0],
+   [-1,  0,  0,  0,  0,  0,  0]
+   ...
+
+:ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to
+:ref:`SingleGridObserver <api_gridworld_observer_single>` in simulations where
+there are many overlapping agents.
+
+The :ref:`MultiGridObserver <api_gridworld_observer_multi>` automatically assigns
+a `null observation` of a tensor of all -2s, indicating that everything is masked.
+
 
 .. _gridworld_blocking:
 
@@ -408,7 +788,8 @@ Blocking
 
 Agents can block other agents' abilities and characteristics, such as blocking
 them from view, which masks out parts of the observation. For example,
-if `agent4` is configured with ``blocking=True``, then the observation would like
+if `agent4` above is configured with ``blocking=True``, then the
+:ref:`SingleGridObserver <gridworld_single_observer>` would produce an observation
 like this:
 
 .. code-block::
@@ -423,9 +804,9 @@ like this:
 
 The -2 indicates that the cell is masked, and the choice of displaying `agent3`
 over `agent4` is still a random choice. Which cells get masked by blocking
-agents is determined by drawing two lines
-from the center of the observing agent's cell to the corners of the blocking agent's
-cell. Any cell whose center falls between those two lines will be masked, as shown below.
+agents is determined by drawing two lines from the center of the observing agent's
+cell to the corners of the blocking agent's cell. Any cell whose center falls between
+those two lines will be masked, as shown below.
 
 .. figure:: .images/gridworld_blocking.png
    :width: 100 %
@@ -436,46 +817,8 @@ cell. Any cell whose center falls between those two lines will be masked, as sho
    on the line or outside of the lines are not masked. Two setups are shown to 
    demonstrate how the masking may change based on the agents' positions.
 
+Blocking works with any of the built-in grid observers.
 
-Multi Grid Observer
-```````````````````
-
-Similar to the :ref:`SingleGridObserver <api_gridworld_observer_single>`, the :ref:`MultiGridObserver <api_gridworld_observer_multi>` displays a separate array
-for every `encoding`. Each array shows the relative positions of the agents and the
-number of those agents that occupy each cell. Out of bounds indicators (-1) and
-masked cells (-2) are present in every grid. For example, this setup would
-show an observation like so:
-
-.. figure:: .images/gridworld_observation.png
-   :width: 50 %
-
-.. code-block::
-
-   # Encoding 1
-   [-1, -1, -1, -1, -1, -1, -1],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  1,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0, -2]
-
-   # Encoding 2
-   [-1, -1, -1, -1, -1, -1, -1],
-   [-1,  0,  1,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0,  0],
-   [-1,  0,  0,  0,  0,  0, -2]
-   ...
-
-:ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to
-:ref:`SingleGridObserver <api_gridworld_observer_single>` in simulations where
-there are many overlapping agents.
-
-The :ref:`MultiGridObserver <api_gridworld_observer_multi>` automatically assigns
-a `null observation` of a tensor of all -2s, indicating that everything is masked.
 
 Health
 ``````
@@ -838,6 +1181,32 @@ automatically assigns an array of 0s as the `null action`, indicating no attack 
    which is determined from ravelling the local grid, where 0 means no attack,
    1 is the top left cell, 2 is to the right of that, and so on through the whole
    local grid.
+
+
+.. _gridworld_done_built_in:
+
+Active Done
+```````````
+
+The :ref:`ActiveDone <api_gridworld_done_active>` component reports that agents are `done`
+based on their `active` property. If the agent is inactive, then it is done. If
+all the agents are inactive, then the entire simulation is done.
+
+One Team Remaining Done
+```````````````````````
+
+The :ref:`OneTeamRemainingDone <api_gridworld_done_one_team_remaining>` component
+reports that the simulation is done when there is only one "team" remaining; that
+is, when all the remaining active agents have the same encoding. This component
+does not report done for individual agents.
+
+Target Agent Done
+`````````````````
+
+The :ref:`TargetAgentDone <api_gridworld_done_target_agent>` component takes
+a ``target_mapping``, which maps agents to their targets by id. If an agent overlaps
+its target, then that agent is done. If all of the agents have overlapped their
+targets, then the simulation is done.
 
 
 RavelActionWrapper

@@ -191,6 +191,12 @@ State
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_state_position_maze:
+
+.. autoclass:: abmarl.sim.gridworld.state.MazePlacementState
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_state_health:
 
 .. autoclass:: abmarl.sim.gridworld.state.HealthState
@@ -210,6 +216,12 @@ Actors
 .. _api_gridworld_actor_move:
 
 .. autoclass:: abmarl.sim.gridworld.actor.MoveActor
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_cross_move:
+
+.. autoclass:: abmarl.sim.gridworld.actor.CrossMoveActor
 	:members:
 	:undoc-members:
 
@@ -259,6 +271,12 @@ Observers
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_observer_absolute_grid:
+
+.. autoclass:: abmarl.sim.gridworld.observer.AbsoluteGridObserver
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_observer_single:
 
 .. autoclass:: abmarl.sim.gridworld.observer.SingleGridObserver
@@ -281,11 +299,21 @@ Done
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_done_active:
+
 .. autoclass:: abmarl.sim.gridworld.done.ActiveDone
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_done_one_team_remaining:
+
 .. autoclass:: abmarl.sim.gridworld.done.OneTeamRemainingDone
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_done_target_agent:
+
+.. autoclass:: abmarl.sim.gridworld.done.TargetAgentDone
 	:members:
 	:undoc-members:
 

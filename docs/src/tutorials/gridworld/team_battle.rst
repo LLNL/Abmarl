@@ -177,9 +177,9 @@ the attributes in the class definition above.
        ) for i in range(24)
    }
 
-Having created the agents, we can now build the simulation. We will allow agents
-from the same team to occupy the same cell and allow agents to attack other agents
-if they are on different teams.
+Having created the agents, we can now :ref:`build the simulation <gridworld_building>`.
+We will allow agents from the same team to occupy the same cell and allow agents
+to attack other agents if they are on different teams.
 
 .. code-block:: python
 
