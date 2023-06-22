@@ -455,7 +455,7 @@ for empty spaces.
    )
    sim.reset()
 
-This simulation is the same as the one above that we built from the array.
+This simulation is the same as the one above that was built from the array.
 
 
 .. _gridworld_built_in_features:

@@ -63,7 +63,7 @@ class AbsoluteGridObserver(ObserverBaseComponent):
     built-in observers, masked cells are indicated as -2. Typially, -1 is reserved
     for out of bounds encoding, but because this Observer only reports cells in the
     grid, we don't need an out of bounds distinction. Instead, in order for the observing
-    agent to identify itself distinctly from other agents of the same encoding, the
+    agent to identify itself distinctly from other agents of the same encoding,
     it is reported as a -1.
     """
     def __init__(self, **kwargs):
