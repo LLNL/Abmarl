@@ -630,11 +630,11 @@ Absolute Grid Observer
 
 :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` means that the
 :ref:`GridObservingAgent <api_gridworld_agent_observing>` observes the grid
-as though it were looking at it from the top down, from the grid's perspective,
+as though it were looking at it from the top down, "from the grid's perspective",
 so to speak. As agents move around, the grid stays fixed and the observation shows
-each agent in their respective cells. Agents are represented by their `encodings`,
+each agent according to their actual positions. Agents are represented by their `encodings`,
 and in order for the observing agent to distinguish itself from other entities of
-its same `encoding`, it sees itself as a -1.
+the same `encoding`, it sees itself as a -1.
 
 An agent's observation may be restricted by its own ``view_range`` and by other
 agents' :ref:`blocking <gridworld_blocking>`. This imposes a "fog of war" type masking
@@ -680,12 +680,12 @@ will position agents as below and output an observation for `agent0` (blue) like
 
 This is a ``6 x 6`` grid, so the observation is the same size. The observing agent
 is located at ``(2, 2)`` in the grid, just as its position indicates. Other agents appear
-in the grid represented as their encodings and located in their positions. Because
+in the grid represented as their encodings and appear according to their actual positions. Because
 the observing agent only has a ``view_range`` of 2, it cannot see the last row or
 column, so the observation masks those cells with the value of -2. There are two
 agents at position ``(4, 4)``, one with encoding 3 and another with encoding 4. The
 :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` randomly chooses
-from among those encodings.
+one from among those encodings.
 
 The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` automatically
 assigns a `null observation` as a matrix of all -2s, indicating that everything
@@ -702,8 +702,9 @@ of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are n
 via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
 generates a two-dimensional matrix sized by the agent's `view range` with the observing
 agent located at the center of the matrix. While the
-:ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes from the
-`grid`'s perspective, the SingleGridObserver observes from the `agent`'s perspective.
+:ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes agents according
+to their actual positions, the SingleGridObserver observes agents according to their
+relative positions.
 All other agents within the `view range` will appear in the observation, shown as
 their `encoding`. For example, using the above setup with a ``view_range`` of 3
 will output an observation for `agent0` (blue) like so:
@@ -734,7 +735,7 @@ can be configured so that an agent doesn't observe itself and only observes
 other agents, which may be helpful if overlapping is an important part of the simulation.
 
 The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assigns
-a `null observation` as a view matrix of all -2s, indicating that everything is
+a `null observation` as a matrix of all -2s, indicating that everything is
 masked.
 
 
