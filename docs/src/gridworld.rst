@@ -263,16 +263,11 @@ simulation via the ``extra_agents`` argument. For example, the following simulat
 is built using a pre-defined grid and extra agents:
 
 .. code-block:: python
-   from abmarl.sim.gridworld.agent import GridWorldAgent
 
-   class MultiAgentGridSim(GridWorldSimulation):
-       def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
-           self.grid = kwargs['grid']
-   
-           self.position_state = PositionState(**kwargs)
-   
-           self.finalize()
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
+   from abmarl.sim.gridworld.agent import GridWorldAgent
+   from abmarl.sim.gridworld.grid import Grid
 
    grid = Grid(2, 2)
    grid.reset()
