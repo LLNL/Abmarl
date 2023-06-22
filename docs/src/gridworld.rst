@@ -232,23 +232,16 @@ Build Sim
 
 Users can build a simulation by supplying the number of rows, columns, and a dictionary
 of agents. The grid is initialized to the specified size and populated using information
-contained in the agents dictionary in conjunction with the simulation's state handlers.
+contained in the agents dictionary in conjunction with the simulation's state components.
 For example, the following simulation is built using information just from the dictionary
 of agents:
 
 .. code-block:: python
 
+   import numpy as np
+   from abmarl.examples.sim import MultiAgentGridSim
    from abmarl.sim.gridworld.agent import GridWorldAgent
-
-   class MultiAgentGridSim(GridWorldSimulation):
-       def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
-           self.grid = kwargs['grid']
    
-           self.position_state = PositionState(**kwargs)
-   
-           self.finalize()
-
    agent = GridWorldAgent(id='agent0', encoding=1, initial_position=np.array([0, 0]))
    sim = MultiAgentGridSim.build_sim(
        3, 4,
