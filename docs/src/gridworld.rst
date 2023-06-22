@@ -8,7 +8,7 @@ GridWorld Simulation Framework
 Abmarl provides a GridWorld Simulation Framework for setting up grid-based
 Agent Based Simulations, which can be connected to Reinforcement Learning algorithms
 through Abmarl's :ref:`AgentBasedSimulation <abs>` interface. The GridWorld
-Simulation Framework is a `grey box`: we assume users have working knowledge of 
+Simulation Framework is a `gray box`: we assume users have working knowledge of 
 Python and object-oriented programming. Using the
 :ref:`built in features <gridworld_built_in_features>` requires minimal knowledge,
 but extending them and creating new features requires more knowledge.
@@ -533,7 +533,7 @@ agent`, which is used for clustering barriers and scattering free agents.
    be given initial positions, except for the target agent.
 
 The :ref:`MazePlacementState <api_gridworld_state_position_maze>` is very useful
-for randomly placing agents at the beginning of each episode while maintaining some
+for randomly placing agents at the beginning of each episode while maintaining a
 desired structure. In this case, we can use this state component to keep barriers
 clustered around a target and scatter free agents away from it, regardless of where
 that target is positioned at the beginning of each episode. The clustering is such
@@ -544,7 +544,7 @@ that all paths to the target are not blocked.
    :alt: Animation showing starting states using Maze Placement State component.
 
    Animation showing a target (green) starting at random positions at the beginning
-   of each episode. Barriers (grey squares) are clustered near the target without
+   of each episode. Barriers (gray squares) are clustered near the target without
    blocking all paths to it. Free agents (blue) are scattered far from the target.
 
 
@@ -604,7 +604,7 @@ Cross Move Actor
 ````````````````
 
 The :ref:`CrossMoveActor <api_gridworld_actor_cross_move>` is very similar to the
-:ref:`MoveActor <gridworld_movement>`. Rather than moving to all nearby squares
+:ref:`MoveActor <gridworld_movement>`. Rather than moving to any nearby squares
 based on some ``move_range``, :ref:`MovingAgents <api_gridworld_agent_moving>`
 can move either up, down, left, right, or stay in place. The ``move_range`` parameter
 is ignored. The CrossMoveActor automatically assigns a `null_action` of 0, indicating
