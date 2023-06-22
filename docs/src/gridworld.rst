@@ -542,6 +542,8 @@ anywhere in the grid (except for (2,4) because they cannot overlap).
    starts at a random cell each time.
 
 
+.. _gridworld_position_maze_placement:
+
 Maze Placement State
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -623,6 +625,7 @@ at position (2, 3).
 The :ref:`MoveActor <api_gridworld_actor_move>` automatically assigns a `null action`
 of `[0, 0]`, indicating no move.
 
+.. _gridworld_movement_cross:
 
 Cross Move Actor
 ````````````````
@@ -1205,6 +1208,8 @@ automatically assigns an array of 0s as the `null action`, indicating no attack 
    1 is the top left cell, 2 is to the right of that, and so on through the whole
    local grid.
 
+
+.. _gridworld_done_built_in:
 
 Active Done
 ```````````

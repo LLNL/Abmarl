@@ -3,116 +3,116 @@
 What's New in Abmarl
 ====================
 
-Abmarl version 0.2.5 features a new set of built-in :ref:`Attack Actors <gridworld_attacking>`
-for the :ref:`Grid World Simulation Framework <gridworld>`; an
-:ref:`exclusive channel action wrapper <gridworld_exclusive_channel_action_wrapper>`
-to allow users to isolate actions by channel; and an enahanced
-:ref:`FlattenWrapper <flatten_wrapper>` for dealing with Discrete spaces.
+Abmarl version 0.2.6 features the new
+:ref:`Absolute Grid Observer <gridworld_absolute_grid_observer>`, which produces
+"top-down" observations of the grid from the grid's perspective; the
+:ref:`Maze Placement State <gridworld_position_maze_placement>` component for structuring
+the initial placement of agents within a grid while allowing for variation in each
+episode; and enhanced support for :ref:`buildling gridworld simulations <gridworld_building>`.
 
 
-New Attack Actors
------------------
+Absolute Grid Observer
+----------------------
 
-Abmarl's :ref:`Grid World Simulation Framework <gridworld>` now provides four built-in
-:ref:`Attack Actors <gridworld_attacking>` for greater flexibility in processing
-attacks. In addition to the already-supported :ref:`BinaryAttackActor <gridworld_binary_attack>`,
-Abmarl now supports an :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`,
-a :ref:`SelectiveAttackActor <gridworld_selective_attack>`, and a
-:ref:`RestrictedSelectiveAttackActor <gridworld_restricted_selective_attack>`.
-These attackors allow agents to specify attacks based on encodings and cells.
-:ref:`AttackingAgents <api_gridworld_agent_attack>` can now use multiple
-attacks per turn, up to their ``attack_count``, as interpreted by the Attack Actors.
+The :ref:`Single and Multi Grid Observers <gridworld_single_observer>` provide
+observations of the the grid centered on the observing agent, a view of the grid
+"from the agent's perspective". Abmarl's :ref:`Grid World Simulation Framework <gridworld>`
+now contains the :ref:`Absolute Grid Observer <gridworld_absolute_grid_observer>`,
+which produces observations of the grid "from the grid's perspective". The observation
+size matches the size of the grid, and the agent sees itself moving around the
+grid instead of seeing all the other agents positioned relative to itself.
 
-In addition, :ref:`Attack Actors <gridworld_attacking>` now output the attack status
-along with a list of attacked agents, allowing simulations to distinguish and issue
-rewards among three outcomes:
+Here we show the following state observation for the bottom-left red agent with
+a ``view_range`` of 2 via the :ref:`Single Grid Observer <gridworld_single_observer>`
+and the new :ref:`Absolute Grid Observer <gridworld_absolute_grid_observer>`. The
+Single Grid Observation is sized by the agent's view range, the observing agent
+is in the very center, and all other cells are shown in their respective positions,
+including out of bounds cells. The Absolute Grid Observation is sized by the grid,
+all agents are shown in their actual grid positions, there are no out of bounds
+cells, and any cell that the agent cannot see is masked with a -2.
 
-   #. No attack attempted
-   #. Attack attempted and failed
-   #. Attack attempted and successful
+.. figure:: /.images/absolute_vs_position_obs.png
+   :width: 75 %
+   :alt: State for comparing the differences between single and absolute grid observer.
 
-
-Exclusive Channel Action Wrapper
---------------------------------
-
-Users can enforce exclusivity of actions among the channels within a single Actor,
-so that the agent must pick from one channel or the other. For example, the
-:ref:`ExclusiveChannelActionWrapper <gridworld_exclusive_channel_action_wrapper>`
-can be used with the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`
-for :ref:`AttackingAgents <api_gridworld_agent_attack>` to focus their attack on
-a specific encoding.
-
-
-Enhanced Flatten Wrapper
-------------------------
-
-Sampling from a flattened space can result in
-`unexpected results <https://github.com/LLNL/Abmarl/issues/355>`_ when the sample
-is later unflattened because the sampling distribution in the flattened space is
-not the same as in the unflattened space. This is particularly important for Discrete
-spaces, which are typically flattened as one-hot-encodings. To overcome these issues,
-Abmarl's :ref:`FlattenWrapper <flatten_wrapper>` now flattens Discrete spaces as
-an integer-Box of a single element with bounds up to ``space.n``.
-
-
-Easier-to-Read Grid Loading
----------------------------
-
-When loading the grid from a file, empty spaces were previously represented as
-zeros. This made the file difficult for humans to read because the entities of
-concern were hard to locate. Now, empty spaces can be zeros, dots, or underscores.
-Here is a comparison:
-
+   Comparing observations for the bottom-left red agent with a ``view_range`` of 2.
+   
 .. code-block::
-  
-   # Zeros
-   0 0 0 0 W 0 W W 0 W W 0 0 W W 0 W 0
-   W 0 W 0 N 0 0 0 0 0 W 0 W W 0 0 0 0
-   W W W W 0 W W 0 W 0 0 0 0 W W 0 W W
-   0 W 0 0 0 W W 0 W 0 W W 0 0 0 0 0 0
-   0 0 0 W 0 0 W W W 0 W 0 0 W 0 W W 0
-   W W W W 0 W W W W W W W 0 W 0 T W 0
-   0 0 0 0 0 W 0 0 0 0 0 0 0 W 0 W W 0
-   0 W 0 W 0 W W W 0 W W 0 W W 0 W 0 0
 
-   # Underscores
-   _ _ _ _ W _ W W _ W W _ _ W W _ W _
-   W _ W _ N _ _ _ _ _ W _ W W _ _ _ _
-   W W W W _ W W _ W _ _ _ _ W W _ W W
-   _ W _ _ _ W W _ W _ W W _ _ _ _ _ _
-   _ _ _ W _ _ W W W _ W _ _ W _ W W _
-   W W W W _ W W W W W W W _ W _ T W _
-   _ _ _ _ _ W _ _ _ _ _ _ _ W _ W W _
-   _ W _ W _ W W W _ W W _ W W _ W _ _
+   # Single Grid Observer, observing agent is shown here as *3
+   [ 0,  2,  2,  0,  2],
+   [ 0,  2,  0,  0,  0],
+   [ 0,  0, *3,  3,  0],
+   [ 0,  0,  0,  0,  0],
+   [-1, -1, -1, -1, -1],
 
-   # Dots
-   . . . . W . W W . W W . . W W . W .
-   W . W . N . . . . . W . W W . . . .
-   W W W W . W W . W . . . . W W . W W
-   . W . . . W W . W . W W . . . . . .
-   . . . W . . W W W . W . . W . W W .
-   W W W W . W W W W W W W . W . T W .
-   . . . . . W . . . . . . . W . W W .
-   . W . W . W W W . W W . W W . W . .
+   # Absolute Grid Observer, observing agent is shown as -1
+   [-2, -2, -2, -2, -2, -2, -2],
+   [-2, -2, -2, -2, -2, -2, -2],
+   [-2, -2, -2, -2, -2, -2, -2],
+   [ 0,  2,  2,  0,  2, -2, -2],
+   [ 0,  2,  0,  0,  0, -2, -2],
+   [ 0,  0, -1,  3,  0, -2, -2],
+   [ 0,  0,  0,  0,  0, -2, -2]
 
-  
+
+Maze Placement State
+--------------------
+
+The :ref:`Position State <gridworld_position>` supports placing agents in the the
+grid either (1) according to their initial positions or (2) randomly selecting
+an available cell. The new :ref:`Maze Placement State <gridworld_position_maze_placement>`
+supports more structure in initially placing agents. It starts by partitioning
+the grid into two types of cells, `free` or `barrier`, according to a maze that
+is generated starting at some `target agent's` position. Agents with `free encodings`
+and `barrier encodigns` are then randomly placed in `free` cells and `barrier` cells,
+respectively. The Maze Placement State component can be configured such that it
+clusters `barrier` agents near the target and scatters `free` agents away from
+the target. The clustering is such that all paths to the target are not blocked.
+In this way, the grid can be randomized at the start of each episode, while still
+maintaining some desired structure.
+
+.. figure:: /.images/gridworld_maze_placement.*
+   :width: 75 %
+   :alt: Animation showing starting states using Maze Placement State component.
+
+   Animation showing a target (green) starting at random positions at the beginning
+   of each episode. Barriers (grey squares) are clustered near the target without
+   blocking all paths to it. Free agents (blue) are scattered far from the target.
+
+
+Building a Gridworld Simulation
+-------------------------------
+
+Abmarl's :ref:`Gridworld Simulation Framework <gridworld>` now supports
+:ref:`building the simulation <gridworld_building>` in these ways:
+
+   #. Building the simulation by specifying the rows, columns, and agents,
+   #. Building the simulation from an existing :ref:`grid <gridworld_grid>`,
+   #. Building the simulation from an array and an object registry, and
+   #. Building the simulation from a file and an object registry.
+
+Additionally, when building the simulation from a grid, array, or file, you can
+specify additional agents to build that are not in those inputs. The builder will
+combine the content from the grid, array, or file with the extra agents.
 
 
 Miscellaneous
 -------------
 
-* New :ref:`AbsolutePositionObserver <gridworld_absolute_position_observer>` reports
-  the agent's absolute position in the grid. This can be used in conjuction with the
-  already-supported :ref:`Observers <gridworld_single_observer>` because the key is
-  "position".
-* The ``local_dir`` parameter in the configuration files will create a directory for
-  the output files so that they are located under ``<local_dir>/abmarl_results/``.
-  This behavior is consistente between the trainer and debugger. If no parameter
-  is specified, Abmarl uses the home directory.
-* A :ref:`PrincipleAgent's <api_principle_agent>` ``active`` property can be now
-  directly set, giving components better control over the "done-state" of an agent.
-* :ref:`Component Wrappers <gridworld_wrappers>` now wrap the null observation
-  and null action of the agents in their underlying components.
-* The :ref:`GymWrapper <gym_external>` now works with simulations with multiple entities
-  as long as there is only a single :ref:`Learning Agent <api_agent>`.
-* Abmarl supports ray version 2.0.
+* New built-in :ref:`Target agent component <gridworld_done_built_in>` supports
+  agents having a target agent with which they must overlap.
+* New :ref:`Cross Move Actors <gridworld_movement_cross>` allows the agents to move
+  up, down, left, right, or stay in place.
+* The :ref:`All Step Manager <api_all_step>` supports randomized ordering in the
+  action dictionary.
+* The :ref:`Position State <gridworld_position>` component supports ignoring the
+  overlapping options during randomly placement. This results in agents being placed
+  on unique cells.
+* Abmarl's visualize component now supports ``--record-only``, which will save animations
+  without displaying them on screen, useful for when running headless or processing
+  in batch.
+* Bugfix with the :ref:`Super Agent Wrapper <super_agent_wrapper>` enables training
+  with rllib 2.0.
+* Abmarl now supports Python 3.9 and 3.10.
+* Abmarl now supports gym 0.23.1.
