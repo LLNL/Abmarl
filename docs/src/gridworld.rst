@@ -1206,6 +1206,30 @@ automatically assigns an array of 0s as the `null action`, indicating no attack 
    local grid.
 
 
+Active Done
+```````````
+
+The :ref:`ActiveDone <api_gridworld_done_active>` component reports that agents are `done`
+based on their `active` property. If the agent is inactive, then it is done. If
+all the agents are inactive, then the entire simulation is done.
+
+One Team Remaining Done
+```````````````````````
+
+The :ref:`OneTeamRemainingDone <api_gridworld_done_one_team_remaining>` component
+reports that the simulation is done when there is only one "team" remaining; that
+is, when all the remaining active agents have the same encoding. This component
+does not report done for individual agents.
+
+Target Agent Done
+`````````````````
+
+The :ref:`TargetAgentDone <api_gridworld_done_target_agent>` component takes
+a ``target_mapping``, which maps agents to their targets by id. If an agent overlaps
+its target, then that agent is done. If all of the agents have overlapped their
+targets, then the simulation is done.
+
+
 RavelActionWrapper
 ``````````````````
 

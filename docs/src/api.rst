@@ -299,11 +299,21 @@ Done
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_done_active:
+
 .. autoclass:: abmarl.sim.gridworld.done.ActiveDone
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_done_one_team_remaining:
+
 .. autoclass:: abmarl.sim.gridworld.done.OneTeamRemainingDone
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_done_target_agent:
+
+.. autoclass:: abmarl.sim.gridworld.done.TargetAgentDone
 	:members:
 	:undoc-members:
 
