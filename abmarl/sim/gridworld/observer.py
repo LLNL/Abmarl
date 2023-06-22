@@ -54,16 +54,17 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
 
 class AbsoluteGridObserver(ObserverBaseComponent):
     """
-    Observe the entire grid.
+    Observe the agents in the grid according to their actual positions.
 
-    This Observer shows agents located on cells by encoding for the entire grid.
+    This Observer represents agents by their encoding on cells according to their
+    actual positions in the grid.
     If there are multiple agents on a single cell with different encodings, only
     a single randomly chosen encoding will be observed. To be consistent with other
     built-in observers, masked cells are indicated as -2. Typially, -1 is reserved
-    for out of bounds encoding, but because this Observer reports the entire
-    grid, we don't need an out of bounds distinction. Instead, in order for the
+    for out of bounds encoding, but because this Observer only reports cells in the
+    grid, we don't need an out of bounds distinction. Instead, in order for the observing
     agent to identify itself distinctly from other agents of the same encoding, the
-    observing agent is reported as a -1.
+    it is reported as a -1.
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -93,7 +94,7 @@ class AbsoluteGridObserver(ObserverBaseComponent):
 
     def get_obs(self, agent, **kwargs):
         """
-        The agent observes the entire grid.
+        The agent observes the grid.
 
         The observation may include the agent itself indicated by a -1, other
         agents indicated by their encodings, empty space indicated with a 0, and
