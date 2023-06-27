@@ -139,6 +139,211 @@ class PositionState(StateBaseComponent):
             self._update_available_positions(var_agent_to_place)
 
 
+class TargetBarriersFreePlacementState(PositionState):
+    """
+    Place agents in the grid based on relationship to the target.
+
+    Place a target agent, either randomly or based on its initial position. Barrier
+    agents can be placed near the target, and free agents can be placed far away
+    from the target.
+
+    Note: Agents with initial positions may conflict with the target agent. If
+    the target agent is configured for random placement, then we recommend not
+    assigning an initial position to any agent.
+
+    Args:
+        target_agent: Barrier will cluster near this agent.
+        barrier_encodings: Set of encodings indicating which agents are to be treated as barriers.
+        free_encodings: Set of encodings indicating which agents are to be treated as free.
+        cluster_barriers: Prioritize the placement of barriers near the target.
+        scatter_free_agents: Prioritize the placement of free agents away from
+            the target.
+    """
+    def __init__(self,
+                 target_agent=None,
+                 barrier_encodings=None,
+                 free_encodings=None,
+                 cluster_barriers=False,
+                 scatter_free_agents=False,
+                 **kwargs):
+        super().__init__(**kwargs)
+        self.target_agent = target_agent
+        self.barrier_encodings = barrier_encodings
+        self.free_encodings = free_encodings
+        self.cluster_barriers = cluster_barriers
+        self.scatter_free_agents = scatter_free_agents
+
+    @property
+    def target_agent(self):
+        """
+        The target agent is the place from which to start the maze generation.
+        """
+        return self._target_agent
+
+    @target_agent.setter
+    def target_agent(self, value):
+        assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
+        assert value in self.agents.values(), "The target agent must be an agent in the simulation."
+        self._target_agent = value
+
+    @property
+    def barrier_encodings(self):
+        """
+        A set of encodings corresponding to the maze's barrier cells.
+        """
+        return self._barrier_encodings
+
+    @barrier_encodings.setter
+    def barrier_encodings(self, value):
+        if value is not None:
+            assert type(value) is set, "Barrier encodings must be a set."
+            for encoding in value:
+                assert type(encoding) is int, "Each barrier encoding must be an integer."
+            self._barrier_encodings = value
+        else:
+            self._barrier_encodings = set()
+
+    @property
+    def free_encodings(self):
+        """
+        A set of encodings corresponding to the maze's free cells.
+        """
+        return self._free_encodings
+
+    @free_encodings.setter
+    def free_encodings(self, value):
+        if value is not None:
+            assert type(value) is set, "Free encodings must be a set."
+            for encoding in value:
+                assert type(encoding) is int, "Each free encoding must be an integer."
+            self._free_encodings = value
+        else:
+            self._free_encodings = set()
+
+    @property
+    def cluster_barriers(self):
+        """
+        If True, then prioritize placing barriers near the target agent.
+        """
+        return self._cluster_barriers
+
+    @cluster_barriers.setter
+    def cluster_barriers(self, value):
+        assert type(value) is bool, "Cluster barriers must be a boolean."
+        self._cluster_barriers = value
+
+    @property
+    def scatter_free_agents(self):
+        """
+        If True, then prioritize placing free agents away from the target agent.
+        """
+        return self._scatter_free_agents
+
+    @scatter_free_agents.setter
+    def scatter_free_agents(self, value):
+        assert type(value) is bool, "Scatter free agents must be a boolean."
+        self._scatter_free_agents = value
+
+    def reset(self, **kwargs):
+        """
+        Give the agents their starting positions.
+        """
+        self.grid.reset()
+
+        # Assert that all encodings are captured
+        for agent in self.agents.values():
+            assert agent.encoding in {*self.barrier_encodings, *self.free_encodings}, \
+                "All agent encodings must be either barrier or free cell."
+
+        # Build lists of available encodings
+        self._build_available_positions()
+
+        # Manually place target agent at the maze start
+        assert self.grid.place(self.target_agent, self._target_start), \
+            "Unable to place target agent."
+        self._update_available_positions(self.target_agent)
+
+        # Place agents with initial positions.
+        for agent in self.agents.values():
+            if agent == self.target_agent:
+                continue
+            if agent.initial_position is not None:
+                self._place_initial_position_agent(agent)
+
+        # Now place barrier + free agents with variable positions
+        for agent in self.agents.values():
+            if agent == self.target_agent:
+                continue
+            if agent.initial_position is None:
+                self._place_variable_position_agent(agent)
+
+    def _build_available_positions(self, **kwargs):
+        """
+        Define the available positions per encoding.
+
+        Available cells are ordered based on clustering and scattering properties.
+        """
+        if self.target_agent.initial_position is not None:
+            self._target_start = self.target_agent.initial_position
+        else:
+            self._target_start = np.random.randint(0, (self.rows, self.cols))
+
+        ravelled_barrier_positions = [i for i in range(self.rows * self.cols)]
+        if self.cluster_barriers:
+            # We sort the available positions according to their distance from target
+            # in reverse order becuase we will grab the last position in the list
+            # when selecting from the available cells, which will give us the closest
+            # cells first.
+            ravelled_barrier_positions.sort(
+                key=lambda x: np.linalg.norm(
+                    np.array([np.unravel_index(x, (self. rows, self.cols))]) - self._target_start
+                ),
+                reverse=True
+            )
+
+        ravelled_free_positions = [i for i in range(self.rows * self.cols)]
+        if self.scatter_free_agents:
+            # We sort the available positions according to their distance from target
+            # becuase we will grab the last position in the list when selecting
+            # from the available cells, which will give us the furthest cells first.
+            ravelled_free_positions.sort(
+                key=lambda x: np.linalg.norm(
+                    np.array([np.unravel_index(x, (self. rows, self.cols))]) - self._target_start
+                )
+            )
+
+        self.ravelled_positions_available = {
+            **{
+                encoding: deepcopy(ravelled_barrier_positions)
+                for encoding in self.barrier_encodings
+            },
+            **{encoding: deepcopy(ravelled_free_positions) for encoding in self.free_encodings}
+        }
+
+    def _place_variable_position_agent(self, var_agent_to_place, **kwargs):
+        """
+        Place an agent with a variable position.
+
+        Barriers agents will be clustered around the target if cluster_barriers
+        is True. Free agents will be scattered far from the target if scatter_free_agents
+        is True.
+        """
+        if (var_agent_to_place.encoding in self.barrier_encodings and self.cluster_barriers) \
+            or (var_agent_to_place.encoding in self.free_encodings and
+                self.scatter_free_agents):
+            try:
+                ravelled_position = \
+                    self.ravelled_positions_available[var_agent_to_place.encoding][-1]
+            except IndexError:
+                raise RuntimeError(f"Could not find a cell for {var_agent_to_place.id}") from None
+            else:
+                r, c = np.unravel_index(ravelled_position, shape=(self.rows, self.cols))
+                assert self.grid.place(var_agent_to_place, (r, c))
+                self._update_available_positions(var_agent_to_place)
+        else:
+            super()._place_variable_position_agent(var_agent_to_place)
+
+
 class MazePlacementState(PositionState):
     """
     Place agents in the grid based on a maze generated around a target.
@@ -157,7 +362,7 @@ class MazePlacementState(PositionState):
         target_agent: Start the maze generation at this agent's position and place
             the target agent here.
         barrier_encodings: A set of encodings corresponding to the maze's barrier cells.
-        free_encodings: A set of encodigns corresponding to the maze's free cells.
+        free_encodings: A set of encodings corresponding to the maze's free cells.
         cluster_barriers: Prioritize the placement of barriers near the target.
         scatter_free_agents: Prioritize the placement of free agents away from
             the target.
