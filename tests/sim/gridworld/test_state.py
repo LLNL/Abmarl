@@ -607,6 +607,7 @@ def test_target_barrier_free_placement_state():
         state.target_agent.initial_position
     )
 
+
 def test_target_barrier_free_placement_failures():
     target_agent = GridWorldAgent(id='target', encoding=1)
     ip_agent = GridWorldAgent(
