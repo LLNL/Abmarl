@@ -3,7 +3,7 @@ import numpy as np
 
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.state import PositionState, MazePlacementState, HealthState, \
-    StateBaseComponent
+    TargetBarriersFreePlacementState, StateBaseComponent
 from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent
 import pytest
 
@@ -565,3 +565,280 @@ def test_maze_placement_state_too_many_agents():
     with pytest.raises(RuntimeError):
         # Fails because cannot find cell
         state.reset()
+
+
+def test_target_barrier_free_placement_state():
+    target_agent = GridWorldAgent(id='target', encoding=1, initial_position=np.array([3, 2]))
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent=target_agent,
+        barrier_encodings={2},
+        free_encodings={1, 3}
+    )
+    assert isinstance(state, PositionState)
+    assert state.target_agent == target_agent
+    assert state.barrier_encodings == {2}
+    assert state.free_encodings == {1, 3}
+    assert not state.cluster_barriers
+    assert not state.scatter_free_agents
+
+    state.reset()
+    np.testing.assert_array_equal(
+        state.target_agent.position,
+        state.target_agent.initial_position
+    )
+
+
+def test_target_barrier_free_placement_failures():
+    target_agent = GridWorldAgent(id='target', encoding=1)
+    ip_agent = GridWorldAgent(
+        id='ip_agent',
+        encoding=1,
+        initial_position=np.array([3, 2]),
+        render_color='b'
+    )
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    with pytest.raises(AssertionError):
+        # Fails because there is no target agent
+        TargetBarriersFreePlacementState(
+            grid=grid,
+            agents=agents,
+            barrier_encodings={2},
+            free_encodings={1, 3}
+        )
+
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    with pytest.raises(AssertionError):
+        # Fails because target agent not in the simulation
+        TargetBarriersFreePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent=ip_agent,
+            barrier_encodings={2},
+            free_encodings={1, 3}
+        )
+
+    with pytest.raises(AssertionError):
+        # Fails because barrier is list
+        TargetBarriersFreePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent=target_agent,
+            barrier_encodings=[2],
+            free_encodings={1, 3}
+        )
+
+    with pytest.raises(AssertionError):
+        # Fails because free is list
+        TargetBarriersFreePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent=target_agent,
+            barrier_encodings={2},
+            free_encodings=[1, 3]
+        )
+
+    with pytest.raises(AssertionError):
+        # Fails because some agents are neither barrier nor free
+        state = TargetBarriersFreePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent=target_agent,
+            barrier_encodings={2},
+            free_encodings={1}
+        )
+        state.reset()
+
+
+def test_target_barrier_free_placement_state_no_barriers_no_free():
+    target_agent = GridWorldAgent(id='target', encoding=1)
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents = {
+        'target': target_agent,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent=target_agent,
+        free_encodings={1, 3}
+    )
+    assert isinstance(state, PositionState)
+    assert state.target_agent == target_agent
+    assert state.barrier_encodings == set()
+    assert state.free_encodings == {1, 3}
+
+    state.reset()
+
+
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    agents = {
+        'target': GridWorldAgent(id='target', encoding=2),
+        **barrier_agents,
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent=agents['target'],
+        barrier_encodings={2},
+    )
+    assert isinstance(state, PositionState)
+    assert state.barrier_encodings == {2}
+    assert state.free_encodings == set()
+
+    state.reset()
+
+
+def test_target_barriers_free_placement_state_clustering_and_scattering():
+    np.random.seed(24)
+    target_agent = GridWorldAgent(id='target', encoding=1, initial_position=np.array([3, 2]))
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(24)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(5)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(6, 8, overlapping={1: {3}, 3: {3}})
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent=target_agent,
+        barrier_encodings={2},
+        free_encodings={1, 3},
+        cluster_barriers=True,
+        scatter_free_agents=True
+    )
+    assert state.cluster_barriers
+    assert state.scatter_free_agents
+
+    # Barrier are close to target, free agents are far from it
+    # All the free agents start on the same cell
+    state.reset()
+    np.testing.assert_array_equal(
+        target_agent.position,
+        np.array([3, 2])
+    )
+    for barrier in barrier_agents.values():
+        assert max(abs(target_agent.position - barrier.position)) <= 2
+
+    for free_agent in free_agents.values():
+        np.testing.assert_array_equal(
+            free_agent.position,
+            np.array([0, 7])
+        )
+
+
+def test_target_barriers_free_placement_state_clustering_and_scattering_no_overlap_at_reset():
+    np.random.seed(24)
+    target_agent = GridWorldAgent(id='target', encoding=1, initial_position=np.array([3, 2]))
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(24)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(5)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(6, 8, overlapping={1: {3}, 3: {3}})
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        no_overlap_at_reset=True,
+        target_agent=target_agent,
+        barrier_encodings={2},
+        free_encodings={1, 3},
+        cluster_barriers=True,
+        scatter_free_agents=True
+    )
+    # Barrier are close to target, free agents are far from it
+    # All agents start on different cells
+    state.reset()
+    np.testing.assert_array_equal(
+        target_agent.position,
+        np.array([3, 2])
+    )
+    for r in range(5):
+        for c in range(8):
+            assert len(grid[r, c]) <= 1
+    for barrier in barrier_agents.values():
+        assert max(abs(target_agent.position - barrier.position)) <= 2
+    for free in free_agents.values():
+        assert max(abs(target_agent.position - free.position)) > 2
