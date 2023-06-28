@@ -1,5 +1,7 @@
 
 from abc import ABC, abstractmethod
+from io import TextIOBase
+from pprint import pprint
 
 from abmarl.policies.policy import Policy
 from abmarl.managers import SimulationManager
@@ -77,7 +79,7 @@ class MultiPolicyTrainer(ABC):
             for agent_id in obs
         }
 
-    def generate_episode(self, horizon=200, render=False, **kwargs):
+    def generate_episode(self, horizon=200, render=False, log=None, **kwargs):
         """
         Generate an episode of data.
 
@@ -95,6 +97,9 @@ class MultiPolicyTrainer(ABC):
                 of steps.
             render: Renders the simulation. This should be False when training,
                 and can be True when debugging or evaluating in post-processing.
+            log: Output SARS as they are produced to this file, allowing users to
+                see a "play-by-play" of how the simulation progressed. If None,
+                then logging is disabled.
 
         Returns:
             Four dictionaries, one for observations, another for actions,
@@ -110,6 +115,9 @@ class MultiPolicyTrainer(ABC):
         if render:
             from matplotlib import pyplot as plt
             fig = plt.figure()
+        if log is not None:
+            assert isinstance(log, TextIOBase), "log must be a file writer."
+            assert 'w' in log.mode or 'a' in log.mode, "log file must be writeable."
 
         # Reset the simulation and policies
         obs = self.sim.reset()
@@ -118,6 +126,9 @@ class MultiPolicyTrainer(ABC):
         if render:
             self.sim.render(fig=fig)
             plt.pause(1e-16)
+        if log is not None:
+            log.write("Observation:\n")
+            pprint(obs, stream=log)
 
         # Data collection
         observations, actions, rewards, dones = {}, {}, {}, {}
@@ -131,6 +142,18 @@ class MultiPolicyTrainer(ABC):
             if render:
                 self.sim.render(fig=fig)
                 plt.pause(1e-16)
+            if log is not None:
+                log.write("Action:\n")
+                pprint(action, stream=log)
+            if log is not None:
+                log.write("Reward:\n")
+                pprint(reward, stream=log)
+            if log is not None:
+                log.write("Done:\n")
+                pprint(done, stream=log)
+            if log is not None:
+                log.write("Observation:\n")
+                pprint(obs, stream=log)
 
             # Store the data
             for agent_id, agent_obs in obs.items():
