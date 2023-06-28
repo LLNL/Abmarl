@@ -127,7 +127,8 @@ class MultiPolicyTrainer(ABC):
             self.sim.render(fig=fig)
             plt.pause(1e-16)
         if log is not None:
-            log.write("Observation:\n")
+            log.write("Reset\n")
+            log.write("Observation: ")
             pprint(obs, stream=log)
 
         # Data collection
@@ -143,17 +144,15 @@ class MultiPolicyTrainer(ABC):
                 self.sim.render(fig=fig)
                 plt.pause(1e-16)
             if log is not None:
-                log.write("Action:\n")
+                log.write(f"\nStep {j}\n")
+                log.write("Action: ")
                 pprint(action, stream=log)
-            if log is not None:
-                log.write("Reward:\n")
-                pprint(reward, stream=log)
-            if log is not None:
-                log.write("Done:\n")
-                pprint(done, stream=log)
-            if log is not None:
-                log.write("Observation:\n")
+                log.write("Observation: ")
                 pprint(obs, stream=log)
+                log.write("Reward: ")
+                pprint(reward, stream=log)
+                log.write("Done: ")
+                pprint(done, stream=log)
 
             # Store the data
             for agent_id, agent_obs in obs.items():
