@@ -89,15 +89,22 @@ class DebugTrainer(MultiPolicyTrainer):
             render: Set to True to visualize the simulation.
         """
         for i in range(iterations):
-            observations, actions, rewards, dones = self.generate_episode(render=render, **kwargs)
+            with open(
+                os.path.join(self.output_dir, f"Episode_{i}_by_event.txt"), 'w'
+            ) as event_dump, open(
+                os.path.join(self.output_dir, f"Episode_{i}_by_agent.txt"), 'w'
+            ) as agent_dump:
 
-            # Setup dump files
-            with open(os.path.join(self.output_dir, f"Episode_{i}.txt"), 'w') as debug_dump:
-                debug_dump.write("Observations:\n")
-                pprint(observations, stream=debug_dump)
-                debug_dump.write("\nActions:\n")
-                pprint(actions, stream=debug_dump)
-                debug_dump.write("\nRewards:\n")
-                pprint(rewards, stream=debug_dump)
-                debug_dump.write("\nDones:\n")
-                pprint(dones, stream=debug_dump)
+                observations, actions, rewards, dones = self.generate_episode(
+                    render=render,
+                    log=event_dump,
+                    **kwargs
+                )
+                agent_dump.write("Observations:\n")
+                pprint(observations, stream=agent_dump)
+                agent_dump.write("\nActions:\n")
+                pprint(actions, stream=agent_dump)
+                agent_dump.write("\nRewards:\n")
+                pprint(rewards, stream=agent_dump)
+                agent_dump.write("\nDones:\n")
+                pprint(dones, stream=agent_dump)
