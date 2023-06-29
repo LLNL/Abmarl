@@ -35,7 +35,7 @@ jobs:
         --ignore="E129,E261,E701,E731,E226,W504"
         # Lint examples directory
         flake8 examples/ --count  --max-line-length 100 --indent-size 4 --doctests \
-        --per-file-ignores="examples/config_prototype.py:F401,E401" \
+        --per-file-ignores="examples/rllib_config_prototype.py:F401,E401" \
         --ignore="E261,E701,E731,E226,E402"
         # Lint the tests directory
         flake8 tests/ --count  --max-line-length 100 --indent-size 4 --doctests \
