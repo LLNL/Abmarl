@@ -35,6 +35,7 @@ class MultiAgentWrapper(MultiAgentEnv):
             for agent in self.sim.agents.values()
             if isinstance(agent, ActingAgent)
         })
+        self._spaces_in_preferred_format = True
 
     def reset(self):
         """See SimulationManager."""
