@@ -90,10 +90,10 @@ class DebugTrainer(MultiPolicyTrainer):
         """
         for i in range(iterations):
             with open(
-                    os.path.join(self.output_dir, f"Episode_{i}_by_event.txt"), 'w'
-                ) as event_dump, open(
-                    os.path.join(self.output_dir, f"Episode_{i}_by_agent.txt"), 'w'
-                ) as agent_dump:
+                os.path.join(self.output_dir, f"Episode_{i}_by_event.txt"), 'w'
+            ) as event_dump, open(
+                os.path.join(self.output_dir, f"Episode_{i}_by_agent.txt"), 'w'
+            ) as agent_dump:
 
                 observations, actions, rewards, dones = self.generate_episode(
                     render=render,
