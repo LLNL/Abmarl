@@ -60,7 +60,7 @@ class MultiMazeNavigationSim(GridWorldSimulation):
 
     def get_done(self, agent_id, **kwargs):
         return np.array_equal(
-            self.agents[agent_id], self.position_state.target_agent
+            self.agents[agent_id].position, self.position_state.target_agent.position
         )
 
     def get_all_done(self, **kwargs):

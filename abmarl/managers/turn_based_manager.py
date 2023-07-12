@@ -23,8 +23,10 @@ class TurnBasedManager(SimulationManager):
         """
         Reset the simulation and return the observation of the first agent.
         """
-        self.done_agents = set()
-
+        self.done_agents = set(
+            agent.id for agent in self.agents.values()
+            if not isinstance(agent, Agent)
+        )
         self.sim.reset(**kwargs)
         next_agent = next(self.agent_order)
         return {next_agent: self.sim.get_obs(next_agent)}
