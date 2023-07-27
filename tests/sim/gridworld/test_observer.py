@@ -1,7 +1,7 @@
 
-from gym.spaces import Box
 import numpy as np
 
+from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.observer import ObserverBaseComponent, AbsoluteGridObserver, \
     SingleGridObserver, MultiGridObserver, AbsolutePositionObserver

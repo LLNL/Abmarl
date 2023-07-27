@@ -132,10 +132,10 @@ def test_box_space():
     ab = gu.Box(0, 4, (1,), int)
     assert isinstance(ab, GymBox)
     assert [3] in gb
-    assert not 3 in gb
+    assert 3 not in gb
     assert [3] in ab
     assert 3 in ab
-    assert not 3.3 in ab
-    assert not 5 in ab
-    assert not -1 in ab
-    assert not [3, 4] in ab
+    assert 3.3 not in ab
+    assert 5 not in ab
+    assert -1 not in ab
+    assert [3, 4] not in ab

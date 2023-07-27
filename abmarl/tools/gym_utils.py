@@ -2,6 +2,7 @@ from gym.spaces import Space, Discrete, MultiBinary, MultiDiscrete, Dict, Tuple
 from gym.spaces import Box as GymBox
 import numpy as np
 
+
 class Box(GymBox):
     """
     Enhanced functionality of the Box space.
@@ -15,11 +16,12 @@ class Box(GymBox):
             x = np.asarray(x, dtype=self.dtype)
 
         return bool(
-            np.can_cast(x.dtype, self.dtype)
-            and x.shape == self.shape
-            and np.all(x >= self.low)
-            and np.all(x <= self.high)
+            np.can_cast(x.dtype, self.dtype) and
+            x.shape == self.shape and
+            np.all(x >= self.low) and
+            np.all(x <= self.high)
         )
+
 
 def check_space(space, strict=False):
     """

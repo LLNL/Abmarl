@@ -1,9 +1,9 @@
 
-from gym.spaces import Discrete, MultiBinary, Box, Dict, Tuple
+from gym.spaces import Discrete, MultiBinary, Dict, Tuple
 import pytest
 
+from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import Agent
-
 from abmarl.trainers import SinglePolicyTrainer
 from abmarl.policies.policy import RandomPolicy
 from abmarl.managers import AllStepManager, TurnBasedManager

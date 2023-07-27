@@ -1,11 +1,13 @@
+
+from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Dict, Tuple
+import numpy as np
+import pytest
+
+from abmarl.tools import Box
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.sim import Agent
 from abmarl.examples import EmptyABS, MultiAgentGymSpacesSim
-
-from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Box, Dict, Tuple
-import numpy as np
-import pytest
 
 
 def test_ravel():

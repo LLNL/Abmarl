@@ -1,6 +1,7 @@
-from gym.spaces import Dict, Tuple, Box, Discrete, MultiDiscrete, MultiBinary
+from gym.spaces import Dict, Tuple, Discrete, MultiDiscrete, MultiBinary
 import numpy as np
 
+from abmarl.tools import Box
 from abmarl.sim.wrappers import FlattenWrapper, FlattenActionWrapper
 from abmarl.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
 from abmarl.examples import MultiAgentContinuousGymSpaceSim
