@@ -1,4 +1,4 @@
-from gym.spaces import Discrete, Dict
+from gym.spaces import Discrete, Dict, Box as GymBox
 import pytest
 
 from abmarl.tools import gym_utils as gu
@@ -125,3 +125,16 @@ def test_make_dict_fail():
     }
     with pytest.raises(AssertionError):
         gu.make_dict(space)
+
+
+def test_box_space():
+    gb = GymBox(0, 4, (1,), int)
+    ab = gu.Box(0, 4, (1,), int)
+    assert [3] in gb
+    assert not 3 in gb
+    assert [3] in ab
+    assert 3 in ab
+    assert not 3.3 in ab
+    assert not 5 in ab
+    assert not -1 in ab
+    assert not [3, 4] in ab

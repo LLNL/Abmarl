@@ -1,5 +1,25 @@
-from gym.spaces import Space, Discrete, MultiBinary, MultiDiscrete, Box, Dict, Tuple
+from gym.spaces import Space, Discrete, MultiBinary, MultiDiscrete, Dict, Tuple
+from gym.spaces import Box as GymBox
+import numpy as np
 
+class Box(GymBox):
+    """
+    Enhanced functionality of the Box space.
+    """
+    def contains(self, x) -> bool:
+        if type(x) is int:
+            x = np.array([x], dtype=int)
+        elif type(x) is float:
+            x = np.array([x], dtype=float)
+        elif not isinstance(x, np.ndarray):
+            x = np.asarray(x, dtype=self.dtype)
+
+        return bool(
+            np.can_cast(x.dtype, self.dtype)
+            and x.shape == self.shape
+            and np.all(x >= self.low)
+            and np.all(x <= self.high)
+        )
 
 def check_space(space, strict=False):
     """
@@ -12,7 +32,7 @@ def check_space(space, strict=False):
         to be iteratively built and assume that the final wrapping to Dict or Tuple
         has yet to occur.
     """
-    if isinstance(space, (Discrete, MultiDiscrete, MultiBinary, Box)):
+    if isinstance(space, (Discrete, MultiDiscrete, MultiBinary, GymBox)):
         return True
     elif isinstance(space, Dict):
         return all([check_space(sub_space) for sub_space in space.spaces.values()])
