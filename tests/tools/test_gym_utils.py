@@ -130,6 +130,7 @@ def test_make_dict_fail():
 def test_box_space():
     gb = GymBox(0, 4, (1,), int)
     ab = gu.Box(0, 4, (1,), int)
+    assert isinstance(ab, GymBox)
     assert [3] in gb
     assert not 3 in gb
     assert [3] in ab

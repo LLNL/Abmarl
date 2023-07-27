@@ -1,9 +1,10 @@
 import itertools
 
 import numpy as np
-from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Box, Dict, Tuple
+from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Dict, Tuple
 from gym.spaces.box import get_inf
 
+from abmarl.tools import Box
 from abmarl.sim import Agent
 
 from .sar_wrapper import SARWrapper
