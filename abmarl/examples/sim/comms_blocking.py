@@ -1,8 +1,9 @@
 
-from gym.spaces import Discrete, Dict, Box
+from gym.spaces import Discrete, Dict
 import numpy as np
 from matplotlib import pyplot as plt
 
+from abmarl.tools import Box
 from abmarl.sim import Agent
 from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, GridWorldAgent
 from abmarl.sim.gridworld.base import GridWorldSimulation

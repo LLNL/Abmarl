@@ -311,7 +311,8 @@ component, which will have a small impact in how we initialize the simulation.
 
 .. code-block:: python
 
-   from gym.spaces import Dict, Box
+   from gym.spaces import Dict
+   from abmarl.tools import Box
    from abmarl.sim.gridworld.observer import ObserverBaseComponent
 
    class BroadcastObserver(ObserverBaseComponent):

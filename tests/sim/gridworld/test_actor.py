@@ -1,8 +1,9 @@
 
-from gym.spaces import Box, Discrete, MultiDiscrete, Dict
+from gym.spaces import Discrete, MultiDiscrete, Dict
 import numpy as np
 import pytest
 
+from abmarl.tools import Box
 from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, BinaryAttackActor, \
     SelectiveAttackActor, EncodingBasedAttackActor, RestrictedSelectiveAttackActor, \
     ActorBaseComponent

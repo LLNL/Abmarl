@@ -1,8 +1,9 @@
 from enum import IntEnum
 
-from gym.spaces import Box, Discrete, MultiBinary
+from gym.spaces import Discrete, MultiBinary
 import numpy as np
 
+from abmarl.tools import Box
 from abmarl.sim import Agent, AgentBasedSimulation
 
 

@@ -1,7 +1,8 @@
 
-from gym.spaces import Box, Discrete, Tuple, Dict, MultiDiscrete, MultiBinary
+from gym.spaces import Discrete, Tuple, Dict, MultiDiscrete, MultiBinary
 import numpy as np
 
+from abmarl.tools import Box
 from abmarl.sim import Agent
 
 from .sar_wrapper import SARWrapper

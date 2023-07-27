@@ -1,6 +1,7 @@
 
-from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Box, Tuple, Dict
+from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Tuple, Dict
 
+from abmarl.tools import Box
 from abmarl.sim import PrincipleAgent, Agent, AgentBasedSimulation
 
 

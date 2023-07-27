@@ -54,7 +54,8 @@ An agent can be created like so:
 
 .. code-block:: python
 
-   from gym.spaces import Discrete, Box
+   from gym.spaces import Discrete
+   from abmarl.tools import Box
    from abmarl.sim import Agent
    agent = Agent(
        id='agent0',
@@ -198,8 +199,9 @@ is ravelled to a Discrete space:
 
 .. code-block:: python
 
-   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Box, Tuple
+   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
    import numpy as np
+   from abmarl.tools import Box
    from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, ravel
    my_space = Dict({
        'a': MultiDiscrete([5, 3]),
@@ -247,8 +249,8 @@ Flatten Wrapper
 ~~~~~~~~~~~~~~~
 
 The :ref:`FlattenWrapper <api_flatten_wrapper>` flattens observation and action spaces
-into Box spaces and automatically maps data to and from it. The FlattenWrapper
-attempts to keep the `dtype` of the resulting Box space as integer if it can; otherwise
+into `Box` spaces and automatically maps data to and from it. The FlattenWrapper
+attempts to keep the `dtype` of the resulting `Box` space as integer if it can; otherwise
 it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
@@ -286,7 +288,7 @@ it will cast up to float. See how the following nested space is flattened:
    flatten(my_space, point)
    >>> array([3, 1, 0, 1, 1, 0, 0, 7, 5, 1, 3, 1, 2, 1, 3, 1, 0, 4, 1, 1, 5, 1])
 
-Because every subspace has integer type, the resulting Box space has dtype integer.
+Because every subspace has integer type, the resulting `Box` space has dtype integer.
 
 .. WARNING::
    Sampling from the flattened space will not produce the same results as

@@ -1,8 +1,9 @@
 
-from gym.spaces import Discrete, Box, Dict
+from gym.spaces import Discrete, Dict
 import numpy as np
 import pytest
 
+from abmarl.tools import Box
 from abmarl.sim.gridworld.actor import MoveActor, EncodingBasedAttackActor, ActorBaseComponent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.wrapper import RavelActionWrapper, ExclusiveChannelActionWrapper, \

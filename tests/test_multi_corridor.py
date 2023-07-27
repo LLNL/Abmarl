@@ -1,6 +1,7 @@
-from gym.spaces import Box, MultiBinary, Discrete, Dict
+from gym.spaces import MultiBinary, Discrete, Dict
 import numpy as np
 
+from abmarl.tools import Box
 from abmarl.sim import Agent
 from abmarl.examples import MultiCorridor
 
