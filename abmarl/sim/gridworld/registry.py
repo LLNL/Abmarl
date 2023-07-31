@@ -43,7 +43,7 @@ _registered_components = {
     }
 }
 
-_registry = {
+registry = {
     component_type: {component.__name__: component for component in components}
     for component_type, components in _registered_components.items()
 }
@@ -53,7 +53,7 @@ def register(component):
     for component_type, base_component in _subclass_check_mapping.items():
         if issubclass(component, base_component):
             _registered_components[component_type].add(component)
-            _registry[component_type][component.__name__] = component
+            registry[component_type][component.__name__] = component
             registered = True
             break # Assumes that a component is a subclass of only one base component
 
