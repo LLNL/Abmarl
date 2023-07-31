@@ -3,6 +3,7 @@ from abc import ABC
 
 import numpy as np
 
+from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim import AgentBasedSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.sim.gridworld.grid import Grid
@@ -219,6 +220,81 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         if draw_now:
             plt.plot()
             plt.pause(1e-17)
+
+
+class SmartGridWorldSimulation(GridWorldSimulation, ABC):
+    """
+    Default "template" for building and running simulations.
+    """
+    def __init__(
+            self,
+            agents=None,
+            grid=None,
+            states=None,
+            observers=None,
+            actors=None,
+            dones=None,
+            entropy=-0.01,
+            **kwargs
+    ):
+        self.agents = agents
+        self.grid = grid
+
+        # # State Components
+        # assert type(states) is dict, "States must be a dictionary mapping id to component"
+        # for state in states.items():
+        #     assert type(state) is str
+        #     assert state in GridWorldSimluation.component_registry
+        #     assert issubclass(GridWorldSimluation.component_registry[state], StateBaseComponent)
+        # self._states = {
+        #     state: GridWorldSimulation.component_registry[state](**kwargs)
+        #     for state in states
+        # }
+
+    def reset(self, **kwargs):
+        for state in self._states:
+            state.reset(**kwargs)
+
+        self.rewards = {agent.id: 0 for agent in self.agents.values() if isinstance(agent, Agent)}
+
+    # Note: This is the theoretical approach we could take in stepping the simulation.
+    # The first 4 lines are boilerplate and good to have in this super class.
+    # The last line is unique to the actor. The output may be different, and
+    # what the simulation should do with that output is also different. This
+    # could be streamlined after we do #337. For now, we will leave the step function
+    # as abstract and to be filled by the implementing class.
+    # def step(self, action_dict, **kwargs):
+    #     for actor in self._actors:
+    #         for agent_id, action in action_dict.items():
+    #             agent = self.agents[agent_id]
+    #             if agent.active:
+    #                 event = actor.process_action(agent, action, **kwargs)
+
+    def get_obs(self, agent_id, **kwargs):
+        agent = self.agents[agent_id]
+        return {
+            k: v for observer in self._observers
+            for k, v in observer.get_obs(agent, **kwargs).items() 
+        }
+
+    def get_reward(self, agent_id, **kwargs):
+        reward = self.rewards[agent_id]
+        self.rewards[agent_id] = 0
+        return reward
+
+    def get_done(self, agent_id, **kwargs):
+        agent = self.agents[agent_id]
+        return all(
+            done.get_done(agent, **kwargs) for done in self._dones
+        )
+
+    def get_all_done(self, **kwargs):
+        return all(
+            done.get_all_done(**kwargs) for done in self._dones
+        )
+
+    def get_info(self, agent_id, **kwargs):
+        return {}
 
 
 class GridWorldBaseComponent(ABC):
