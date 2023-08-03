@@ -1,9 +1,10 @@
 
 import numpy as np
+import pytest
 
 from abmarl.sim.gridworld.agent import MovingAgent
 from abmarl.sim.gridworld.actor import MoveActor, SelectiveAttackActor
-from abmarl.sim.gridworld.state import PositionState, HealthState, MazePlacementState
+from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.observer import AbsoluteGridObserver, SingleGridObserver
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.examples.sim.reach_the_target import ActiveDone, TargetDone, OnlyAgentLeftDone, \
@@ -72,7 +73,7 @@ class SmartReachTheTarget(SmartGridWorldSimulation):
         return self.only_agent_done.get_all_done(**kwargs)
 
 
-def test_reach_target_sim_components():
+def test_smart_sim_components():
     grid_size = 7
     corners = [
         np.array([0, 0], dtype=int),
@@ -214,3 +215,36 @@ def test_reach_target_sim_components():
     assert len(sim._observers) == 2
     for observer in sim._observers:
         assert isinstance(observer, (AbsoluteGridObserver, SingleGridObserver))
+
+    with pytest.raises(AssertionError):
+        sim = SmartReachTheTarget.build_sim(
+            grid_size, grid_size,
+            agents=agents,
+            target=agents['target'],
+            observers={'AbsoluteGridObserver', 'HealthState'},
+            states={'PositionState', 'SingleGridObserver'},
+            overlapping=overlapping,
+            attack_mapping=attack_mapping
+        )
+
+    with pytest.raises(AssertionError):
+        sim = SmartReachTheTarget.build_sim(
+            grid_size, grid_size,
+            agents=agents,
+            target=agents['target'],
+            observers={'AbsoluteGridObserver', 'SingleGridObserver'},
+            overlapping=overlapping,
+            attack_mapping=attack_mapping
+        )
+        sim.reset()
+
+    with pytest.raises(AssertionError):
+        sim = SmartReachTheTarget.build_sim(
+            grid_size, grid_size,
+            agents=agents,
+            target=agents['target'],
+            states={'PositionState', 'HealthState'},
+            overlapping=overlapping,
+            attack_mapping=attack_mapping
+        )
+        sim.get_obs('target')
