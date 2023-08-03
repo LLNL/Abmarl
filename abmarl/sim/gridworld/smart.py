@@ -40,12 +40,12 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
         # State Components
         assert type(states) is set, "States must be a set of state components"
         self._states = set()
-        for state in states.items():
+        for state in states:
             if type(state) is str:
                 assert state in registry['state'], f"{state} is not registered as a state."
                 self._states.add(registry['state'][state](**kwargs))
             elif issubclass(state, StateBaseComponent):
-                self._states.add(state)
+                self._states.add(state(agents=agents, grid=grid, **kwargs))
             else:
                 raise ValueError(
                     f"{state} must be a state component or the name of a registered "
@@ -55,12 +55,12 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
         # Observer Components
         assert type(observers) is set, "Observers must be a set of observer components"
         self._observers = set()
-        for observer in observers.items():
+        for observer in observers:
             if type(observer) is str:
                 assert observer in registry['observer'], f"{observer} is not registered as an observer."
                 self._observers.add(registry['observer'][observer](**kwargs))
             elif issubclass(observer, ObserverBaseComponent):
-                self._observers.add(observer)
+                self._observers.add(observer(agents=agents, grid=grid, **kwargs))
             else:
                 raise ValueError(
                     f"{observer} must be a observer component or the name of a registered "
@@ -70,12 +70,12 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
         # Done Components
         assert type(dones) is set, "Dones must be a set of done components"
         self._dones = set()
-        for done in dones.items():
+        for done in dones:
             if type(done) is str:
                 assert done in registry['done'], f"{done} is not registered as a done component."
                 self._dones.add(registry['done'][done](**kwargs))
             elif issubclass(done, DoneBaseComponent):
-                self._dones.add(done)
+                self._dones.add(done(agents=agents, grid=grid, **kwargs))
             else:
                 raise ValueError(
                     f"{done} must be a done component or the name of a registered "
