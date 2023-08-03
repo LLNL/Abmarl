@@ -30,7 +30,9 @@ sim = MultiAgentWrapper(
         MazeNavigationSim.build_sim_from_file(
             file_name,
             object_registry,
-            overlapping={1: {3}, 3: {1}}
+            overlapping={1: {3}, 3: {1}},
+            states={'PositionState'},
+            observers={'SingleGridObserver'}
         )
     )
 )
