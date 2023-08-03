@@ -8,7 +8,7 @@ from .state import StateBaseComponent, PositionState, TargetBarriersFreePlacemen
     MazePlacementState, HealthState
 
 # TODO: Figure out how to wrap
-from.wrapper import ComponentWrapper, ActorWrapper, ObserverWrapper, RavelActionWrapper, \
+from .wrapper import ComponentWrapper, ActorWrapper, ObserverWrapper, RavelActionWrapper, \
     ExclusiveChannelActionWrapper
 
 _subclass_check_mapping = {
@@ -43,10 +43,12 @@ _registered_components = {
     }
 }
 
+
 registry = {
     component_type: {component.__name__: component for component in components}
     for component_type, components in _registered_components.items()
 }
+
 
 def register(component):
     registered = False

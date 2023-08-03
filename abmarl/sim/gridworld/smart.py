@@ -5,7 +5,8 @@ from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.registry import registry, DoneBaseComponent, \
     ObserverBaseComponent, StateBaseComponent
-    
+
+
 class SmartGridWorldSimulation(GridWorldSimulation, ABC):
     """
     Default "template" for building and running simulations.
@@ -125,7 +126,7 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
         agent = self.agents[agent_id]
         return {
             k: v for observer in self._observers
-            for k, v in observer.get_obs(agent, **kwargs).items() 
+            for k, v in observer.get_obs(agent, **kwargs).items()
         }
 
     def get_reward(self, agent_id, **kwargs):

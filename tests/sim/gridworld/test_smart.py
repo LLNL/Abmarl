@@ -10,6 +10,7 @@ from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.examples.sim.reach_the_target import ActiveDone, TargetDone, OnlyAgentLeftDone, \
     BarrierAgent, TargetAgent, RunningAgent
 
+
 class SmartReachTheTarget(SmartGridWorldSimulation):
     def __init__(self, target=None, **kwargs):
         super().__init__(**kwargs)

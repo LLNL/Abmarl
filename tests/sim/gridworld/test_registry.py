@@ -1,20 +1,20 @@
 
 import pytest
 
-from abmarl.sim.gridworld.actor import ActorBaseComponent, MoveActor, CrossMoveActor, \
+from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, \
     BinaryAttackActor, EncodingBasedAttackActor, RestrictedSelectiveAttackActor, \
     SelectiveAttackActor
-from abmarl.sim.gridworld.done import DoneBaseComponent, ActiveDone, TargetAgentDone, \
+from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, \
     OneTeamRemainingDone
-from abmarl.sim.gridworld.observer import ObserverBaseComponent, AbsoluteGridObserver, \
+from abmarl.sim.gridworld.observer import AbsoluteGridObserver, \
     SingleGridObserver, MultiGridObserver, AbsolutePositionObserver
-from abmarl.sim.gridworld.state import StateBaseComponent, PositionState, \
+from abmarl.sim.gridworld.state import PositionState, \
     TargetBarriersFreePlacementState, MazePlacementState, HealthState
 from abmarl.sim.gridworld.registry import registry, register
 
-from abmarl.examples.sim.reach_the_target import TargetDone, OnlyAgentLeftDone
 from abmarl.examples.sim.comms_blocking import BroadcastingActor, BroadcastingState, \
     BroadcastObserver, AverageMessageDone, BroadcastingAgent
+
 
 def test_built_in_registry():
     assert MoveActor in registry['actor'].values()
