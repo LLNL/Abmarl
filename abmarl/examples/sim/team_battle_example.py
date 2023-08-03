@@ -1,14 +1,11 @@
-from abmarl.sim.gridworld.base import GridWorldSimulation
+from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.agent import (
     GridObservingAgent,
     MovingAgent,
     AttackingAgent,
     HealthAgent,
 )
-from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
-from abmarl.sim.gridworld.observer import SingleGridObserver
-from abmarl.sim.gridworld.done import OneTeamRemainingDone
 
 
 class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
@@ -23,32 +20,15 @@ class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
         )
 
 
-class TeamBattleSim(GridWorldSimulation):
+class TeamBattleSim(SmartGridWorldSimulation):
     def __init__(self, **kwargs):
-        self.agents = kwargs["agents"]
-
-        # State Components
-        self.position_state = PositionState(**kwargs)
-        self.health_state = HealthState(**kwargs)
+        super().__init__(**kwargs)
 
         # Action Components
         self.move_actor = MoveActor(**kwargs)
         self.attack_actor = BinaryAttackActor(**kwargs)
 
-        # Observation Components
-        self.grid_observer = SingleGridObserver(**kwargs)
-
-        # Done Compoennts
-        self.done = OneTeamRemainingDone(**kwargs)
-
         self.finalize()
-
-    def reset(self, **kwargs):
-        self.health_state.reset(**kwargs)
-        self.position_state.reset(**kwargs)
-
-        # Track the rewards
-        self.rewards = {agent.id: 0 for agent in self.agents.values()}
 
     def step(self, action_dict, **kwargs):
         # Process attacks:
@@ -77,21 +57,3 @@ class TeamBattleSim(GridWorldSimulation):
         # Entropy penalty
         for agent_id in action_dict:
             self.rewards[agent_id] -= 0.01
-
-    def get_obs(self, agent_id, **kwargs):
-        agent = self.agents[agent_id]
-        return {**self.grid_observer.get_obs(agent, **kwargs)}
-
-    def get_reward(self, agent_id, **kwargs):
-        reward = self.rewards[agent_id]
-        self.rewards[agent_id] = 0
-        return reward
-
-    def get_done(self, agent_id, **kwargs):
-        return self.done.get_done(self.agents[agent_id])
-
-    def get_all_done(self, **kwargs):
-        return self.done.get_all_done(**kwargs)
-
-    def get_info(self, agent_id, **kwargs):
-        return {}
