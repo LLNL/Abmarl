@@ -99,28 +99,6 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
 
         self.rewards = {agent.id: 0 for agent in self.agents.values() if isinstance(agent, Agent)}
 
-    # Note: This is the theoretical approach we could take in stepping the simulation.
-    # The first 4 lines are boilerplate and good to have in this super class.
-    # After that, the result is unique to the actor. The output may be different, and
-    # what the simulation should do with that output is also different. This
-    # could be streamlined after we do #337. For now, we leave it up to the subclass
-    # to implement the actors and step function.
-    # def step(self, action_dict, **kwargs):
-    #     if not self._warning_issued:
-    #         raise UserWarning("It is best practice to implement your own step function.")
-    #     for actor in self._actors:
-    #         for agent_id, action in action_dict.items():
-    #             agent = self.agents[agent_id]
-    #             if agent.active:
-    #                 result = actor.process_action(agent, action, **kwargs)
-    #                 if result: # Positive result
-    #                     self.rewards[agent_id] += 1
-    #                 else:
-    #                     self.rewards[agent_id] -= 0.1
-
-    #     for agent_id in action_dict:
-    #         self.rewards[agent_id] -= 0.01
-
     def get_obs(self, agent_id, **kwargs):
         assert hasattr(self, '_observers'), "Smart Simulation requires '_observers' attribute."
         agent = self.agents[agent_id]

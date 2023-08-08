@@ -7,9 +7,6 @@ from .observer import ObserverBaseComponent, AbsoluteGridObserver, SingleGridObs
 from .state import StateBaseComponent, PositionState, TargetBarriersFreePlacementState, \
     MazePlacementState, HealthState
 
-# TODO: Figure out how to wrap
-from .wrapper import ComponentWrapper, ActorWrapper, ObserverWrapper, RavelActionWrapper, \
-    ExclusiveChannelActionWrapper
 
 _subclass_check_mapping = {
     'actor': ActorBaseComponent,

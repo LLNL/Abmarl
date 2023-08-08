@@ -37,7 +37,6 @@ def test_built_in_registry():
     assert TargetBarriersFreePlacementState in registry['state'].values()
     assert MazePlacementState in registry['state'].values()
     assert HealthState in registry['state'].values()
-# test_built_in_registry()
 
 
 def test_custom_registrations():
