@@ -1,4 +1,4 @@
-from .base import GridWorldBaseComponent
+
 from .actor import ActorBaseComponent, MoveActor, CrossMoveActor, BinaryAttackActor, \
     EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor
 from .done import DoneBaseComponent, ActiveDone, TargetAgentDone, OneTeamRemainingDone
