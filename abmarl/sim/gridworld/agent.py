@@ -193,7 +193,7 @@ class HealthAgent(GridWorldAgent):
     def initial_health(self, value):
         if value is not None:
             assert type(value) in [int, float], "Initial health must be a numeric value."
-            assert 0 < value <= 1, "Initial value must be between 0 and 1."
+            assert 0 < value <= 1, "Initial health must be between 0 and 1."
         self._initial_health = value
 
 
@@ -202,12 +202,13 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     Agents that can attack other agents.
     """
     def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None,
-                 attack_count=1, **kwargs):
+                 attack_count=1, initial_ammo=None, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
         self.attack_accuracy = attack_accuracy
         self.attack_count = attack_count
+        self.initial_ammo = initial_ammo
 
     @property
     def attack_range(self):
@@ -273,3 +274,31 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         return super().configured and self.attack_range is not None and \
             self.attack_strength is not None and self.attack_accuracy is not None and \
             self.attack_count is not None
+
+    @property
+    def ammo(self):
+        """
+        The agent's ammo throughout the simulation trajectory.
+        """
+        return self._ammo
+
+    @ammo.setter
+    def ammo(self, value):
+        if value is None:
+            self._ammo = float('inf')
+        else:
+            assert type(value) is int and 0 <= value, "Ammo must be an integer."
+            self._ammo = 0 if value < 0 else value
+
+    @property
+    def initial_ammo(self):
+        """
+        The ammount of ammo with which this agent starts.
+        """
+        return self._initial_ammo
+
+    @initial_ammo.setter
+    def initial_ammo(self, value):
+        if value is not None:
+            assert type(value) is int and 0 <= value, "Initial ammo must be a nonnegative integer."
+        self._initial_ammo = value
