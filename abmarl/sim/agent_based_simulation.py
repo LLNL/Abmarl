@@ -304,7 +304,7 @@ class DynamicOrderSimulation(AgentBasedSimulation):
     def next_agent(self, value):
         assert isinstance(value, (Container, str)), \
             "The next agent must be a single string or a Container of strings."
-        if type(value) == str:
+        if type(value) is str:
             value = [value]
         for agent_id in value:
             assert agent_id in self.agents, \
