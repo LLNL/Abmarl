@@ -138,6 +138,30 @@ def test_absolute_grid_observer_blocking():
     )
 
 
+    agents['agent3'].active = False
+
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent0'])['absolute_grid'],
+        np.array([
+            [-2, -2,  0,  0,  0],
+            [-2,  4,  0,  0,  0],
+            [-2,  6, -1,  0,  0],
+            [-2,  0,  0,  5,  0],
+            [ 0,  0,  0,  0,  3]
+        ])
+    )
+    np.testing.assert_array_equal(
+        observer.get_obs(agents['agent2'])['absolute_grid'],
+        np.array([
+            [-2, -2,  0,  0,  0],
+            [-2,  4,  0,  0,  0],
+            [-2,  6,  1,  0,  0],
+            [ 0,  0,  0,  5,  0],
+            [ 0,  0,  0,  0, -1]
+        ])
+    )
+
+
 def test_single_grid_observer():
     grid = Grid(5, 5)
     agents = {

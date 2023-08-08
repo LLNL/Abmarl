@@ -44,7 +44,7 @@ def create_grid_and_mask(agent, grid, mask_range, agents):
 
     mask = np.ones((2 * mask_range + 1, 2 * mask_range + 1))
     for other in agents.values():
-        if other.blocking:
+        if other.active and other.blocking:
             r_diff, c_diff = other.position - agent.position
             # Ensure the other agent within the view range
             if -mask_range <= r_diff <= mask_range and \
