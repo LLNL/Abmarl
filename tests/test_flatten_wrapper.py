@@ -22,7 +22,7 @@ def test_integer_sample():
     flat_combo = flatten_space(combo)
     samp = flat_combo.sample()
     for i in samp:
-        assert type(i) == np.int64
+        assert type(i) is np.int64
 
 
 def test_flatdim():
