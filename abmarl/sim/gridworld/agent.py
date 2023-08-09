@@ -284,7 +284,7 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
 
     @ammo.setter
     def ammo(self, value):
-        if value is None:
+        if value is None or value == float('inf'):
             self._ammo = float('inf')
         else:
             assert type(value) is int and 0 <= value, "Ammo must be an integer."
