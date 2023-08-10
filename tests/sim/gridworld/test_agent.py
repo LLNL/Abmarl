@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
-    HealthAgent, AttackingAgent
+    HealthAgent, AttackingAgent, AmmoAgent, AmmoObservingAgent
 from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
@@ -181,4 +181,62 @@ def test_attacking_agent():
             attack_strength=0.6,
             attack_accuracy=0.95,
             attack_count=-2
+        )
+
+
+def test_ammo_agent():
+    agent = AmmoAgent(
+        id='agent',
+        encoding=1,
+        initial_ammo=4
+    )
+    assert isinstance(agent, GridWorldAgent)
+    assert agent.initial_ammo == 4
+    assert agent.configured
+
+    agent = AmmoAgent(
+        id='agent',
+        encoding=1,
+        initial_ammo=-2
+    )
+    assert agent.initial_ammo == -2
+
+    with pytest.raises(AssertionError):
+        agent = AmmoAgent(
+            id='agent',
+            encoding=1,
+            initial_ammo=2.4
+        )
+
+    with pytest.raises(AssertionError):
+        agent = AmmoAgent(
+            id='agent',
+            encoding=1,
+        )
+
+
+def test_ammo_observing_agent():
+    class CustomAmmoObservingAgent(AmmoAgent, ObservingAgent): pass
+
+    agent = AmmoObservingAgent(
+        id='agent',
+        encoding=1,
+        initial_ammo=4
+    )
+    assert isinstance(agent, AmmoAgent)
+    assert isinstance(agent, ObservingAgent)
+    assert isinstance(agent, GridWorldAgent)
+                      
+    agent = CustomAmmoObservingAgent(
+        id='agent',
+        encoding=1,
+        initial_ammo=2
+    )
+    assert isinstance(agent, AmmoObservingAgent)
+
+    with pytest.raises(AssertionError):
+        agent = AmmoObservingAgent(
+            id='agent',
+            encoding=1,
+            initial_ammo=2.4
         )

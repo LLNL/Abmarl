@@ -321,7 +321,7 @@ class AmmoObservingAgentMeta(type):
 
 
 # TODO: Should all agents be self-observing agents?
-class AmmoObservingAgent(AmmoAgent, ObservingAgent):
+class AmmoObservingAgent(AmmoAgent, ObservingAgent, metaclass=AmmoObservingAgentMeta):
     """
     Boilterplate class required to work with the AmmoObserver.
     """
