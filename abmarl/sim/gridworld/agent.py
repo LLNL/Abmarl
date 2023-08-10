@@ -202,13 +202,12 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
     Agents that can attack other agents.
     """
     def __init__(self, attack_range=None, attack_strength=None, attack_accuracy=None,
-                 attack_count=1, initial_ammo=None, **kwargs):
+                 attack_count=1, **kwargs):
         super().__init__(**kwargs)
         self.attack_range = attack_range
         self.attack_strength = attack_strength
         self.attack_accuracy = attack_accuracy
         self.attack_count = attack_count
-        self.initial_ammo = initial_ammo
 
     @property
     def attack_range(self):
