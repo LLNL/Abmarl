@@ -6,7 +6,7 @@ import numpy as np
 from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import GridObservingAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoObservingAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -371,3 +371,54 @@ class AbsolutePositionObserver(ObserverBaseComponent):
             return {}
         else:
             return {self.key: agent.position}
+
+
+class AmmoObserver(ObserverBaseComponent):
+    """
+    Agents observe their own ammo.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.observation_space[self.key] = Box(
+                    0,
+                    float('inf')
+                    shape=(1,),
+                    dtype=int
+                )
+                # TODO: I don't really like that the ammo can be inf for the case
+                # when we have an attacking agent without the ammo issue. I can
+                # make a separate agent class called AmmoAgent. This agent guarenteed
+                # to have ammo. Then I don't have to treat lack of ammo attribute
+                # as the agent having infinite ammo. Then, the attack actors have
+                # to check if the agent has ammo and adjust the attack logic based
+                # on that. This is not too bad because they already have to check/assume
+                # that the attacked_agent has health. #337 should be made aware
+                # of this.
+                # I think this may the the only way forward because I don't think
+                # you can pass 'inf' to a NN.
+                agent.null_observation[self.key] = 0
+
+    @property
+    def key(self):
+        """
+        This Observer's key is "ammo".
+        """
+        return 'ammo'
+
+    @property
+    def supported_agent_type(self):
+        """
+        This Observer works with AmmoObservingAgents.
+        """
+        return AmmoObservingAgent
+
+    def get_obs(self, agent, **kwargs):
+        """
+        Agents observe their own ammo
+        """
+        if not isinstance(agent, self.supported_agent_type):
+            return {}
+        else:
+            return {self.key: agent.ammo}

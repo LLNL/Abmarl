@@ -302,3 +302,21 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         if value is not None:
             assert type(value) is int and 0 <= value, "Initial ammo must be a nonnegative integer."
         self._initial_ammo = value
+
+
+class AmmoObservingAgentMeta(type):
+    """
+    AmmoObservingAgentMeta class defines an AmmoObservingAgent as an instance of
+    AttackingAgent and ObservingAgent. Then, when we check if an agent is an instance
+    of AmmoObservingAgent, it doesn't have to directly derive from it; it just has
+    to derive from both AttackingAgent and ObservingAgent.
+    """
+    def __instancecheck__(self, instance):
+        return isinstance(instance, ObservingAgent) and isinstance(instance, AttackingAgent)
+
+
+class AmmoObservingAgent(AttackingAgent, ObservingAgent):
+    """
+    Boilterplate class required to work with the AmmoObserver
+    """
+    pass
