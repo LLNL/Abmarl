@@ -5,7 +5,7 @@ from copy import deepcopy
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent, GridWorldAgent
-from abmarl.sim.gridworld.agent import HealthAgent
+from abmarl.sim.gridworld.agent import HealthAgent, AmmoAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -588,3 +588,18 @@ class HealthState(StateBaseComponent):
                     agent.health = agent.initial_health
                 else:
                     agent.health = np.random.uniform(0, 1)
+
+
+class AmmoState(StateBaseComponent):
+    """
+    Manage the state of the agents' ammo.
+
+    Every AmmoAgent has ammo.
+    """
+    def reset(self, **kwargs):
+        """
+        Give AmmoAgents their starting ammo.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, AmmoAgent):
+                agent.ammo = agent.initial_ammo
