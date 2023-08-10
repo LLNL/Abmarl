@@ -383,21 +383,10 @@ class AmmoObserver(ObserverBaseComponent):
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
                     0,
-                    float('inf')
+                    agent.initial_ammo,
                     shape=(1,),
                     dtype=int
                 )
-                # TODO: I don't really like that the ammo can be inf for the case
-                # when we have an attacking agent without the ammo issue. I can
-                # make a separate agent class called AmmoAgent. This agent guarenteed
-                # to have ammo. Then I don't have to treat lack of ammo attribute
-                # as the agent having infinite ammo. Then, the attack actors have
-                # to check if the agent has ammo and adjust the attack logic based
-                # on that. This is not too bad because they already have to check/assume
-                # that the attacked_agent has health. #337 should be made aware
-                # of this.
-                # I think this may the the only way forward because I don't think
-                # you can pass 'inf' to a NN.
                 agent.null_observation[self.key] = 0
 
     @property
