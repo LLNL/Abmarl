@@ -6,7 +6,7 @@ from gym.spaces import Discrete, MultiDiscrete, Dict
 
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -301,15 +301,17 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             attack_status, attacked_agents = self._determine_attack(attacking_agent, action)
 
             # Filter the attacked agents by the amount of ammo the attacking agent has
-            if len(attacked_agents) > attacking_agent.ammo:
-                attacked_agents = np.random.choice(
-                    attacked_agents,
-                    size=attacking_agent.ammo,
-                    replace=False
-                )
-            attacking_agent.ammo -= len(attacked_agents)
+            if isinstance(attacking_agent, AmmoAgent):
+                if len(attacked_agents) > attacking_agent.ammo:
+                    attacked_agents = np.random.choice(
+                        attacked_agents,
+                        size=attacking_agent.ammo,
+                        replace=False
+                    )
+                attacking_agent.ammo -= len(attacked_agents)
 
             # Attack impacts the attacked_agent's health
+            # TODO: What happens if we attack an agent that does not have health?
             for attacked_agent in attacked_agents:
                 if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
