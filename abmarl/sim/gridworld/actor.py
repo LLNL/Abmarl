@@ -307,7 +307,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
                         attacked_agents,
                         size=attacking_agent.ammo,
                         replace=False
-                    )
+                    ).tolist()
                 attacking_agent.ammo -= len(attacked_agents)
 
             # Attack impacts the attacked_agent's health
@@ -460,6 +460,9 @@ class BinaryAttackActor(AttackActorBaseComponent):
             return True, self._subset_attackables(attackable_agents, attack)
         else:
             return True, []
+        # TODO: Attack is successful if at least one of the attacks is successful.
+        # But this is really just partial success because not all of its attacks
+        # passed. Should be noted in #337
 
 
 class EncodingBasedAttackActor(AttackActorBaseComponent):
