@@ -275,6 +275,15 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
             self.attack_strength is not None and self.attack_accuracy is not None and \
             self.attack_count is not None
 
+
+class AmmoAgent(GridWorldAgent):
+    """
+    Agent that has a limited amount of ammunition.
+    """
+    def __init__(self, initial_ammo=None, **kwargs):
+        super().__init__(**kwargs)
+        self.initial_ammo = initial_ammo
+
     @property
     def ammo(self):
         """
@@ -284,11 +293,8 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
 
     @ammo.setter
     def ammo(self, value):
-        if value is None or value == float('inf'):
-            self._ammo = float('inf')
-        else:
-            assert type(value) is int and 0 <= value, "Ammo must be an integer."
-            self._ammo = 0 if value < 0 else value
+        assert type(value) is int, "Ammo must be an integer."
+        self._ammo = 0 if value < 0 else value
 
     @property
     def initial_ammo(self):
@@ -299,24 +305,24 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
 
     @initial_ammo.setter
     def initial_ammo(self, value):
-        if value is not None:
-            assert type(value) is int and 0 <= value, "Initial ammo must be a nonnegative integer."
+        assert type(value) is int, "Initial ammo must be a an integer."
         self._initial_ammo = value
 
 
 class AmmoObservingAgentMeta(type):
     """
     AmmoObservingAgentMeta class defines an AmmoObservingAgent as an instance of
-    AttackingAgent and ObservingAgent. Then, when we check if an agent is an instance
+    AmmoAgent and ObservingAgent. Then, when we check if an agent is an instance
     of AmmoObservingAgent, it doesn't have to directly derive from it; it just has
-    to derive from both AttackingAgent and ObservingAgent.
+    to derive from both AmmoAgent and ObservingAgent.
     """
     def __instancecheck__(self, instance):
-        return isinstance(instance, ObservingAgent) and isinstance(instance, AttackingAgent)
+        return isinstance(instance, ObservingAgent) and isinstance(instance, AmmoAgent)
 
 
-class AmmoObservingAgent(AttackingAgent, ObservingAgent):
+# TODO: Should all agents be self-observing agents?
+class AmmoObservingAgent(AmmoAgent, ObservingAgent):
     """
-    Boilterplate class required to work with the AmmoObserver
+    Boilterplate class required to work with the AmmoObserver.
     """
     pass
