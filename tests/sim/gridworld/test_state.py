@@ -3,8 +3,8 @@ import numpy as np
 
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.state import PositionState, MazePlacementState, HealthState, \
-    TargetBarriersFreePlacementState, StateBaseComponent
-from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent
+    TargetBarriersFreePlacementState, StateBaseComponent, AmmoState
+from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent, AmmoAgent
 import pytest
 
 
@@ -128,6 +128,33 @@ def test_health_state():
     assert agents['agent0'].active
     assert agents['agent1'].active
     assert agents['agent2'].active
+
+
+def test_ammo_state():
+    grid = Grid(3, 3)
+    agents = {
+        'agent0': AmmoAgent(id='agent0', encoding=1, initial_ammo=40),
+        'agent1': AmmoAgent(id='agent1', encoding=1, initial_ammo=-2),
+        'agent2': AmmoAgent(id='agent2', encoding=1, initial_ammo=13)
+    }
+
+    ammo_state = AmmoState(agents=agents, grid=grid)
+    assert isinstance(ammo_state, StateBaseComponent)
+    ammo_state.reset()
+
+    assert agents['agent0'].ammo == 40
+    assert agents['agent1'].ammo == 0
+    assert agents['agent2'].ammo == 13
+
+    agents['agent0'].ammo -= 16
+    agents['agent1'].ammo += 7
+    agents['agent2'].ammo -= 15
+    assert agents['agent0'].ammo == 24
+    assert agents['agent1'].ammo == 7
+    assert agents['agent2'].ammo == 0
+
+    agents['agent0'].ammo += 5
+    assert agents['agent0'].ammo == 29
 
 
 def test_maze_placement_state():

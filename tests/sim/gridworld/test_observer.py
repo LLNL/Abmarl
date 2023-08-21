@@ -4,10 +4,38 @@ import numpy as np
 from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.observer import ObserverBaseComponent, AbsoluteGridObserver, \
-    SingleGridObserver, MultiGridObserver, AbsolutePositionObserver
-from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent, MovingAgent
-from abmarl.sim.gridworld.state import PositionState
+    SingleGridObserver, MultiGridObserver, AbsolutePositionObserver, AmmoObserver
+from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent, MovingAgent, \
+    AmmoAgent, AmmoObservingAgent
+from abmarl.sim.gridworld.state import PositionState, AmmoState
 from abmarl.sim.gridworld.grid import Grid
+
+
+def test_ammo_observer():
+    grid = Grid(3, 3)
+    agents = {
+        'agent0': AmmoAgent(id='agent0', encoding=1, initial_ammo=10),
+        'agent1': AmmoObservingAgent(id='agent1', encoding=1, initial_ammo=-3),
+        'agent2': AmmoObservingAgent(id='agent2', encoding=1, initial_ammo=14),
+        'agent3': AmmoObservingAgent(id='agent3', encoding=1, initial_ammo=12),
+    }
+    state = AmmoState(grid=grid, agents=agents)
+    observer = AmmoObserver(grid=grid, agents=agents)
+    assert isinstance(observer, ObserverBaseComponent)
+    state.reset()
+
+    assert observer.get_obs(agents['agent1'])['ammo'] == agents['agent1'].ammo
+    assert observer.get_obs(agents['agent2'])['ammo'] == agents['agent2'].ammo
+    assert observer.get_obs(agents['agent3'])['ammo'] == agents['agent3'].ammo
+
+    agents['agent0'].ammo -= 16
+    agents['agent1'].ammo += 7
+    agents['agent2'].ammo -= 15
+    assert observer.get_obs(agents['agent1'])['ammo'] == agents['agent1'].ammo
+    assert observer.get_obs(agents['agent2'])['ammo'] == agents['agent2'].ammo
+    assert observer.get_obs(agents['agent3'])['ammo'] == agents['agent3'].ammo
+
+    assert not observer.get_obs(agents['agent0'])
 
 
 def test_absolute_grid_observer():

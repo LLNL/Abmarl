@@ -193,7 +193,7 @@ class HealthAgent(GridWorldAgent):
     def initial_health(self, value):
         if value is not None:
             assert type(value) in [int, float], "Initial health must be a numeric value."
-            assert 0 < value <= 1, "Initial value must be between 0 and 1."
+            assert 0 < value <= 1, "Initial health must be between 0 and 1."
         self._initial_health = value
 
 
@@ -273,3 +273,54 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
         return super().configured and self.attack_range is not None and \
             self.attack_strength is not None and self.attack_accuracy is not None and \
             self.attack_count is not None
+
+
+class AmmoAgent(GridWorldAgent):
+    """
+    Agent that has a limited amount of ammunition.
+    """
+    def __init__(self, initial_ammo=None, **kwargs):
+        super().__init__(**kwargs)
+        self.initial_ammo = initial_ammo
+
+    @property
+    def ammo(self):
+        """
+        The agent's ammo throughout the simulation trajectory.
+        """
+        return self._ammo
+
+    @ammo.setter
+    def ammo(self, value):
+        assert type(value) is int, "Ammo must be an integer."
+        self._ammo = 0 if value < 0 else value
+
+    @property
+    def initial_ammo(self):
+        """
+        The ammount of ammo with which this agent starts.
+        """
+        return self._initial_ammo
+
+    @initial_ammo.setter
+    def initial_ammo(self, value):
+        assert type(value) is int, "Initial ammo must be a an integer."
+        self._initial_ammo = value
+
+
+class AmmoObservingAgentMeta(type):
+    """
+    AmmoObservingAgentMeta class defines an AmmoObservingAgent as an instance of
+    AmmoAgent and ObservingAgent. Then, when we check if an agent is an instance
+    of AmmoObservingAgent, it doesn't have to directly derive from it; it just has
+    to derive from both AmmoAgent and ObservingAgent.
+    """
+    def __instancecheck__(self, instance):
+        return isinstance(instance, ObservingAgent) and isinstance(instance, AmmoAgent)
+
+
+class AmmoObservingAgent(AmmoAgent, ObservingAgent, metaclass=AmmoObservingAgentMeta):
+    """
+    Boilterplate class required to work with the AmmoObserver.
+    """
+    pass

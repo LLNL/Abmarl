@@ -6,7 +6,7 @@ from gym.spaces import Discrete, MultiDiscrete, Dict
 
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -274,6 +274,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         2. The attackable agent is positioned at the attacked cell.
         3. The attackable agent is valid according to the attack_mapping.
         4. The attacking agent's accuracy is high enough.
+        5. The attacking agent has enough ammo.
 
         Furthemore, a single agent may only be attacked once if stacked_attacks
         is False. Additional attacks will be applied on other agents or wasted.
@@ -298,6 +299,18 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         if isinstance(attacking_agent, self.supported_agent_type):
             action = action_dict[self.key]
             attack_status, attacked_agents = self._determine_attack(attacking_agent, action)
+
+            # Filter the attacked agents by the amount of ammo the attacking agent has
+            if isinstance(attacking_agent, AmmoAgent):
+                if len(attacked_agents) > attacking_agent.ammo:
+                    attacked_agents = np.random.choice(
+                        attacked_agents,
+                        size=attacking_agent.ammo,
+                        replace=False
+                    ).tolist()
+                attacking_agent.ammo -= len(attacked_agents)
+
+            # Attack impacts the attacked_agent's health
             for attacked_agent in attacked_agents:
                 if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
@@ -344,7 +357,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
 
         If the number of attacks is greater than the list of agents and stacked
         attacks is False, then each attackable agent is attacked, and any extra
-        attacks are wasted. Otherwise,, randomly choose agents from the list of
+        attacks are wasted. Otherwise, randomly choose agents from the list of
         attackable_agents, using replacement if stacked attacks is True.
 
         Args:
