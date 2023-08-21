@@ -311,7 +311,6 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
                 attacking_agent.ammo -= len(attacked_agents)
 
             # Attack impacts the attacked_agent's health
-            # TODO: What happens if we attack an agent that does not have health?
             for attacked_agent in attacked_agents:
                 if not attacked_agent.active: continue # Skip this agent since it is dead
                 attacked_agent.health = attacked_agent.health - attacking_agent.attack_strength
@@ -460,9 +459,6 @@ class BinaryAttackActor(AttackActorBaseComponent):
             return True, self._subset_attackables(attackable_agents, attack)
         else:
             return True, []
-        # TODO: Attack is successful if at least one of the attacks is successful.
-        # But this is really just partial success because not all of its attacks
-        # passed. Should be noted in #337
 
 
 class EncodingBasedAttackActor(AttackActorBaseComponent):

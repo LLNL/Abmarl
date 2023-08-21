@@ -319,7 +319,6 @@ class AmmoObservingAgentMeta(type):
         return isinstance(instance, ObservingAgent) and isinstance(instance, AmmoAgent)
 
 
-# TODO: Should all agents be self-observing agents?
 class AmmoObservingAgent(AmmoAgent, ObservingAgent, metaclass=AmmoObservingAgentMeta):
     """
     Boilterplate class required to work with the AmmoObserver.
