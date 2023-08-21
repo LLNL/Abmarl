@@ -226,7 +226,7 @@ def test_ammo_observing_agent():
     assert isinstance(agent, AmmoAgent)
     assert isinstance(agent, ObservingAgent)
     assert isinstance(agent, GridWorldAgent)
-                      
+
     agent = CustomAmmoObservingAgent(
         id='agent',
         encoding=1,

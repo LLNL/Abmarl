@@ -13,6 +13,7 @@ from abmarl.sim.gridworld.grid import Grid
 
 grid = Grid(5,6)
 
+
 class AttackerWithAmmo(AttackingAgent, AmmoAgent): pass
 
 
