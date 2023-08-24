@@ -40,7 +40,7 @@ overlapping = {
     3: {1, 2, 3}
 }
 attack_mapping = {
-    2: [3]
+    2: {3}
 }
 
 sim = MultiAgentWrapper(
