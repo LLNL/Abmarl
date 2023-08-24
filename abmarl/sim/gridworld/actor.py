@@ -230,7 +230,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         """
         Dict that dictates which agents the attacking agent can attack.
 
-        The dictionary maps the attacking agents' encodings to a list of encodings
+        The dictionary maps the attacking agents' encodings to a set of encodings
         that they can attack.
         """
         return self._attack_mapping
@@ -239,8 +239,8 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     def attack_mapping(self, value):
         assert type(value) is dict, "Attack mapping must be dictionary."
         for k, v in value.items():
-            assert type(k) is int, "All keys in attack mapping must be integer."
-            assert type(v) is list, "All values in attack mapping must be list."
+            assert type(k) is int, "All keys in attack mapping must be an integer."
+            assert type(v) is set, "All values in attack mapping must be a set."
             for i in v:
                 assert type(i) is int, \
                     "All elements in the attack mapping values must be integers."
