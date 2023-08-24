@@ -52,7 +52,7 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         pass
 
 
-class AbsoluteGridObserver(ObserverBaseComponent):
+class AbsoluteEncodingObserver(ObserverBaseComponent):
     """
     Observe the agents in the grid according to their actual positions.
 
@@ -81,9 +81,9 @@ class AbsoluteGridObserver(ObserverBaseComponent):
     @property
     def key(self):
         """
-        This Observer's key is "absolute_grid".
+        This Observer's key is "absolute_encoding".
         """
-        return 'absolute_grid'
+        return 'absolute_encoding'
 
     @property
     def supported_agent_type(self):
@@ -150,7 +150,7 @@ class AbsoluteGridObserver(ObserverBaseComponent):
         return {self.key: obs}
 
 
-class SingleGridObserver(ObserverBaseComponent):
+class PositionCenteredEncodingObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's position.
 
@@ -176,9 +176,9 @@ class SingleGridObserver(ObserverBaseComponent):
     @property
     def key(self):
         """
-        This Observer's key is "grid".
+        This Observer's key is "position_centered_encoding".
         """
-        return 'grid'
+        return 'position_centered_encoding'
 
     @property
     def supported_agent_type(self):
@@ -250,13 +250,13 @@ class SingleGridObserver(ObserverBaseComponent):
         return {self.key: obs}
 
 
-class MultiGridObserver(ObserverBaseComponent):
+class StackedPositionCenteredEncodingObserver(ObserverBaseComponent):
     """
     Observe a subset of the grid centered on the agent's position.
 
     The observation is centered around the observing agent's position. The observing
-    agent sees a stack of observations, one for each positive encoding, where the
-    number of agents of each encoding is given rather than the encoding
+    agent sees a stack of observations, one for each encoding, where the
+    number of agents of each encoding at a cell is given rather than the encoding
     itself. Out of bounds and masked indicators appear in every grid.
     """
     def __init__(self, **kwargs):
@@ -278,9 +278,9 @@ class MultiGridObserver(ObserverBaseComponent):
     @property
     def key(self):
         """
-        This Observer's key is "grid".
+        This Observer's key is "stacked_position_centered_encoding".
         """
-        return 'grid'
+        return 'stacked_position_centered_encoding'
 
     @property
     def supported_agent_type(self):

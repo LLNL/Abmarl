@@ -6,7 +6,7 @@ from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent
 from abmarl.sim.gridworld.state import MazePlacementState
 from abmarl.sim.gridworld.actor import MoveActor
-from abmarl.sim.gridworld.observer import SingleGridObserver
+from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
 
 
 class MultiMazeNavigationAgent(GridObservingAgent, MovingAgent):
@@ -25,7 +25,7 @@ class MultiMazeNavigationSim(GridWorldSimulation):
         self.move_actor = MoveActor(**kwargs)
 
         # Observation Components
-        self.grid_observer = SingleGridObserver(**kwargs)
+        self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
 
         self.finalize()
 

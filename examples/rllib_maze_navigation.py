@@ -32,7 +32,7 @@ sim = MultiAgentWrapper(
             object_registry,
             overlapping={1: {3}, 3: {1}},
             states={'PositionState'},
-            observers={'SingleGridObserver'}
+            observers={'PositionCenteredEncodingObserver'}
         )
     )
 )

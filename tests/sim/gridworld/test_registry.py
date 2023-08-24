@@ -6,8 +6,9 @@ from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, \
     SelectiveAttackActor
 from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, \
     OneTeamRemainingDone
-from abmarl.sim.gridworld.observer import AbsoluteGridObserver, \
-    SingleGridObserver, MultiGridObserver, AbsolutePositionObserver
+from abmarl.sim.gridworld.observer import AbsoluteEncodingObserver, \
+    PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
+    AbsolutePositionObserver
 from abmarl.sim.gridworld.state import PositionState, \
     TargetBarriersFreePlacementState, MazePlacementState, HealthState
 from abmarl.sim.gridworld.registry import registry, register
@@ -28,9 +29,9 @@ def test_built_in_registry():
     assert TargetAgentDone in registry['done'].values()
     assert OneTeamRemainingDone in registry['done'].values()
 
-    assert AbsoluteGridObserver in registry['observer'].values()
-    assert SingleGridObserver in registry['observer'].values()
-    assert MultiGridObserver in registry['observer'].values()
+    assert AbsoluteEncodingObserver in registry['observer'].values()
+    assert PositionCenteredEncodingObserver in registry['observer'].values()
+    assert StackedPositionCenteredEncodingObserver in registry['observer'].values()
     assert AbsolutePositionObserver in registry['observer'].values()
 
     assert PositionState in registry['state'].values()

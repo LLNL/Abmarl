@@ -5,7 +5,7 @@ import pytest
 from abmarl.sim.gridworld.agent import MovingAgent
 from abmarl.sim.gridworld.actor import MoveActor, SelectiveAttackActor
 from abmarl.sim.gridworld.state import PositionState, HealthState
-from abmarl.sim.gridworld.observer import AbsoluteGridObserver, SingleGridObserver
+from abmarl.sim.gridworld.observer import AbsoluteEncodingObserver, PositionCenteredEncodingObserver
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.examples.sim.reach_the_target import ActiveDone, TargetDone, OnlyAgentLeftDone, \
     BarrierAgent, TargetAgent, RunningAgent
@@ -118,63 +118,63 @@ def test_smart_sim_components():
         agents=agents,
         target=agents['target'],
         states={PositionState},
-        observers={AbsoluteGridObserver},
+        observers={AbsoluteEncodingObserver},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
     assert len(sim._states) == 1
     assert isinstance(next(iter(sim._states)), PositionState)
     assert len(sim._observers) == 1
-    assert isinstance(next(iter(sim._observers)), AbsoluteGridObserver)
+    assert isinstance(next(iter(sim._observers)), AbsoluteEncodingObserver)
 
     sim = SmartReachTheTarget.build_sim(
         grid_size, grid_size,
         agents=agents,
         target=agents['target'],
         states={'PositionState'},
-        observers={'AbsoluteGridObserver'},
+        observers={'AbsoluteEncodingObserver'},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
     assert len(sim._states) == 1
     assert isinstance(next(iter(sim._states)), PositionState)
     assert len(sim._observers) == 1
-    assert isinstance(next(iter(sim._observers)), AbsoluteGridObserver)
+    assert isinstance(next(iter(sim._observers)), AbsoluteEncodingObserver)
 
     sim = SmartReachTheTarget.build_sim(
         grid_size, grid_size,
         agents=agents,
         target=agents['target'],
         states={HealthState},
-        observers={SingleGridObserver},
+        observers={PositionCenteredEncodingObserver},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
     assert len(sim._states) == 1
     assert isinstance(next(iter(sim._states)), HealthState)
     assert len(sim._observers) == 1
-    assert isinstance(next(iter(sim._observers)), SingleGridObserver)
+    assert isinstance(next(iter(sim._observers)), PositionCenteredEncodingObserver)
 
     sim = SmartReachTheTarget.build_sim(
         grid_size, grid_size,
         agents=agents,
         target=agents['target'],
         states={'HealthState'},
-        observers={'SingleGridObserver'},
+        observers={'PositionCenteredEncodingObserver'},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
     assert len(sim._states) == 1
     assert isinstance(next(iter(sim._states)), HealthState)
     assert len(sim._observers) == 1
-    assert isinstance(next(iter(sim._observers)), SingleGridObserver)
+    assert isinstance(next(iter(sim._observers)), PositionCenteredEncodingObserver)
 
     sim = SmartReachTheTarget.build_sim(
         grid_size, grid_size,
         agents=agents,
         target=agents['target'],
         states={PositionState, HealthState},
-        observers={AbsoluteGridObserver, SingleGridObserver},
+        observers={AbsoluteEncodingObserver, PositionCenteredEncodingObserver},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
@@ -183,14 +183,14 @@ def test_smart_sim_components():
         assert isinstance(state, (PositionState, HealthState))
     assert len(sim._observers) == 2
     for observer in sim._observers:
-        assert isinstance(observer, (AbsoluteGridObserver, SingleGridObserver))
+        assert isinstance(observer, (AbsoluteEncodingObserver, PositionCenteredEncodingObserver))
 
     sim = SmartReachTheTarget.build_sim(
         grid_size, grid_size,
         agents=agents,
         target=agents['target'],
         states={'PositionState', HealthState},
-        observers={AbsoluteGridObserver, 'SingleGridObserver'},
+        observers={AbsoluteEncodingObserver, 'PositionCenteredEncodingObserver'},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
@@ -199,14 +199,14 @@ def test_smart_sim_components():
         assert isinstance(state, (PositionState, HealthState))
     assert len(sim._observers) == 2
     for observer in sim._observers:
-        assert isinstance(observer, (AbsoluteGridObserver, SingleGridObserver))
+        assert isinstance(observer, (AbsoluteEncodingObserver, PositionCenteredEncodingObserver))
 
     sim = SmartReachTheTarget.build_sim(
         grid_size, grid_size,
         agents=agents,
         target=agents['target'],
         states={'PositionState', 'HealthState'},
-        observers={'AbsoluteGridObserver', 'SingleGridObserver'},
+        observers={'AbsoluteEncodingObserver', 'PositionCenteredEncodingObserver'},
         overlapping=overlapping,
         attack_mapping=attack_mapping
     )
@@ -215,15 +215,15 @@ def test_smart_sim_components():
         assert isinstance(state, (PositionState, HealthState))
     assert len(sim._observers) == 2
     for observer in sim._observers:
-        assert isinstance(observer, (AbsoluteGridObserver, SingleGridObserver))
+        assert isinstance(observer, (AbsoluteEncodingObserver, PositionCenteredEncodingObserver))
 
     with pytest.raises(AssertionError):
         sim = SmartReachTheTarget.build_sim(
             grid_size, grid_size,
             agents=agents,
             target=agents['target'],
-            observers={'AbsoluteGridObserver', 'HealthState'},
-            states={'PositionState', 'SingleGridObserver'},
+            observers={'AbsoluteEncodingObserver', 'HealthState'},
+            states={'PositionState', 'PositionCenteredEncodingObserver'},
             overlapping=overlapping,
             attack_mapping=attack_mapping
         )
@@ -233,7 +233,7 @@ def test_smart_sim_components():
             grid_size, grid_size,
             agents=agents,
             target=agents['target'],
-            observers={'AbsoluteGridObserver', 'SingleGridObserver'},
+            observers={'AbsoluteEncodingObserver', 'PositionCenteredEncodingObserver'},
             overlapping=overlapping,
             attack_mapping=attack_mapping
         )
