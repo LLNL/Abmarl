@@ -7,7 +7,7 @@ from abmarl.sim.gridworld.agent import GridWorldAgent, MovingAgent, AttackingAge
     GridObservingAgent, HealthAgent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import SelectiveAttackActor, MoveActor
-from abmarl.sim.gridworld.observer import SingleGridObserver
+from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
 from abmarl.sim.gridworld.done import ActiveDone, DoneBaseComponent
 
 
@@ -101,7 +101,7 @@ class ReachTheTargetSim(GridWorldSimulation):
         self.attack_actor = SelectiveAttackActor(**kwargs)
 
         # Observer Components
-        self.grid_observer = SingleGridObserver(**kwargs)
+        self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
 
         # Done components
         self.active_done = ActiveDone(**kwargs)

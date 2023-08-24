@@ -3,8 +3,9 @@ import numpy as np
 
 from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
-from abmarl.sim.gridworld.observer import ObserverBaseComponent, AbsoluteGridObserver, \
-    SingleGridObserver, MultiGridObserver, AbsolutePositionObserver, AmmoObserver
+from abmarl.sim.gridworld.observer import ObserverBaseComponent, AbsoluteEncodingObserver, \
+    PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
+    AbsolutePositionObserver, AmmoObserver
 from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent, MovingAgent, \
     AmmoAgent, AmmoObservingAgent
 from abmarl.sim.gridworld.state import PositionState, AmmoState
@@ -38,7 +39,7 @@ def test_ammo_observer():
     assert not observer.get_obs(agents['agent0'])
 
 
-def test_absolute_grid_observer():
+def test_absolute_encoding_observer():
     np.random.seed(24)
     grid = Grid(5, 5, overlapping={1: {6}, 6: {1}})
     agents = {
@@ -66,12 +67,12 @@ def test_absolute_grid_observer():
     }
 
     position_state = PositionState(grid=grid, agents=agents)
-    observer = AbsoluteGridObserver(agents=agents, grid=grid)
+    observer = AbsoluteEncodingObserver(agents=agents, grid=grid)
     assert isinstance(observer, ObserverBaseComponent)
     position_state.reset()
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['absolute_grid'],
+        observer.get_obs(agents['agent0'])['absolute_encoding'],
         np.array([
             [ 2,  0,  0,  0,  0],
             [ 0,  4,  0,  0,  0],
@@ -81,7 +82,7 @@ def test_absolute_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['absolute_grid'],
+        observer.get_obs(agents['agent1'])['absolute_encoding'],
         np.array([
             [-1,  0, -2, -2, -2],
             [ 0,  4, -2, -2, -2],
@@ -91,7 +92,7 @@ def test_absolute_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['absolute_grid'],
+        observer.get_obs(agents['agent2'])['absolute_encoding'],
         np.array([
             [ 2,  0,  0,  0,  0],
             [ 0,  4,  0,  0,  0],
@@ -102,7 +103,7 @@ def test_absolute_grid_observer():
     )
 
 
-def test_absolute_grid_observer_blocking():
+def test_absolute_encoding_observer_blocking():
     np.random.seed(24)
     grid = Grid(5, 5, overlapping={1: {6}, 6: {1}})
     agents = {
@@ -130,12 +131,12 @@ def test_absolute_grid_observer_blocking():
     }
 
     position_state = PositionState(grid=grid, agents=agents)
-    observer = AbsoluteGridObserver(agents=agents, grid=grid)
+    observer = AbsoluteEncodingObserver(agents=agents, grid=grid)
     assert isinstance(observer, ObserverBaseComponent)
     position_state.reset()
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['absolute_grid'],
+        observer.get_obs(agents['agent0'])['absolute_encoding'],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  4,  0,  0,  0],
@@ -145,7 +146,7 @@ def test_absolute_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['absolute_grid'],
+        observer.get_obs(agents['agent1'])['absolute_encoding'],
         np.array([
             [-1,  0, -2, -2, -2],
             [ 0,  4, -2, -2, -2],
@@ -155,7 +156,7 @@ def test_absolute_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['absolute_grid'],
+        observer.get_obs(agents['agent2'])['absolute_encoding'],
         np.array([
             [-2, -2, -2,  0,  0],
             [-2, -2, -2,  0,  0],
@@ -169,7 +170,7 @@ def test_absolute_grid_observer_blocking():
     agents['agent3'].active = False
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['absolute_grid'],
+        observer.get_obs(agents['agent0'])['absolute_encoding'],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  4,  0,  0,  0],
@@ -179,7 +180,7 @@ def test_absolute_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['absolute_grid'],
+        observer.get_obs(agents['agent2'])['absolute_encoding'],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  4,  0,  0,  0],
@@ -208,39 +209,42 @@ def test_single_grid_observer():
     }
 
     position_state = PositionState(grid=grid, agents=agents)
-    observer = SingleGridObserver(agents=agents, grid=grid)
-    assert observer.key == 'grid'
+    observer = PositionCenteredEncodingObserver(agents=agents, grid=grid)
+    assert observer.key == 'position_centered_encoding'
     assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
-    assert agents['agent0'].observation_space['grid'] == Box(
+    assert agents['agent0'].observation_space['position_centered_encoding'] == Box(
         -2, 6, (5, 5), int
     )
-    assert agents['agent1'].observation_space['grid'] == Box(
+    assert agents['agent1'].observation_space['position_centered_encoding'] == Box(
         -2, 6, (3, 3), int
     )
-    assert agents['agent2'].observation_space['grid'] == Box(
+    assert agents['agent2'].observation_space['position_centered_encoding'] == Box(
         -2, 6, (9, 9), int
     )
 
     agents['agent0'].finalize()
-    assert agents['agent0'].null_observation.keys() == set(('grid',))
+    assert agents['agent0'].null_observation.keys() == set(('position_centered_encoding',))
     np.testing.assert_array_equal(
-        agents['agent0'].null_observation['grid'], -2 * np.ones((5, 5), dtype=int)
+        agents['agent0'].null_observation['position_centered_encoding'],
+        -2 * np.ones((5, 5), dtype=int)
     )
     agents['agent1'].finalize()
-    assert agents['agent1'].null_observation.keys() == set(('grid',))
+    assert agents['agent1'].null_observation.keys() == set(('position_centered_encoding',))
     np.testing.assert_array_equal(
-        agents['agent1'].null_observation['grid'], -2 * np.ones((3, 3), dtype=int)
+        agents['agent1'].null_observation['position_centered_encoding'],
+        -2 * np.ones((3, 3), dtype=int)
     )
     agents['agent2'].finalize()
-    assert agents['agent2'].null_observation.keys() == set(('grid',))
+    assert agents['agent2'].null_observation.keys() == set(('position_centered_encoding',))
     np.testing.assert_array_equal(
-        agents['agent2'].null_observation['grid'], -2 * np.ones((9, 9), dtype=int)
+        agents['agent2'].null_observation['position_centered_encoding'],
+        -2 * np.ones((9, 9), dtype=int)
     )
 
     position_state.reset()
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'],
+        observer.get_obs(agents['agent0'])['position_centered_encoding'],
         np.array([
             [2, 0, 0, 0, 0],
             [0, 4, 0, 0, 0],
@@ -250,7 +254,7 @@ def test_single_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'],
+        observer.get_obs(agents['agent1'])['position_centered_encoding'],
         np.array([
             [-1, -1, -1],
             [-1,  2,  0],
@@ -258,7 +262,7 @@ def test_single_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'],
+        observer.get_obs(agents['agent2'])['position_centered_encoding'],
         np.array([
             [ 2,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  4,  0,  0,  0, -1, -1, -1, -1],
@@ -297,12 +301,12 @@ def test_single_grid_observer_blocking():
     }
 
     position_state = PositionState(grid=grid, agents=agents)
-    observer = SingleGridObserver(agents=agents, grid=grid)
+    observer = PositionCenteredEncodingObserver(agents=agents, grid=grid)
     assert isinstance(observer, ObserverBaseComponent)
     position_state.reset()
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'],
+        observer.get_obs(agents['agent0'])['position_centered_encoding'],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  4,  0,  0,  0],
@@ -312,7 +316,7 @@ def test_single_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'],
+        observer.get_obs(agents['agent1'])['position_centered_encoding'],
         np.array([
             [-1, -1, -1],
             [-1,  2,  0],
@@ -320,7 +324,7 @@ def test_single_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'],
+        observer.get_obs(agents['agent2'])['position_centered_encoding'],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -370,41 +374,44 @@ def test_multi_grid_observer():
     grid = Grid(5, 5, overlapping={2: {3}, 3: {2}, 5: {5}})
 
     position_state = PositionState(grid=grid, agents=agents)
-    observer = MultiGridObserver(agents=agents, grid=grid)
-    assert observer.key == 'grid'
+    observer = StackedPositionCenteredEncodingObserver(agents=agents, grid=grid)
+    assert observer.key == 'stacked_position_centered_encoding'
     assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
     assert observer.number_of_encodings == 6
-    assert agents['agent0'].observation_space['grid'] == Box(
+    assert agents['agent0'].observation_space['stacked_position_centered_encoding'] == Box(
         -2, 9, (5, 5, 6), int
     )
-    assert agents['agent1'].observation_space['grid'] == Box(
+    assert agents['agent1'].observation_space['stacked_position_centered_encoding'] == Box(
         -2, 9, (3, 3, 6), int
     )
-    assert agents['agent2'].observation_space['grid'] == Box(
+    assert agents['agent2'].observation_space['stacked_position_centered_encoding'] == Box(
         -2, 9, (9, 9, 6), int
     )
 
     agents['agent0'].finalize()
-    assert agents['agent0'].null_observation.keys() == set(('grid',))
+    assert agents['agent0'].null_observation.keys() == set(('stacked_position_centered_encoding',))
     np.testing.assert_array_equal(
-        agents['agent0'].null_observation['grid'], -2 * np.ones((5, 5, 6), dtype=int)
+        agents['agent0'].null_observation['stacked_position_centered_encoding'],
+        -2 * np.ones((5, 5, 6), dtype=int)
     )
     agents['agent1'].finalize()
-    assert agents['agent1'].null_observation.keys() == set(('grid',))
+    assert agents['agent1'].null_observation.keys() == set(('stacked_position_centered_encoding',))
     np.testing.assert_array_equal(
-        agents['agent1'].null_observation['grid'], -2 * np.ones((3, 3, 6), dtype=int)
+        agents['agent1'].null_observation['stacked_position_centered_encoding'],
+        -2 * np.ones((3, 3, 6), dtype=int)
     )
     agents['agent2'].finalize()
-    assert agents['agent2'].null_observation.keys() == set(('grid',))
+    assert agents['agent2'].null_observation.keys() == set(('stacked_position_centered_encoding',))
     np.testing.assert_array_equal(
-        agents['agent2'].null_observation['grid'], -2 * np.ones((9, 9, 6), dtype=int)
+        agents['agent2'].null_observation['stacked_position_centered_encoding'],
+        -2 * np.ones((9, 9, 6), dtype=int)
     )
 
     position_state.reset()
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 0],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 0],
         np.array([
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -414,7 +421,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 1],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 1],
         np.array([
             [1, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -424,7 +431,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 2],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 2],
         np.array([
             [1, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -434,7 +441,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 3],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 3],
         np.array([
             [0, 0, 0, 0, 0],
             [0, 1, 0, 0, 0],
@@ -444,7 +451,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 4],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 4],
         np.array([
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -454,7 +461,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 5],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 5],
         np.array([
             [0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -465,7 +472,7 @@ def test_multi_grid_observer():
     )
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,0],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,0],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -473,7 +480,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,1],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,1],
         np.array([
             [-1, -1, -1],
             [-1,  1,  0],
@@ -481,7 +488,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,2],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,2],
         np.array([
             [-1, -1, -1],
             [-1,  1,  0],
@@ -489,7 +496,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,3],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,3],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -497,7 +504,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,4],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,4],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -505,7 +512,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,5],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,5],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -514,7 +521,7 @@ def test_multi_grid_observer():
     )
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,0],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,0],
         np.array([
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
@@ -528,7 +535,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,1],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,1],
         np.array([
             [ 1,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
@@ -542,7 +549,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,2],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,2],
         np.array([
             [ 1,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
@@ -556,7 +563,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,3],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,3],
         np.array([
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  1,  0,  0,  0, -1, -1, -1, -1],
@@ -570,7 +577,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,4],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,4],
         np.array([
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
@@ -584,7 +591,7 @@ def test_multi_grid_observer():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,5],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,5],
         np.array([
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
             [ 0,  0,  0,  0,  0, -1, -1, -1, -1],
@@ -634,12 +641,12 @@ def test_multi_grid_observer_blocking():
     grid = Grid(5, 5, overlapping={2: {3}, 3: {2}, 5: {5}})
 
     position_state = PositionState(grid=grid, agents=agents)
-    observer = MultiGridObserver(agents=agents, grid=grid)
+    observer = StackedPositionCenteredEncodingObserver(agents=agents, grid=grid)
     assert isinstance(observer, ObserverBaseComponent)
     position_state.reset()
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 0],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 0],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  0,  0,  0,  0],
@@ -649,7 +656,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 1],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 1],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  0,  0,  0,  0],
@@ -659,7 +666,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 2],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 2],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  0,  0,  0,  0],
@@ -669,7 +676,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 3],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 3],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  1,  0,  0,  0],
@@ -679,7 +686,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 4],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 4],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  0,  0,  0,  0],
@@ -689,7 +696,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent0'])['grid'][:, :, 5],
+        observer.get_obs(agents['agent0'])['stacked_position_centered_encoding'][:, :, 5],
         np.array([
             [-2, -2,  0,  0,  0],
             [-2,  0,  0,  0,  0],
@@ -700,7 +707,7 @@ def test_multi_grid_observer_blocking():
     )
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,0],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,0],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -708,7 +715,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,1],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,1],
         np.array([
             [-1, -1, -1],
             [-1,  1,  0],
@@ -716,7 +723,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,2],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,2],
         np.array([
             [-1, -1, -1],
             [-1,  1,  0],
@@ -724,7 +731,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,3],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,3],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -732,7 +739,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,4],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,4],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -740,7 +747,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent1'])['grid'][:,:,5],
+        observer.get_obs(agents['agent1'])['stacked_position_centered_encoding'][:,:,5],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -749,7 +756,7 @@ def test_multi_grid_observer_blocking():
     )
 
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,0],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,0],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -763,7 +770,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,1],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,1],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -777,7 +784,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,2],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,2],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -791,7 +798,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,3],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,3],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -805,7 +812,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,4],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,4],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -819,7 +826,7 @@ def test_multi_grid_observer_blocking():
         ])
     )
     np.testing.assert_array_equal(
-        observer.get_obs(agents['agent2'])['grid'][:,:,5],
+        observer.get_obs(agents['agent2'])['stacked_position_centered_encoding'][:,:,5],
         np.array([
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
             [-2, -2, -2,  0,  0, -1, -1, -1, -1],
@@ -853,11 +860,13 @@ def test_observe_self():
 
     position_state = PositionState(grid=grid, agents=agents)
     position_state.reset()
-    self_observer = SingleGridObserver(agents=agents, grid=grid)
-    no_self_observer = SingleGridObserver(agents=agents, grid=grid, observe_self=False)
+    self_observer = PositionCenteredEncodingObserver(agents=agents, grid=grid)
+    no_self_observer = PositionCenteredEncodingObserver(
+        agents=agents, grid=grid, observe_self=False
+    )
 
     np.testing.assert_array_equal(
-        self_observer.get_obs(agents['agent0'])['grid'],
+        self_observer.get_obs(agents['agent0'])['position_centered_encoding'],
         np.array([
             [2, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -867,7 +876,7 @@ def test_observe_self():
         ])
     )
     np.testing.assert_array_equal(
-        no_self_observer.get_obs(agents['agent0'])['grid'],
+        no_self_observer.get_obs(agents['agent0'])['position_centered_encoding'],
         np.array([
             [2, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -877,7 +886,7 @@ def test_observe_self():
         ])
     )
     np.testing.assert_array_equal(
-        self_observer.get_obs(agents['agent1'])['grid'],
+        self_observer.get_obs(agents['agent1'])['position_centered_encoding'],
         np.array([
             [-1, -1, -1],
             [-1,  2,  0],
@@ -885,7 +894,7 @@ def test_observe_self():
         ])
     )
     np.testing.assert_array_equal(
-        no_self_observer.get_obs(agents['agent1'])['grid'],
+        no_self_observer.get_obs(agents['agent1'])['position_centered_encoding'],
         np.array([
             [-1, -1, -1],
             [-1,  0,  0],
@@ -1007,7 +1016,7 @@ def test_grid_and_absolute_position_observer_combined():
     }
 
     position_state = PositionState(grid=grid, agents=agents)
-    grid_observer = SingleGridObserver(grid=grid, agents=agents)
+    grid_observer = PositionCenteredEncodingObserver(grid=grid, agents=agents)
     position_observer = AbsolutePositionObserver(grid=grid, agents=agents)
 
     agent = agents['agent0']
@@ -1017,13 +1026,13 @@ def test_grid_and_absolute_position_observer_combined():
         np.array([5, 6]),
         dtype=int
     )
-    assert agent.observation_space['grid'] == Box(-2, 5, (5, 5), int)
+    assert agent.observation_space['position_centered_encoding'] == Box(-2, 5, (5, 5), int)
     np.testing.assert_array_equal(
         agent.null_observation['position'],
         np.array([0, 0])
     )
     np.testing.assert_array_equal(
-        agent.null_observation['grid'],
+        agent.null_observation['position_centered_encoding'],
         -2 * np.ones((5, 5), dtype=int)
     )
 
@@ -1034,13 +1043,13 @@ def test_grid_and_absolute_position_observer_combined():
         np.array([5, 6]),
         dtype=int
     )
-    assert agent.observation_space['grid'] == Box(-2, 5, (5, 5), int)
+    assert agent.observation_space['position_centered_encoding'] == Box(-2, 5, (5, 5), int)
     np.testing.assert_array_equal(
         agent.null_observation['position'],
         np.array([0, 0])
     )
     np.testing.assert_array_equal(
-        agent.null_observation['grid'],
+        agent.null_observation['position_centered_encoding'],
         -2 * np.ones((5, 5), dtype=int)
     )
 
@@ -1051,7 +1060,7 @@ def test_grid_and_absolute_position_observer_combined():
         np.array([2, 2], dtype=int)
     )
     np.testing.assert_array_equal(
-        grid_observer.get_obs(agents['agent0'])['grid'],
+        grid_observer.get_obs(agents['agent0'])['position_centered_encoding'],
         np.array([
             [3, 0, 0, 0, 0],
             [0, 0, 0, 0, 0],
@@ -1065,7 +1074,7 @@ def test_grid_and_absolute_position_observer_combined():
         np.array([3, 4], dtype=int)
     )
     np.testing.assert_array_equal(
-        grid_observer.get_obs(agents['agent1'])['grid'],
+        grid_observer.get_obs(agents['agent1'])['position_centered_encoding'],
         np.array([
             [0, 0, 0, 0, 0],
             [1, 0, 0, 0, 0],

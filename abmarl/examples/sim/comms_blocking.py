@@ -9,7 +9,7 @@ from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, GridWorl
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.state import PositionState, StateBaseComponent
 from abmarl.sim.gridworld.actor import MoveActor, ActorBaseComponent
-from abmarl.sim.gridworld.observer import SingleGridObserver, ObserverBaseComponent
+from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver, ObserverBaseComponent
 from abmarl.sim.gridworld.done import DoneBaseComponent
 import abmarl.sim.gridworld.utils as gu
 
@@ -257,7 +257,7 @@ class BroadcastSim(GridWorldSimulation):
         self.move_actor = MoveActor(**kwargs)
         self.broadcast_actor = BroadcastingActor(**kwargs)
 
-        self.grid_observer = SingleGridObserver(**kwargs)
+        self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
         self.broadcast_observer = BroadcastObserver(
             broadcasting_state=self.broadcasting_state, **kwargs
         )

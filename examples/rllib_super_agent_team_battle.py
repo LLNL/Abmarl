@@ -45,7 +45,7 @@ sim_ = AllStepManager(
             overlapping=overlap_map,
             attack_mapping=attack_map,
             states={'PositionState', 'HealthState'},
-            observers={'SingleGridObserver'},
+            observers={'PositionCenteredEncodingObserver'},
             dones={'OneTeamRemainingDone'}
         ),
         super_agent_mapping=super_agent_mapping,

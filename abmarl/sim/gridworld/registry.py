@@ -2,8 +2,9 @@
 from .actor import ActorBaseComponent, MoveActor, CrossMoveActor, BinaryAttackActor, \
     EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor
 from .done import DoneBaseComponent, ActiveDone, TargetAgentDone, OneTeamRemainingDone
-from .observer import ObserverBaseComponent, AbsoluteGridObserver, SingleGridObserver, \
-    MultiGridObserver, AbsolutePositionObserver
+from .observer import ObserverBaseComponent, AbsoluteEncodingObserver, \
+    PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
+    AbsolutePositionObserver
 from .state import StateBaseComponent, PositionState, TargetBarriersFreePlacementState, \
     MazePlacementState, HealthState
 
@@ -28,9 +29,9 @@ _registered_components = {
         TargetAgentDone,
         OneTeamRemainingDone
     }, 'observer': {
-        AbsoluteGridObserver,
-        SingleGridObserver,
-        MultiGridObserver,
+        AbsoluteEncodingObserver,
+        PositionCenteredEncodingObserver,
+        StackedPositionCenteredEncodingObserver,
         AbsolutePositionObserver
     }, 'state': {
         PositionState,
