@@ -46,7 +46,7 @@ move_actor = MoveActor(grid=grid, agents=agents)
 attack_actor = EncodingBasedAttackActor(
     grid=grid,
     agents=agents,
-    attack_mapping={1: [1, 2, 3], 2: [1, 3], 3: [1]}
+    attack_mapping={1: {1, 2, 3}, 2: {1, 3}, 3: {1}}
 )
 ravelled_move_actor = RavelActionWrapper(move_actor)
 exclusive_attack_actor = ExclusiveChannelActionWrapper(attack_actor)

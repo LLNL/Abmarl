@@ -258,7 +258,7 @@ def test_binary_attack_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = BinaryAttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(attack_mapping={1: {1}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -309,13 +309,13 @@ def test_binary_attack_actor_attack_mapping():
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping=[1, 2, 3])
 
     with pytest.raises(AssertionError):
-        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={'1': [3], 2.0: [6]})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={'1': {3}, 2.0: {6}})
 
     with pytest.raises(AssertionError):
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: 3, 2: [6]})
 
     with pytest.raises(AssertionError):
-        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: ['2', 3], 2: [2, 3]})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: {'2', 3}, 2: {2, 3}})
 
 
 def test_binary_attack_actor_attack_count():
@@ -342,7 +342,7 @@ def test_binary_attack_actor_attack_count():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = BinaryAttackActor(attack_mapping={1: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(attack_mapping={1: {1, 2}}, grid=grid, agents=agents)
     assert agents['agent0'].action_space['attack'] == Discrete(4)
 
     agents['agent0'].finalize()
@@ -407,7 +407,7 @@ def test_binary_attack_actor_ammo():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     ammo_state = AmmoState(grid=grid, agents=agents)
-    attack_actor = BinaryAttackActor(attack_mapping={1: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(attack_mapping={1: {1, 2}}, grid=grid, agents=agents)
     assert agents['agent0'].action_space['attack'] == Discrete(4)
 
     agents['agent0'].finalize()
@@ -461,7 +461,7 @@ def test_binary_attack_actor_stacked_attack():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     attack_actor = BinaryAttackActor(
-        attack_mapping={1: [1]}, stacked_attacks=False, grid=grid, agents=agents
+        attack_mapping={1: {1}}, stacked_attacks=False, grid=grid, agents=agents
     )
     assert agents['agent0'].action_space['attack'] == Discrete(3)
 
@@ -485,7 +485,7 @@ def test_binary_attack_actor_stacked_attack():
 
     agents['agent0'].attack_strength = 0.5
     attack_actor = BinaryAttackActor(
-        attack_mapping={1: [2]}, stacked_attacks=True, grid=grid, agents=agents
+        attack_mapping={1: {2}}, stacked_attacks=True, grid=grid, agents=agents
     )
 
     attack_status, attacked_agents = attack_actor.process_action(agents['agent0'], {'attack': 1})
@@ -528,7 +528,7 @@ def test_selective_attack_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = SelectiveAttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+    attack_actor = SelectiveAttackActor(attack_mapping={1: {1}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -691,7 +691,7 @@ def test_selective_attack_actor_ammo():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     ammo_state = AmmoState(grid=grid, agents=agents)
-    attack_actor = SelectiveAttackActor(attack_mapping={1: [1]}, grid=grid, agents=agents)
+    attack_actor = SelectiveAttackActor(attack_mapping={1: {1}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -803,7 +803,7 @@ def test_selective_attack_actor_attack_count():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = SelectiveAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = SelectiveAttackActor(attack_mapping={3: {1, 2}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -905,7 +905,7 @@ def test_selective_attack_actor_stacked_attack():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     attack_actor = SelectiveAttackActor(
-        attack_mapping={3: [1, 2]}, grid=grid, agents=agents
+        attack_mapping={3: {1, 2}}, grid=grid, agents=agents
     )
     agents['agent0'].finalize()
 
@@ -928,7 +928,7 @@ def test_selective_attack_actor_stacked_attack():
 
     agents['agent0'].attack_strength = 0.5
     attack_actor = SelectiveAttackActor(
-        attack_mapping={3: [1, 2]}, stacked_attacks=True, grid=grid, agents=agents
+        attack_mapping={3: {1, 2}}, stacked_attacks=True, grid=grid, agents=agents
     )
 
     attack = {'attack': np.array([
@@ -981,7 +981,7 @@ def test_encoding_based_attack_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = EncodingBasedAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = EncodingBasedAttackActor(attack_mapping={3: {1, 2}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -1058,7 +1058,7 @@ def test_encoding_based_attack_actor_ammo():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     ammo_state = AmmoState(grid=grid, agents=agents)
-    attack_actor = EncodingBasedAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = EncodingBasedAttackActor(attack_mapping={3: {1, 2}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
@@ -1131,7 +1131,7 @@ def test_encoding_based_attack_actor_attack_count():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = EncodingBasedAttackActor(attack_mapping={3: [1, 2]}, grid=grid, agents=agents)
+    attack_actor = EncodingBasedAttackActor(attack_mapping={3: {1, 2}}, grid=grid, agents=agents)
     assert agents['agent3'].action_space['attack'] == Dict({
         1: Discrete(3),
         2: Discrete(3)
@@ -1247,7 +1247,7 @@ def test_encoding_based_attack_actor_stacked_attack():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     attack_actor = EncodingBasedAttackActor(
-        attack_mapping={3: [1, 2]}, stacked_attacks=True, grid=grid, agents=agents
+        attack_mapping={3: {1, 2}}, stacked_attacks=True, grid=grid, agents=agents
     )
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
@@ -1313,7 +1313,7 @@ def test_restricted_selective_attack_actor():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     attack_actor = RestrictedSelectiveAttackActor(
-        attack_mapping={3: [1, 2]}, grid=grid, agents=agents
+        attack_mapping={3: {1, 2}}, grid=grid, agents=agents
     )
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
@@ -1389,7 +1389,7 @@ def test_restricted_selective_attack_actor_stacked_attacks():
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
     attack_actor = RestrictedSelectiveAttackActor(
-        attack_mapping={3: [1, 2]}, stacked_attacks=True, grid=grid, agents=agents
+        attack_mapping={3: {1, 2}}, stacked_attacks=True, grid=grid, agents=agents
     )
     assert isinstance(attack_actor, ActorBaseComponent)
     assert agents['agent3'].action_space['attack'] == MultiDiscrete([10, 10])
@@ -1463,7 +1463,7 @@ def test_restricted_selective_attack_actor_ammo():
     health_state = HealthState(grid=grid, agents=agents)
     ammo_state = AmmoState(grid=grid, agents=agents)
     attack_actor = RestrictedSelectiveAttackActor(
-        attack_mapping={3: [1, 2]}, stacked_attacks=True, grid=grid, agents=agents
+        attack_mapping={3: {1, 2}}, stacked_attacks=True, grid=grid, agents=agents
     )
     assert isinstance(attack_actor, ActorBaseComponent)
     assert agents['agent3'].action_space['attack'] == MultiDiscrete([10, 10])
