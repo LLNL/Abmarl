@@ -43,7 +43,10 @@ sim_ = AllStepManager(
             8, 8,
             agents=agents,
             overlapping=overlap_map,
-            attack_mapping=attack_map
+            attack_mapping=attack_map,
+            states={'PositionState', 'HealthState'},
+            observers={'SingleGridObserver'},
+            dones={'OneTeamRemainingDone'}
         ),
         super_agent_mapping=super_agent_mapping,
     )
