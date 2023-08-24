@@ -903,7 +903,7 @@ the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the follo
            attack_range=1,
            attack_strength=0.4,
            attack_accuracy=1,
-           attack_count=2
+           simultaneous_attacks=2
        ),
        'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
        'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=0.3),
@@ -977,7 +977,7 @@ agents to specify attack by encoding. Consider the following setup:
            attack_range=1,
            attack_strength=0.4,
            attack_accuracy=1,
-           attack_count=2
+           simultaneous_attacks=2
        ),
        'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
        'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=1),
@@ -1052,7 +1052,7 @@ allowed. Consider the following setup:
           attack_range=1,
           attack_strength=1,
           attack_accuracy=1,
-          attack_count=2
+          simultaneous_attacks=2
       ),
       'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
       'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=1),
@@ -1131,7 +1131,7 @@ are allowed. Consider the following setup:
            attack_range=1,
            attack_strength=0.6,
            attack_accuracy=1,
-           attack_count=3
+           simultaneous_attacks=3
        ),
        'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=0.1),
        'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([0, 1]), initial_health=0.1),
@@ -1294,7 +1294,7 @@ force the agent to only attack one encoding per turn, like so:
            attack_range=1,
            attack_strength=0.4,
            attack_accuracy=1,
-           attack_count=2
+           simultaneous_attacks=2
        ),
        'agent1': HealthAgent(id='agent1', encoding=2, initial_position=np.array([1, 0]), initial_health=1),
        'agent2': HealthAgent(id='agent2', encoding=2, initial_position=np.array([1, 1]), initial_health=1),
