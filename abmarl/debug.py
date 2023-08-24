@@ -20,4 +20,8 @@ def run(full_config_path, parameters):
     )
     import shutil
     shutil.copy(full_config_path, trainer.output_dir)
-    trainer.train(iterations=parameters.episodes, render=parameters.render)
+    trainer.train(
+        iterations=parameters.episodes,
+        render=parameters.render,
+        horizon=parameters.steps_per_episode
+    )
