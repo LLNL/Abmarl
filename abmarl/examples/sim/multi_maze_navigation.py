@@ -16,7 +16,7 @@ class MultiMazeNavigationAgent(GridObservingAgent, MovingAgent):
 
 class MultiMazeNavigationSim(GridWorldSimulation):
     def __init__(self, **kwargs):
-        self.agents = kwargs['agents']
+        super().__init__(**kwargs)
 
         # State Components
         self.position_state = MazePlacementState(**kwargs)

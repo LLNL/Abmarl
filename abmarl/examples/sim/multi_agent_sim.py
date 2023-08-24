@@ -6,9 +6,6 @@ from abmarl.sim import PrincipleAgent, Agent, AgentBasedSimulation
 
 
 class EmptyABS(AgentBasedSimulation):
-    def __init__(self, agents=None):
-        self.agents = agents
-
     def reset(self):
         pass
 

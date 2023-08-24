@@ -15,7 +15,26 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
     Extends the AgentBasedSimulation interface for the GridWorld. We provide builders
     for streamlining the building process.
+
+    Args:
+        grid: The underlying grid. This is typically provided by the builder.
     """
+    def __init__(self, grid=None, **kwargs):
+        super().__init__(**kwargs)
+        self.grid = grid
+
+    @property
+    def grid(self):
+        """
+        The underlying grid in the Grid World Simulation.
+        """
+        return self._grid
+
+    @grid.setter
+    def grid(self, value):
+        assert isinstance(value, Grid), "Grid must be a Grid object."
+        self._grid = value
+
     @classmethod
     def build_sim(cls, rows, cols, **kwargs):
         """
@@ -199,9 +218,9 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         ax = fig.gca()
 
         # Draw the gridlines
-        ax.set(xlim=(0, self.position_state.cols), ylim=(0, self.position_state.rows))
-        ax.set_xticks(np.arange(0, self.position_state.cols, 1))
-        ax.set_yticks(np.arange(0, self.position_state.rows, 1))
+        ax.set(xlim=(0, self.grid.cols), ylim=(0, self.grid.rows))
+        ax.set_xticks(np.arange(0, self.grid.cols, 1))
+        ax.set_yticks(np.arange(0, self.grid.rows, 1))
         ax.grid()
 
         # Draw the agents
@@ -209,7 +228,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             agent.position[1] + 0.5 for agent in self.agents.values() if agent.active
         ]
         agents_y = [
-            self.position_state.rows - 0.5 - agent.position[0]
+            self.grid.rows - 0.5 - agent.position[0]
             for agent in self.agents.values() if agent.active
         ]
         shape = [agent.render_shape for agent in self.agents.values() if agent.active]
