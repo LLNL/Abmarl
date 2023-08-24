@@ -627,7 +627,10 @@ class SelectiveAttackActor(AttackActorBaseComponent):
     """
     def _assign_space(self, agent):
         agent.action_space[self.key] = Box(
-            0, agent.simultaneous_attacks, (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), int
+            0,
+            agent.simultaneous_attacks,
+            (2 * agent.attack_range + 1, 2 * agent.attack_range + 1),
+            int
         )
         agent.null_action[self.key] = np.zeros(
             (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), dtype=int
