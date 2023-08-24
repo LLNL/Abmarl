@@ -318,7 +318,7 @@ def test_binary_attack_actor_attack_mapping():
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: ['2', 3], 2: [2, 3]})
 
 
-def test_binary_attack_actor_attack_count():
+def test_binary_attack_actor_simultaneous_attacks():
     agents = {
         'agent0': AttackingAgent(
             id='agent0',
@@ -327,7 +327,7 @@ def test_binary_attack_actor_attack_count():
             attack_range=2,
             attack_strength=0,
             attack_accuracy=1,
-            attack_count=3
+            simultaneous_attacks=3
         ),
         'agent1': HealthAgent(
             id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
@@ -390,7 +390,7 @@ def test_binary_attack_actor_ammo():
             attack_range=2,
             attack_strength=0,
             attack_accuracy=1,
-            attack_count=3,
+            simultaneous_attacks=3,
             initial_ammo=5
         ),
         'agent1': HealthAgent(
@@ -445,7 +445,7 @@ def test_binary_attack_actor_stacked_attack():
             attack_range=2,
             attack_strength=1,
             attack_accuracy=1,
-            attack_count=2
+            simultaneous_attacks=2
         ),
         'agent1': HealthAgent(
             id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
@@ -775,7 +775,7 @@ def test_selective_attack_actor_ammo():
     assert agents['agent1'].ammo == 0
 
 
-def test_selective_attack_actor_attack_count():
+def test_selective_attack_actor_simultaneous_attacks():
     grid = Grid(2, 2, overlapping={1: {1, 2, 3}, 2: {1, 2, 3}, 3: {1, 2, 3}})
     agents = {
         'agent0': AttackingAgent(
@@ -785,7 +785,7 @@ def test_selective_attack_actor_attack_count():
             attack_range=1,
             attack_strength=0,
             attack_accuracy=1,
-            attack_count=3
+            simultaneous_attacks=3
         ),
         'agent1': HealthAgent(
             id='agent1', initial_position=np.array([0, 0]), encoding=1, initial_health=1
@@ -886,7 +886,7 @@ def test_selective_attack_actor_stacked_attack():
             attack_range=1,
             attack_strength=1,
             attack_accuracy=1,
-            attack_count=3
+            simultaneous_attacks=3
         ),
         'agent1': HealthAgent(
             id='agent1', initial_position=np.array([0, 0]), encoding=1, initial_health=1
@@ -1111,7 +1111,7 @@ def test_encoding_based_attack_actor_ammo():
     assert agents['agent3'].ammo == 0
 
 
-def test_encoding_based_attack_actor_attack_count():
+def test_encoding_based_attack_actor_simultaneous_attacks():
     grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
         'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
@@ -1124,7 +1124,7 @@ def test_encoding_based_attack_actor_attack_count():
             attack_range=1,
             attack_strength=0,
             attack_accuracy=1,
-            attack_count=2
+            simultaneous_attacks=2
         ),
         'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
     }
@@ -1239,7 +1239,7 @@ def test_encoding_based_attack_actor_stacked_attack():
             attack_range=1,
             attack_strength=1,
             attack_accuracy=1,
-            attack_count=2
+            simultaneous_attacks=2
         ),
         'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
     }
@@ -1305,7 +1305,7 @@ def test_restricted_selective_attack_actor():
             attack_range=1,
             attack_strength=0,
             attack_accuracy=1,
-            attack_count=2
+            simultaneous_attacks=2
         ),
         'agent4': HealthAgent(id='agent4', initial_position=np.array([0, 0]), encoding=1),
     }
@@ -1382,7 +1382,7 @@ def test_restricted_selective_attack_actor_stacked_attacks():
             attack_range=1,
             attack_strength=1,
             attack_accuracy=1,
-            attack_count=2
+            simultaneous_attacks=2
         )
     }
 
@@ -1454,7 +1454,7 @@ def test_restricted_selective_attack_actor_ammo():
             attack_range=1,
             attack_strength=1,
             attack_accuracy=1,
-            attack_count=2,
+            simultaneous_attacks=2,
             initial_ammo=1
         )
     }

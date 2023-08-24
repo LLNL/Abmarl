@@ -409,7 +409,7 @@ class BinaryAttackActor(AttackActorBaseComponent):
     agents, and randomly chooses from that set up to the number of attacks issued.
     """
     def _assign_space(self, agent):
-        agent.action_space[self.key] = Discrete(agent.attack_count + 1)
+        agent.action_space[self.key] = Discrete(agent.simultaneous_attacks + 1)
         agent.null_action[self.key] = 0
 
     def _determine_attack(self, agent, attack):
@@ -474,7 +474,7 @@ class EncodingBasedAttackActor(AttackActorBaseComponent):
     def _assign_space(self, agent):
         attackable_encodings = self.attack_mapping[agent.encoding]
         agent.action_space[self.key] = Dict({
-            i: Discrete(agent.attack_count + 1) for i in attackable_encodings
+            i: Discrete(agent.simultaneous_attacks + 1) for i in attackable_encodings
         })
         agent.null_action[self.key] = {i: 0 for i in attackable_encodings}
 
@@ -551,9 +551,9 @@ class RestrictedSelectiveAttackActor(AttackActorBaseComponent):
     def _assign_space(self, agent):
         grid_cells = (2 * agent.attack_range + 1) ** 2
         agent.action_space[self.key] = MultiDiscrete(
-            [grid_cells + 1] * agent.attack_count
+            [grid_cells + 1] * agent.simultaneous_attacks
         )
-        agent.null_action[self.key] = np.zeros((agent.attack_count,), dtype=int)
+        agent.null_action[self.key] = np.zeros((agent.simultaneous_attacks,), dtype=int)
 
     def _determine_attack(self, agent, attack):
         """
@@ -627,7 +627,7 @@ class SelectiveAttackActor(AttackActorBaseComponent):
     """
     def _assign_space(self, agent):
         agent.action_space[self.key] = Box(
-            0, agent.attack_count, (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), int
+            0, agent.simultaneous_attacks, (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), int
         )
         agent.null_action[self.key] = np.zeros(
             (2 * agent.attack_range + 1, 2 * agent.attack_range + 1), dtype=int
