@@ -14,8 +14,8 @@ class MazeNavigationAgent(GridObservingAgent, MovingAgent):
 class MazeNavigationSim(SmartGridWorldSimulation):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.navigator = kwargs['agents']['navigator']
-        self.target = kwargs['agents']['target']
+        self.navigator = self.agents['navigator']
+        self.target = self.agents['target']
 
         # Action Components
         self.move_actor = MoveActor(**kwargs)

@@ -5,8 +5,7 @@ from abmarl.sim.gridworld.state import PositionState
 
 class MultiAgentGridSim(GridWorldSimulation):
     def __init__(self, **kwargs):
-        self.agents = kwargs['agents']
-        self.grid = kwargs['grid']
+        super().__init__(**kwargs)
 
         self.position_state = PositionState(**kwargs)
 

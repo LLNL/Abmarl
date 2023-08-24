@@ -249,7 +249,7 @@ class BlockingAgent(MovingAgent, GridObservingAgent):
 
 class BroadcastSim(GridWorldSimulation):
     def __init__(self, **kwargs):
-        self.agents = kwargs['agents']
+        super().__init__(**kwargs)
 
         self.position_state = PositionState(**kwargs)
         self.broadcasting_state = BroadcastingState(**kwargs)

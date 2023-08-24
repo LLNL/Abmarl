@@ -198,7 +198,12 @@ class AgentBasedSimulation(ABC):
     This interface supports both single- and multi-agent simulations by treating
     the single-agent simulation as a special case of the multi-agent, where there
     is only a single agent in the agents dictionary.
+
+    Args:
+        agents: Dictionary of agents
     """
+    def __init__(self, agents=None, **kwargs):
+        self.agents = agents
 
     @property
     def agents(self):

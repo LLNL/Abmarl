@@ -16,8 +16,6 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
     step function must still be implemented by the sub class.
 
     Args:
-        agents: Dictionary of agents
-        grid: The underlying grid. This is typically provided by the builder.
         states: A set of state components. It could be the component class or the
             name of a registered state components.
         observers: A set of observer components. It could be the component class
@@ -27,17 +25,12 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
     """
     def __init__(
             self,
-            agents=None,
-            grid=None,
             states=None,
             observers=None,
             dones=None,
             **kwargs
     ):
-
-        self.agents = agents
-        self.grid = grid
-
+        super().__init__(**kwargs)
         # State Components
         if states:
             assert type(states) is set, "States must be a set of state components"
@@ -45,9 +38,11 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
             for state in states:
                 if type(state) is str:
                     assert state in registry['state'], f"{state} is not registered as a state."
-                    self._states.add(registry['state'][state](agents=agents, grid=grid, **kwargs))
+                    self._states.add(
+                        registry['state'][state](**kwargs)
+                    )
                 elif issubclass(state, StateBaseComponent):
-                    self._states.add(state(agents=agents, grid=grid, **kwargs))
+                    self._states.add(state(**kwargs))
                 else:
                     raise ValueError(
                         f"{state} must be a state component or the name of a registered "
@@ -62,11 +57,9 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
                 if type(observer) is str:
                     assert observer in registry['observer'], \
                         f"{observer} is not registered as an observer."
-                    self._observers.add(registry['observer'][observer](
-                        agents=agents, grid=grid, **kwargs
-                    ))
+                    self._observers.add(registry['observer'][observer](**kwargs))
                 elif issubclass(observer, ObserverBaseComponent):
-                    self._observers.add(observer(agents=agents, grid=grid, **kwargs))
+                    self._observers.add(observer(**kwargs))
                 else:
                     raise ValueError(
                         f"{observer} must be a observer component or the name of a registered "
@@ -81,11 +74,9 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
                 if type(done) is str:
                     assert done in registry['done'], \
                         f"{done} is not registered as a done component."
-                    self._dones.add(registry['done'][done](
-                        agents=agents, grid=grid, **kwargs
-                    ))
+                    self._dones.add(registry['done'][done](**kwargs))
                 elif issubclass(done, DoneBaseComponent):
-                    self._dones.add(done(agents=agents, grid=grid, **kwargs))
+                    self._dones.add(done(**kwargs))
                 else:
                     raise ValueError(
                         f"{done} must be a done component or the name of a registered "

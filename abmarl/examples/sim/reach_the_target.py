@@ -89,8 +89,7 @@ class RunningAgent(MovingAgent, GridObservingAgent, HealthAgent):
 
 class ReachTheTargetSim(GridWorldSimulation):
     def __init__(self, **kwargs):
-        self.agents = kwargs['agents']
-        self.grid = kwargs['grid']
+        super().__init__(**kwargs)
         self.target = self.agents['target']
 
         # State Components
