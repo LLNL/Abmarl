@@ -265,27 +265,27 @@ Observers
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_observer_absolute:
+.. _api_gridworld_observer_absolute_position:
 
 .. autoclass:: abmarl.sim.gridworld.observer.AbsolutePositionObserver
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_observer_absolute_grid:
+.. _api_gridworld_observer_absolute_encoding:
 
-.. autoclass:: abmarl.sim.gridworld.observer.AbsoluteGridObserver
+.. autoclass:: abmarl.sim.gridworld.observer.AbsoluteEncodingObserver
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_observer_single:
+.. _api_gridworld_observer_position_centered:
 
-.. autoclass:: abmarl.sim.gridworld.observer.SingleGridObserver
+.. autoclass:: abmarl.sim.gridworld.observer.PositionCenteredEncodingObserver
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_observer_multi:
+.. _api_gridworld_observer_position_centered_stacked:
 
-.. autoclass:: abmarl.sim.gridworld.observer.MultiGridObserver
+.. autoclass:: abmarl.sim.gridworld.observer.StackedPositionCenteredEncodingObserver
 	:members:
 	:undoc-members:
 
