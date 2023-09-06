@@ -60,24 +60,25 @@ something like this:
            return self.observer.get_obs(self.agents[agent_id])
        ...
 
-The GridWorld Simulation Framework's architecture defines how the simulation generates
-(state, action, reward, next state)-tuples used in Reinforcement Learning.
-In a given step, agents send actions to the simulation. The Actors receive these
-signals and are responsible to determine if they are legitimate and how they impact
-the simulation state. For example, and agent may attempt three attacks in one step:
-one attack on an empty cell, one attack on an enemy agent, and one attack on a friendly
-agent. If the Actor does not allow friendly fire, then only the attack on an enemy
-would result in a propsed change in state. The Actor sends the propsed state change
-to the state component responsible for that part of the state. The State components
-apply the changes and ensure that the next state is valid.
+The GSF architecture defines how the simulation generates
+`(state, action, reward, next state)`-tuples used in Reinforcement Learning.
+In a given step, agents send actions to the simulation. The :ref:`Actors <gridworld_actor>`
+receive these actions and are responsible to determine if they are legitimate and
+how they impact the simulation state. For example, and agent may attempt three attacks
+in one step: one attack on an empty cell, one attack on an enemy agent, and one
+attack on a friendly agent. If the Actor does not allow friendly fire, then only
+the attack on an enemy would result in a propsed change in state. The Actor sends
+the propsed state change to the :ref:`State Component <gridworld_state>` responsible
+for that part of the state. The State Components apply the changes and ensure that
+the next state is valid.
 
 After the simulation receives actions and updates the state, it generates observations
-for the respective agents using the Observer components. Observers query, filter,
-and transform data from the state components. For example, an agent may observe
-the health of all other agents within its vicinity. The observer is responsible
-for acquiring the health state and determining which agents are to be included in
-the observation. It then sends the observation to the agent, completing the simulation
-step.
+for the respective agents using :ref:`Observers <gridworld_observer>`. Observers
+query, filter, and transform data from the state components. For example, an agent
+may observe the health of all other agents within its vicinity. The observer is
+responsible for acquiring the health state and determining which agents are to be
+included in the observation. After generating the appropriate observation, the Observers
+send them to the agents, completing the simulation step.
 
 
 .. figure:: .images/gridworld_action_processing.png
