@@ -186,7 +186,8 @@ class TargetBarriersFreePlacementState(PositionState):
             assert value in self.agents, "The target agent must be an agent in the simulation."
             value = self.agents[value]
         else:
-            assert value in self.agents.values(), "The target agent must be an agent in the simulation."
+            assert value in self.agents.values(), \
+                "The target agent must be an agent in the simulation."
         assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
         self._target_agent = value
 
@@ -400,7 +401,8 @@ class MazePlacementState(PositionState):
             assert value in self.agents, "The target agent must be an agent in the simulation."
             value = self.agents[value]
         else:
-            assert value in self.agents.values(), "The target agent must be an agent in the simulation."
+            assert value in self.agents.values(), \
+                "The target agent must be an agent in the simulation."
         assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
         self._target_agent = value
 
