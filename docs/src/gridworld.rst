@@ -60,7 +60,11 @@ something like this:
            return self.observer.get_obs(self.agents[agent_id])
        ...
 
-The GSF architecture defines how the simulation generates
+
+Processing Actions
+``````````````````
+
+The GridWorld Simulation Framework architecture defines how the simulation generates
 `(state, action, reward, next state)`-tuples used in Reinforcement Learning.
 In a given step, agents send actions to the simulation. The :ref:`Actors <gridworld_actor>`
 receive these actions and are responsible to determine if they are legitimate and
@@ -80,6 +84,10 @@ the next state is valid.
    change the state. The state components are responsible for executing state changes
    and ensuring the simulation remains in a valid state.
 
+
+Generating Observations
+```````````````````````
+
 After the simulation receives actions and updates the state, it generates observations
 for the respective agents using :ref:`Observers <gridworld_observer>`. Observers
 query, filter, and transform data from the state components. For example, an agent
@@ -97,10 +105,13 @@ send them to the agents, completing the simulation step.
    agents.
 
 
+Components
+``````````
+
 .. _gridworld_agent:
 
 Agent
-`````
+~~~~~
 
 Every entity in the simulation is a :ref:`GridWorldAgent <api_gridworld_agent>`
 (e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_principle_agent>` with specific parameters
@@ -136,7 +147,7 @@ For example, one can define a new type of agent like so:
 .. _gridworld_grid:
 
 Grid
-````
+~~~~
 The :ref:`Grid <api_gridworld_grid>` stores :ref:`Agents <gridworld_agent>` in a two-dimensional numpy array. The Grid is configured
 to be a certain size (rows and columns) and to allow types of Agents to overlap
 (occupy the same cell). For example, you may want a ForagingAgent to be able to overlap
@@ -177,7 +188,7 @@ agents from specific positions in the Grid.
 .. _gridworld_state:
 
 State
-`````
+~~~~~
 
 :ref:`State Components <api_gridworld_statebase>` manage the state of the simulation alongside the :ref:`Grid <gridworld_grid>`.
 At the bare minimum, each State resets the part of the simulation that it manages
@@ -187,7 +198,7 @@ at the the start of each episode.
 .. _gridworld_actor:
 
 Actor
-`````
+~~~~~
 
 :ref:`Actor Components <api_gridworld_actor>` are responsible for processing agent actions and producing changes
 to the state of the simulation. Actors assign supported agents with an appropriate
@@ -201,7 +212,7 @@ action. After a move is processed, the MoveActor returns if the move was success
 .. _gridworld_observer:
 
 Observer
-````````
+~~~~~~~~
 
 :ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
@@ -214,7 +225,7 @@ the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
 .. _gridworld_done:
 
 Done
-````
+~~~~
 
 :ref:`Done Components <api_gridworld_done>` manage the "done state" of each agent and of the simulation as a
 whole. Agents that are reported as done will cease sending actions to the simulation, 
@@ -224,7 +235,7 @@ and the episode will end when all the agents are done or when the simulation is 
 .. _gridworld_wrappers:
 
 Component Wrappers
-``````````````````
+~~~~~~~~~~~~~~~~~~
 
 The GridWorld Simulation Framework also supports
 :ref:`Component Wrappers <api_gridworld_wrappers>`. Wrapping a component
@@ -245,7 +256,7 @@ the actual datda processing. The main difference among wrapper types is in
 the direction of data flow, which we detail below.
 
 Actor Wrappers
-~~~~~~~~~~~~~~
+""""""""""""""
 
 :ref:`Actor Wrappers <api_gridworld_actor_wrappers>` receive actions in the
 `wrapped_space` through the ``process_action``
