@@ -152,7 +152,7 @@ class TargetBarriersFreePlacementState(PositionState):
     assigning an initial position to any agent.
 
     Args:
-        target_agent_id: Barrier will cluster near this agent.
+        target_agent: Barrier will cluster near this agent.
         barrier_encodings: Set of encodings indicating which agents are to be treated as barriers.
         free_encodings: Set of encodings indicating which agents are to be treated as free.
         cluster_barriers: Prioritize the placement of barriers near the target.
@@ -160,14 +160,14 @@ class TargetBarriersFreePlacementState(PositionState):
             the target.
     """
     def __init__(self,
-                 target_agent_id=None,
+                 target_agent=None,
                  barrier_encodings=None,
                  free_encodings=None,
                  cluster_barriers=False,
                  scatter_free_agents=False,
                  **kwargs):
         super().__init__(**kwargs)
-        self.target_agent = target_agent_id
+        self.target_agent = target_agent
         self.barrier_encodings = barrier_encodings
         self.free_encodings = free_encodings
         self.cluster_barriers = cluster_barriers
@@ -182,9 +182,13 @@ class TargetBarriersFreePlacementState(PositionState):
 
     @target_agent.setter
     def target_agent(self, value):
-        assert value in self.agents, "The target agent must be an agent in the simulation."
-        assert isinstance(self.agents[value], GridWorldAgent), "Target agent must be a GridWorld agent."
-        self._target_agent = self.agents[value]
+        if type(value) is str:
+            assert value in self.agents, "The target agent must be an agent in the simulation."
+            value = self.agents[value]
+        else:
+            assert value in self.agents.values(), "The target agent must be an agent in the simulation."
+        assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
+        self._target_agent = value
 
     @property
     def barrier_encodings(self):
