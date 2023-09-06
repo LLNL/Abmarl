@@ -221,6 +221,46 @@ def test_maze_placement_state():
         assert not agent.initial_position
 
 
+def test_maze_placement_state_target_by_id():
+    target_agent = GridWorldAgent(id='target', encoding=1)
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    state = MazePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent='target',
+        barrier_encodings={2},
+        free_encodings={1, 3}
+    )
+    assert isinstance(state, PositionState)
+    assert state.target_agent == target_agent
+
+    with pytest.raises(AssertionError):
+        state = MazePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent='target_agent',
+            barrier_encodings={2},
+            free_encodings={1, 3}
+        )
+
+
 def test_maze_placement_target_has_ip():
     ip_agent = GridWorldAgent(
         id='ip_agent',
@@ -633,6 +673,46 @@ def test_target_barrier_free_placement_state():
         state.target_agent.position,
         state.target_agent.initial_position
     )
+
+
+def test_target_barrier_free_placement_state_target_by_id():
+    target_agent = GridWorldAgent(id='target', encoding=1, initial_position=np.array([3, 2]))
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(5)
+    }
+    free_agents = {
+        f'free_agent{i}': GridWorldAgent(
+            id=f'free_agent{i}',
+            encoding=3
+        ) for i in range(3)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+        **free_agents
+    }
+    grid = Grid(5, 8, overlapping={1: {3}, 3: {3}})
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent='target',
+        barrier_encodings={2},
+        free_encodings={1, 3}
+    )
+    assert isinstance(state, PositionState)
+    assert state.target_agent == target_agent
+
+    with pytest.raises(AssertionError):
+        state = TargetBarriersFreePlacementState(
+            grid=grid,
+            agents=agents,
+            target_agent='target_agent',
+            barrier_encodings={2},
+            free_encodings={1, 3}
+        )
 
 
 def test_target_barrier_free_placement_failures():
