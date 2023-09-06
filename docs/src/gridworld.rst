@@ -60,6 +60,43 @@ something like this:
            return self.observer.get_obs(self.agents[agent_id])
        ...
 
+The GridWorld Simulation Framework's architecture defines how the simulation generates
+(state, action, reward, next state)-tuples used in Reinforcement Learning.
+In a given step, agents send actions to the simulation. The Actors receive these
+signals and are responsible to determine if they are legitimate and how they impact
+the simulation state. For example, and agent may attempt three attacks in one step:
+one attack on an empty cell, one attack on an enemy agent, and one attack on a friendly
+agent. If the Actor does not allow friendly fire, then only the attack on an enemy
+would result in a propsed change in state. The Actor sends the propsed state change
+to the state component responsible for that part of the state. The State components
+apply the changes and ensure that the next state is valid.
+
+After the simulation receives actions and updates the state, it generates observations
+for the respective agents using the Observer components. Observers query, filter,
+and transform data from the state components. For example, an agent may observe
+the health of all other agents within its vicinity. The observer is responsible
+for acquiring the health state and determining which agents are to be included in
+the observation. It then sends the observation to the agent, completing the simulation
+step.
+
+
+.. figure:: .images/gridworld_action_processing.png
+   :width: 100 %
+   :alt: Processing Actions with Gridworld Component Design
+
+   Agents send action signal to Actors, which process the action and attempt to
+   change the state. The state components are responsible for executing state changes
+   and ensuring the simulation remains in a valid state.
+
+.. figure:: .images/gridworld_observation_generation.png
+   :width: 100 %
+   :alt: Generating Observations with Gridworld Component Design
+
+   State components maintain the state of the simulation. Observers query, filter,
+   and transform the state into observations and report those observations to the
+   agents.
+
+
 .. _gridworld_agent:
 
 Agent
