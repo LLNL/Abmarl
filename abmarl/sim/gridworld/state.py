@@ -389,13 +389,19 @@ class MazePlacementState(PositionState):
     def target_agent(self):
         """
         The target agent is the place from which to start the maze generation.
+
+        Other agents are placed relative to the target.
         """
         return self._target_agent
 
     @target_agent.setter
     def target_agent(self, value):
+        if type(value) is str:
+            assert value in self.agents, "The target agent must be an agent in the simulation."
+            value = self.agents[value]
+        else:
+            assert value in self.agents.values(), "The target agent must be an agent in the simulation."
         assert isinstance(value, GridWorldAgent), "Target agent must be a GridWorld agent."
-        assert value in self.agents.values(), "The target agent must be an agent in the simulation."
         self._target_agent = value
 
     @property
