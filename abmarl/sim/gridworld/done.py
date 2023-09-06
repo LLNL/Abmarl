@@ -99,6 +99,44 @@ class TargetAgentDone(DoneBaseComponent):
         ])
 
 
+class TargetDestroyedDone(DoneBaseComponent):
+    """
+    Agents are done when their target agent becomes inactive.
+    """
+    def __init__(self, target_mapping=None, **kwargs):
+        super().__init__(**kwargs)
+        self.target_mapping = target_mapping
+
+    @property
+    def target_mapping(self):
+        """
+        Maps the agent to its respective target.
+
+        Mapping is done via the agents' ids.
+        """
+        return self._target_mapping
+
+    @target_mapping.setter
+    def target_mapping(self, value):
+        assert type(value) is dict, "Target mapping must be a dictionary."
+        for agent_id, target_id in value.items():
+            assert agent_id in self.agents, f"{agent_id} must be an agent in the simulation."
+            assert isinstance(self.agents[agent_id], GridWorldAgent), \
+                f"{agent_id} must be a GridWorldAgent."
+            assert target_id in self.agents, "Target must be an agent in the simulation."
+            assert isinstance(self.agents[target_id], GridWorldAgent), \
+                "Target must be a GridWorldAgent."
+        self._target_mapping = value
+
+    def get_done(self, agent, **kwarg):
+        return not self.agents[self.target_mapping[agent.id]].active
+
+    def get_all_done(self, **kwargs):
+        return all([
+            self.get_done(self.agents[agent_id]) for agent_id in self.target_mapping
+        ])
+
+
 class OneTeamRemainingDone(ActiveDone):
     """
     Inactive agents are indicated as done.
