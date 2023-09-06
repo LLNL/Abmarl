@@ -616,7 +616,7 @@ the agent stays in place.
 Absolute Position Observer
 ``````````````````````````
 
-The :ref:`AbsolutePositionObserver <api_gridworld_observer_absolute>` enables
+The :ref:`AbsolutePositionObserver <api_gridworld_observer_absolute_position>` enables
 :ref:`ObservingAgents <api_observing_agent>` to observe their own absolute position
 in the grid. The position is reported as a two-dimensional numpy array, whose lower
 bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
@@ -628,7 +628,7 @@ observer does not provide information on any other agent in the grid.
 Absolute Grid Observer
 ``````````````````````
 
-:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` means that the
+:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` means that the
 :ref:`GridObservingAgent <api_gridworld_agent_observing>` observes the grid
 as though it were looking at it from the top down, "from the grid's perspective",
 so to speak. As agents move around, the grid stays fixed and the observation shows
@@ -684,10 +684,10 @@ in the grid represented as their encodings and appear according to their actual 
 the observing agent only has a ``view_range`` of 2, it cannot see the last row or
 column, so the observation masks those cells with the value of -2. There are two
 agents at position ``(4, 4)``, one with encoding 3 and another with encoding 4. The
-:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` randomly chooses
+:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` randomly chooses
 one from among those encodings.
 
-The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_grid>` automatically
+The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` automatically
 assigns a `null observation` as a matrix of all -2s, indicating that everything
 is masked.
 
@@ -699,7 +699,7 @@ Single Grid Observer
 
 :ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
 of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
-via the :ref:`SingleGridObserver <api_gridworld_observer_single>`. The SingleGridObserver
+via the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`. The SingleGridObserver
 generates a two-dimensional matrix sized by the agent's `view range` with the observing
 agent located at the center of the matrix. While the
 :ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes agents according
@@ -727,14 +727,15 @@ Since `view range` is the number of cells away that can be observed, the observa
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to `agent0's` position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the :ref:`SingleGridObserver <api_gridworld_observer_single>` will randomly
+and the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>` will randomly
 select between their `encodings` for the observation.
 
-By setting `observe_self` to False, the :ref:`SingleGridObserver <api_gridworld_observer_single>`
+By setting `observe_self` to False, the
+:ref:`SingleGridObserver <api_gridworld_observer_position_centered>`
 can be configured so that an agent doesn't observe itself and only observes
 other agents, which may be helpful if overlapping is an important part of the simulation.
 
-The :ref:`SingleGridObserver <api_gridworld_observer_single>` automatically assigns
+The :ref:`SingleGridObserver <api_gridworld_observer_position_centered>` automatically assigns
 a `null observation` as a matrix of all -2s, indicating that everything is
 masked.
 
@@ -742,12 +743,13 @@ masked.
 Multi Grid Observer
 ```````````````````
 
-Similar to the :ref:`SingleGridObserver <api_gridworld_observer_single>`,
-the :ref:`MultiGridObserver <api_gridworld_observer_multi>` observes the grid from
-the observing agent's perspective. It displays a separate matrix for every `encoding`.
-Each matrix shows the relative positions of the agents and the number of those agents
-that occupy each cell. Out of bounds indicators (-1) and masked cells (-2) are present
-in every matrix. For example, the above setup would show an observation like so:
+Similar to the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`,
+the :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
+observes the grid from the observing agent's perspective. It displays a separate
+matrix for every `encoding`. Each matrix shows the relative positions of the agents
+and the number of those agents that occupy each cell. Out of bounds indicators (-1)
+and masked cells (-2) are present in every matrix. For example, the above setup
+would show an observation like so:
 
 .. figure:: .images/gridworld_observation.png
    :width: 50 %
@@ -773,11 +775,12 @@ in every matrix. For example, the above setup would show an observation like so:
    [-1,  0,  0,  0,  0,  0,  0]
    ...
 
-:ref:`MultiGridObserver <api_gridworld_observer_multi>` may be preferable to
-:ref:`SingleGridObserver <api_gridworld_observer_single>` in simulations where
+:ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
+may be preferable to
+:ref:`SingleGridObserver <api_gridworld_observer_position_centered>` in simulations where
 there are many overlapping agents.
 
-The :ref:`MultiGridObserver <api_gridworld_observer_multi>` automatically assigns
+The :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>` automatically assigns
 a `null observation` of a tensor of all -2s, indicating that everything is masked.
 
 
