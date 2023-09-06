@@ -273,19 +273,19 @@ Observers
 
 .. _api_gridworld_observer_absolute_grid:
 
-.. autoclass:: abmarl.sim.gridworld.observer.AbsoluteGridObserver
+.. autoclass:: abmarl.sim.gridworld.observer.AbsoluteEncodingObserver
 	:members:
 	:undoc-members:
 
 .. _api_gridworld_observer_single:
 
-.. autoclass:: abmarl.sim.gridworld.observer.SingleGridObserver
+.. autoclass:: abmarl.sim.gridworld.observer.PositionCenteredEncodingObserver
 	:members:
 	:undoc-members:
 
 .. _api_gridworld_observer_multi:
 
-.. autoclass:: abmarl.sim.gridworld.observer.MultiGridObserver
+.. autoclass:: abmarl.sim.gridworld.observer.StackedPositionCenteredEncodingObserver
 	:members:
 	:undoc-members:
 
