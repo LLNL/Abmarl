@@ -72,15 +72,6 @@ the propsed state change to the :ref:`State Component <gridworld_state>` respons
 for that part of the state. The State Components apply the changes and ensure that
 the next state is valid.
 
-After the simulation receives actions and updates the state, it generates observations
-for the respective agents using :ref:`Observers <gridworld_observer>`. Observers
-query, filter, and transform data from the state components. For example, an agent
-may observe the health of all other agents within its vicinity. The observer is
-responsible for acquiring the health state and determining which agents are to be
-included in the observation. After generating the appropriate observation, the Observers
-send them to the agents, completing the simulation step.
-
-
 .. figure:: .images/gridworld_action_processing.png
    :width: 100 %
    :alt: Processing Actions with Gridworld Component Design
@@ -88,6 +79,14 @@ send them to the agents, completing the simulation step.
    Agents send action signal to Actors, which process the action and attempt to
    change the state. The state components are responsible for executing state changes
    and ensuring the simulation remains in a valid state.
+
+After the simulation receives actions and updates the state, it generates observations
+for the respective agents using :ref:`Observers <gridworld_observer>`. Observers
+query, filter, and transform data from the state components. For example, an agent
+may observe the health of all other agents within its vicinity. The observer is
+responsible for acquiring the health state and determining which agents are to be
+included in the observation. After generating the appropriate observation, the Observers
+send them to the agents, completing the simulation step.
 
 .. figure:: .images/gridworld_observation_generation.png
    :width: 100 %
