@@ -68,9 +68,9 @@ The GridWorld Simulation Framework architecture defines how the simulation gener
 `(state, action, reward, next state)`-tuples used in Reinforcement Learning.
 In a given step, agents send actions to the simulation. The :ref:`Actors <gridworld_actor>`
 receive these actions and are responsible to determine if they are legitimate and
-how they impact the simulation state. For example, and agent may attempt three attacks
+how they impact the simulation state. For example, an agent may attempt three attacks
 in one step: one attack on an empty cell, one attack on an enemy agent, and one
-attack on a friendly agent. If the Actor does not allow friendly fire, then only
+attack on a friendly agent. If the Actor does not allow "friendly fire", then only
 the attack on an enemy would result in a propsed change in state. The Actor sends
 the propsed state change to the :ref:`State Component <gridworld_state>` responsible
 for that part of the state. The State Components apply the changes and ensure that
