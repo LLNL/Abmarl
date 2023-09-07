@@ -53,8 +53,8 @@ def register(component):
     Register a component.
 
     Args:
-        component: The component will be registered by its type--actor, done, observer,
-        or state--and class name.
+        component: The component will be registered by its type (actor, done, observer,
+            or state) and class name.
     """
     registered = False
     for component_type, base_component in _subclass_check_mapping.items():

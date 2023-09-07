@@ -506,6 +506,78 @@ for empty spaces.
 This simulation is the same as the one above that was built from the array.
 
 
+.. _gridworld_smart_sim:
+
+Smart Simulation and Registry
+`````````````````````````````
+
+The :ref:`SmartGridWorldSimulation <>` streamlines the creation of simulations
+by allowing users to provide the components by name at simulation initialization
+instead of including them directly in the simulation definition. The SmartSim supports
+all the fundamental component types except for :ref:`Actor <gridworld_actor>`,
+which still need to be included in the definition. It pre-fills the `getters` and
+`reset` function, leaving only the `step` function to be defined by the user.
+
+The :ref:`SmartGridWorldSimulation <>` enables users to rapidly swap out components,
+thus changing the behavior of the simulation, without modifying the definition.
+For example, the following code block defines one simulation class, but several
+fundamentally different simulations can be intialized from it.
+
+.. code-block:: python
+
+   from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
+   from abmarl.sim.gridworld.actor import MoveActor
+
+   class MyGridSim(SmartGridWorldSimulation):
+       def __init__(self, **kwargs):
+           super().__init__(**kwargs)
+           self.move_actor = MoveActor(**kwargs)
+           self.finalize()
+
+       def step(self, action_dict):
+           for agent_id, action in action_dict.items():
+               self.move_actor.process_action(self.agents[agent_id], action)
+
+       sim1 = MyGridSim.build(
+           ...,
+           states={'MazePlacementState', 'HealthState'},
+           observers={'PositionCenteredEncodingObserver'},
+           dones={'TargetAgentDone'},
+           ...
+       )
+       sim2 = MyGridSim.build(
+           ...,
+           states={'MazePlacementState', 'HealthState'},
+           observers={'AbsolutePositionObserver'},
+           dones={'TargetAgentDone'},
+           ...
+       )
+       sim3 = MyGridSim.build(
+           ...,
+           states={'TargetBarriersFreePlacementState', 'HealthState'},
+           observers={'StackedPositionCenteredEncodingObserver'},
+           dones={'ActiveDone'},
+           ...
+       )
+       sim4 = MyGridSim.build(
+           ...,
+           states={'PositionState', 'HealthState'},
+           observers={'AbsoluteEncodingObserver'},
+           dones={'OneTeamRemainingDone'},
+           ...
+       )
+
+All :ref:`built-in features <gridworld_built_in_features>` are automatically included
+in the GridWorld Simulation Framework :ref:`registry <api_gridworld_register>` and
+are registered by their class name. Custom components can be registered and then
+used in the same manner.
+
+.. Note::
+   The :ref:`registry <api_gridworld_register>` supports :ref:`Actors <gridworld_actor>`,
+   but the :ref:`SmartSim <>` does not yet support them, so they must still be
+   defined in the simulation.
+
+
 .. _gridworld_built_in_features:
 
 Built-in Features
