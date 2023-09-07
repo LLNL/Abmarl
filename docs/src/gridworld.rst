@@ -865,11 +865,12 @@ automatically assigns a `null observation` as a matrix of all -2s, indicating th
 everything is masked.
 
 
-Multi Grid Observer
-```````````````````
+Stacked Position Centered Encoding Observer
+```````````````````````````````````````````
 
 Similar to the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`,
-the :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
+the
+:ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`
 observes the grid from the observing agent's perspective. It displays a separate
 matrix for every `encoding`. Each matrix shows the relative positions of the agents
 and the number of those agents that occupy each cell. Out of bounds indicators (-1)
@@ -900,13 +901,15 @@ would show an observation like so:
    [-1,  0,  0,  0,  0,  0,  0]
    ...
 
-:ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
+:ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`
 may be preferable to
 :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>` in simulations where
 there are many overlapping agents.
 
-The :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>` automatically assigns
-a `null observation` of a tensor of all -2s, indicating that everything is masked.
+The
+:ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`
+automatically assigns a `null observation` of a tensor of all -2s, indicating that
+everything is masked.
 
 
 .. _gridworld_blocking:

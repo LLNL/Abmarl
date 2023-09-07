@@ -231,7 +231,7 @@ Having successfully created and run a TeamBattle simulation, we can further expl
 the GridWorldSimulation framework. Some ideas are:
 
 * Experiment with the number of agents and the impact that has on both the
-  PositionCenteredEncodingObserver and the MultiGridObserver.
+  PositionCenteredEncodingObserver and the StackedPositionCenteredEncodingObserver.
 * Experiment with the number of agents per team as well as the capabilities of
   those agents. You might find that a super capable agent is still effective against
   a team of multiple agents.
