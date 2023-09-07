@@ -691,7 +691,6 @@ is very useful for randomly placing agents at the beginning of each episode whil
 desired structure. In this case, we can use this state component to completely
 enclose a target with barrier agents and scatter the free agents away from it.
 
-# TODO:
 .. figure:: /.images/gridworld_blockade_placement.*
    :width: 75 %
    :alt: Animation showing starting states using Target Barrier Free Placement State component.
