@@ -36,7 +36,7 @@ they are the same features that we used in the :ref:`Team Battle tutorial <gridw
    from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
 
 Then, we define our agent types. We need an MazeNavigationAgent, WallAgents to act
 as the barriers of the maze, and a TargetAgent to indicate the goal. Although we
@@ -76,7 +76,7 @@ for our simple done condition, we just write the condition itself in the functio
            self.move_actor = MoveActor(**kwargs)
    
            # Observation Components
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
    
            self.finalize()
    

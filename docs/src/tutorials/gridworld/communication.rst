@@ -27,7 +27,8 @@ Using built-in features
 
 Let's start by laying the groundwork using components already in Abmarl. We
 create a simulation with :ref:`position <gridworld_position>`,
-:ref:`movement <gridworld_movement>`, and :ref:`observations <gridworld_single_observer>`.
+:ref:`movement <gridworld_movement>`, and
+:ref:`observations <gridworld_position_centered_observer>`.
 
 .. code-block:: python
 
@@ -38,7 +39,7 @@ create a simulation with :ref:`position <gridworld_position>`,
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
 
    class BlockingAgent(MovingAgent, GridObservingAgent):
        def __init__(self, **kwargs):
@@ -49,7 +50,7 @@ create a simulation with :ref:`position <gridworld_position>`,
            self.agents = kwargs['agents']
            self.position_state = PositionState(**kwargs)
            self.move_actor = MoveActor(**kwargs)
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
    
            self.finalize()
    
@@ -408,7 +409,7 @@ Now that all the components have been created, we can create the full simulation
            self.move_actor = MoveActor(**kwargs)
            self.broadcast_actor = BroadcastingActor(**kwargs)
    
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
            self.broadcast_observer = BroadcastObserver(broadcasting_state=self.broadcasting_state, **kwargs)
    
            self.done = AverageMessageDone(**kwargs)

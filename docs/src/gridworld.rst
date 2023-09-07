@@ -40,14 +40,14 @@ something like this:
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
    
    class MyGridSim(GridWorldSimulation):
        def __init__(self, **kwargs):
            self.agents = kwargs['agents']
            self.position_state = PositionState(**kwargs)
            self.move_actor = MoveActor(**kwargs)
-           self.observer = SingleGridObserver(**kwargs)
+           self.observer = PositionCenteredEncodingObserver(**kwargs)
 
        def reset(self, **kwargs):
            self.position_state.reset(**kwargs)
@@ -123,10 +123,14 @@ with an :ref:`initial position <gridworld_position>`, the ability to
 parameters such as `shape` and `color`.
 
 Following the dataclass model, additional agent classes can be defined that allow
-them to work with various components. For example, :ref:`GridObservingAgents <gridworld_single_observer>` can work with
-:ref:`Observers <gridworld_single_observer>`, and :ref:`MovingAgents <gridworld_movement>` can work with the :ref:`MoveActor <gridworld_movement>`. Any new agent class should
-inhert from :ref:`GridWorldAgent <api_gridworld_agent>` and possibly from :ref:`ActingAgent <api_acting_agent>` or :ref:`ObservingAgent <api_observing_agent>` as needed.
-For example, one can define a new type of agent like so:
+them to work with various components. For example,
+:ref:`GridObservingAgents <api_gridworld_agent_observing>` can work with
+:ref:`Observers <gridworld_position_centered_observer>`, and
+:ref:`MovingAgents <gridworld_movement>` can work with the
+:ref:`MoveActor <gridworld_movement>`. Any new agent class should inhert from
+:ref:`GridWorldAgent <api_gridworld_agent>` and possibly from
+:ref:`ActingAgent <api_acting_agent>` or :ref:`ObservingAgent <api_observing_agent>`
+as needed. For example, one can define a new type of agent like so:
 
 .. code-block:: python
 
@@ -217,9 +221,10 @@ Observer
 :ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
-Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>`
+Observer's key. For example, the
+:ref:`PositionCenteredEncodingObserver <gridworld_position_centered_observer>`
 generates an observation of the nearby grid and stores it in the 'grid' channel of
-the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
+the :ref:`ObservingAgent's <gridworld_position_centered_observer>` observation.
 
 
 .. _gridworld_done:
@@ -742,7 +747,7 @@ in the grid. The position is reported as a two-dimensional numpy array, whose lo
 bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
 observer does not provide information on any other agent in the grid.
 
-# TODO:
+
 .. _gridworld_absolute_encoding_observer:
 
 Absolute Encoding Observer
@@ -812,18 +817,18 @@ assigns a `null observation` as a matrix of all -2s, indicating that everything
 is masked.
 
 
-.. _gridworld_single_observer:
+.. _gridworld_position_centered_observer:
 
-Single Grid Observer
-````````````````````
+Position Centered Encoding Observer
+```````````````````````````````````
 
 :ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
 of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
-via the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`. The SingleGridObserver
-generates a two-dimensional matrix sized by the agent's `view range` with the observing
-agent located at the center of the matrix. While the
+via the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`.
+The PositionCenteredEncodingObserver generates a two-dimensional matrix sized by
+the agent's `view range` with the observing agent located at the center of the matrix. While the
 :ref:`AbsoluteEncodingObserver <gridworld_absolute_encoding_observer>` observes agents according
-to their actual positions, the SingleGridObserver observes agents according to their
+to their actual positions, the PositionCenteredEncodingObserver observes agents according to their
 relative positions.
 All other agents within the `view range` will appear in the observation, shown as
 their `encoding`. For example, using the above setup with a ``view_range`` of 3
@@ -847,23 +852,23 @@ Since `view range` is the number of cells away that can be observed, the observa
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to `agent0's` position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>` will randomly
-select between their `encodings` for the observation.
+and the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`
+will randomly select between their `encodings` for the observation.
 
 By setting `observe_self` to False, the
-:ref:`SingleGridObserver <api_gridworld_observer_position_centered>`
+:ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`
 can be configured so that an agent doesn't observe itself and only observes
 other agents, which may be helpful if overlapping is an important part of the simulation.
 
-The :ref:`SingleGridObserver <api_gridworld_observer_position_centered>` automatically assigns
-a `null observation` as a matrix of all -2s, indicating that everything is
-masked.
+The :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`
+automatically assigns a `null observation` as a matrix of all -2s, indicating that
+everything is masked.
 
 
 Multi Grid Observer
 ```````````````````
 
-Similar to the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`,
+Similar to the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`,
 the :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
 observes the grid from the observing agent's perspective. It displays a separate
 matrix for every `encoding`. Each matrix shows the relative positions of the agents
@@ -897,7 +902,7 @@ would show an observation like so:
 
 :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
 may be preferable to
-:ref:`SingleGridObserver <api_gridworld_observer_position_centered>` in simulations where
+:ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>` in simulations where
 there are many overlapping agents.
 
 The :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>` automatically assigns
@@ -912,8 +917,8 @@ Blocking
 Agents can block other agents' abilities and characteristics, such as blocking
 them from view, which masks out parts of the observation. For example,
 if `agent4` above is configured with ``blocking=True``, then the
-:ref:`SingleGridObserver <gridworld_single_observer>` would produce an observation
-like this:
+:ref:`PositionCenteredEncodingObserver <gridworld_position_centered_observer>` would
+produce an observation like this:
 
 .. code-block::
 
