@@ -511,15 +511,15 @@ This simulation is the same as the one above that was built from the array.
 Smart Simulation and Registry
 `````````````````````````````
 
-The :ref:`SmartGridWorldSimulation <>` streamlines the creation of simulations
-by allowing users to provide the components by name at simulation initialization
+The :ref:`SmartGridWorldSimulation <api_gridworld_smart_sim>` streamlines the creation
+of simulations by allowing users to provide the components by name at simulation initialization
 instead of including them directly in the simulation definition. The SmartSim supports
 all the fundamental component types except for :ref:`Actor <gridworld_actor>`,
 which still need to be included in the definition. It pre-fills the `getters` and
 `reset` function, leaving only the `step` function to be defined by the user.
 
-The :ref:`SmartGridWorldSimulation <>` enables users to rapidly swap out components,
-thus changing the behavior of the simulation, without modifying the definition.
+The :ref:`SmartGridWorldSimulation <api_gridworld_smart_sim>` enables users to rapidly
+swap out components, thus changing the behavior of the simulation, without modifying the definition.
 For example, the following code block defines one simulation class, but several
 fundamentally different simulations can be intialized from it.
 
@@ -574,8 +574,8 @@ used in the same manner.
 
 .. Note::
    The :ref:`registry <api_gridworld_register>` supports :ref:`Actors <gridworld_actor>`,
-   but the :ref:`SmartSim <>` does not yet support them, so they must still be
-   defined in the simulation.
+   but the :ref:`SmartSim <api_gridworld_smart_sim>` does not yet support them,
+   so they must still be defined in the simulation.
 
 
 .. _gridworld_built_in_features:
