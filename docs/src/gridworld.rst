@@ -742,13 +742,13 @@ in the grid. The position is reported as a two-dimensional numpy array, whose lo
 bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
 observer does not provide information on any other agent in the grid.
 
+# TODO:
+.. _gridworld_absolute_encoding_observer:
 
-.. _gridworld_absolute_grid_observer:
+Absolute Encoding Observer
+``````````````````````````
 
-Absolute Grid Observer
-``````````````````````
-
-:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` means that the
+:ref:`AbsoluteEncodingObserver <api_gridworld_observer_absolute_encoding>` means that the
 :ref:`GridObservingAgent <api_gridworld_agent_observing>` observes the grid
 as though it were looking at it from the top down, "from the grid's perspective",
 so to speak. As agents move around, the grid stays fixed and the observation shows
@@ -767,7 +767,7 @@ For example, the following setup
    from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
    from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState
-   from abmarl.sim.gridworld.observer import AbsoluteGridObserver
+   from abmarl.sim.gridworld.observer import AbsoluteEncodingObserver
 
    agents = {
        'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=2),
@@ -779,7 +779,7 @@ For example, the following setup
    }
    grid = Grid(6, 6, overlapping={4: {5}, 5: {4}})
    position_state = PositionState(agents=agents, grid=grid)
-   observer = AbsoluteGridObserver(agents=agents, grid=grid)
+   observer = AbsoluteEncodingObserver(agents=agents, grid=grid)
 
    position_state.reset()
    observer.get_obs(agents['agent0'])
@@ -804,10 +804,10 @@ in the grid represented as their encodings and appear according to their actual 
 the observing agent only has a ``view_range`` of 2, it cannot see the last row or
 column, so the observation masks those cells with the value of -2. There are two
 agents at position ``(4, 4)``, one with encoding 3 and another with encoding 4. The
-:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` randomly chooses
+:ref:`AbsoluteEncodingObserver <api_gridworld_observer_absolute_encoding>` randomly chooses
 one from among those encodings.
 
-The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` automatically
+The :ref:`AbsoluteEncodingObserver <api_gridworld_observer_absolute_encoding>` automatically
 assigns a `null observation` as a matrix of all -2s, indicating that everything
 is masked.
 
@@ -822,7 +822,7 @@ of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are n
 via the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`. The SingleGridObserver
 generates a two-dimensional matrix sized by the agent's `view range` with the observing
 agent located at the center of the matrix. While the
-:ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes agents according
+:ref:`AbsoluteEncodingObserver <gridworld_absolute_encoding_observer>` observes agents according
 to their actual positions, the SingleGridObserver observes agents according to their
 relative positions.
 All other agents within the `view range` will appear in the observation, shown as

@@ -167,8 +167,8 @@ Simluation Managers "wrap" simulations, and they can be used like so:
    :ref:`Dynamic Order Simulation <api_dynamic_sim>`. This allows the simulation
    to dynamically choose the agents' turns, but it also requires the simulation
    to pay attention to the interface rules. For example, a Dynamic Order Simulation
-   must ensure that at every step there is at least one reported agent who is not done,
-   unless it is the last turn, which the other managers handle automatically.
+   must ensure that at every step there is at least one reported agent who is not done
+   (unless it is the last turn), which the other managers handle automatically.
 
 
 .. _wrappers:
