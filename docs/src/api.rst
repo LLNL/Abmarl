@@ -207,6 +207,12 @@ State
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_state_position_target_barriers_free:
+
+.. autoclass:: abmarl.sim.gridworld.state.TargetBarriersFreePlacementState
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_state_health:
 
 .. autoclass:: abmarl.sim.gridworld.state.HealthState

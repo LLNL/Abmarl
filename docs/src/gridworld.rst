@@ -673,6 +673,33 @@ that all paths to the target are not blocked.
    blocking all paths to it. Free agents (blue) are scattered far from the target.
 
 
+Target Barriers Free Placement State
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`TargetBarriersFreePlacementState <api_gridworld_state_position_target_barriers_free>`
+is a specialized state component used for positioning agents relative to a target.
+`Barrier-encoded` agents can be clustered near the target, and `free-encoded` agents
+can be scattered away from the target.
+
+.. Note::
+   Agents with initial positions may conflict with the target agent. If
+   the target agent is configured for random placement, then we recommend not
+   assigning an initial position to any agent.
+
+The :ref:`TargetBarriersFreePlacementState <api_gridworld_state_position_target_barriers_free>`
+is very useful for randomly placing agents at the beginning of each episode while maintaining a
+desired structure. In this case, we can use this state component to completely
+enclose a target with barrier agents and scatter the free agents away from it.
+
+# TODO:
+.. figure:: /.images/gridworld_maze_placement.*
+   :width: 75 %
+   :alt: Animation showing starting states using Maze Placement State component.
+
+   Animation showing a target (green) starting at random positions at the beginning
+   of each episode. Barriers (gray squares) completely enclose the target. Free
+   agents (blue and red) are scattered far from the target.
+
 .. _gridworld_movement:
 
 Movement
