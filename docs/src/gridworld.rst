@@ -692,9 +692,9 @@ desired structure. In this case, we can use this state component to completely
 enclose a target with barrier agents and scatter the free agents away from it.
 
 # TODO:
-.. figure:: /.images/gridworld_maze_placement.*
+.. figure:: /.images/gridworld_blockade_placement.*
    :width: 75 %
-   :alt: Animation showing starting states using Maze Placement State component.
+   :alt: Animation showing starting states using Target Barrier Free Placement State component.
 
    Animation showing a target (green) starting at random positions at the beginning
    of each episode. Barriers (gray squares) completely enclose the target. Free
