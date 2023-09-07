@@ -255,6 +255,10 @@ it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
 
+   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
+   import numpy as np
+   from abmarl.tools import Box
+   from abmarl.sim.wrappers.flatten_wrapper import flatten_space, flatten
    my_space = Dict({
        'a': MultiDiscrete([5, 3]),
        'b': MultiBinary(4),
