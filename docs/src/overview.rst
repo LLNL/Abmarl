@@ -511,6 +511,7 @@ simple corridor simulation with multiple agents.
                'multiagent': {
                    'policies': policies,
                    'policy_mapping_fn': policy_mapping_fn,
+                   'policies_to_train': [*policies]
                },
                # --- Parallelism ---
                "num_workers": 7,
