@@ -141,6 +141,10 @@ Base
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_register:
+
+.. autofunction:: abmarl.sim.gridworld.registry.register
+
 
 Agents
 ``````
