@@ -941,7 +941,7 @@ everything is masked.
 .. _gridworld_blocking:
 
 Blocking
-~~~~~~~~
+````````
 
 Agents can block other agents' abilities and characteristics, such as blocking
 them from view, which masks out parts of the observation. For example,
