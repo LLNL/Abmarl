@@ -131,7 +131,7 @@ Base
 
 .. _api_gridworld_smart_sim:
 
-.. autoclass:: abmarl.sim.gridworld.base.SmartGridWorldSimulation
+.. autoclass:: abmarl.sim.gridworld.smart.SmartGridWorldSimulation
 	:members:
 	:undoc-members:
 
