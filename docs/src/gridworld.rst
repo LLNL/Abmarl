@@ -44,7 +44,7 @@ something like this:
    
    class MyGridSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
            self.position_state = PositionState(**kwargs)
            self.move_actor = MoveActor(**kwargs)
            self.observer = PositionCenteredEncodingObserver(**kwargs)
@@ -179,14 +179,15 @@ is 2 or 3.
    If `overlapping` is not specified, then no agents will be able to occupy the same
    cell in the Grid.
 
-Interaction between simulation components and the :ref:`Grid <api_gridworld_grid>` is
-`data open`, which means that we allow components to access the internals of the
-Grid. Although this is possible and sometimes necessary, the Grid also provides
-an interface for safer interactions with components. Components can `query` the
-Grid to see if an agent can be placed at a specific position. Components can `place`
-agents at a specific position in the Grid, which will succeed if that cell is available
-to the agent as per the `overlapping` configuration. And Components can `remove`
-agents from specific positions in the Grid. 
+The Grid is referenced in every simulation component as well as the
+:ref:`GridWorldSimulation <gridworld>` itself. Interaction between simulation components
+and the :ref:`Grid <api_gridworld_grid>` is `data open`, which means that we allow
+components to access the internals of the Grid. Although this is possible and sometimes
+necessary, the Grid also provides an interface for safer interactions with components.
+Components can `query` the Grid to see if an agent can be placed at a specific position.
+Components can `place` agents at a specific position in the Grid, which will succeed
+if that cell is available to the agent as per the `overlapping` configuration. And
+Components can `remove` agents from specific positions in the Grid. 
 
 
 .. _gridworld_state:
