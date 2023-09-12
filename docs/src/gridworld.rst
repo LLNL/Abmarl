@@ -224,8 +224,8 @@ agent's observation of the state of the simulation. Observers assign supported a
 with an appropriate observation space and generate observations based on the
 Observer's key. For example, the
 :ref:`PositionCenteredEncodingObserver <gridworld_position_centered_observer>`
-generates an observation of the nearby grid and stores it in the 'grid' channel of
-the :ref:`ObservingAgent's <gridworld_position_centered_observer>` observation.
+generates an observation of the nearby grid and stores it in the 'position_centered_encoding'
+channel of the :ref:`ObservingAgent's <gridworld_position_centered_observer>` observation.
 
 
 .. _gridworld_done:
@@ -544,34 +544,34 @@ fundamentally different simulations can be intialized from it.
            for agent_id, action in action_dict.items():
                self.move_actor.process_action(self.agents[agent_id], action)
 
-       sim1 = MyGridSim.build(
-           ...,
-           states={'MazePlacementState', 'HealthState'},
-           observers={'PositionCenteredEncodingObserver'},
-           dones={'TargetAgentDone'},
-           ...
-       )
-       sim2 = MyGridSim.build(
-           ...,
-           states={'MazePlacementState', 'HealthState'},
-           observers={'AbsolutePositionObserver'},
-           dones={'TargetAgentDone'},
-           ...
-       )
-       sim3 = MyGridSim.build(
-           ...,
-           states={'TargetBarriersFreePlacementState', 'HealthState'},
-           observers={'StackedPositionCenteredEncodingObserver'},
-           dones={'ActiveDone'},
-           ...
-       )
-       sim4 = MyGridSim.build(
-           ...,
-           states={'PositionState', 'HealthState'},
-           observers={'AbsoluteEncodingObserver'},
-           dones={'OneTeamRemainingDone'},
-           ...
-       )
+   sim1 = MyGridSim.build(
+       ...,
+       states={'MazePlacementState', 'HealthState'},
+       observers={'PositionCenteredEncodingObserver'},
+       dones={'TargetAgentDone'},
+       ...
+   )
+   sim2 = MyGridSim.build(
+       ...,
+       states={'MazePlacementState', 'HealthState'},
+       observers={'AbsolutePositionObserver'},
+       dones={'TargetAgentDone'},
+       ...
+   )
+   sim3 = MyGridSim.build(
+       ...,
+       states={'TargetBarriersFreePlacementState', 'HealthState'},
+       observers={'StackedPositionCenteredEncodingObserver'},
+       dones={'ActiveDone'},
+       ...
+   )
+   sim4 = MyGridSim.build(
+       ...,
+       states={'PositionState', 'HealthState'},
+       observers={'AbsoluteEncodingObserver'},
+       dones={'OneTeamRemainingDone'},
+       ...
+   )
 
 All :ref:`built-in features <gridworld_built_in_features>` are automatically included
 in the GridWorld Simulation Framework :ref:`registry <api_gridworld_register>` and
@@ -1085,7 +1085,7 @@ the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the follo
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: {2}}, stacked_attacks=False)
 
    position_state.reset()
    health_state.reset()
@@ -1159,7 +1159,7 @@ agents to specify attack by encoding. Consider the following setup:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: {2, 3}}, stacked_attacks=True)
 
    position_state.reset()
    health_state.reset()
@@ -1234,7 +1234,7 @@ allowed. Consider the following setup:
   grid = Grid(2, 2, overlapping={2: {3}, 3: {2}})
   position_state = PositionState(agents=agents, grid=grid)
   health_state = HealthState(agents=agents, grid=grid)
-  attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+  attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: {2}}, stacked_attacks=False)
 
   position_state.reset()
   health_state.reset()
@@ -1313,7 +1313,7 @@ are allowed. Consider the following setup:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = RestrictedSelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+   attack_actor = RestrictedSelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: {2}}, stacked_attacks=False)
 
    position_state.reset()
    health_state.reset()
@@ -1423,16 +1423,16 @@ to the MoveActor, like so:
    actions = {
        agent.id: agent.action_space.sample() for agent in agents.values()
    }
-   print(actions)
-   # >>> {'agent0': OrderedDict([('move', array([1, 1]))]), 'agent1': OrderedDict([('move', array([ 2, -1]))])}
+   actions
+   >>> {'agent0': OrderedDict([('move', array([1, 1]))]), 'agent1': OrderedDict([('move', array([ 2, -1]))])}
    
    # Wrapped move actor
    move_actor = RavelActionWrapper(move_actor)
    actions = {
        agent.id: agent.action_space.sample() for agent in agents.values()
    }
-   print(actions)
-   # >>> {'agent0': OrderedDict([('move', 1)]), 'agent1': OrderedDict([('move', 22)])}
+   actions
+   >>> {'agent0': OrderedDict([('move', 1)]), 'agent1': OrderedDict([('move', 22)])}
 
 The actions from the unwrapped actor are in the original `Box` space, whereas after
 we apply the wrapper, the actions from the wrapped actor are in the transformed
@@ -1484,23 +1484,23 @@ force the agent to only attack one encoding per turn, like so:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
-   print(agents['agent0'].action_space)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: {2, 3}}, stacked_attacks=True)
+   agents['agent0'].action_space
    >>> {'attack': Dict(2:Discrete(3), 3:Discrete(3))}
    
    wrapped_attack_actor = ExclusiveChannelActionWrapper(attack_actor)
-   print(agents['agent0'].action_space)
+   agents['agent0'].action_space
    >>> {'attack': Discrete(5)}
 
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 0))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 1))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 2))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 3))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 4))
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 0)
    >>> {2: 0, 3: 0}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 1)
    >>> {2: 1, 3: 0}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 2)
    >>> {2: 2, 3: 0}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 3)
    >>> {2: 0, 3: 1}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 4)
    >>> {2: 0, 3: 2}
 
 With just the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`,
