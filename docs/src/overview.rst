@@ -97,7 +97,7 @@ An Agent Based Simulation can be created and used like so:
    class MySim(AgentBasedSimulation):
        def __init__(self, agents=None, **kwargs):
            self.agents = agents
-        ... # Implement the ABS interface
+       ... # Implement the ABS interface
 
    # Create a dictionary of agents
    agents = {f'agent{i}': Agent(id=f'agent{i}', ...) for i in range(10)}
@@ -341,14 +341,15 @@ To use the :ref:`SuperAgentWrapper <api_super_agent_wrapper>`, simply provide a
 like so:
 
 .. code-block:: python
+   from abmarl.managers import AllStepManager
+   from abmarl.sim.wrappers import SuperAgentWrapper
+   from abmarl.examples import TeamBattleSim
 
    AllStepManager(
        SuperAgentWrapper(
            TeamBattleSim.build_sim(
                8, 8,
-               agents=agents,
-               overlapping=overlap_map,
-               attack_mapping=attack_map
+               ...
            ),
            super_agent_mapping = {
                'red': [agent.id for agent in agents.values() if agent.encoding == 1],
@@ -359,7 +360,7 @@ like so:
        )
    )
 
-Check out the `Super Agent Team Battle example <https://github.com/LLNL/Abmarl/blob/main/examples/team_battle_super_agent.py>`_ for more details.
+Check out the `Super Agent Team Battle example <https://github.com/LLNL/Abmarl/blob/main/examples/rllib_super_agent_team_battle.py>`_ for more details.
 
 .. _external:
 
@@ -479,7 +480,7 @@ simple corridor simulation with multiple agents.
    
    # Set up the policies. In this experiment, all agents are homogeneous,
    # so we just use a single shared policy.
-   ref_agent = sim.unwrapped.agents['agent0']
+   ref_agent = sim.sim.agents['agent0']
    policies = {
        'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
    }
@@ -544,8 +545,9 @@ to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
 Command Line
 ````````````
 With the configuration file complete, we can utilize the command line interface
-to train our agents. We simply type ``abmarl train multi_corridor_example.py``,
-where `multi_corridor_example.py` is the name of our configuration file. This will launch
+to train our agents. We simply type ``abmarl train rllib_multi_corridor.py``, where
+`rllib_multi_corridor.py <https://github.com/LLNL/Abmarl/blob/main/examples/rllib_multi_corridor.py>`_
+is the name of our configuration file. This will launch
 Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
@@ -575,7 +577,7 @@ For example, the command
 
 .. code-block::
 
-   abmarl debug multi_corridor_example.py -n 2 -s 20 --render
+   abmarl debug rllib_multi_corridor.py -n 2 -s 20 --render
 
 will run the `MultiCorridor` simulation with random actions and output log files
 to the directory it creates for 2 episodes and a horizon of 20, as well as render
