@@ -1000,12 +1000,26 @@ Consider the following setup:
 
 `agent0` will be assigned a random `health` value between 0 and 1.
 
+
+Ammo
+````
+
+:ref:`AmmoAgents <api_gridworld_agent_ammo>` track their `ammo` throughout the simulation.
+Each :ref:`Attack Actor <gridworld_attacking>` interprets the ammo, but the general
+idea is that when the attacking agent runs out of ammo, its attacks are no longer
+successful.
+
+:ref:`AmmoObservingAgents <api_gridworld_agent_ammo_observing>` work in conjuction
+with the :ref:`AmmoObserver <api_gridworld_observer_ammo>` to observe their own
+ammo.
+
+
 .. _gridworld_attacking:
 
 Attacking
 `````````
 
-`Health` becomes more interesting when we let agents attack one another.
+`Health` and `ammo` become more interesting when we let agents attack one another.
 :ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with 
 an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
@@ -1027,11 +1041,12 @@ criteria:
       is determined the same way as :ref:`blocking <gridworld_blocking>` described above.
 
 Then, the :ref:`AttackActor <api_gridworld_actor_attack>` selects agents from that
-set based on the attacking agent's `attack count`. When an agent is successfully
-attacked, its health is depleted by the attacking agent's `attack strength`, which
-may result in the attacked agent's death. AttackActors can be configured to allow
-multiple attacks against a single agent per attacking agent and per turn via the
-`stacked attacks` property. The following four AttackActors are built into Abmarl:
+set based on the attacking agent's `attack count` and `ammo` (if applicable). When
+an agent is successfully attacked, its health is depleted by the attacking agent's
+`attack strength`, which may result in the attacked agent's death. AttackActors
+can be configured to allow multiple attacks against a single agent per attacking
+agent and per turn via the `stacked attacks` property. The following four AttackActors
+are built into Abmarl:
 
 .. _gridworld_binary_attack:
 
