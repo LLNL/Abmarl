@@ -59,7 +59,7 @@ simulation.
 
    class TeamBattleSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
    
            # State Components
            self.position_state = PositionState(**kwargs)
@@ -190,10 +190,10 @@ to attack other agents if they are on different teams.
        4: {4}
    }
    attack_map = {
-       1: [2, 3, 4],
-       2: [1, 3, 4],
-       3: [1, 2, 4],
-       4: [1, 2, 3]
+       1: {2, 3, 4},
+       2: {1, 3, 4},
+       3: {1, 2, 4},
+       4: {1, 2, 3}
    }
    sim = TeamBattleSim.build_sim(
        8, 8,
