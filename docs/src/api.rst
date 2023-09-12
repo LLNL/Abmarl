@@ -333,6 +333,12 @@ Done
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_done_target_destroyed:
+
+.. autoclass:: abmarl.sim.gridworld.done.TargetDestroyedDone
+	:members:
+	:undoc-members:
+
 
 Wrappers
 ````````

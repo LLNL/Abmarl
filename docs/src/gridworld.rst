@@ -1361,9 +1361,17 @@ Target Agent Done
 `````````````````
 
 The :ref:`TargetAgentDone <api_gridworld_done_target_agent>` component takes
-a ``target_mapping``, which maps agents to their targets by id. If an agent overlaps
+a ``target_mapping``, which maps agents to their targets by id. If an agent *overlaps*
 its target, then that agent is done. If all of the agents have overlapped their
 targets, then the simulation is done.
+
+Target Destroyed Done
+`````````````````````
+
+The :ref:`TargetDestroyedDone <api_gridworld_done_target_destroyed>` component takes
+a ``target_mapping``, which maps agents to their targets by id. If an agent's target
+becomes *inactive*, then that agent is done, regardless of its own involvement in
+that change. If all target agents become inactive, then the simulation is done.
 
 
 RavelActionWrapper
