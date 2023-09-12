@@ -1024,7 +1024,7 @@ Attacking
 an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
 attack being successful; an `attack strength`, which dictates how much `health`
-is depleted from the attacked agent, and an `attack count`, which dictates the
+is depleted from the attacked agent, and a `simultaneous attacks`, which dictates the
 number of attacks an agent can make per turn.
 
 An :ref:`AttackActor <api_gridworld_actor_attack>` interprets these properties
@@ -1041,7 +1041,7 @@ criteria:
       is determined the same way as :ref:`blocking <gridworld_blocking>` described above.
 
 Then, the :ref:`AttackActor <api_gridworld_actor_attack>` selects agents from that
-set based on the attacking agent's `attack count` and `ammo` (if applicable). When
+set based on the attacking agent's `simultaneous attacks` and `ammo` (if applicable). When
 an agent is successfully attacked, its health is depleted by the attacking agent's
 `attack strength`, which may result in the attacked agent's death. AttackActors
 can be configured to allow multiple attacks against a single agent per attacking
@@ -1055,7 +1055,7 @@ Binary Attack Actor
 
 With the :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`,
 :ref:`AttackingAgents <api_gridworld_agent_attack>` can choose to launch attacks
-up to its `attack count` or not to attack at all. For each attack, the BinaryAttackActor
+up to its `simultaneous attacks` or not to attack at all. For each attack, the BinaryAttackActor
 randomly searches the vicinity of the attacking agent for an attackble agent according to
 the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the following setup:
 
@@ -1202,7 +1202,7 @@ In contrast to the :ref:`BinaryAttackActor <gridworld_binary_attack>` and
 :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>` above, the
 SelectiveAttackActor does not randomly search for agents in the vicinity because
 it receives the attacked cells directly. The attacking agent can attack each cell
-up to its `attack count`. Attackable agents are defined according to the
+up to its `simultaneous attacks`. Attackable agents are defined according to the
 :ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
 attackable agents on the same cell, the actor randomly picks from among them based
 on the number of attacks on that cell and whether or not `stacked attacks` are
@@ -1280,7 +1280,7 @@ allows :ref:`AttackingAgents <api_gridworld_agent_attack>` to specify some numbe
 of attacks in some local grid defined by the attacking agent's `attack range`.
 This actor is more *restricted* than its counterpart, the
 :ref:`SelectiveAttackActor <gridworld_selective_attack>`, because rather than issuing
-attacks up to its `attack count` *per cell*, the attacking agent can only issue
+attacks up to its `simultaneous attacks` *per cell*, the attacking agent can only issue
 that many attacks in the *whole local grid*. Attackable agents are defined according
 to the :ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
 attackable agents on a the same cell, the actor randomly picks from among them
@@ -1349,7 +1349,7 @@ automatically assigns an array of 0s as the `null action`, indicating no attack 
    The form of the attack in the
    :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
    is the most difficult for humans to interpret. The number of entries in the
-   array reflects the agent's `attack count`. The attack appears as the cell's id,
+   array reflects the agent's `simultaneous attacks`. The attack appears as the cell's id,
    which is determined from ravelling the local grid, where 0 means no attack,
    1 is the top left cell, 2 is to the right of that, and so on through the whole
    local grid.
