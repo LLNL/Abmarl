@@ -23,7 +23,7 @@ the :ref:`AbsoluteEncodingObserver <gridworld_absolute_encoding_observer>` in th
 manually change the simulation definition or to define multiple simulations that
 were exactly the same but had a differet `observer`. The
 :ref:`Smart Simulation <gridworld_smart_sim>` streamlines creating
-simulations by allowing components to be specified at the simulations' *initialization*,
+simulations by allowing components to be specified at the simulation's *initialization*,
 instead of requiring them to be specified in the simulation *definition*. This avoids
 workflow issues where the config file in an output directory is including a different
 version of the simulation than what was used in training caused by the user changing
@@ -37,7 +37,7 @@ be given as the class name (e.g. ``"TargetDone"``). All
 and users can :ref:`register <api_gridworld_register>` custom components.
 
 .. NOTE::
-   The :ref:`Smart Simulation <gridworld_smart_sim>` cannot currently support
+   The :ref:`Smart Simulation <gridworld_smart_sim>` does not currently support
    :ref:`Actors <gridworld_actor>`, so those must still be defined in the simulation
    definition.
 
@@ -46,7 +46,7 @@ Ammo Agents
 -----------
 
 :ref:`Ammo Agents <gridworld_ammo>` have limited ammunition that determines how
-many attacks they can issue per simualation. The :ref:`Attack Actors <gridworld_attacking>`
+many attacks they can issue per simulation. The :ref:`Attack Actors <gridworld_attacking>`
 interpret the ammunition in conjunction with `simultaneous attacks` to provide
 the ability to determine both how many attacks can be issued per step and, with
 the addition of Ammo Agents, how many attacks can be issued during the entire simulation.
@@ -57,7 +57,7 @@ Target Barricading
 ------------------
 
 Similar to the :ref:`MazePlacementState <_gridworld_position_maze_placement>`, Abmarl now
-includes the ability to cluster the *barrier* around the target in such a way that
+includes the ability to cluster *barriers* around the target in such a way that
 the target is completely enclosed. For example, a target with 8 barriers will provide
 a single layer of barricade, 24 barriers two layers, 48 barriers three, and so on
 (with some variation if the target starts near an edge or corner). The following
@@ -76,9 +76,9 @@ Debugging by Event
 ------------------
 
 Abmarl's :ref:`Debugger <debugging>` now outputs log files by agent and by event
-to the output directory. The file `Episode_by_agent.txt` organizes the SARS by type
+to the output directory. The file `Episode_by_agent.txt` organizes the data by type
 and then by agent, so one can see all the observations made by a specific agent
-during the simulation, or all the actions made by another agent during the simulation.
+during the simulation, or all the actions made by an agent during the simulation.
 `Episode_by_event.txt`, on the other hand, shows the events in order, starting with
 reset and moving through each step.
 
@@ -89,13 +89,13 @@ Miscellaneous
 Interface changes
 `````````````````
 
-* :ref:`Attacking Agents <api_gridworld_agent_attack>` `attack_count` has been changed
-  to `simultaneous_attacks` to deconflict the concept with the new ammunition feature.
-* :ref:`Attack mapping <api_gridworld_actor_attack>` now expects a set of attackable
-  encodings instead of a list.
-* The SingleGridObserver has been changed to the
+* :ref:`Attacking Agents <api_gridworld_agent_attack>` ``attack_count`` has been changed
+  to ``simultaneous_attacks`` to deconflict the concept with the new ammunition feature.
+* :ref:`Attack mapping <api_gridworld_actor_attack>` now expects a *set* of attackable
+  encodings instead of a *list*.
+* The *SingleGridObserver* has been changed to the
   :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`.
-* The MultiGridObserver has been changed to the
+* The *MultiGridObserver* has been changed to the
   :ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`.
 
 Other Features
@@ -108,7 +108,7 @@ Other Features
   ``[24]`` and ``24``; both are in, say, ``Box(-3, 40, (1,), int)``.
 * :ref:`MazePlacementState <api_gridworld_state_position_maze>` can take the target
   agent by object or by id, which is useful in situations where one does not have
-  the target object, such as if one is building from an array with an object registry.
+  the target object, such as if one is building the sim from an array with an object registry.
 * A new :ref:`TargetDestroyedDone <gridworld_done_target_destroyed>`, which is similar to the
   already-existing :ref:`TargetAgentDone <gridworld_done_target_overlap>`, but the
   target must become *inactive* in order for the agent to be considered done.
