@@ -1377,6 +1377,8 @@ reports that the simulation is done when there is only one "team" remaining; tha
 is, when all the remaining active agents have the same encoding. This component
 does not report done for individual agents.
 
+.. _gridworld_done_target_overlap:
+
 Target Agent Done
 `````````````````
 
@@ -1384,6 +1386,8 @@ The :ref:`TargetAgentDone <api_gridworld_done_target_agent>` component takes
 a ``target_mapping``, which maps agents to their targets by id. If an agent *overlaps*
 its target, then that agent is done. If all of the agents have overlapped their
 targets, then the simulation is done.
+
+.. _gridworld_done_target_destroyed:
 
 Target Destroyed Done
 `````````````````````

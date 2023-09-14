@@ -3,23 +3,6 @@
 What's New in Abmarl
 ====================
 
-Top features
-* Smart Agent Based Simulation
-* Debug outputs play-by-play
-* State component for barricading a target with barriers
-* Agents with ammo and attackers work with ammo
-
-Interface changes
-* Change name of attack count to simultaneous attacks
-* Attack mapping expects a set
-* New names for Single and Multi Grid observers
-
-Other features
-* Maze placement state can take target by id
-* Built in support for target destroyed done
-* Custom Box space that returns true for single numeric in space. GIVE EXAMPLE.
-* Smarter prechecker in env wrapper for better integration with rllib
-
 Bug fixes
 * Bugfix command line debug uses -s arg now
 * Bugfix inactive agent still block
@@ -110,19 +93,41 @@ reset and moving through each step.
 Miscellaneous
 -------------
 
-* New built-in :ref:`Target agent component <gridworld_done_built_in>` supports
-  agents having a target agent with which they must overlap.
-* New :ref:`Cross Move Actor <gridworld_movement_cross>` allows the agents to move
-  up, down, left, right, or stay in place.
-* The :ref:`All Step Manager <api_all_step>` supports randomized ordering in the
-  action dictionary.
-* The :ref:`Position State <gridworld_position>` component supports ignoring the
-  overlapping options during random placement. This results in agents being placed
-  on unique cells.
-* Abmarl's visualize component now supports the ``--record-only`` flag, which will
-  save animations without displaying them on screen, useful for when running headless
-  or processing in batch.
-* Bugfix with the :ref:`Super Agent Wrapper <super_agent_wrapper>` enables training
-  with rllib 2.0.
-* Abmarl now supports Python 3.9 and 3.10.
-* Abmarl now supports gym 0.23.1.
+Interface changes
+`````````````````
+
+* :ref:`Attacking Agents <api_gridworld_agent_attack>` `attack_count` has been changed
+  to `simultaneous_attacks` to deconflict the concept with the new ammunition feature.
+* :ref:`Attack mapping <api_gridworld_actor_attack>` now expects a set of attackable
+  encodings instead of a list.
+* The SingleGridObserver has been changed to the
+  :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`.
+* The MultiGridObserver has been changed to the
+  :ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`.
+
+Other Features
+``````````````
+
+* Abmarl provides a
+  `custom box space <https://github.com/LLNL/Abmarl/blob/main/abmarl/tools/gym_utils.py#L6>`_
+  that will return true when checking if a single numeric value is *in* a `Box`
+  space with dimension 1. That is, Abmarl's `Box` does not distinguish between
+  ``[24]`` and ``24``; both are in, say, ``Box(-3, 40, (1,), int)``.
+* :ref:`MazePlacementState <api_gridworld_state_position_maze>` can take the target
+  agent by object or by id, which is useful in situations where one does not have
+  the target object, such as if one is building from an array with an object registry.
+* A new :ref:`TargetDestroyedDone <gridworld_done_target_destroyed>`, which is similar to the
+  already-existing :ref:`TargetAgentDone <gridworld_done_target_overlap>`, but the
+  target must become *inactive* in order for the agent to be considered done.
+* Enhanced :ref:`RLlib's wrapper <rllib_external>` for less warnings when training
+  with RLlib.
+
+Bug fixes
+`````````
+
+* The :ref:`TurnBasedManager <api_turn_based>` no longer expects output from non-learning
+  agents, that is, entities in the simulation that are not observing or acting.
+* Inactive agents no longer :ref:`block <gridworld_blocking>`.
+* The :ref:`Debug command line interface <debugging>` now makes use of the ``-s``
+  argument, which specifies simulation horizon (i.e. max steps to take in a single
+  run).
