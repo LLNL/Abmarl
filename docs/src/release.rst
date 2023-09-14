@@ -44,7 +44,7 @@ be given as the class name (e.g. ``"TargetDone"``). All
 and users can :ref:`register <api_gridworld_register>` custom components.
 
 .. NOTE::
-   The :ref:`Smart Simulation <gridworld_smart_sim>`` cannot currently support
+   The :ref:`Smart Simulation <gridworld_smart_sim>` cannot currently support
    :ref:`Actors <gridworld_actor>`, so those must still be defined in the simulation
    definition.
 
@@ -63,7 +63,7 @@ attack will be unsuccessful.
 Target Barricading
 ------------------
 
-Similar to the :ref:`MazePlacementState <gridworld_maze_placement>`, Abmarl now
+Similar to the :ref:`MazePlacementState <_gridworld_position_maze_placement>`, Abmarl now
 includes the ability to cluster the *barrier* around the target in such a way that
 the target is completely enclosed. For example, a target with 8 barriers will provide
 a single layer of barricade, 24 barriers two layers, 48 barriers three, and so on
