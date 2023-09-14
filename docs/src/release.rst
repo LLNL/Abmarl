@@ -58,12 +58,24 @@ the simulation definition between training runs.
 ``TargetDone``). Any :ref:`registered <gridworld_smart_sim>` component can also
 be given as the class name (e.g. ``"TargetDone"``). All
 :ref:`Built in features <gridworld_built_in_features>` are automatically registered,
-and users can :ref:`register <api_gridworld_register>` custom components. The
-:ref:`Smart Simulation <gridworld_smart_sim>`` cannot currently support
-:ref:`Actors <gridworld_actor>`, so those must still be defined in the simulation
-definition.
+and users can :ref:`register <api_gridworld_register>` custom components.
+
+.. NOTE::
+   The :ref:`Smart Simulation <gridworld_smart_sim>`` cannot currently support
+   :ref:`Actors <gridworld_actor>`, so those must still be defined in the simulation
+   definition.
 
 
+Ammo Agents
+-----------
+
+:ref:`Ammo Agents <gridworld_ammo>` have limited ammunition that determines how
+many attacks they can issue per simualation. The :ref:`Attack Actors <gridworld_attacking>`
+interpret the ammunition in conjunction with `simultaneous attacks` to provide
+the ability to determine both how many attacks can be issued per step and, with
+the addition of Ammo Agents, how many attacks can be issued during the entire simulation.
+Agents that have run out of ammo will still be able to chose to attack, but that
+attack will be unsuccessful.
 
 
 
