@@ -3,13 +3,6 @@
 What's New in Abmarl
 ====================
 
-Bug fixes
-* Bugfix command line debug uses -s arg now
-* Bugfix inactive agent still block
-* Bugfix turn based manager learning agents
-
-
-
 Abmarl version 0.2.7 features the new
 :ref:`Smart Simulation and Registry <gridworld_smart_sim>`,
 which streamlines creating simulations by allowing components to be specified at the
