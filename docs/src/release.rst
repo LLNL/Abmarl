@@ -77,6 +77,26 @@ the addition of Ammo Agents, how many attacks can be issued during the entire si
 Agents that have run out of ammo will still be able to chose to attack, but that
 attack will be unsuccessful.
 
+Target Barricading
+------------------
+
+Similar to the :ref:`MazePlacementState <gridworld_maze_placement>`, Abmarl now
+includes the ability to cluster the *barrier* around the target in such a way that
+the target is completely enclosed. For example, a target with 8 barriers will provide
+a single layer of barricade, 24 barriers two layers, 48 barriers three, and so on
+(with some variation if the target starts near an edge or corner). The following
+animation shows some example starting states using the
+:ref:`TargetBarriersFreePlacementState <gridworld_barricade_placement>`:
+
+.. figure:: /.images/gridworld_blockade_placement.*
+   :width: 75 %
+   :alt: Animation showing starting states using Target Barrier Free Placement State component.
+
+   Animation showing a target (green) starting at random positions at the beginning
+   of each episode. Barriers (gray squares) completely enclose the target. Free
+   agents (blue and red) are scattered far from the target.
+
+
 
 
 
