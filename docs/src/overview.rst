@@ -341,11 +341,11 @@ To use the :ref:`SuperAgentWrapper <api_super_agent_wrapper>`, simply provide a
 like so:
 
 .. code-block:: python
-
+   
    from abmarl.managers import AllStepManager
    from abmarl.sim.wrappers import SuperAgentWrapper
    from abmarl.examples import TeamBattleSim
-
+   
    AllStepManager(
        SuperAgentWrapper(
            TeamBattleSim.build_sim(
@@ -361,7 +361,9 @@ like so:
        )
    )
 
-Check out the `Super Agent Team Battle example <https://github.com/LLNL/Abmarl/blob/main/examples/rllib_super_agent_team_battle.py>`_ for more details.
+Check out the
+`Super Agent Team Battle example <https://github.com/LLNL/Abmarl/blob/main/examples/rllib_super_agent_team_battle.py>`_
+for more details.
 
 .. _external:
 
