@@ -341,6 +341,7 @@ To use the :ref:`SuperAgentWrapper <api_super_agent_wrapper>`, simply provide a
 like so:
 
 .. code-block:: python
+
    from abmarl.managers import AllStepManager
    from abmarl.sim.wrappers import SuperAgentWrapper
    from abmarl.examples import TeamBattleSim
