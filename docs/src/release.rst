@@ -56,7 +56,7 @@ attack will be unsuccessful.
 Target Barricading
 ------------------
 
-Similar to the :ref:`MazePlacementState <_gridworld_position_maze_placement>`, Abmarl now
+Similar to the :ref:`MazePlacementState <gridworld_position_maze_placement>`, Abmarl now
 includes the ability to cluster *barriers* around the target in such a way that
 the target is completely enclosed. For example, a target with 8 barriers will provide
 a single layer of barricade, 24 barriers two layers, 48 barriers three, and so on
