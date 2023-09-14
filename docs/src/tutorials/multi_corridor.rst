@@ -18,7 +18,7 @@ the same action space, observation space, and objective function.
    Animation of agents moving left and right in a corridor until they reach the end.
 
 This tutorial uses the `MultiCorridor simulation <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/multi_corridor.py>`_
-and the `MultiCorridor configuration <https://github.com/LLNL/Abmarl/blob/main/examples/multi_corridor_example.py>`_.
+and the `MultiCorridor configuration <https://github.com/LLNL/Abmarl/blob/main/examples/rllib_multi_corridor.py>`_.
 
 Creating the MultiCorridor Simulation
 -------------------------------------
@@ -285,7 +285,7 @@ single policy and map all agents to that policy.
 
 .. code-block:: python
 
-   ref_agent = sim.unwrapped.agents['agent0']
+   ref_agent = sim.sim.agents['agent0']
    policies = {
        'corridor': (None, ref_agent.observation_space, ref_agent.action_space, {})
    }
@@ -337,7 +337,7 @@ Command Line interface
 ``````````````````````
 With the configuration file complete, we can utilize the command line interface
 to train our agents. We simply type ``abmarl train multi_corridor_example.py``,
-where `multi_corridor_example.py` is the name of our configuration file. This will launch
+where `rllib_multi_corridor.py` is the name of our configuration file. This will launch
 Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance

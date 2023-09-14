@@ -7,7 +7,7 @@ Maze Navigation
 Using the same components as we did in the :ref:`Team Battle tutorial <gridworld_tutorial_team_battle>`,
 we can create a Maze Navigation Simulation that contains a single moving agent navigating a maze
 defined by wall agents in the grid. The moving agent's goal is to reach a target
-agent. We will construct the Grid by :ref:`reading a grid file <api_gridworld_sim>`.
+agent. We will construct the Grid by :ref:`reading a grid file <gridworld_building>`.
 This tutorial can be found in full `in our repo <https://github.com/LLNL/Abmarl/blob/main/abmarl/examples/sim/maze_navigation.py>`_.
 
 .. figure:: /.images/gridworld_tutorial_maze_navigation.*
@@ -36,7 +36,7 @@ they are the same features that we used in the :ref:`Team Battle tutorial <gridw
    from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, GridWorldAgent
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
 
 Then, we define our agent types. We need an MazeNavigationAgent, WallAgents to act
 as the barriers of the maze, and a TargetAgent to indicate the goal. Although we
@@ -63,11 +63,11 @@ for our simple done condition, we just write the condition itself in the functio
 
    class MazeNaviationSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
 
            # Store the navigation and target agents
-           self.navigator = kwargs['agents']['navigator']
-           self.target = kwargs['agents']['target']
+           self.navigator = self.agents['navigator']
+           self.target = self.agents['target']
    
            # State Components
            self.position_state = PositionState(**kwargs)
@@ -76,7 +76,7 @@ for our simple done condition, we just write the condition itself in the functio
            self.move_actor = MoveActor(**kwargs)
    
            # Observation Components
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
    
            self.finalize()
    

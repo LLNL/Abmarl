@@ -27,7 +27,8 @@ Using built-in features
 
 Let's start by laying the groundwork using components already in Abmarl. We
 create a simulation with :ref:`position <gridworld_position>`,
-:ref:`movement <gridworld_movement>`, and :ref:`observations <gridworld_single_observer>`.
+:ref:`movement <gridworld_movement>`, and
+:ref:`observations <gridworld_position_centered_observer>`.
 
 .. code-block:: python
 
@@ -38,7 +39,7 @@ create a simulation with :ref:`position <gridworld_position>`,
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
 
    class BlockingAgent(MovingAgent, GridObservingAgent):
        def __init__(self, **kwargs):
@@ -46,10 +47,10 @@ create a simulation with :ref:`position <gridworld_position>`,
 
    class BroadcastSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
            self.position_state = PositionState(**kwargs)
            self.move_actor = MoveActor(**kwargs)
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
    
            self.finalize()
    
@@ -107,10 +108,10 @@ to set its message.
 
 .. code-block:: python
 
-   from abmarl.sim import Agent
+   from abmarl.sim import ObservingAgent, ActingAgent
    from abmarl.sim.gridworld.agent import GridWorldAgent
 
-   class BroadcastingAgent(Agent, GridWorldAgent):
+   class BroadcastingAgent(ObservingAgent, ActingAgent, GridWorldAgent):
        def __init__(self, broadcast_range=None, initial_message=None, **kwargs):
            super().__init__(**kwargs)
            self.broadcast_range = broadcast_range
@@ -226,6 +227,7 @@ a compatible encoding, and (3) is not blocked.
            for agent in self.agents.values():
                if isinstance(agent, self.supported_agent_type):
                    agent.action_space[self.key] = Discrete(2)
+                   agent.null_action[self.key] = 0
        
        @property
        def key(self):
@@ -326,9 +328,13 @@ component, which will have a small impact in how we initialize the simulation.
            for agent in self.agents.values():
                if isinstance(agent, self.supported_agent_type):
                    agent.observation_space[self.key] = Dict({
-                       other.id: Box(-1, 1, (1,))
+                       other.id: Box(-1, 1, (1,), float)
                        for other in self.agents.values() if isinstance(other, self.supported_agent_type)
                    })
+                   agent.null_observation[self.key] = {
+                       other.id: 0. for other in self.agents.values()
+                       if isinstance(other, self.supported_agent_type)
+                   }
        
        @property
        def key(self):
@@ -400,7 +406,7 @@ Now that all the components have been created, we can create the full simulation
 
    class BroadcastSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
    
            self.position_state = PositionState(**kwargs)
            self.broadcasting_state = BroadcastingState(**kwargs)
@@ -408,7 +414,7 @@ Now that all the components have been created, we can create the full simulation
            self.move_actor = MoveActor(**kwargs)
            self.broadcast_actor = BroadcastingActor(**kwargs)
    
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
            self.broadcast_observer = BroadcastObserver(broadcasting_state=self.broadcasting_state, **kwargs)
    
            self.done = AverageMessageDone(**kwargs)

@@ -32,7 +32,7 @@ First, we import the components that we need. Each component is
    from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
    from abmarl.sim.gridworld.state import HealthState, PositionState
    from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
    from abmarl.sim.gridworld.done import OneTeamRemainingDone
 
 Then, we define our agent types. This simulation will only have a single type:
@@ -59,7 +59,7 @@ simulation.
 
    class TeamBattleSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
    
            # State Components
            self.position_state = PositionState(**kwargs)
@@ -70,7 +70,7 @@ simulation.
            self.attack_actor = BinaryAttackActor(**kwargs)
    
            # Observation Components
-           self.grid_observer = SingleGridObserver(**kwargs)
+           self.grid_observer = PositionCenteredEncodingObserver(**kwargs)
    
            # Done Compoennts
            self.done = OneTeamRemainingDone(**kwargs)
@@ -190,10 +190,10 @@ to attack other agents if they are on different teams.
        4: {4}
    }
    attack_map = {
-       1: [2, 3, 4],
-       2: [1, 3, 4],
-       3: [1, 2, 4],
-       4: [1, 2, 3]
+       1: {2, 3, 4},
+       2: {1, 3, 4},
+       3: {1, 2, 4},
+       4: {1, 2, 3}
    }
    sim = TeamBattleSim.build_sim(
        8, 8,
@@ -230,8 +230,8 @@ Extra Challenges
 Having successfully created and run a TeamBattle simulation, we can further explore
 the GridWorldSimulation framework. Some ideas are:
 
-* Experiment with the number of agents and the impact that has on both the SingleGridObserver
-  and the MultiGridObserver.
+* Experiment with the number of agents and the impact that has on both the
+  PositionCenteredEncodingObserver and the StackedPositionCenteredEncodingObserver.
 * Experiment with the number of agents per team as well as the capabilities of
   those agents. You might find that a super capable agent is still effective against
   a team of multiple agents.

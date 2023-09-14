@@ -5,12 +5,12 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
     name='abmarl',
-    version='0.2.6',
+    version='0.2.7',
     description='Agent Based Simulation and MultiAgent Reinforcement Learning',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/llnl/abmarl',
-    author='Edward Rusu',
+    author='Ephraim Rusu',
     author_email='rusu1@llnl.gov',
     license='BSD 3',
     classifiers=[

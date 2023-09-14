@@ -129,6 +129,12 @@ Base
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_smart_sim:
+
+.. autoclass:: abmarl.sim.gridworld.smart.SmartGridWorldSimulation
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_base:
 
 .. autoclass:: abmarl.sim.gridworld.base.GridWorldBaseComponent
@@ -140,6 +146,10 @@ Base
 .. autoclass:: abmarl.sim.gridworld.grid.Grid
 	:members:
 	:undoc-members:
+
+.. _api_gridworld_register:
+
+.. autofunction:: abmarl.sim.gridworld.registry.register
 
 
 Agents
@@ -175,6 +185,18 @@ Agents
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_agent_ammo:
+
+.. autoclass:: abmarl.sim.gridworld.agent.AmmoAgent
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_agent_ammo_observing:
+
+.. autoclass:: abmarl.sim.gridworld.agent.AmmoObservingAgent
+	:members:
+	:undoc-members:
+
 
 State
 `````
@@ -194,6 +216,12 @@ State
 .. _api_gridworld_state_position_maze:
 
 .. autoclass:: abmarl.sim.gridworld.state.MazePlacementState
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_state_position_target_barriers_free:
+
+.. autoclass:: abmarl.sim.gridworld.state.TargetBarriersFreePlacementState
 	:members:
 	:undoc-members:
 
@@ -265,6 +293,12 @@ Observers
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_observer_ammo:
+
+.. autoclass:: abmarl.sim.gridworld.observer.AmmoObserver
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_observer_absolute_position:
 
 .. autoclass:: abmarl.sim.gridworld.observer.AbsolutePositionObserver
@@ -314,6 +348,12 @@ Done
 .. _api_gridworld_done_target_agent:
 
 .. autoclass:: abmarl.sim.gridworld.done.TargetAgentDone
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_done_target_destroyed:
+
+.. autoclass:: abmarl.sim.gridworld.done.TargetDestroyedDone
 	:members:
 	:undoc-members:
 

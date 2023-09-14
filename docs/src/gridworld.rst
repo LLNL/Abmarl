@@ -40,14 +40,14 @@ something like this:
    from abmarl.sim.gridworld.base import GridWorldSimulation
    from abmarl.sim.gridworld.state import PositionState
    from abmarl.sim.gridworld.actor import MoveActor
-   from abmarl.sim.gridworld.observer import SingleGridObserver
+   from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
    
    class MyGridSim(GridWorldSimulation):
        def __init__(self, **kwargs):
-           self.agents = kwargs['agents']
+           super().__init__(**kwargs)
            self.position_state = PositionState(**kwargs)
            self.move_actor = MoveActor(**kwargs)
-           self.observer = SingleGridObserver(**kwargs)
+           self.observer = PositionCenteredEncodingObserver(**kwargs)
 
        def reset(self, **kwargs):
            self.position_state.reset(**kwargs)
@@ -123,10 +123,14 @@ with an :ref:`initial position <gridworld_position>`, the ability to
 parameters such as `shape` and `color`.
 
 Following the dataclass model, additional agent classes can be defined that allow
-them to work with various components. For example, :ref:`GridObservingAgents <gridworld_single_observer>` can work with
-:ref:`Observers <gridworld_single_observer>`, and :ref:`MovingAgents <gridworld_movement>` can work with the :ref:`MoveActor <gridworld_movement>`. Any new agent class should
-inhert from :ref:`GridWorldAgent <api_gridworld_agent>` and possibly from :ref:`ActingAgent <api_acting_agent>` or :ref:`ObservingAgent <api_observing_agent>` as needed.
-For example, one can define a new type of agent like so:
+them to work with various components. For example,
+:ref:`GridObservingAgents <api_gridworld_agent_observing>` can work with
+:ref:`Observers <gridworld_position_centered_observer>`, and
+:ref:`MovingAgents <gridworld_movement>` can work with the
+:ref:`MoveActor <gridworld_movement>`. Any new agent class should inhert from
+:ref:`GridWorldAgent <api_gridworld_agent>` and possibly from
+:ref:`ActingAgent <api_acting_agent>` or :ref:`ObservingAgent <api_observing_agent>`
+as needed. For example, one can define a new type of agent like so:
 
 .. code-block:: python
 
@@ -175,14 +179,15 @@ is 2 or 3.
    If `overlapping` is not specified, then no agents will be able to occupy the same
    cell in the Grid.
 
-Interaction between simulation components and the :ref:`Grid <api_gridworld_grid>` is
-`data open`, which means that we allow components to access the internals of the
-Grid. Although this is possible and sometimes necessary, the Grid also provides
-an interface for safer interactions with components. Components can `query` the
-Grid to see if an agent can be placed at a specific position. Components can `place`
-agents at a specific position in the Grid, which will succeed if that cell is available
-to the agent as per the `overlapping` configuration. And Components can `remove`
-agents from specific positions in the Grid. 
+The Grid is referenced in every simulation component as well as the
+:ref:`GridWorldSimulation <gridworld>` itself. Interaction between simulation components
+and the :ref:`Grid <api_gridworld_grid>` is `data open`, which means that we allow
+components to access the internals of the Grid. Although this is possible and sometimes
+necessary, the Grid also provides an interface for safer interactions with components.
+Components can `query` the Grid to see if an agent can be placed at a specific position.
+Components can `place` agents at a specific position in the Grid, which will succeed
+if that cell is available to the agent as per the `overlapping` configuration. And
+Components can `remove` agents from specific positions in the Grid. 
 
 
 .. _gridworld_state:
@@ -217,9 +222,10 @@ Observer
 :ref:`Observer Components <api_gridworld_observer>` are responsible for creating an
 agent's observation of the state of the simulation. Observers assign supported agents
 with an appropriate observation space and generate observations based on the
-Observer's key. For example, the :ref:`SingleGridObserver <gridworld_single_observer>`
-generates an observation of the nearby grid and stores it in the 'grid' channel of
-the :ref:`ObservingAgent's <gridworld_single_observer>` observation.
+Observer's key. For example, the
+:ref:`PositionCenteredEncodingObserver <gridworld_position_centered_observer>`
+generates an observation of the nearby grid and stores it in the 'position_centered_encoding'
+channel of the :ref:`ObservingAgent's <gridworld_position_centered_observer>` observation.
 
 
 .. _gridworld_done:
@@ -506,6 +512,78 @@ for empty spaces.
 This simulation is the same as the one above that was built from the array.
 
 
+.. _gridworld_smart_sim:
+
+Smart Simulation and Registry
+`````````````````````````````
+
+The :ref:`SmartGridWorldSimulation <api_gridworld_smart_sim>` streamlines the creation
+of simulations by allowing users to provide the components by name at simulation initialization
+instead of including them directly in the simulation definition. The SmartSim supports
+all the fundamental component types except for :ref:`Actor <gridworld_actor>`,
+which still need to be included in the definition. It pre-fills the `getters` and
+`reset` function, leaving only the `step` function to be defined by the user.
+
+The :ref:`SmartGridWorldSimulation <api_gridworld_smart_sim>` enables users to rapidly
+swap out components, thus changing the behavior of the simulation, without modifying the definition.
+For example, the following code block defines one simulation class, but several
+fundamentally different simulations can be intialized from it.
+
+.. code-block:: python
+
+   from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
+   from abmarl.sim.gridworld.actor import MoveActor
+
+   class MyGridSim(SmartGridWorldSimulation):
+       def __init__(self, **kwargs):
+           super().__init__(**kwargs)
+           self.move_actor = MoveActor(**kwargs)
+           self.finalize()
+
+       def step(self, action_dict):
+           for agent_id, action in action_dict.items():
+               self.move_actor.process_action(self.agents[agent_id], action)
+
+   sim1 = MyGridSim.build(
+       ...,
+       states={'MazePlacementState', 'HealthState'},
+       observers={'PositionCenteredEncodingObserver'},
+       dones={'TargetAgentDone'},
+       ...
+   )
+   sim2 = MyGridSim.build(
+       ...,
+       states={'MazePlacementState', 'HealthState'},
+       observers={'AbsolutePositionObserver'},
+       dones={'TargetAgentDone'},
+       ...
+   )
+   sim3 = MyGridSim.build(
+       ...,
+       states={'TargetBarriersFreePlacementState', 'HealthState'},
+       observers={'StackedPositionCenteredEncodingObserver'},
+       dones={'ActiveDone'},
+       ...
+   )
+   sim4 = MyGridSim.build(
+       ...,
+       states={'PositionState', 'HealthState'},
+       observers={'AbsoluteEncodingObserver'},
+       dones={'OneTeamRemainingDone'},
+       ...
+   )
+
+All :ref:`built-in features <gridworld_built_in_features>` are automatically included
+in the GridWorld Simulation Framework :ref:`registry <api_gridworld_register>` and
+are registered by their class name. Custom components can be registered and then
+used in the same manner.
+
+.. Note::
+   The :ref:`registry <api_gridworld_register>` supports :ref:`Actors <gridworld_actor>`,
+   but the :ref:`SmartSim <api_gridworld_smart_sim>` does not yet support them,
+   so they must still be defined in the simulation.
+
+
 .. _gridworld_built_in_features:
 
 Built-in Features
@@ -596,6 +674,34 @@ that all paths to the target are not blocked.
    blocking all paths to it. Free agents (blue) are scattered far from the target.
 
 
+.. _gridworld_barricade_placement:
+
+Target Barriers Free Placement State
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The :ref:`TargetBarriersFreePlacementState <api_gridworld_state_position_target_barriers_free>`
+is a specialized state component used for positioning agents relative to a target.
+`Barrier-encoded` agents can be clustered near the target, and `free-encoded` agents
+can be scattered away from the target.
+
+.. Note::
+   Agents with initial positions may conflict with the target agent. If
+   the target agent is configured for random placement, then we recommend not
+   assigning an initial position to any agent.
+
+The :ref:`TargetBarriersFreePlacementState <api_gridworld_state_position_target_barriers_free>`
+is very useful for randomly placing agents at the beginning of each episode while maintaining a
+desired structure. In this case, we can use this state component to completely
+enclose a target with barrier agents and scatter the free agents away from it.
+
+.. figure:: /.images/gridworld_blockade_placement.*
+   :width: 75 %
+   :alt: Animation showing starting states using Target Barrier Free Placement State component.
+
+   Animation showing a target (green) starting at random positions at the beginning
+   of each episode. Barriers (gray squares) completely enclose the target. Free
+   agents (blue and red) are scattered far from the target.
+
 .. _gridworld_movement:
 
 Movement
@@ -671,12 +777,12 @@ bounds are ``(0, 0)`` and upper bounds are the size of the grid minus one. This
 observer does not provide information on any other agent in the grid.
 
 
-.. _gridworld_absolute_grid_observer:
+.. _gridworld_absolute_encoding_observer:
 
-Absolute Grid Observer
-``````````````````````
+Absolute Encoding Observer
+``````````````````````````
 
-:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` means that the
+:ref:`AbsoluteEncodingObserver <api_gridworld_observer_absolute_encoding>` means that the
 :ref:`GridObservingAgent <api_gridworld_agent_observing>` observes the grid
 as though it were looking at it from the top down, "from the grid's perspective",
 so to speak. As agents move around, the grid stays fixed and the observation shows
@@ -695,7 +801,7 @@ For example, the following setup
    from abmarl.sim.gridworld.agent import GridObservingAgent, GridWorldAgent
    from abmarl.sim.gridworld.grid import Grid
    from abmarl.sim.gridworld.state import PositionState
-   from abmarl.sim.gridworld.observer import AbsoluteGridObserver
+   from abmarl.sim.gridworld.observer import AbsoluteEncodingObserver
 
    agents = {
        'agent0': GridObservingAgent(id='agent0', encoding=1, initial_position=np.array([2, 2]), view_range=2),
@@ -707,7 +813,7 @@ For example, the following setup
    }
    grid = Grid(6, 6, overlapping={4: {5}, 5: {4}})
    position_state = PositionState(agents=agents, grid=grid)
-   observer = AbsoluteGridObserver(agents=agents, grid=grid)
+   observer = AbsoluteEncodingObserver(agents=agents, grid=grid)
 
    position_state.reset()
    observer.get_obs(agents['agent0'])
@@ -732,26 +838,26 @@ in the grid represented as their encodings and appear according to their actual 
 the observing agent only has a ``view_range`` of 2, it cannot see the last row or
 column, so the observation masks those cells with the value of -2. There are two
 agents at position ``(4, 4)``, one with encoding 3 and another with encoding 4. The
-:ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` randomly chooses
+:ref:`AbsoluteEncodingObserver <api_gridworld_observer_absolute_encoding>` randomly chooses
 one from among those encodings.
 
-The :ref:`AbsoluteGridObserver <api_gridworld_observer_absolute_encoding>` automatically
+The :ref:`AbsoluteEncodingObserver <api_gridworld_observer_absolute_encoding>` automatically
 assigns a `null observation` as a matrix of all -2s, indicating that everything
 is masked.
 
 
-.. _gridworld_single_observer:
+.. _gridworld_position_centered_observer:
 
-Single Grid Observer
-````````````````````
+Position Centered Encoding Observer
+```````````````````````````````````
 
 :ref:`GridObservingAgents <api_gridworld_agent_observing>` can observe the state
 of the :ref:`Grid <gridworld_grid>` around them, namely which other agents are nearby,
-via the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`. The SingleGridObserver
-generates a two-dimensional matrix sized by the agent's `view range` with the observing
-agent located at the center of the matrix. While the
-:ref:`AbsoluteGridObserver <gridworld_absolute_grid_observer>` observes agents according
-to their actual positions, the SingleGridObserver observes agents according to their
+via the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`.
+The PositionCenteredEncodingObserver generates a two-dimensional matrix sized by
+the agent's `view range` with the observing agent located at the center of the matrix. While the
+:ref:`AbsoluteEncodingObserver <gridworld_absolute_encoding_observer>` observes agents according
+to their actual positions, the PositionCenteredEncodingObserver observes agents according to their
 relative positions.
 All other agents within the `view range` will appear in the observation, shown as
 their `encoding`. For example, using the above setup with a ``view_range`` of 3
@@ -775,24 +881,25 @@ Since `view range` is the number of cells away that can be observed, the observa
 of this array, shown by its `encoding`: 1. All other agents appear in the observation
 relative to `agent0's` position and shown by their `encodings`. The agent observes some out
 of bounds cells, which appear as -1s. `agent3` and `agent4` occupy the same cell,
-and the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>` will randomly
-select between their `encodings` for the observation.
+and the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`
+will randomly select between their `encodings` for the observation.
 
 By setting `observe_self` to False, the
-:ref:`SingleGridObserver <api_gridworld_observer_position_centered>`
+:ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`
 can be configured so that an agent doesn't observe itself and only observes
 other agents, which may be helpful if overlapping is an important part of the simulation.
 
-The :ref:`SingleGridObserver <api_gridworld_observer_position_centered>` automatically assigns
-a `null observation` as a matrix of all -2s, indicating that everything is
-masked.
+The :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`
+automatically assigns a `null observation` as a matrix of all -2s, indicating that
+everything is masked.
 
 
-Multi Grid Observer
-```````````````````
+Stacked Position Centered Encoding Observer
+```````````````````````````````````````````
 
-Similar to the :ref:`SingleGridObserver <api_gridworld_observer_position_centered>`,
-the :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
+Similar to the :ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>`,
+the
+:ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`
 observes the grid from the observing agent's perspective. It displays a separate
 matrix for every `encoding`. Each matrix shows the relative positions of the agents
 and the number of those agents that occupy each cell. Out of bounds indicators (-1)
@@ -823,25 +930,27 @@ would show an observation like so:
    [-1,  0,  0,  0,  0,  0,  0]
    ...
 
-:ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>`
+:ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`
 may be preferable to
-:ref:`SingleGridObserver <api_gridworld_observer_position_centered>` in simulations where
+:ref:`PositionCenteredEncodingObserver <api_gridworld_observer_position_centered>` in simulations where
 there are many overlapping agents.
 
-The :ref:`MultiGridObserver <api_gridworld_observer_position_centered_stacked>` automatically assigns
-a `null observation` of a tensor of all -2s, indicating that everything is masked.
+The
+:ref:`StackedPositionCenteredEncodingObserver <api_gridworld_observer_position_centered_stacked>`
+automatically assigns a `null observation` of a tensor of all -2s, indicating that
+everything is masked.
 
 
 .. _gridworld_blocking:
 
 Blocking
-~~~~~~~~
+````````
 
 Agents can block other agents' abilities and characteristics, such as blocking
 them from view, which masks out parts of the observation. For example,
 if `agent4` above is configured with ``blocking=True``, then the
-:ref:`SingleGridObserver <gridworld_single_observer>` would produce an observation
-like this:
+:ref:`PositionCenteredEncodingObserver <gridworld_position_centered_observer>` would
+produce an observation like this:
 
 .. code-block::
 
@@ -894,17 +1003,33 @@ Consider the following setup:
 
 `agent0` will be assigned a random `health` value between 0 and 1.
 
+
+.. _gridworld_ammo:
+
+Ammo
+````
+
+:ref:`AmmoAgents <api_gridworld_agent_ammo>` track their `ammo` throughout the simulation.
+Each :ref:`Attack Actor <gridworld_attacking>` interprets the ammo, but the general
+idea is that when the attacking agent runs out of ammo, its attacks are no longer
+successful.
+
+:ref:`AmmoObservingAgents <api_gridworld_agent_ammo_observing>` work in conjuction
+with the :ref:`AmmoObserver <api_gridworld_observer_ammo>` to observe their own
+ammo.
+
+
 .. _gridworld_attacking:
 
 Attacking
 `````````
 
-`Health` becomes more interesting when we let agents attack one another.
+`Health` and `ammo` become more interesting when we let agents attack one another.
 :ref:`AttackingAgents <api_gridworld_agent_attack>` work in conjunction with 
 an :ref:`AttackActor <api_gridworld_actor_attack>`. They have an `attack range`, which dictates
 the range of their attack; an `attack accuracy`, which dictates the chances of the
 attack being successful; an `attack strength`, which dictates how much `health`
-is depleted from the attacked agent, and an `attack count`, which dictates the
+is depleted from the attacked agent, and a `simultaneous attacks`, which dictates the
 number of attacks an agent can make per turn.
 
 An :ref:`AttackActor <api_gridworld_actor_attack>` interprets these properties
@@ -921,11 +1046,12 @@ criteria:
       is determined the same way as :ref:`blocking <gridworld_blocking>` described above.
 
 Then, the :ref:`AttackActor <api_gridworld_actor_attack>` selects agents from that
-set based on the attacking agent's `attack count`. When an agent is successfully
-attacked, its health is depleted by the attacking agent's `attack strength`, which
-may result in the attacked agent's death. AttackActors can be configured to allow
-multiple attacks against a single agent per attacking agent and per turn via the
-`stacked attacks` property. The following four AttackActors are built into Abmarl:
+set based on the attacking agent's `simultaneous attacks` and `ammo` (if applicable). When
+an agent is successfully attacked, its health is depleted by the attacking agent's
+`attack strength`, which may result in the attacked agent's death. AttackActors
+can be configured to allow multiple attacks against a single agent per attacking
+agent and per turn via the `stacked attacks` property. The following four AttackActors
+are built into Abmarl:
 
 .. _gridworld_binary_attack:
 
@@ -934,7 +1060,7 @@ Binary Attack Actor
 
 With the :ref:`BinaryAttackActor <api_gridworld_actor_binary_attack>`,
 :ref:`AttackingAgents <api_gridworld_agent_attack>` can choose to launch attacks
-up to its `attack count` or not to attack at all. For each attack, the BinaryAttackActor
+up to its `simultaneous attacks` or not to attack at all. For each attack, the BinaryAttackActor
 randomly searches the vicinity of the attacking agent for an attackble agent according to
 the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the following setup:
 
@@ -963,7 +1089,7 @@ the :ref:`basic criteria listed above <gridworld_attacking>`. Consider the follo
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+   attack_actor = BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: {2}}, stacked_attacks=False)
 
    position_state.reset()
    health_state.reset()
@@ -1037,7 +1163,7 @@ agents to specify attack by encoding. Consider the following setup:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: {2, 3}}, stacked_attacks=True)
 
    position_state.reset()
    health_state.reset()
@@ -1081,7 +1207,7 @@ In contrast to the :ref:`BinaryAttackActor <gridworld_binary_attack>` and
 :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>` above, the
 SelectiveAttackActor does not randomly search for agents in the vicinity because
 it receives the attacked cells directly. The attacking agent can attack each cell
-up to its `attack count`. Attackable agents are defined according to the
+up to its `simultaneous attacks`. Attackable agents are defined according to the
 :ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
 attackable agents on the same cell, the actor randomly picks from among them based
 on the number of attacks on that cell and whether or not `stacked attacks` are
@@ -1112,7 +1238,7 @@ allowed. Consider the following setup:
   grid = Grid(2, 2, overlapping={2: {3}, 3: {2}})
   position_state = PositionState(agents=agents, grid=grid)
   health_state = HealthState(agents=agents, grid=grid)
-  attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+  attack_actor = SelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: {2}}, stacked_attacks=False)
 
   position_state.reset()
   health_state.reset()
@@ -1159,7 +1285,7 @@ allows :ref:`AttackingAgents <api_gridworld_agent_attack>` to specify some numbe
 of attacks in some local grid defined by the attacking agent's `attack range`.
 This actor is more *restricted* than its counterpart, the
 :ref:`SelectiveAttackActor <gridworld_selective_attack>`, because rather than issuing
-attacks up to its `attack count` *per cell*, the attacking agent can only issue
+attacks up to its `simultaneous attacks` *per cell*, the attacking agent can only issue
 that many attacks in the *whole local grid*. Attackable agents are defined according
 to the :ref:`basic criteria listed above <gridworld_attacking>`. If there are multiple
 attackable agents on a the same cell, the actor randomly picks from among them
@@ -1191,7 +1317,7 @@ are allowed. Consider the following setup:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = RestrictedSelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: [2]}, stacked_attacks=False)
+   attack_actor = RestrictedSelectiveAttackActor(agents=agents, grid=grid, attack_mapping={1: {2}}, stacked_attacks=False)
 
    position_state.reset()
    health_state.reset()
@@ -1228,7 +1354,7 @@ automatically assigns an array of 0s as the `null action`, indicating no attack 
    The form of the attack in the
    :ref:`RestrictedSelectiveAttackActor <api_gridworld_actor_restricted_selective_attack>`
    is the most difficult for humans to interpret. The number of entries in the
-   array reflects the agent's `attack count`. The attack appears as the cell's id,
+   array reflects the agent's `simultaneous attacks`. The attack appears as the cell's id,
    which is determined from ravelling the local grid, where 0 means no attack,
    1 is the top left cell, 2 is to the right of that, and so on through the whole
    local grid.
@@ -1251,13 +1377,25 @@ reports that the simulation is done when there is only one "team" remaining; tha
 is, when all the remaining active agents have the same encoding. This component
 does not report done for individual agents.
 
+.. _gridworld_done_target_overlap:
+
 Target Agent Done
 `````````````````
 
 The :ref:`TargetAgentDone <api_gridworld_done_target_agent>` component takes
-a ``target_mapping``, which maps agents to their targets by id. If an agent overlaps
+a ``target_mapping``, which maps agents to their targets by id. If an agent *overlaps*
 its target, then that agent is done. If all of the agents have overlapped their
 targets, then the simulation is done.
+
+.. _gridworld_done_target_destroyed:
+
+Target Destroyed Done
+`````````````````````
+
+The :ref:`TargetDestroyedDone <api_gridworld_done_target_destroyed>` component takes
+a ``target_mapping``, which maps agents to their targets by id. If an agent's target
+becomes *inactive*, then that agent is done, regardless of its own involvement in
+that change. If all target agents become inactive, then the simulation is done.
 
 
 RavelActionWrapper
@@ -1293,16 +1431,16 @@ to the MoveActor, like so:
    actions = {
        agent.id: agent.action_space.sample() for agent in agents.values()
    }
-   print(actions)
-   # >>> {'agent0': OrderedDict([('move', array([1, 1]))]), 'agent1': OrderedDict([('move', array([ 2, -1]))])}
+   actions
+   >>> {'agent0': OrderedDict([('move', array([1, 1]))]), 'agent1': OrderedDict([('move', array([ 2, -1]))])}
    
    # Wrapped move actor
    move_actor = RavelActionWrapper(move_actor)
    actions = {
        agent.id: agent.action_space.sample() for agent in agents.values()
    }
-   print(actions)
-   # >>> {'agent0': OrderedDict([('move', 1)]), 'agent1': OrderedDict([('move', 22)])}
+   actions
+   >>> {'agent0': OrderedDict([('move', 1)]), 'agent1': OrderedDict([('move', 22)])}
 
 The actions from the unwrapped actor are in the original `Box` space, whereas after
 we apply the wrapper, the actions from the wrapped actor are in the transformed
@@ -1354,23 +1492,23 @@ force the agent to only attack one encoding per turn, like so:
    grid = Grid(2, 2)
    position_state = PositionState(agents=agents, grid=grid)
    health_state = HealthState(agents=agents, grid=grid)
-   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: [2, 3]}, stacked_attacks=True)
-   print(agents['agent0'].action_space)
+   attack_actor = EncodingBasedAttackActor(agents=agents, grid=grid, attack_mapping={1: {2, 3}}, stacked_attacks=True)
+   agents['agent0'].action_space
    >>> {'attack': Dict(2:Discrete(3), 3:Discrete(3))}
    
    wrapped_attack_actor = ExclusiveChannelActionWrapper(attack_actor)
-   print(agents['agent0'].action_space)
+   agents['agent0'].action_space
    >>> {'attack': Discrete(5)}
 
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 0))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 1))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 2))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 3))
-   print(wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 4))
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 0)
    >>> {2: 0, 3: 0}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 1)
    >>> {2: 1, 3: 0}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 2)
    >>> {2: 2, 3: 0}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 3)
    >>> {2: 0, 3: 1}
+   wrapped_attack_actor.wrap_point(Dict({2: Discrete(3), 3: Discrete(3)}), 4)
    >>> {2: 0, 3: 2}
 
 With just the :ref:`EncodingBasedAttackActor <gridworld_encoding_based_attack>`,
