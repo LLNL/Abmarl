@@ -567,6 +567,8 @@ in real time in tensorboard with ``tensorboard --logdir <local_dir>/abmarl_resul
    If a path is given, the output will be under ``<local_dir>/abmarl_results``.
 
 
+.. _debugging:
+
 Debugging
 ---------
 It may be useful to trial run a simulation after setting up a configuration file

@@ -674,6 +674,8 @@ that all paths to the target are not blocked.
    blocking all paths to it. Free agents (blue) are scattered far from the target.
 
 
+.. _gridworld_barricade_placement:
+
 Target Barriers Free Placement State
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1001,6 +1003,8 @@ Consider the following setup:
 
 `agent0` will be assigned a random `health` value between 0 and 1.
 
+
+.. _gridworld_ammo:
 
 Ammo
 ````
