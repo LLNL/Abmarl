@@ -27,10 +27,9 @@ for pre-existing projects to prototype RL as a potential solution.
    release
    overview
    gridworld
-   featured_usage
+   featured_usage/featured_usage
    install
    tutorials/tutorials
-   api
 
 
 Citation
