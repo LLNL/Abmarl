@@ -1,10 +1,33 @@
 .. Abmarl documentation highlights.
 
 
-.. _jcats_interface:
+.. _jcats_nav:
 
-JCATS Interface
-===============
+AI-Enabled Conflict Simulation
+==============================
+.. include_after_this_label
+
+We use :ref:`Abmarl's simulation interface <>` to connect a C++
+based conflict simulation :ref:`JCATS <>` to reinforcement learning algorithms in order to
+train an agent to navigate to a waypoint. All state updates are controlled by the
+JCATS simulation itself. Positional observations are reported to the RL policy, which in turn
+issues movement commands to the the simulator. Training is performed on a cluster
+of 4 nodes utilizing :ref:`RLlib's client-server architecture<>`. We successfully
+generated 136 million training steps and trained the agent to navigate the scenario.
+
+.. include_before_this_label
+
+JCATS
+-----
+
+
+
+The scenario is set in a continuous spatial domain
+and contains a set of buildings
+interconnected with fences, among which there are several paths an agent can take
+to reach a waypoint. The agent must solve this maze by issuing movement commands
+in the form of continuous relative vectors while only observing its exact position
+and nothing about its surroundings.
 
 In this experiment, we study how collaborative and competitive behaviors emerge
 among agents in a partially observable stochastic game. In our simulation, each
