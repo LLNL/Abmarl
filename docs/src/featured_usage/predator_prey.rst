@@ -5,6 +5,7 @@
 
 Emergent Collaborative and Competitive Behavior
 ===============================================
+.. include_after_this_label
 
 In this experiment, we study how collaborative and competitive behaviors emerge
 among agents in a partially observable stochastic game. In our simulation, each
@@ -14,6 +15,8 @@ is removed from the simulation. Each agent can observe the state of the map in
 a region surrounding its location. It can see other agents and what team they're
 on as well as the edges of the map. The diagram below visuially depicts the agents'
 observation and action spaces.
+
+.. include_before_this_label
 
 .. figure:: ../.images/grid_agent_diagram.png
    :width: 100 %
