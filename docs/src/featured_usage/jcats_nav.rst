@@ -11,7 +11,8 @@ We use :ref:`Abmarl's simulation interface <>` to connect a C++
 based conflict simulation :ref:`JCATS <>` to reinforcement learning algorithms in order to
 train an agent to navigate to a waypoint. All state updates are controlled by the
 JCATS simulation itself. Positional observations are reported to the RL policy, which in turn
-issues movement commands to the the simulator. Training is performed on a cluster
+issues movement commands to the the simulator. We leveraged Abmarl as a proxy simulation
+to rapidly find a warm start configuration. Training is performed on a cluster
 of 4 nodes utilizing :ref:`RLlib's client-server architecture<>`. We successfully
 generated 136 million training steps and trained the agent to navigate the scenario.
 
@@ -24,15 +25,16 @@ JCATS and the PolicyClient Infrastructure
 by Lawrence Livermore National Laboratory. It's objective is to simulate real conflict
 in real time with real data. It is a discrete-event, agent-based
 conflict simulator that can simulate land, air, and sea agents in open scenarios.
-The user interacts with the simulation through a GUI-client, from which we can control
+The user interacts with the simulation through a GUI, from which we can control
 a single agent all the way up to an entire task force.
 
-.. figure:: .images/jcats_intro.png
-   :width: 100 %
+.. figure:: ../.images/jcats_intro.png
    :alt: Images showing JCATS user experience.
 
-JCATS supports two modes: (1) human-interactive mode and (2) batch mode. In the
-interactive mode, the user interacts with JCATS via a GUI, which provides a graphical
+   User experience in JCATS, including the GUI and 3d renderings.
+
+JCATS supports two modes: (1) *human-interactive* mode and (2) *batch* mode. In the
+*interactive* mode, the user interacts with JCATS via a GUI, which provides a graphical
 visualization of the state of the simulation. We can pause the simulation, query
 static and dynamic properties of agents and terrain to build up observations, and
 we can issue actions to the
@@ -41,7 +43,7 @@ it is artificially slowed down for the user to keep pace with it. While this mod
 for reinforcement learning application, which requires the simulation to rapidly
 generate data.
 
-JCATS batch mode requires pre-scripted plan files. The simulation runs the actions
+JCATS *batch* mode requires pre-scripted plan files made of action sequences. The simulation runs the actions
 from those files *unthrottled*, generating huge amounts of data very quickly. The
 drawback in batch mode is that we cannot dynamically update the action sequence
 mid-game, which is necessary for our reinforcement learning interest.
@@ -53,24 +55,26 @@ with PyBind11 to bring the functionality to Python. The PolicyClient is a genera
 interactive interface that can be used to drive JCATS and connect it with other
 libraries in Python, including open-source reinforcement learning libraries.
 
-.. figure:: .images/jcats_policy_client_diagram.png
+.. figure:: ../.images/jcats_policy_client_diagram.png
    :width: 100 %
    :alt: Diagram showing JCATS client-server architecture and the PolicyClient's place in it.
+
+   How the PolicyClient fits into JCATS's client-server architecture.
 
 
 Scaling Training with RLlib
 ---------------------------
 
-:ref:`RLlib <>` also utilizes a client-server architecture to accomplish reinforcement
+:ref:`RLlib <>` is an open-source reinforcement learning libraries written in python.
+It utilizes a client-server architecture to accomplish reinforcement
 learning training at scale on HPC systems. The trainer is the server that receives
 data from the clients, which it processes according to the specific reinforcement
 learning algorithm to update the policy and send those updated weights to the clients.
-Each client node has an instance of JCATS and the PolicyClient,
-allowing the node to quickly generate rollout fragments on node with a copy of the
-policy stored in the PolicyClient. As the rollout fragments build up, the client
+Each client node has a local instance of JCATS,
+allowing the node to quickly generate rollout fragments locally. As the rollout fragments build up, the client
 sends them to the server and receives policy updates asynchronously.
 
-.. figure:: .images/jcats_policy_client_diagram.png
+.. figure:: ../.images/jcats_rllib_diagram.png
    :width: 100 %
    :alt: Diagram showing RLlib client-server architecture for training at scale.
 
@@ -83,7 +87,7 @@ server.
 JCATS Navigation Scenario
 -------------------------
 
-The scenario is set in a continuous spatial domain
+The JCATS Navigation Scenario is set in a continuous spatial domain
 and contains a set of buildings
 interconnected with fences, among which there are several paths an agent can take
 to reach a waypoint. The agent, a single infantry unit, must navigate the 2100x2100
@@ -91,11 +95,27 @@ maze by issuing movement commands
 in the form of continuous relative vectors (up to 100 units away) while only observing its exact position
 and nothing about its surroundings.
 
-.. figure:: .images/jcats_maze_scenario.png
-   :width: 100 %
+.. figure:: ../.images/jcats_maze_scenario.png
    :alt: Image showing the maze that the JCATS agent must navigate.
 
-.. todo: need to include information on the actual Abmarl interface
+
+Abmarl Simulation Interface
+```````````````````````````
+
+We wrap the PolicyClient interface with an Abmarl :ref:`Agent Based Simulation <>`
+class to connect the JCATS simulation with RLlib. The observation space is just
+a two-dimensional continuous array of the agent's position, which ranges from ``(0, 0)``
+to ``(2100, 2100)``. The action space is a relative movement vector that captures
+the agent's movement range, from ``(-100, -100)`` to ``(100, 100)``.
+
+We need to discretize the time steps in order to use JCATS like a discrete-time simulator. We determine
+the minimal amount of time needed for the simulation to process moving our agent
+100 units away and set this as the discrete time-gram. Any time less than this
+and the agent would essentially be wasting some of its action space since the simulation
+would not process the full update state before requesting another action from the
+policy. Thus, in each step, the
+policy will issue a movement command, and then the AgentBasedSimulation tells the simulation to run for 50 simulation
+seconds.
 
 
 
@@ -118,8 +138,7 @@ to answer questions like:
 We can work through learning shots in Abmarl much faster than in JCATS to find a
 configuration that we can use as a warm-start for the JCATS training.
 
-.. figure:: .images/jcats_abmarl_proxy_scenario.png
-   :width: 100 %
+.. figure:: ../.images/jcats_abmarl_proxy_scenario.png
    :alt: Image showing the maze that the JCATS agent must navigate.
 
 
@@ -130,7 +149,11 @@ The two most pressing questions are (1) how should the agent be rewarded and (2)
 what does it need to observe. For the sake of this demonstration, we show three
 different configurations:
 
-.. todo: put this all in a single table table
+.. figure:: ../.images/jcats_abmarl_table_of_results.png
+   :width: 100 %
+   :alt: Table showing the results of our different configurations.
+
+.. todo: try making a table here for style comparison
 
 Regional Awareness
 ~~~~~~~~~~~~~~~~~~
@@ -141,7 +164,6 @@ for making invalid moves (e.g. moving into a barrier). Training this scenario in
 minute and required 132 thousand steps. This is a great configuration, but it is
 difficult to implement regional-awareness in JCATS because it requires the ability
 for the PolicyClient to provide a local subset of the simulation state.
-
 
 Only Position
 ~~~~~~~~~~~~~
@@ -167,15 +189,21 @@ minutes and 300 thousands steps.
 Decision Field Analysis
 ```````````````````````
 
-Once can query our trained policy over all the cells in our grid to produce a direction
+We query our trained policy over all the cells in our grid to produce a direction
 field, showing us a visual depiction of the navigation policy. If we imagine the
 arrows pointing "down" the gradient, we can see that the policy learns to direct
 all movements to the "valley" which is the shortest path to the waypoint.
 
+.. figure:: ../.images/jcats_abmarl_maze_solve.*
+   :width: 100 %
+   :alt: Animation showing the agent navigating to the waypoint.
 
 .. figure:: ../.images/jcats_abmarl_direction_field.png
    :width: 100 %
    :alt: Direction field showing the shortest path to the waypoint in Abmarl proxy sim.
+
+The direction field serves as an tool for analyzing what a policy learns and how
+its performance evolves over time.
 
 
 Training and Analysis in JCATS
