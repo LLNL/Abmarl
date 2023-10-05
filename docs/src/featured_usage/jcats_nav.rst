@@ -17,8 +17,68 @@ generated 136 million training steps and trained the agent to navigate the scena
 
 .. include_before_this_label
 
-JCATS
------
+JCATS and the PolicyClient Infrastructure
+-----------------------------------------
+
+:ref:`JCATS <>` is the Joint Conflict And Tactical Simulation developed and maintained
+by Lawrence Livermore National Laboratory. It's objective is to simulate real conflict
+in real time with real data. It is a discrete-event, agent-based
+conflict simulator that can simulate land, air, and sea agents in open scenarios.
+The user interacts with the simulation through a GUI-client, from which we can control
+a single agent all the way up to an entire task force.
+
+.. figure:: .images/jcats_intro.png
+   :width: 100 %
+   :alt: Images showing JCATS user experience.
+
+JCATS supports two modes: (1) human-interactive mode and (2) batch mode. In the
+interactive mode, the user interacts with JCATS via a GUI, which provides a graphical
+visualization of the state of the simulation. We can pause the simulation, query
+static and dynamic properties of agents and terrain to build up observations, and
+we can issue actions to the
+agents in our control. To support human-interaction, the simulation runs *throttled*:
+it is artificially slowed down for the user to keep pace with it. While this mode is great for its purpose, it is too slow
+for reinforcement learning application, which requires the simulation to rapidly
+generate data.
+
+JCATS batch mode requires pre-scripted plan files. The simulation runs the actions
+from those files *unthrottled*, generating huge amounts of data very quickly. The
+drawback in batch mode is that we cannot dynamically update the action sequence
+mid-game, which is necessary for our reinforcement learning interest.
+
+We wanted the speed of batch mode with the dynamic action control of interactive mode,
+so we leveraged JCATS's client-server architecture to create a *PolicyClient*. State
+and action functions and variable are exposed to a client object, which is wrapped
+with PyBind11 to bring the functionality to Python. The PolicyClient is a general-purpose
+interactive interface that can be used to drive JCATS and connect it with other
+libraries in Python, including open-source reinforcement learning libraries.
+
+.. figure:: .images/jcats_policy_client_diagram.png
+   :width: 100 %
+   :alt: Diagram showing JCATS client-server architecture and the PolicyClient's place in it.
+
+
+Scaling Training with RLlib
+---------------------------
+
+:ref:`RLlib <>` also utilizes a client-server architecture to accomplish reinforcement
+learning training at scale on HPC systems. The trainer is the server that receives
+data from the clients, which it processes according to the specific reinforcement
+learning algorithm to update the policy and send those updated weights to the clients.
+Each client node has an instance of JCATS and the PolicyClient,
+allowing the node to quickly generate rollout fragments on node with a copy of the
+policy stored in the PolicyClient. As the rollout fragments build up, the client
+sends them to the server and receives policy updates asynchronously.
+
+.. figure:: .images/jcats_policy_client_diagram.png
+   :width: 100 %
+   :alt: Diagram showing RLlib client-server architecture for training at scale.
+
+We have a few dimensions of scalability available to us. First, we can launch multiple
+instances of JCATS on a single compute
+node. Second, we an have muliptle client nodes, all connected to the same training
+server.
+
 
 
 
