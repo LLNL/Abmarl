@@ -74,20 +74,95 @@ sends them to the server and receives policy updates asynchronously.
    :width: 100 %
    :alt: Diagram showing RLlib client-server architecture for training at scale.
 
-We have a few dimensions of scalability available to us. First, we can launch multiple
+We have two dimensions of scalability available to us. First, we can launch multiple
 instances of JCATS on a single compute
 node. Second, we an have muliptle client nodes, all connected to the same training
 server.
 
 
-
+JCATS Navigation Scenario
+-------------------------
 
 The scenario is set in a continuous spatial domain
 and contains a set of buildings
 interconnected with fences, among which there are several paths an agent can take
-to reach a waypoint. The agent must solve this maze by issuing movement commands
-in the form of continuous relative vectors while only observing its exact position
+to reach a waypoint. The agent, a single infantry unit, must navigate the 2100x2100
+maze by issuing movement commands
+in the form of continuous relative vectors (up to 100 units away) while only observing its exact position
 and nothing about its surroundings.
+
+.. figure:: .images/jcats_maze_scenario.png
+   :width: 100 %
+   :alt: Image showing the maze that the JCATS agent must navigate.
+
+
+
+Proxy Simulation with Abmarl's GridWorld Simulation Framework
+`````````````````````````````````````````````````````````````
+
+We leveraged :ref:`Abmarl's GridWorld Simulation Framework <>` to serve as a proxy
+for the :ref:`JCATS navigation scenario <>`. The corresponding Abmarl scenario is
+a 20x20 discrete grid with buildings located in approximately the same locations
+as the JCATS scenario. The agent issues movement commands in the form of discrete
+relative vectors. Abmarl serves as a particularly good proxy because it can generate
+data 300x faster than JCATS, enabling us to iterate experiment configuration design
+to answer questions like:
+
+1. What does the agent need to observe?
+2. How does it need to be rewarded?
+3. What are good hyperparameters for the learning algorithm?
+4. How should we design the neural network?
+
+We can work through learning shots in Abmarl much faster than in JCATS to find a
+configuration that we can use as a warm-start for the JCATS training.
+
+.. figure:: .images/jcats_abmarl_proxy_scenario.png
+   :width: 100 %
+   :alt: Image showing the maze that the JCATS agent must navigate.
+
+
+Searching for Rewards and Observations
+``````````````````````````````````````
+
+The two most pressing questions are (1) how should the agent be rewarded and (2)
+what does it need to observe. For the sake of this demonstration, we show three
+different configurations:
+
+.. todo: put this all in a single table table
+
+Regional Awareness
+~~~~~~~~~~~~~~~~~~
+
+In this configuration, the agent can observe the surrounding region.
+It is rewarded for reaching the waypoint on the other side of the grid and penalized
+for making invalid moves (e.g. moving into a barrier). Training this scenario in Abmarl took one
+minute and required 132 thousand steps. This is a great configuration, but it is
+difficult to implement regional-awareness in JCATS because it requires the ability
+for the PolicyClient to provide a local subset of the simulation state.
+
+
+Only Position
+~~~~~~~~~~~~~
+
+In this configuration, the agent can only observe its absolute position. It is rewarded
+for reaching the waypoint and penalized for making invalid moves. This configuration
+is easy to implement in JCATS because it only requires exposing a single state
+variable, namely the agent's absolute position. However, training is difficult because
+the policy must learn to map absolute position to movement without any knowledge
+of surroundings. Training this scenario in Abmarl took 30 minutes and required 2.5
+million steps.
+
+
+Soft Reward
+~~~~~~~~~~~
+
+In this configuration, the agent only observes its absolute position. It is rewarded
+for reaching the waypoint, and there are no penalties. This configuration is easy
+to implement in JCATS and easy to train. Training this scenario in JCATS took 2
+minutes and 300 thousands steps.
+
+
+
 
 In this experiment, we study how collaborative and competitive behaviors emerge
 among agents in a partially observable stochastic game. In our simulation, each
