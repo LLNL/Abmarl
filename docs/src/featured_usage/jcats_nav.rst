@@ -96,6 +96,7 @@ in the form of continuous relative vectors (up to 100 units away) while only obs
 and nothing about its surroundings.
 
 .. figure:: ../.images/jcats_maze_scenario.png
+   :width: 70 %
    :alt: Image showing the maze that the JCATS agent must navigate.
 
 
@@ -139,6 +140,7 @@ We can work through learning shots in Abmarl much faster than in JCATS to find a
 configuration that we can use as a warm-start for the JCATS training.
 
 .. figure:: ../.images/jcats_abmarl_proxy_scenario.png
+   :width: 70 %
    :alt: Image showing the maze that the JCATS agent must navigate.
 
 
@@ -149,11 +151,22 @@ The two most pressing questions are (1) how should the agent be rewarded and (2)
 what does it need to observe. For the sake of this demonstration, we show three
 different configurations:
 
-.. figure:: ../.images/jcats_abmarl_table_of_results.png
-   :width: 100 %
-   :alt: Table showing the results of our different configurations.
+.. list-table:: Finding viable experiment configuration
+   :widths: 25 25 50
+   :header-rows: 1
 
-.. todo: try making a table here for style comparison
+   * - Heading row 1, column 1
+     - Training Time
+     - Simulation Steps
+   * - Regional Awareness
+     - 1 minute
+     - 132 thousand
+   * - Only Position
+     - 30 minutes
+     - 2.5 million
+   * - Position with Soft Reward
+     - 2 minutes
+     - 300 thousand
 
 Regional Awareness
 ~~~~~~~~~~~~~~~~~~
@@ -194,12 +207,13 @@ field, showing us a visual depiction of the navigation policy. If we imagine the
 arrows pointing "down" the gradient, we can see that the policy learns to direct
 all movements to the "valley" which is the shortest path to the waypoint.
 
-.. figure:: ../.images/jcats_abmarl_maze_solve.*
-   :width: 100 %
-   :alt: Animation showing the agent navigating to the waypoint.
+.. todo: need to convert .mp4 to .gif
 
-.. figure:: ../.images/jcats_abmarl_direction_field.png
-   :width: 100 %
+.. image:: ../.images/jcats_abmarl_maze_solve.*
+   :width: 48 %
+   :alt: Animation showing the agent navigating to the waypoint.
+.. image:: ../.images/jcats_abmarl_direction_field.png
+   :width: 48 %
    :alt: Direction field showing the shortest path to the waypoint in Abmarl proxy sim.
 
 The direction field serves as an tool for analyzing what a policy learns and how
@@ -215,8 +229,11 @@ nodes and one server node, with 64 instances of JCATS on each node for a total
 of 256 data collectors. After one hour of training, we see that the policy begins
 to move the agent in the correct direction, which is generally to the Northeast.
 
-.. figure:: ../.images/jcats_direction_field_1_hour.png
-   :width: 100 %
+.. image:: ../.images/jcats_direction_field_1_hour.png
+   :width: 48 %
+   :alt: Direction field showing the shortest path to the waypoint in JCATS.
+.. image:: ../.images/jcats_direction_field_10_days.png
+   :width: 48 %
    :alt: Direction field showing the shortest path to the waypoint in JCATS.
 
 To push our infrastructure even further, we ran the training scenario for 10 days,
@@ -224,13 +241,12 @@ totalling 61,440 core hours, and successfully generating 136 million training st
 without any faults in the duration of training. The direction field shows finer-grained
 adjustments to the policy to navigate around specific obstructions along the way.
 
-.. figure:: ../.images/jcats_direction_field_10_days.png
-   :width: 100 %
-   :alt: Direction field showing the shortest path to the waypoint in JCATS.
 
 Finally, we can see in the video below that the agent has learned to navigate the
 maze of buildings and fences to reach the waypoint.
 
+.. todo: covert this mp4 to .gif
+
 .. figure:: ../.images/jcats_maze_navigation.*
-   :width: 100 %
+   :width: 70 %
    :alt: Animation showing the agent navigating the maze to the waypoint.
