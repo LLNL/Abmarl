@@ -270,3 +270,10 @@ maze of buildings and fences to reach the waypoint.
    :alt: Animation showing the agent navigating the maze to the waypoint.
 
    Agent successfully navigating the JCATS maze to reach the target.
+
+
+*This work was performed under the auspices of the U.S. Department of Energy by*
+*Lawrence Livermore National Laboratory under contract DE-AC52-07NA27344. Lawrence*
+*Livermore National Security, LLC*
+
+*Content has been reformatted from its original presentation LLNL-PRES-851032.*
