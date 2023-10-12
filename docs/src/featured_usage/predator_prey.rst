@@ -1,11 +1,11 @@
 .. Abmarl documentation highlights.
 
-Featured Use Cases
-==================
 
+.. _predator_prey:
 
 Emergent Collaborative and Competitive Behavior
------------------------------------------------
+===============================================
+.. include_after_this_label
 
 In this experiment, we study how collaborative and competitive behaviors emerge
 among agents in a partially observable stochastic game. In our simulation, each
@@ -16,7 +16,9 @@ a region surrounding its location. It can see other agents and what team they're
 on as well as the edges of the map. The diagram below visuially depicts the agents'
 observation and action spaces.
 
-.. figure:: .images/grid_agent_diagram.png
+.. include_before_this_label
+
+.. figure:: ../.images/grid_agent_diagram.png
    :width: 100 %
    :alt: Diagram visually depicting agents' observation and action spaces.
 
@@ -57,7 +59,7 @@ of the learned behavior and a brief analysis.
    themselves. However, since they don't do or see anything, we tend not to call
    them agents in the text that follows.
 
-.. figure:: .images/single_agent_full.*
+.. figure:: ../.images/single_agent_full.*
    :width: 100 %
    :alt: Video showing an episode with the trained behavior.
 
@@ -78,7 +80,7 @@ likely due to the small penalty we give it for moving off the map, which results
 in an aversion towards the map edges. Below is a series of short video
 clips showing the foraging strategy.
 
-.. figure:: .images/single_agent_exploit.*
+.. figure:: ../.images/single_agent_exploit.*
    :width: 100 %
    :alt: Video showing the forager's behavior when it observes resources.
 
@@ -96,7 +98,7 @@ In the video below, we can see that the forager learns to explore the map by mov
 along its edges in a clockwise direction, occasionally making random moves towards
 the middle of the map.
 
-.. figure:: .images/single_agent_explore.*
+.. figure:: ../.images/single_agent_explore.*
    :width: 100 %
    :alt: Video showing the forager's behavior when it does not observe resources.
 
@@ -135,7 +137,7 @@ Similar to the single-agent case above, they learn to *explore* along the
 edges of the map in a clockwise direction. However, they're not as efficient as
 the single agent because they "repel" each other.
 
-.. figure:: .images/multi_agent_spread.*
+.. figure:: ../.images/multi_agent_spread.*
    :width: 100 %
    :alt: Video showing how the foragers spread out.
 
@@ -156,7 +158,7 @@ there is no incentive for competition, so no need to negotiate. If another forag
 gets there first, everyone benefits. The foragers learn to prioritize collecting
 the resources over keeping their distance from each other.
 
-.. figure:: .images/multi_agent_forage.*
+.. figure:: ../.images/multi_agent_forage.*
    :width: 100 %
    :alt: Video showing how the foragers move towards resources.
 
@@ -194,7 +196,7 @@ capture multiple strategies and attempt to describe them in detail.
 First Scenario
 ''''''''''''''
 
-.. image:: .images/teams_scenario_1.*
+.. image:: ../.images/teams_scenario_1.*
    :width: 100 %
    :alt: Video showing the first scenario with hunters and foragers.
 
@@ -225,7 +227,7 @@ boxing it in and killing it.
 Second scenario
 '''''''''''''''
 
-.. image:: .images/teams_scenario_2.*
+.. image:: ../.images/teams_scenario_2.*
    :width: 100 %
    :alt: Video showing the second scenario with hunters and foragers.
 
