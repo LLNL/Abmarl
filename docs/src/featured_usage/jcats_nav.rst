@@ -170,7 +170,7 @@ different configurations:
    :widths: 25 25 50
    :header-rows: 1
 
-   * - Heading row 1, column 1
+   * - 
      - Training Time
      - Simulation Steps
    * - Regional Awareness
@@ -275,6 +275,6 @@ and fences to reach the waypoint.
 
 *This work was performed under the auspices of the U.S. Department of Energy by*
 *Lawrence Livermore National Laboratory under contract DE-AC52-07NA27344. Lawrence*
-*Livermore National Security, LLC*
+*Livermore National Security, LLC.*
 
 *Content has been reformatted from its original presentation LLNL-PRES-851032.*
