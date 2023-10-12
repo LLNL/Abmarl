@@ -30,6 +30,7 @@ for pre-existing projects to prototype RL as a potential solution.
    featured_usage/featured_usage
    install
    tutorials/tutorials
+   api
 
 
 Citation

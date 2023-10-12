@@ -24,7 +24,7 @@ Featured Use Cases
 
 .. raw:: html
 
-   <h2> JCATS Interface </h2>
+   <h2> AI-Enabled Conflict Simulation </h2>
 
 .. include::  jcats_nav.rst
     :start-after: include_after_this_label
