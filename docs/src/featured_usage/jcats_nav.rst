@@ -46,7 +46,7 @@ it is artificially slowed down for the user to keep pace with it. While this mod
 for reinforcement learning application, which requires the simulation to rapidly
 generate data.
 
-JCATS *batch* mode requires pre-scripted plan files made of action sequences. The simulation runs the actions
+JCATS *batch* mode requires pre-scripted plan files made up of action sequences. The simulation runs the actions
 from those files *unthrottled*, generating huge amounts of data very quickly. The
 drawback in batch mode is that we cannot dynamically update the action sequence
 mid-game, which is necessary for our reinforcement learning interest.
@@ -120,18 +120,18 @@ Abmarl Simulation Interface
 
 We wrap the PolicyClient interface with an Abmarl :ref:`Agent Based Simulation <abs>`
 class to connect the JCATS simulation with :ref:`RLlib <jcats_rllib_training>`.
-The observation space is just
+The observation space is
 a two-dimensional continuous array of the agent's position, which ranges from ``(0, 0)``
 to ``(2100, 2100)``. The action space is a relative movement vector that captures
 the agent's movement range, from ``(-100, -100)`` to ``(100, 100)``.
 
 We need to discretize the time steps in order to use JCATS like a discrete-time simulator. We determine
 the minimal amount of time needed for the simulation to process moving our agent
-100 units away and set this as the discrete time-gram. Any time less than this
+100 units away and set this as the discrete *time-gram*. Any time less than this
 and the agent would essentially be wasting some of its action space since the simulation
-would not process the full update state before requesting another action from the
+would not process the full state update before requesting another action from the
 policy. Thus, in each step, the
-policy will issue a movement command, and then the AgentBasedSimulation tells the simulation to run for 50 simulation
+policy will issue a movement command, and then the PolicyClient tells the simulation to run for 50 simulation
 seconds.
 
 
@@ -144,7 +144,7 @@ for the :ref:`JCATS navigation scenario <jcats_nav_scenario>`. The corresponding
 a 20x20 discrete grid with barriers located in approximately the same locations
 as the buildings in the JCATS scenario. The agent issues movement commands in the form of discrete
 relative vectors. Abmarl serves as a particularly good proxy because it can generate
-data 300x faster than JCATS, enabling us to iterate experiment configuration design
+data 300x faster than JCATS, enabling us to iterate experiment configuration
 to answer questions like:
 
 1. What does the agent need to observe?
@@ -216,6 +216,10 @@ for reaching the waypoint, and there are no penalties. This configuration is eas
 to implement in JCATS and easy to train. Training this scenario in JCATS took 2
 minutes and 300 thousands steps.
 
+A few training runs in the course of less than one hour enabled us to find a good
+training configuration for the JCATS training shot, thanks to Abmarl's GridWorld
+Simulation Framework.
+
 
 Decision Field Analysis
 ```````````````````````
@@ -258,7 +262,7 @@ adjustments to the policy to navigate around specific obstructions along the way
    :alt: Direction field showing the shortest path to the waypoint in JCATS after 10 days.
 
 
-Finally, we can see in the video below that the agent has learned to navigate the
+We see in the video below that the agent has learned to navigate the
 maze of buildings and fences to reach the waypoint.
 
 .. figure:: ../.images/jcats_maze_navigation.*
