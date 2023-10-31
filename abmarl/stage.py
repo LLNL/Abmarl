@@ -60,12 +60,20 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
     ray.shutdown()
 
 
-              
+def visualize(
+        params,
+        checkpoint=None,
+        episodes=1,
+        steps_per_episode=200,
+        record=False,
+        record_only=False,
+        frame_delay=200,
+        explore=True,
+        seed=None
+    ):
+    full_trained_directory = params['ray_tune']['local_dir']
 
-
-def run_visualize(full_trained_directory, parameters):
-    """Visualize MARL policies from a saved policy"""
-    if parameters.record_only:
+    if record_only:
         matplotlib.use("Agg")
     else:
         try:
@@ -73,21 +81,14 @@ def run_visualize(full_trained_directory, parameters):
         except ImportError:
             matplotlib.use('TkAgg')
 
-    # sim, trainer = _start(full_trained_directory, parameters.checkpoint, seed=parameters.seed)
-        """The elements that are common to both analyze and visualize."""
-    # Load the experiment as a module
-    # First, we must find the .py file in the directory
-    py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
-    assert len(py_files) == 1
-    full_path_to_config = os.path.join(full_trained_directory, py_files[0])
-    experiment_mod = adu.custom_import_module(full_path_to_config)
     # Modify the number of workers in the configuration
-    experiment_mod.params['ray_tune']['config']['num_workers'] = 1
-    experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
-    experiment_mod.params['ray_tune']['config']['seed'] = parameters.seed
+    params['ray_tune']['config']['num_workers'] = 1
+    params['ray_tune']['config']['num_envs_per_worker'] = 1
+    params['ray_tune']['config']['seed'] = seed
 
+    # Find the checkpoint
     checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(
-        full_trained_directory, parameters.requested_checkpoint
+        full_trained_directory, checkpoint
     )
     print(checkpoint_dir)
 
@@ -95,16 +96,16 @@ def run_visualize(full_trained_directory, parameters):
     ray.init()
 
     # Get the trainer
-    alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
+    alg = get_trainable_cls(params['ray_tune']['run_or_experiment'])
     trainer = alg(
-        env=experiment_mod.params['ray_tune']['config']['env'],
-        config=experiment_mod.params['ray_tune']['config']
+        env=params['ray_tune']['config']['env'],
+        config=params['ray_tune']['config']
     )
     trainer.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
 
     # Get the simulation
-    sim = experiment_mod.params['experiment']['sim_creator'](
-        experiment_mod.params['ray_tune']['config']['env_config']
+    sim = params['experiment']['sim_creator'](
+        params['ray_tune']['config']['env_config']
     )
 
     # Determine if we are single- or multi-agent case.
@@ -116,13 +117,13 @@ def run_visualize(full_trained_directory, parameters):
             if done[agent_id]: continue # Don't get actions for done agents
             policy_id = policy_agent_mapping(agent_id)
             action = trainer.compute_action(
-                agent_obs, policy_id=policy_id, explore=parameters.no_explore
+                agent_obs, policy_id=policy_id, explore=explore
             )
             joint_action[agent_id] = action
         return joint_action
 
     def _single_get_action(obs, trainer=None, **kwargs):
-        return trainer.compute_action(obs, explore=parameters.no_explore)
+        return trainer.compute_action(obs, explore=explore)
 
     def _multi_get_done(done):
         return done['__all__']
@@ -139,7 +140,7 @@ def run_visualize(full_trained_directory, parameters):
         _get_action = _single_get_action
         _get_done = _single_get_done
 
-    for episode in range(parameters.episodes):
+    for episode in range(episodes):
         print('Episode: {}'.format(episode))
         obs = sim.reset()
         done = None
@@ -156,27 +157,27 @@ def run_visualize(full_trained_directory, parameters):
         def animate(i):
             nonlocal obs, done
             sim.render(fig=fig)
-            if not parameters.record_only:
+            if not record_only:
                 plt.pause(1e-16)
             action = _get_action(
                 obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
             )
             obs, _, done, _ = sim.step(action)
-            if _get_done(done) or i >= parameters.steps_per_episode:
+            if _get_done(done) or i >= steps_per_episode:
                 nonlocal all_done
                 all_done = True
                 sim.render(fig=fig)
-                if not parameters.record_only:
+                if not record_only:
                     plt.pause(1e-16)
 
         anim = FuncAnimation(
             fig, animate, frames=gen_frame_until_done, repeat=False,
-            interval=parameters.frame_delay, cache_frame_data=False
+            interval=frame_delay, cache_frame_data=False
         )
-        if parameters.record:
+        if record:
             anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
             plt.show(block=False)
-        elif parameters.record_only:
+        elif record_only:
             anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
 
         while not all_done:
@@ -184,3 +185,18 @@ def run_visualize(full_trained_directory, parameters):
         plt.close(fig)
 
     ray.shutdown()
+
+
+ 
+
+
+def run_visualize(full_trained_directory):
+    # Load the experiment as a module
+    # First, we must find the .py file in the directory
+    py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
+    assert len(py_files) == 1
+    full_path_to_config = os.path.join(full_trained_directory, py_files[0])
+    experiment_mod = adu.custom_import_module(full_path_to_config)
+    params = experiment_mod.params
+
+    visualize(params)
