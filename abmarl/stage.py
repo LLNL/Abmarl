@@ -185,18 +185,3 @@ def visualize(
         plt.close(fig)
 
     ray.shutdown()
-
-
- 
-
-
-def run_visualize(full_trained_directory):
-    # Load the experiment as a module
-    # First, we must find the .py file in the directory
-    py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
-    assert len(py_files) == 1
-    full_path_to_config = os.path.join(full_trained_directory, py_files[0])
-    experiment_mod = adu.custom_import_module(full_path_to_config)
-    params = experiment_mod.params
-
-    visualize(params)
