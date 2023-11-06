@@ -15,8 +15,8 @@ def create_parser(subparsers):
 
 
 def run(full_trained_directory, full_subscript, parameters):
-    from abmarl import stage
+    from abmarl.stage import analyze
     from abmarl.tools import utils as adu
-    params = stage._find_params_from_output_dir(full_trained_directory)
+    params = adu.find_params_from_output_dir(full_trained_directory)
     analysis_func = adu.custom_import_module(full_subscript).run
-    stage.analyze(params, analysis_func, **parameters)
+    analyze(params, analysis_func, **parameters)

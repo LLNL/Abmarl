@@ -66,6 +66,24 @@ def find_dirs_in_dir(pattern, path):
     return result
 
 
+def find_params_from_output_dir(output_dir):
+    """
+    Find the parameters file from the output directory after a training run.
+
+    Args:
+        output_dir: The directory in which to look for the parameters.
+
+    Returns:
+        Dictionary of parameters.
+    """
+    import os
+    py_files = [file for file in os.listdir(output_dir) if file.endswith('.py')]
+    assert len(py_files) == 1
+    full_path_to_config = os.path.join(output_dir, py_files[0])
+    experiment_mod = custom_import_module(full_path_to_config)
+    return experiment_mod.params
+
+
 def set_output_directory(params):
     """
     Set the output directory in the parameters.

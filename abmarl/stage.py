@@ -12,16 +12,6 @@ from ray.tune.registry import get_trainable_cls
 from abmarl.tools import utils as adu
 from abmarl.managers import SimulationManager
 
-def _find_params_from_output_dir(output_dir):
-    import os
-    from abmarl.tools import utils as adu
-    from abmarl.stage import visualize
-    py_files = [file for file in os.listdir(output_dir) if file.endswith('.py')]
-    assert len(py_files) == 1
-    full_path_to_config = os.path.join(output_dir, py_files[0])
-    experiment_mod = adu.custom_import_module(full_path_to_config)
-    return experiment_mod.params
-
 
 def analyze(
         params,

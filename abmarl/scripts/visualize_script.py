@@ -35,6 +35,7 @@ def create_parser(subparsers):
 
 
 def run(full_trained_directory, parameters):
-    from abmarl.stage import visualize, _find_params_from_output_dir
-    params = _find_params_from_output_dir(full_trained_directory)
+    from abmarl.tools import utils as adu
+    from abmarl.stage import visualize
+    params = adu.find_params_from_output_dir(full_trained_directory)
     visualize(params, **parameters)
