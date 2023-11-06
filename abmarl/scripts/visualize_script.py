@@ -35,13 +35,6 @@ def create_parser(subparsers):
 
 
 def run(full_trained_directory, parameters):
-    import os
-    from abmarl.tools import utils as adu
-    from abmarl.stage import visualize
-    py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
-    assert len(py_files) == 1
-    full_path_to_config = os.path.join(full_trained_directory, py_files[0])
-    experiment_mod = adu.custom_import_module(full_path_to_config)
-    params = experiment_mod.params
-
+    from abmarl.stage import visualize, _find_params_from_output_dir
+    params = _find_params_from_output_dir(full_trained_directory)
     visualize(params, **parameters)

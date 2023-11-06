@@ -12,23 +12,31 @@ from ray.tune.registry import get_trainable_cls
 from abmarl.tools import utils as adu
 from abmarl.managers import SimulationManager
 
-
-
-def run_analysis(full_trained_directory, full_subscript, parameters):
-    """Analyze MARL policies from a saved policy through an analysis script"""
-    # Load the experiment as a module
-    # First, we must find the .py file in the directory
-    py_files = [file for file in os.listdir(full_trained_directory) if file.endswith('.py')]
+def _find_params_from_output_dir(output_dir):
+    import os
+    from abmarl.tools import utils as adu
+    from abmarl.stage import visualize
+    py_files = [file for file in os.listdir(output_dir) if file.endswith('.py')]
     assert len(py_files) == 1
-    full_path_to_config = os.path.join(full_trained_directory, py_files[0])
+    full_path_to_config = os.path.join(output_dir, py_files[0])
     experiment_mod = adu.custom_import_module(full_path_to_config)
+    return experiment_mod.params
+
+
+def analyze(
+        params,
+        analysis_func=None,
+        seed=None,
+        checkpoint=None,
+    ):
+    full_trained_directory = params['ray_tune']['local_dir']
     # Modify the number of workers in the configuration
-    experiment_mod.params['ray_tune']['config']['num_workers'] = 1
-    experiment_mod.params['ray_tune']['config']['num_envs_per_worker'] = 1
-    experiment_mod.params['ray_tune']['config']['seed'] = parameters.seed
+    params['ray_tune']['config']['num_workers'] = 1
+    params['ray_tune']['config']['num_envs_per_worker'] = 1
+    params['ray_tune']['config']['seed'] = seed
 
     checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(
-        full_trained_directory, parameters.requested_checkpoint
+        full_trained_directory, checkpoint
     )
     print(checkpoint_dir)
 
@@ -36,16 +44,16 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
     ray.init()
 
     # Get the trainer
-    alg = get_trainable_cls(experiment_mod.params['ray_tune']['run_or_experiment'])
+    alg = get_trainable_cls(params['ray_tune']['run_or_experiment'])
     trainer = alg(
-        env=experiment_mod.params['ray_tune']['config']['env'],
-        config=experiment_mod.params['ray_tune']['config']
+        env=params['ray_tune']['config']['env'],
+        config=params['ray_tune']['config']
     )
     trainer.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
 
     # Get the simulation
-    sim = experiment_mod.params['experiment']['sim_creator'](
-        experiment_mod.params['ray_tune']['config']['env_config']
+    sim = params['experiment']['sim_creator'](
+        params['ray_tune']['config']['env_config']
     )
 
     # The sim may be wrapped by an external wrapper, which we support, but we need
@@ -53,9 +61,8 @@ def run_analysis(full_trained_directory, full_subscript, parameters):
     if not isinstance(sim, SimulationManager):
         sim = sim.unwrapped
 
-    # Load the analysis module and run it
-    analysis_mod = adu.custom_import_module(full_subscript)
-    analysis_mod.run(sim, trainer)
+    # Run the analysis function
+    analysis_func(sim, trainer)
 
     ray.shutdown()
 
