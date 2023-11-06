@@ -1,19 +1,5 @@
 
-def _set_output_directory(params):
-    """
-    Set the output directory in the parameters.
-    """
-    import os
-    import time
-    title = params['experiment']['title']
-    base = params['ray_tune'].get('local_dir', os.path.expanduser("~"))
-    output_dir = os.path.join(
-        base, 'abmarl_results/{}_{}'.format(
-            title, time.strftime('%Y-%m-%d_%H-%M')
-        )
-    )
-    params['ray_tune']['local_dir'] = output_dir
-    return output_dir
+from abmarl.tools import utils as adu
 
 
 def _train_rllib(params):
@@ -35,5 +21,5 @@ def train(params):
         Parameter dictionary that holds all the parameters for training.
     """
     # Copy the configuration module to the output directory
-    output_dir = _set_output_directory(params)
+    adu.set_output_directory(params)
     _train_rllib(params)

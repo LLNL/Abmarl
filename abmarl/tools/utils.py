@@ -64,3 +64,26 @@ def find_dirs_in_dir(pattern, path):
             if fnmatch.fnmatch(name, pattern):
                 result.append(os.path.join(root, name))
     return result
+
+
+def set_output_directory(params):
+    """
+    Set the output directory in the parameters.
+
+    Args:
+        params: Dictionary of parameters
+
+    Returns:
+        output_dir: The output directory, also updated in the params.
+    """
+    import os
+    import time
+    title = params['experiment']['title']
+    base = params['ray_tune'].get('local_dir', os.path.expanduser("~"))
+    output_dir = os.path.join(
+        base, 'abmarl_results/{}_{}'.format(
+            title, time.strftime('%Y-%m-%d_%H-%M')
+        )
+    )
+    params['ray_tune']['local_dir'] = output_dir
+    return output_dir
