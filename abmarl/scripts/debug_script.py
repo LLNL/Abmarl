@@ -28,12 +28,12 @@ def create_parser(subparsers):
 
 def run(full_config_path, parameters):
     from abmarl.tools import util as adu
-    from abmarl.debug import _init_trainer, _debug_trainer
+    from abmarl.debug import debug, _set_output_directory
 
     experiment_mod = adu.custom_import_module(full_config_path)
     params = experiment_mod.params
 
-    trainer = _init_trainer(params)
+    output_dir = _set_output_directory(params)
     import shutil
-    shutil.copy(full_config_path, trainer.output_dir)
-    _debug_trainer(trainer, parameters)
+    shutil.copy(full_config_path, output_dir)
+    debug(params, **parameters)
