@@ -84,6 +84,21 @@ def find_params_from_output_dir(output_dir):
     return experiment_mod.params
 
 
+def register_env_from_params(params):
+    """
+    Register a simulation with RLlib by the simulations title.
+
+    Args:
+        params: Dictionary of parameters.
+    """
+    if type(params['ray_tune']['config']['env']) is str:
+        from ray.tune import register_env
+        register_env(
+            params['experiment']['title'],
+            params['experiment']['sim_creator']
+        )
+
+
 def set_output_directory(params):
     """
     Set the output directory in the parameters.

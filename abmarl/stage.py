@@ -14,6 +14,7 @@ from abmarl.managers import SimulationManager
 
 
 def _stage_setup(params, seed=None, checkpoint=None):
+    adu.register_env_from_params(params)
     full_trained_directory = params['ray_tune']['local_dir']
     # Modify the number of workers in the configuration
     params['ray_tune']['config']['num_workers'] = 1
