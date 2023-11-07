@@ -38,4 +38,7 @@ def run(full_trained_directory, parameters):
     from abmarl.tools import utils as adu
     from abmarl.stage import visualize
     params = adu.find_params_from_output_dir(full_trained_directory)
+    import ray
+    ray.init()
     visualize(params, **parameters)
+    ray.shutdown()

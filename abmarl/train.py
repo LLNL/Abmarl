@@ -6,12 +6,8 @@ def _train_rllib(params):
     """
     Train MARL policies with RLlib using parameters dictionary.
     """
-    # adu.register_env_from_params(params)
-    # import ray
     from ray import tune
-    # ray.init()
     tune.run(**params['ray_tune'])
-    # ray.shutdown()
 
 
 def train(params):

@@ -4,8 +4,6 @@ import matplotlib
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import ray
-import ray.rllib
 from ray.rllib.env import MultiAgentEnv
 from ray.tune.registry import get_trainable_cls
 
@@ -14,7 +12,6 @@ from abmarl.managers import SimulationManager
 
 
 def _stage_setup(params, seed=None, checkpoint=None):
-    # adu.register_env_from_params(params)
     full_trained_directory = params['ray_tune']['local_dir']
     # Modify the number of workers in the configuration
     params['ray_tune']['config']['num_workers'] = 1
@@ -61,8 +58,6 @@ def analyze(
 
     # Run the analysis function
     analysis_func(sim, trainer)
-
-    # ray.shutdown()
 
 
 def visualize(
@@ -165,5 +160,3 @@ def visualize(
         while not all_done:
             plt.pause(1)
         plt.close(fig)
-
-    # ray.shutdown()

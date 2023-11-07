@@ -28,4 +28,7 @@ def run(full_config_path):
     shutil.copy(full_config_path, output_dir)
 
     # Train the policy
+    import ray
+    ray.init()
     _train_rllib(params)
+    ray.shutdown()
