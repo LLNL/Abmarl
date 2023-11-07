@@ -108,3 +108,5 @@ class DebugTrainer(MultiPolicyTrainer):
                 pprint(rewards, stream=agent_dump)
                 agent_dump.write("\nDones:\n")
                 pprint(dones, stream=agent_dump)
+
+        print(f"Files written to {self.output_dir}")
