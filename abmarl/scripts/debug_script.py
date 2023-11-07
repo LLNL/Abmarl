@@ -27,7 +27,7 @@ def create_parser(subparsers):
 
 
 def run(full_config_path, parameters):
-    from abmarl.tools import util as adu
+    from abmarl.tools import utils as adu
     from abmarl.debug import _debug
 
     experiment_mod = adu.custom_import_module(full_config_path)
