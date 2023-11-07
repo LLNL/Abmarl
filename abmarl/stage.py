@@ -14,7 +14,7 @@ from abmarl.managers import SimulationManager
 
 
 def _stage_setup(params, seed=None, checkpoint=None):
-    adu.register_env_from_params(params)
+    # adu.register_env_from_params(params)
     full_trained_directory = params['ray_tune']['local_dir']
     # Modify the number of workers in the configuration
     params['ray_tune']['config']['num_workers'] = 1
@@ -27,7 +27,7 @@ def _stage_setup(params, seed=None, checkpoint=None):
     print(checkpoint_dir)
 
     # Setup ray
-    ray.init()
+    # ray.init()
 
     # Get the trainer
     alg = get_trainable_cls(params['ray_tune']['run_or_experiment'])
@@ -62,7 +62,7 @@ def analyze(
     # Run the analysis function
     analysis_func(sim, trainer)
 
-    ray.shutdown()
+    # ray.shutdown()
 
 
 def visualize(
@@ -166,4 +166,4 @@ def visualize(
             plt.pause(1)
         plt.close(fig)
 
-    ray.shutdown()
+    # ray.shutdown()
