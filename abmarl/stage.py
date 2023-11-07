@@ -11,8 +11,7 @@ from abmarl.tools import utils as adu
 from abmarl.managers import SimulationManager
 
 
-def _stage_setup(params, seed=None, checkpoint=None):
-    full_trained_directory = params['ray_tune']['local_dir']
+def _stage_setup(params, full_trained_directory, seed=None, checkpoint=None):
     # Modify the number of workers in the configuration
     params['ray_tune']['config']['num_workers'] = 1
     params['ray_tune']['config']['num_envs_per_worker'] = 1
@@ -63,6 +62,7 @@ def analyze(
 
 def visualize(
         params,
+        full_trained_directory,
         checkpoint=None,
         episodes=1,
         steps_per_episode=200,
@@ -73,7 +73,12 @@ def visualize(
         seed=None,
         **kwargs
     ):
-    trainer, sim = _stage_setup(params, seed=seed, checkpoint=checkpoint)
+    trainer, sim = _stage_setup(
+        params,
+        full_trained_directory,
+        seed=seed,
+        checkpoint=checkpoint
+    )
 
     if record_only:
         matplotlib.use("Agg")

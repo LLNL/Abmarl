@@ -18,5 +18,6 @@ def train(params):
         Parameter dictionary that holds all the parameters for training.
     """
     # Copy the configuration module to the output directory
-    adu.set_output_directory(params)
+    output_dir = adu.set_output_directory(params)
     _train_rllib(params)
+    return output_dir

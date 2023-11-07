@@ -40,5 +40,5 @@ def run(full_trained_directory, parameters):
     params = adu.find_params_from_output_dir(full_trained_directory)
     import ray
     ray.init()
-    visualize(params, **vars(parameters))
+    visualize(params, full_trained_directory, **vars(parameters))
     ray.shutdown()
