@@ -47,6 +47,7 @@ def analyze(
         analysis_func=None,
         seed=None,
         checkpoint=None,
+        **kwargs
     ):
     trainer, sim = _stage_setup(params, seed=seed, checkpoint=checkpoint)
 
@@ -69,7 +70,8 @@ def visualize(
         record_only=False,
         frame_delay=200,
         explore=True,
-        seed=None
+        seed=None,
+        **kwargs
     ):
     trainer, sim = _stage_setup(params, seed=seed, checkpoint=checkpoint)
 

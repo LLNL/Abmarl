@@ -32,8 +32,6 @@ def run(full_config_path, parameters):
 
     experiment_mod = adu.custom_import_module(full_config_path)
     params = experiment_mod.params
-
-    output_dir = adu.set_output_directory(params)
+    output_dir = _debug(params, **vars(parameters))
     import shutil
     shutil.copy(full_config_path, output_dir)
-    _debug(params, **parameters)
