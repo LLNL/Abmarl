@@ -30,5 +30,4 @@ def debug(params, episodes=1, steps_per_episode=200, render=False):
         steps_per_episode: The maximum number of steps to take per episode.
         render: Render the simulation each step.
     """
-    adu.set_output_directory(params)
     _debug(params, episodes=episodes, steps_per_episode=steps_per_episode, render=render)
