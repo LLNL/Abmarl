@@ -13,12 +13,7 @@ from abmarl.tools import utils as adu
 from abmarl.managers import SimulationManager
 
 
-def analyze(
-        params,
-        analysis_func=None,
-        seed=None,
-        checkpoint=None,
-    ):
+def _stage_setup(params, seed=None, checkpoint=None):
     full_trained_directory = params['ray_tune']['local_dir']
     # Modify the number of workers in the configuration
     params['ray_tune']['config']['num_workers'] = 1
@@ -46,10 +41,22 @@ def analyze(
         params['ray_tune']['config']['env_config']
     )
 
+    return trainer, sim
+
+
+def analyze(
+        params,
+        analysis_func=None,
+        seed=None,
+        checkpoint=None,
+    ):
+    trainer, sim = _stage_setup(params, seed=seed, checkpoint=checkpoint)
+
     # The sim may be wrapped by an external wrapper, which we support, but we need
     # to unwrap it.
     if not isinstance(sim, SimulationManager):
         sim = sim.unwrapped
+    # TODO: I don't think this works anymore...
 
     # Run the analysis function
     analysis_func(sim, trainer)
@@ -68,7 +75,7 @@ def visualize(
         explore=True,
         seed=None
     ):
-    full_trained_directory = params['ray_tune']['local_dir']
+    trainer, sim = _stage_setup(params, seed=seed, checkpoint=checkpoint)
 
     if record_only:
         matplotlib.use("Agg")
@@ -77,33 +84,6 @@ def visualize(
             matplotlib.use("macosx")
         except ImportError:
             matplotlib.use('TkAgg')
-
-    # Modify the number of workers in the configuration
-    params['ray_tune']['config']['num_workers'] = 1
-    params['ray_tune']['config']['num_envs_per_worker'] = 1
-    params['ray_tune']['config']['seed'] = seed
-
-    # Find the checkpoint
-    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(
-        full_trained_directory, checkpoint
-    )
-    print(checkpoint_dir)
-
-    # Setup ray
-    ray.init()
-
-    # Get the trainer
-    alg = get_trainable_cls(params['ray_tune']['run_or_experiment'])
-    trainer = alg(
-        env=params['ray_tune']['config']['env'],
-        config=params['ray_tune']['config']
-    )
-    trainer.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
-
-    # Get the simulation
-    sim = params['experiment']['sim_creator'](
-        params['ray_tune']['config']['env_config']
-    )
 
     # Determine if we are single- or multi-agent case.
     def _multi_get_action(obs, done=None, sim=None, policy_agent_mapping=None, **kwargs):
@@ -172,10 +152,14 @@ def visualize(
             interval=frame_delay, cache_frame_data=False
         )
         if record:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+            anim.save(
+                os.path.join(params['ray_tune']['local_dir'], 'Episode_{}.gif'.format(episode))
+            )
             plt.show(block=False)
         elif record_only:
-            anim.save(os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode)))
+            anim.save(
+                os.path.join(params['ray_tune']['local_dir'], 'Episode_{}.gif'.format(episode))
+            )
 
         while not all_done:
             plt.pause(1)
