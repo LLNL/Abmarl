@@ -21,5 +21,5 @@ def run(full_trained_directory, full_subscript, parameters):
     analysis_func = adu.custom_import_module(full_subscript).run
     import ray
     ray.init()
-    analyze(params, analysis_func, **vars(parameters))
+    analyze(params, full_trained_directory, analysis_func, **vars(parameters))
     ray.shutdown()

@@ -43,12 +43,18 @@ def _stage_setup(params, full_trained_directory, seed=None, checkpoint=None):
 
 def analyze(
         params,
+        full_trained_directory,
         analysis_func=None,
         seed=None,
         checkpoint=None,
         **kwargs
     ):
-    trainer, sim = _stage_setup(params, seed=seed, checkpoint=checkpoint)
+    trainer, sim = _stage_setup(
+        params,
+        full_trained_directory,
+        seed=seed,
+        checkpoint=checkpoint
+    )
 
     # The sim may be wrapped by an external wrapper, which we support, but we need
     # to unwrap it.

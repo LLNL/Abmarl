@@ -11,7 +11,8 @@ def run(sim, trainer):
     """
     # Run the simulation with actions chosen from the trained policies
     policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
-    for episode in range(100):
+    for episode in range(5):
+        episode_reward = 0
         print('Episode: {}'.format(episode))
         obs = sim.reset()
         done = {agent: False for agent in obs}
@@ -25,5 +26,7 @@ def run(sim, trainer):
                 joint_action[agent_id] = action
             # Step the simulation
             obs, reward, done, info = sim.step(joint_action)
+            episode_reward += sum(reward.values())
             if done['__all__']:
                 break
+        print(episode_reward)
