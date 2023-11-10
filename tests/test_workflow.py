@@ -1,5 +1,6 @@
 
 import os
+import pytest
 
 from abmarl.debug import debug
 from abmarl.train import train
@@ -9,6 +10,12 @@ from abmarl.examples import MultiMazeNavigationAgent, MultiMazeNavigationSim
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
+
+def pytest_namespace():
+    return {'output_dir': None}
+
+def pytest_collection_modifyitems(items):
+    items = ["test_debug", "test_train", "test_visualize", "test_analyze"]
 
 agents = {
     'target': GridWorldAgent(id='target', encoding=1, render_color='g'),
@@ -70,17 +77,17 @@ params = {
     },
     'ray_tune': {
         'run_or_experiment': 'A2C',
-        'checkpoint_freq': 5,
-        'checkpoint_at_end': True,
+        'checkpoint_freq': 2,
+        'checkpoint_at_end': False,
         'stop': {
-            'episodes_total': 2,
+            'episodes_total': 100,
         },
-        'verbose': 2,
+        'verbose': 0,
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,
             'env': sim_name,
-            'horizon': 200,
+            'horizon': 100,
             'env_config': {},
             # --- Multiagent ---
             'multiagent': {
@@ -89,7 +96,7 @@ params = {
             },
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 7,
+            "num_workers": 0,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
@@ -133,9 +140,8 @@ def tally_rewards(sim, trainer):
 # --- Demonstrate Workflow --- #
 
 
-def test_debug(tmpdir):
+def test_debug():
     output_dir = debug(params)
-    assert output_dir == params['ray_tune']['local_dir']
     assert os.path.exists(output_dir)
     assert "Episode_0_by_event.txt" in os.listdir(output_dir)
     assert "Episode_0_by_agent.txt" in os.listdir(output_dir)
@@ -157,21 +163,55 @@ def test_debug(tmpdir):
         assert "Dones" in text
 
     output_dir = debug(params, episodes=11, steps_per_episode=10)
-    assert output_dir == params['ray_tune']['local_dir']
     assert os.path.exists(output_dir)
     assert len(os.listdir(output_dir)) == 22
 
 
-import ray
-ray.init()
+def test_train():
+    import ray
+    ray.init()
+    output_dir = train(params)
+    pytest.output_dir = output_dir
+    assert os.path.exists(output_dir)
+    assert len(os.listdir(output_dir)) == 1
+    a2c_dir = os.path.join(output_dir, "A2C")
+    assert len(os.listdir(a2c_dir)) == 3
+    sub_dir = ''
+    for name in os.listdir(a2c_dir):
+        if name.startswith("A2C_"):
+            sub_dir = name
+            break
+    sub_dir = os.path.join(a2c_dir, sub_dir)
+    assert "checkpoint_000002" in os.listdir(sub_dir)
+    assert "checkpoint_000004" in os.listdir(sub_dir)
+    # Hard to determine just how many checkpoints will be produced, so we will
+    # go with at least 2
+    # ray.shutdown()
 
-print("\n\n\n# --- Debugging --- #\n\n\n")
-debug(params) # Debug the simulation with random policies
-print("\n\n\n# --- Training --- #\n\n\n")
-output_dir = train(params) # Train the policies with RLlib
-print("\n\n\n# --- Visualizing --- #\n\n\n")
-visualize(params, output_dir) # Visualize the trained policies in the simulation
-print("\n\n\n# --- Analyzing --- #\n\n\n")
-analyze(params, output_dir, tally_rewards) # Analyze the trained policies in the simulation
 
-ray.shutdown()
+def test_visualize():
+    import ray
+    # ray.init()
+    output_dir = pytest.output_dir
+    visualize(params, output_dir, checkpoint=5, episodes=3, steps_per_episode=20, record_only=True)
+    assert 'Episode_0.gif' in os.listdir(output_dir)
+    assert 'Episode_1.gif' in os.listdir(output_dir)
+    assert 'Episode_2.gif' in os.listdir(output_dir)
+    # ray.shutdown()
+
+
+def test_analyze():
+    import ray
+    # ray.init()
+    output_dir = pytest.output_dir
+    analyze(params, output_dir, tally_rewards, checkpoint=10)
+    ray.shutdown()
+
+# print("\n\n\n# --- Debugging --- #\n\n\n")
+# debug(params) # Debug the simulation with random policies
+# print("\n\n\n# --- Training --- #\n\n\n")
+# output_dir = train(params) # Train the policies with RLlib
+# print("\n\n\n# --- Visualizing --- #\n\n\n")
+# visualize(params, output_dir) # Visualize the trained policies in the simulation
+# print("\n\n\n# --- Analyzing --- #\n\n\n")
+# analyze(params, output_dir, tally_rewards) # Analyze the trained policies in the simulation

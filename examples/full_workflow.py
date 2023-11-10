@@ -76,7 +76,7 @@ params = {
         'checkpoint_freq': 5,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2,
+            'episodes_total': 200,
         },
         'verbose': 2,
         'config': {
