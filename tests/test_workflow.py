@@ -186,32 +186,18 @@ def test_train():
     assert "checkpoint_000004" in os.listdir(sub_dir)
     # Hard to determine just how many checkpoints will be produced, so we will
     # go with at least 2
-    # ray.shutdown()
 
 
 def test_visualize():
-    import ray
-    # ray.init()
     output_dir = pytest.output_dir
     visualize(params, output_dir, checkpoint=5, episodes=3, steps_per_episode=20, record_only=True)
     assert 'Episode_0.gif' in os.listdir(output_dir)
     assert 'Episode_1.gif' in os.listdir(output_dir)
     assert 'Episode_2.gif' in os.listdir(output_dir)
-    # ray.shutdown()
 
 
 def test_analyze():
     import ray
-    # ray.init()
     output_dir = pytest.output_dir
     analyze(params, output_dir, tally_rewards, checkpoint=10)
     ray.shutdown()
-
-# print("\n\n\n# --- Debugging --- #\n\n\n")
-# debug(params) # Debug the simulation with random policies
-# print("\n\n\n# --- Training --- #\n\n\n")
-# output_dir = train(params) # Train the policies with RLlib
-# print("\n\n\n# --- Visualizing --- #\n\n\n")
-# visualize(params, output_dir) # Visualize the trained policies in the simulation
-# print("\n\n\n# --- Analyzing --- #\n\n\n")
-# analyze(params, output_dir, tally_rewards) # Analyze the trained policies in the simulation
