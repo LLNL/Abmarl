@@ -22,9 +22,6 @@ def _stage_setup(params, full_trained_directory, seed=None, checkpoint=None):
     )
     print(checkpoint_dir)
 
-    # Setup ray
-    # ray.init()
-
     # Get the trainer
     alg = get_trainable_cls(params['ray_tune']['run_or_experiment'])
     trainer = alg(
@@ -75,7 +72,7 @@ def visualize(
         record=False,
         record_only=False,
         frame_delay=200,
-        explore=True,
+        explore=False,
         seed=None,
         **kwargs
 ):

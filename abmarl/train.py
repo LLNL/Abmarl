@@ -15,7 +15,7 @@ def train(params):
     Train MARL policies with RLlib using parameters dictionary.
 
     Args:
-        Parameter dictionary that holds all the parameters for training.
+        params: Parameter dictionary that holds all the parameters for training.
     """
     # Copy the configuration module to the output directory
     output_dir = adu.set_output_directory(params)
