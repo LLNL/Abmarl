@@ -15,5 +15,11 @@ def create_parser(subparsers):
 
 
 def run(full_trained_directory, full_subscript, parameters):
-    from abmarl import stage
-    stage.run_analysis(full_trained_directory, full_subscript, parameters)
+    from abmarl.stage import analyze
+    from abmarl.tools import utils as adu
+    params = adu.find_params_from_output_dir(full_trained_directory)
+    analysis_func = adu.custom_import_module(full_subscript).run
+    import ray
+    ray.init()
+    analyze(params, full_trained_directory, analysis_func, **vars(parameters))
+    ray.shutdown()

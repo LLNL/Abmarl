@@ -28,12 +28,17 @@ def create_parser(subparsers):
         default=200
     )
     visualize_parser.add_argument(
-        '--no-explore', action='store_false', help='Turn off exploration in the action policy.'
+        '--explore', action='store_true', help='Turn on exploration in the action policy.'
     )
     visualize_parser.add_argument('--seed', type=int, help='Seed for reproducibility.')
     return visualize_parser
 
 
 def run(full_trained_directory, parameters):
-    from abmarl import stage
-    stage.run_visualize(full_trained_directory, parameters)
+    from abmarl.tools import utils as adu
+    from abmarl.stage import visualize
+    params = adu.find_params_from_output_dir(full_trained_directory)
+    import ray
+    ray.init()
+    visualize(params, full_trained_directory, **vars(parameters))
+    ray.shutdown()

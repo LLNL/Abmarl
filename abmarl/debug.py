@@ -1,27 +1,33 @@
-from abmarl.tools import utils as adu
+
 from abmarl.trainers import DebugTrainer
 
 
-def run(full_config_path, parameters):
-    """Debug the SimulationManagers from the config_file."""
+def debug(params, episodes=1, steps_per_episode=200, render=False, **kwargs):
+    """
+    Debug the simulation using the parameters.
 
-    # Load the experiment as a module
-    experiment_mod = adu.custom_import_module(full_config_path)
-    title = "DEBUG_" + experiment_mod.params['experiment']['title']
+    Args:
+        episodes: The number of episodes to run.
+        steps_per_episode: The maximum number of steps to take per episode.
+        render: Render the simulation each step.
 
-    # Debug the simulation
-    sim = experiment_mod.params['experiment']['sim_creator'](
-        experiment_mod.params['ray_tune']['config']['env_config']
+    Returns:
+        The directory where the debug files are saved.
+    """
+    title = "DEBUG_" + params['experiment']['title']
+    sim = params['experiment']['sim_creator'](
+        params['ray_tune']['config']['env_config']
     )
     trainer = DebugTrainer(
         sim=sim.sim,
         name=title,
-        output_dir=experiment_mod.params['ray_tune'].get('local_dir')
+        output_dir=params['ray_tune'].get('local_dir')
     )
-    import shutil
-    shutil.copy(full_config_path, trainer.output_dir)
+
     trainer.train(
-        iterations=parameters.episodes,
-        render=parameters.render,
-        horizon=parameters.steps_per_episode
+        iterations=episodes,
+        render=render,
+        horizon=steps_per_episode
     )
+
+    return trainer.output_dir

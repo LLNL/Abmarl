@@ -64,3 +64,59 @@ def find_dirs_in_dir(pattern, path):
             if fnmatch.fnmatch(name, pattern):
                 result.append(os.path.join(root, name))
     return result
+
+
+def find_params_from_output_dir(output_dir):
+    """
+    Find the parameters file from the output directory after a training run.
+
+    Args:
+        output_dir: The directory in which to look for the parameters.
+
+    Returns:
+        Dictionary of parameters.
+    """
+    import os
+    py_files = [file for file in os.listdir(output_dir) if file.endswith('.py')]
+    assert len(py_files) == 1
+    full_path_to_config = os.path.join(output_dir, py_files[0])
+    experiment_mod = custom_import_module(full_path_to_config)
+    return experiment_mod.params
+
+
+def register_env_from_params(params):
+    """
+    Register a simulation with RLlib by the simulations title.
+
+    Args:
+        params: Dictionary of parameters.
+    """
+    if type(params['ray_tune']['config']['env']) is str:
+        from ray.tune import register_env
+        register_env(
+            params['experiment']['title'],
+            params['experiment']['sim_creator']
+        )
+
+
+def set_output_directory(params):
+    """
+    Set the output directory in the parameters.
+
+    Args:
+        params: Dictionary of parameters
+
+    Returns:
+        output_dir: The output directory, also updated in the params.
+    """
+    import os
+    import time
+    title = params['experiment']['title']
+    base = params['ray_tune'].get('local_dir', os.path.expanduser("~"))
+    output_dir = os.path.join(
+        base, 'abmarl_results/{}_{}'.format(
+            title, time.strftime('%Y-%m-%d_%H-%M')
+        )
+    )
+    params['ray_tune']['local_dir'] = output_dir
+    return output_dir
