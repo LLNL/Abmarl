@@ -57,7 +57,6 @@ def analyze(
     # to unwrap it.
     if not isinstance(sim, SimulationManager):
         sim = sim.unwrapped
-    # TODO: I don't think this works anymore...
 
     # Run the analysis function
     analysis_func(sim, trainer)
