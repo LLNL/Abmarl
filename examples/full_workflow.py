@@ -62,8 +62,10 @@ policies = {
     )
 }
 
+
 def policy_mapping_fn(agent_id):
     return 'navigator'
+
 
 # Experiment parameters
 params = {
@@ -105,6 +107,7 @@ params = {
 import ray
 ray.init()
 
+
 def tally_rewards(sim, trainer):
     """
     Analyze the behavior of your trained policies using the simulation and trainer
@@ -137,6 +140,7 @@ def tally_rewards(sim, trainer):
             if done['__all__']:
                 break
         print(episode_reward)
+
 
 print("\n\n\n# --- Debugging --- #\n\n\n")
 debug(params) # Debug the simulation with random policies

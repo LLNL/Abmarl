@@ -48,7 +48,7 @@ def analyze(
         seed=None,
         checkpoint=None,
         **kwargs
-    ):
+):
     trainer, sim = _stage_setup(
         params,
         full_trained_directory,
@@ -78,7 +78,7 @@ def visualize(
         explore=True,
         seed=None,
         **kwargs
-    ):
+):
     trainer, sim = _stage_setup(
         params,
         full_trained_directory,

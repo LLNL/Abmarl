@@ -1,6 +1,7 @@
 
 import os
 import pytest
+from ray.tune.registry import register_env
 
 from abmarl.debug import debug
 from abmarl.train import train
@@ -11,11 +12,15 @@ from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 
+
 def pytest_namespace():
     return {'output_dir': None}
 
+
 def pytest_collection_modifyitems(items):
     items = ["test_debug", "test_train", "test_visualize", "test_analyze"]
+    return items
+
 
 agents = {
     'target': GridWorldAgent(id='target', encoding=1, render_color='g'),
@@ -54,7 +59,6 @@ sim = MultiAgentWrapper(
 )
 
 sim_name = "MultiMazeNavigation"
-from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
 policies = {
@@ -66,8 +70,10 @@ policies = {
     )
 }
 
+
 def policy_mapping_fn(agent_id):
     return 'navigator'
+
 
 # Experiment parameters
 params = {
@@ -102,6 +108,7 @@ params = {
         },
     }
 }
+
 
 def tally_rewards(sim, trainer):
     """

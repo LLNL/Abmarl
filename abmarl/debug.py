@@ -1,5 +1,4 @@
 
-from abmarl.tools import utils as adu
 from abmarl.trainers import DebugTrainer
 
 
@@ -26,7 +25,7 @@ def _debug(params, episodes=1, steps_per_episode=200, render=False, **kwargs):
 def debug(params, episodes=1, steps_per_episode=200, render=False):
     """
     Debug the simulation using the parameters.
-    
+
     Args:
         episodes: The number of episodes to run.
         steps_per_episode: The maximum number of steps to take per episode.
