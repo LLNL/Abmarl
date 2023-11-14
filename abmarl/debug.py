@@ -2,7 +2,18 @@
 from abmarl.trainers import DebugTrainer
 
 
-def _debug(params, episodes=1, steps_per_episode=200, render=False, **kwargs):
+def debug(params, episodes=1, steps_per_episode=200, render=False, **kwargs):
+    """
+    Debug the simulation using the parameters.
+
+    Args:
+        episodes: The number of episodes to run.
+        steps_per_episode: The maximum number of steps to take per episode.
+        render: Render the simulation each step.
+
+    Returns:
+        The directory where the debug files are saved.
+    """
     title = "DEBUG_" + params['experiment']['title']
     sim = params['experiment']['sim_creator'](
         params['ray_tune']['config']['env_config']
@@ -20,18 +31,3 @@ def _debug(params, episodes=1, steps_per_episode=200, render=False, **kwargs):
     )
 
     return trainer.output_dir
-
-
-def debug(params, episodes=1, steps_per_episode=200, render=False):
-    """
-    Debug the simulation using the parameters.
-
-    Args:
-        episodes: The number of episodes to run.
-        steps_per_episode: The maximum number of steps to take per episode.
-        render: Render the simulation each step.
-
-    Returns:
-        The directory where the debug files are saved.
-    """
-    return _debug(params, episodes=episodes, steps_per_episode=steps_per_episode, render=render)
