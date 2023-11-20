@@ -33,12 +33,18 @@ setuptools.setup(
     install_requires=[
         'importlib-metadata<5.0',
         'numpy<1.24',
-        'tensorflow',
-        'ray[rllib]==2.0.0',
-        'open-spiel',
         'matplotlib',
         'seaborn',
     ],
+    extras_require={
+        "rllib": [
+            'tensorflow',
+            'ray[rllib]==2.0.0',
+        ],
+        "open-spiel": [
+            'open-spiel'
+        ]
+    },
     python_requires='>=3.7, <3.11',
     entry_points={
         'console_scripts': [
