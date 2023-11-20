@@ -305,5 +305,5 @@ except ImportError:
         """
         Not implemented without the open-spiel extra.
         """
-        def __init__(self):
-            raise NotImplementedError
+        def __init__(self, sim, **kwargs):
+            raise NotImplementedError("Requires open-spiel")

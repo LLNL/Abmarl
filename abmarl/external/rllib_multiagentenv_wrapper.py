@@ -55,5 +55,5 @@ except ImportError:
         """
         Not implemented without the rllib extra.
         """
-        def __init__(self):
-            raise NotImplementedError()
+        def __init__(self, sim):
+            raise NotImplementedError("Requires rllib")
