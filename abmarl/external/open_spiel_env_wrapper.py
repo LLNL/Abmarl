@@ -7,6 +7,7 @@ from abmarl.managers import TurnBasedManager, SimulationManager
 
 try:
     from open_spiel.python.rl_environment import TimeStep, StepType
+
     class OpenSpielWrapper:
         """
         Enable connection between Abmarl's SimulationManager and OpenSpiel agents.
@@ -82,7 +83,8 @@ try:
                     assert type(discount) in (float, int), \
                         "discount values must be a number."
                 assert all([
-                    True if agent_id in value.keys() else False for agent_id in self._learning_agents
+                    True if agent_id in value.keys() else False
+                    for agent_id in self._learning_agents
                 ]), "All agents must be given a discount."
                 self._discounts = value
 
@@ -115,7 +117,8 @@ try:
 
         @current_player.setter
         def current_player(self, value):
-            assert value in self._learning_agents, "Current player must be an agent in the simulation."
+            assert value in self._learning_agents, \
+                "Current player must be an agent in the simulation."
             self._current_player = value
 
         def reset(self, **kwargs):
@@ -250,8 +253,9 @@ try:
             Return the legal actions available to the agent.
 
             By default, the OpenSpielWrapper uses the agent's entire action space
-            as its legal actions in each time step. This function can be overwritten in a derived class
-            to add logic for obtaining the actual legal actions available.
+            as its legal actions in each time step. This function can be overwritten
+            in a derived class to add logic for obtaining the actual legal actions
+            available.
             """
             return [*range(self._learning_agents[agent_id].action_space.n)]
 
@@ -296,7 +300,7 @@ try:
                 discounts=self._discounts,
                 step_type=StepType.MID
             )
-except:
+except ImportError:
     class OpenSpielWrapper:
         """
         Not implemented without the open-spiel extra.

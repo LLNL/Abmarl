@@ -5,6 +5,7 @@ from abmarl.sim.agent_based_simulation import ActingAgent, Agent, ObservingAgent
 
 try:
     from ray.rllib import MultiAgentEnv
+
     class MultiAgentWrapper(MultiAgentEnv):
         """
         Enable connection between SimulationManager and RLlib Trainer.
