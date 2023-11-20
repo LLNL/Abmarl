@@ -1,0 +1,8 @@
+importlib-metadata<5.0
+numpy<1.24
+matplotlib
+seaborn
+sphinx
+sphinx-rtd-theme
+flake8
+pytest

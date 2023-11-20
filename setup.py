@@ -33,6 +33,7 @@ setuptools.setup(
     install_requires=[
         'importlib-metadata<5.0',
         'numpy<1.24',
+        'gym',
         'matplotlib',
         'seaborn',
     ],
