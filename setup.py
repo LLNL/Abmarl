@@ -29,7 +29,10 @@ setuptools.setup(
         'Featured Usage': 'https://abmarl.readthedocs.io/en/latest/featured_usage.html',
         'Documentation': 'https://abmarl.readthedocs.io/en/latest/index.html',
     },
-    packages=setuptools.find_packages(),
+    packages=['abmarl'],
+    package_dir = {
+        "abmarl": "abmarl"
+    },
     install_requires=[
         'importlib-metadata<5.0',
         'numpy<1.24',
