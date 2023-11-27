@@ -29,10 +29,19 @@ setuptools.setup(
         'Featured Usage': 'https://abmarl.readthedocs.io/en/latest/featured_usage.html',
         'Documentation': 'https://abmarl.readthedocs.io/en/latest/index.html',
     },
-    packages=['abmarl'],
-    package_dir = {
-        "abmarl": "abmarl"
-    },
+    packages=[
+        'abmarl',
+        'abmarl.algs',
+        'abmarl.examples',
+        'abmarl.external',
+        'abmarl.managers',
+        'abmarl.policies',
+        'abmarl.scripts',
+        'abmarl.sim',
+        'abmarl.tools',
+        'abmarl.trainers',
+        'abmarl.examples',
+    ],
     install_requires=[
         'importlib-metadata<5.0',
         'numpy<1.24',

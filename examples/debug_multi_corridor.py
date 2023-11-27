@@ -31,4 +31,4 @@ debugger = DebugTrainer(
     output_dir="output_dir",
     name="Epsilon_Soft_Multi_Corridor"
 )
-debugger.train(iterations=4, render=True, horizon=20)
+debugger.train(iterations=4, render=False, horizon=20)
