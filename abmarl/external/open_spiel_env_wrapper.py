@@ -303,7 +303,10 @@ try:
 except ImportError:
     class OpenSpielWrapper:
         """
-        Not implemented without the open-spiel extra.
+        Stub for OpenSpielWrapper, which is not implemented without open-spiel.
         """
         def __init__(self, sim, **kwargs):
-            raise NotImplementedError("Requires open-spiel")
+            raise NotImplementedError(
+                "Cannot use OpenSpielWrapper without open-spiel. Please install "
+                "the open-spiel extra with, for example, pip install abmarl[open-spiel]."
+            )

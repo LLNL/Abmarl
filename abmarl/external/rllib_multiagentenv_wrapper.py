@@ -53,7 +53,10 @@ try:
 except ImportError:
     class MultiAgentWrapper:
         """
-        Not implemented without the rllib extra.
+        Stub for MultiAgentWrapper class, which is not implemented without RLlib.
         """
         def __init__(self, sim):
-            raise NotImplementedError("Requires rllib")
+            raise NotImplementedError(
+                "Cannot use MultiAgentWrapper without RLlib. Please install the "
+                "RLlib extra with, for example, pip install abmarl[rllib]."
+            )
