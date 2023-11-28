@@ -11,7 +11,12 @@ You can install abmarl via `pip`:
 
 .. code-block::
 
-   pip install abmarl
+   pip install abmarl[, rllib, open-spiel]
+
+Specifying `rllib` or `open-spiel` will install the dependencies necessary for
+using those packages with Abmarl. If neither is specified, then the core Abmarl
+features will be installed, such as the :ref:`AgentBasedSimulation <abs>` interface
+and the :ref:`GridWorldSimluation Framework <gridworld>`.
 
 
 Developer Installation
@@ -23,7 +28,7 @@ via pip's development mode.
 
    git clone git@github.com:LLNL/Abmarl.git
    cd abmarl
-   pip install -r requirements.txt
+   pip install -r requirements/requirements_all.txt
    pip install -e . --no-deps
 
 
