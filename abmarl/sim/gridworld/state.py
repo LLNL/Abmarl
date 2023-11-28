@@ -29,7 +29,7 @@ class PositionState(StateBaseComponent):
     def __init__(self, no_overlap_at_reset=False, randomize_placement_order=False, **kwargs):
         super().__init__(**kwargs)
         self.no_overlap_at_reset = no_overlap_at_reset
-        self.randomize_placement = randomize_placement_order
+        self.randomize_placement_order = randomize_placement_order
 
     @property
     def ravelled_positions_available(self):
@@ -98,7 +98,7 @@ class PositionState(StateBaseComponent):
         if self.randomize_placement_order:
             agents = list(self.agents.items())
             random.shuffle(agents)
-            self.agents = agents
+            self.agents = dict(agents)
 
         # Build lists of available positions
         self._build_available_positions()
@@ -286,7 +286,7 @@ class TargetBarriersFreePlacementState(PositionState):
         if self.randomize_placement_order:
             agents = list(self.agents.items())
             random.shuffle(agents)
-            self.agents = agents
+            self.agents = dict(agents)
 
         # Assert that all encodings are captured
         for agent in self.agents.values():
@@ -507,7 +507,7 @@ class MazePlacementState(PositionState):
         if self.randomize_placement_order:
             agents = list(self.agents.items())
             random.shuffle(agents)
-            self.agents = agents
+            self.agents = dict(agents)
 
         # Assert that all encodings are captured
         for agent in self.agents.values():

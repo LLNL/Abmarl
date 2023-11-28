@@ -949,3 +949,41 @@ def test_target_barriers_free_placement_state_clustering_and_scattering_no_overl
         assert max(abs(target_agent.position - barrier.position)) <= 2
     for free in free_agents.values():
         assert max(abs(target_agent.position - free.position)) > 2
+
+
+def test_target_barrier_free_placement_state_random_order():
+    target_agent = GridWorldAgent(id='target', encoding=1, initial_position=np.array([0, 0]))
+    barrier_agents = {
+        f'barrier_agent{i}': GridWorldAgent(
+            id=f'barrier_agent{i}',
+            encoding=2
+        ) for i in range(3)
+    }
+    agents = {
+        'target': target_agent,
+        **barrier_agents,
+    }
+    grid = Grid(1, 4)
+    state = TargetBarriersFreePlacementState(
+        grid=grid,
+        agents=agents,
+        target_agent=target_agent,
+        barrier_encodings={1, 2},
+        cluster_barriers=True,
+        randomize_placement_order=False
+    )
+    assert not state.randomize_placement_order
+
+    state.reset()
+    assert 'barrier_agent0' in grid[0, 1]
+    assert len(grid[0, 1]) == 1
+
+    np.random.seed(24)
+    state.randomize_placement_order=True
+
+    count_0_closest = 0
+    for _ in range(10):
+        state.reset()
+        if 'barrier_agent0' in grid[0, 1]:
+            count_0_closest += 1
+    assert count_0_closest < 10
