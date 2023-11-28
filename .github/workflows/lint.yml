@@ -31,7 +31,8 @@ jobs:
         # Lint source directory
         flake8 abmarl/ --count  --max-line-length 100 --indent-size 4 --doctests \
         --per-file-ignores="__init__.py:F401 abmarl/sim/wrappers/communication_wrapper.py,\
-        abmarl/sim/components/wrappers/observer_wrapper.py,abmarl/algs/monte_carlo.py:W504" \
+        abmarl/sim/components/wrappers/observer_wrapper.py,abmarl/algs/monte_carlo.py:W504,\
+        abmarl/scripts/scripts.py:F401" \
         --ignore="E129,E261,E701,E731,E226,W504"
         # Lint examples directory
         flake8 examples/ --count  --max-line-length 100 --indent-size 4 --doctests \

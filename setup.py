@@ -29,16 +29,23 @@ setuptools.setup(
         'Featured Usage': 'https://abmarl.readthedocs.io/en/latest/featured_usage.html',
         'Documentation': 'https://abmarl.readthedocs.io/en/latest/index.html',
     },
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=['tests']),
     install_requires=[
         'importlib-metadata<5.0',
         'numpy<1.24',
-        'tensorflow',
-        'ray[rllib]==2.0.0',
-        'open-spiel',
+        'gym',
         'matplotlib',
         'seaborn',
     ],
+    extras_require={
+        "rllib": [
+            'tensorflow',
+            'ray[rllib]==2.0.0',
+        ],
+        "open-spiel": [
+            'open-spiel'
+        ]
+    },
     python_requires='>=3.7, <3.11',
     entry_points={
         'console_scripts': [

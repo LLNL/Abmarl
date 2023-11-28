@@ -50,6 +50,12 @@ def cli():
     parameters = parser.parse_args()
     path_config = os.path.join(os.getcwd(), parameters.configuration)
 
+    if parameters.command in ['train', 'visualize', 'analyze']:
+        try:
+            from ray import tune
+        except ImportError as e:
+            raise ImportError("Abmarl requires rllib to train, visualize, and analyze.") from e
+
     if parameters.command == 'train':
         train.run(path_config)
     elif parameters.command == 'analyze':

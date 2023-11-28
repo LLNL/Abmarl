@@ -4,14 +4,13 @@ import matplotlib
 
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from ray.rllib.env import MultiAgentEnv
-from ray.tune.registry import get_trainable_cls
 
 from abmarl.tools import utils as adu
 from abmarl.managers import SimulationManager
 
 
 def _stage_setup(params, full_trained_directory, seed=None, checkpoint=None):
+    from ray.tune.registry import get_trainable_cls
     # Modify the number of workers in the configuration
     params['ray_tune']['config']['num_workers'] = 1
     params['ray_tune']['config']['num_envs_per_worker'] = 1
@@ -75,6 +74,7 @@ def visualize(
         seed=None,
         **kwargs
 ):
+    from ray.rllib.env import MultiAgentEnv
     trainer, sim = _stage_setup(
         params,
         full_trained_directory,
