@@ -1,6 +1,7 @@
 
 from abc import ABC, abstractmethod
 from copy import deepcopy
+import random
 
 import numpy as np
 
@@ -25,9 +26,10 @@ class PositionState(StateBaseComponent):
     """
     Manage the agents' positions in the grid.
     """
-    def __init__(self, no_overlap_at_reset=False, **kwargs):
+    def __init__(self, no_overlap_at_reset=False, randomize_placement_order=False, **kwargs):
         super().__init__(**kwargs)
         self.no_overlap_at_reset = no_overlap_at_reset
+        self.randomize_placement = randomize_placement_order
 
     @property
     def ravelled_positions_available(self):
@@ -64,6 +66,25 @@ class PositionState(StateBaseComponent):
         assert type(value) is bool, "No overlap at reset must be a boolean."
         self._no_overlap_at_reset = value
 
+    @property
+    def randomize_placement_order(self):
+        """
+        Randomize the order in which each agent in a category is placed.
+
+        All agents with initial positions will still be placed before agents without
+        initial positions. Now, the subset of agents with initial positions will
+        be placed in random order. Likewise, the subset of agents without initial
+        positions will be placed in random order.
+
+        Agents are reshuffled every episode.
+        """
+        return self._randomize_placement_order
+
+    @randomize_placement_order.setter
+    def randomize_placement_order(self, value):
+        assert type(value) is bool, "Randomize placement order must be True or False."
+        self._randomize_placement_order = value
+
     def reset(self, **kwargs):
         """
         Give agents their starting positions.
@@ -72,6 +93,12 @@ class PositionState(StateBaseComponent):
         place the agents in the grid.
         """
         self.grid.reset()
+
+        # Shuffle agents if requested
+        if self.randomize_placement_order:
+            agents = list(self.agents.items())
+            random.shuffle(agents)
+            self.agents = agents
 
         # Build lists of available positions
         self._build_available_positions()
@@ -254,6 +281,12 @@ class TargetBarriersFreePlacementState(PositionState):
         Give the agents their starting positions.
         """
         self.grid.reset()
+
+        # Shuffle agents if requested
+        if self.randomize_placement_order:
+            agents = list(self.agents.items())
+            random.shuffle(agents)
+            self.agents = agents
 
         # Assert that all encodings are captured
         for agent in self.agents.values():
@@ -469,6 +502,12 @@ class MazePlacementState(PositionState):
         Give the agents their starting positions.
         """
         self.grid.reset()
+
+        # Shuffle agents if requested
+        if self.randomize_placement_order:
+            agents = list(self.agents.items())
+            random.shuffle(agents)
+            self.agents = agents
 
         # Assert that all encodings are captured
         for agent in self.agents.values():
