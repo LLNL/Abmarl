@@ -979,7 +979,7 @@ def test_target_barrier_free_placement_state_random_order():
     assert len(grid[0, 1]) == 1
 
     np.random.seed(24)
-    state.randomize_placement_order=True
+    state.randomize_placement_order = True
 
     count_0_closest = 0
     for _ in range(10):
