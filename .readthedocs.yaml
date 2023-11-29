@@ -11,7 +11,7 @@ formats:
 # Set the version of Python and requirements
 python:
   install:
-    - requirements: requirements.txt
+    - requirements: requirements/requirements_all.txt
     # Below will install abmarl to the RTD virtual environment so that the API build works.
     - method: pip
       path: .
