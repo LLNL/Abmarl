@@ -88,7 +88,8 @@ sim = MultiAgentWrapper(
                 'green': 'green_target',
                 'black': 'black_target',
             }
-        )
+        ),
+        randomize_action_input=True,
     )
 )
 
