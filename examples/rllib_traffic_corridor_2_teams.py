@@ -6,7 +6,7 @@ from abmarl.external import MultiAgentWrapper
 from abmarl.examples.sim.traffic_corridor import WallAgent, TargetAgent, TrafficAgent, \
     TrafficCorridorSimulation
 
-grid_1_lane_2_teams = np.array([
+grid = np.array([
     ['G', 'W', 'W', 'W', 'R'],
     ['r', '_', '_', '_', 'g'],
     ['G', 'W', 'W', 'W', 'R'],
@@ -44,15 +44,12 @@ object_registry = {
 }
 
 
-grid = grid_1_lane_2_teams
 sim = MultiAgentWrapper(
     AllStepManager(
         TrafficCorridorSimulation.build_sim_from_array(
             grid,
             object_registry,
             overlapping={1: {1}, 2: {2}},
-            # TODO: Don't know the agent's id's beforehand, how to create better mapping?
-            # See if I can use mapping by encoding....
             states={"PositionState"},
             dones={"TargetAgentDone"},
             observers={'PositionCenteredEncodingObserver'},
