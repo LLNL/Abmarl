@@ -45,5 +45,5 @@ class TrafficCorridorSimulation(SmartGridWorldSimulation):
             if not move_result:
                 self.rewards[agent.id] -= 0.1
 
-            if self.target_done.get_done(self.agents[agent_id]):
+            if self.get_done(agent_id):
                 self.rewards[agent_id] += 1.0

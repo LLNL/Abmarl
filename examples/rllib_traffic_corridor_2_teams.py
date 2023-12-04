@@ -1,6 +1,4 @@
 
-import os
-
 import numpy as np
 
 from abmarl.managers import AllStepManager
@@ -11,13 +9,6 @@ grid_1_lane_2_teams = np.array([
     ['G', 'W', 'W', 'W', 'R'],
     ['r', '_', '_', '_', 'g'],
     ['G', 'W', 'W', 'W', 'R'],
-])
-
-grid_2_lane_2_teams = np.array([
-    ['_', 'W', 'W', 'W',' W', 'W', 'W', 'W', 'g'],
-    ['G', '_', '_', '_',' _', '_', '_', '_', 'R'],
-    ['G', '_', '_', '_',' _', '_', '_', '_', 'R'],
-    ['r', 'W', 'W', 'W',' W', 'W', 'W', 'W', '_'],
 ])
 
 
@@ -61,14 +52,14 @@ sim = MultiAgentWrapper(
             overlapping={1: {1}, 2: {2}},
             # TODO: Don't know the agent's id's beforehand, how to create better mapping?
             # See if I can use mapping by encoding....
-            state={"PositionState"},
+            states={"PositionState"},
             dones={"TargetAgentDone"},
             observers={'PositionCenteredEncodingObserver'},
             target_mapping = {
-                'red9': 'red_target',
+                'red4': 'red_target',
                 'red11': 'red_target',
-                'green8': 'green_target',
-                'green10': 'green_target',
+                'green0': 'green_target',
+                'green7': 'green_target',
             }
         ),
         randomize_action_input=True,
@@ -79,19 +70,17 @@ sim_name = "TrafficCoordination"
 from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
-red_agent_id = next(iter([agent_id for agent_id in sim.sim.agents if agent_id.startswith('red')]))
-green_agent_id = next(iter([agent_id for agent_id in sim.sim.agents if agent_id.startswith('green')]))
 policies = {
     'red': (
         None,
-        sim.sim.agents[red_agent_id].observation_space,
-        sim.sim.agents[red_agent_id].action_space,
+        sim.sim.agents['red4'].observation_space,
+        sim.sim.agents['red4'].action_space,
         {}
     ),
     'green': (
         None,
-        sim.sim.agents[green_agent_id].observation_space,
-        sim.sim.agents[green_agent_id].action_space,
+        sim.sim.agents['green0'].observation_space,
+        sim.sim.agents['green0'].action_space,
         {}
     ),
 }
