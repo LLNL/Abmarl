@@ -3,7 +3,8 @@ import numpy as np
 
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
-from abmarl.examples.sim.traffic_corridor import WallAgent, TargetAgent, TrafficAgent, TrafficCorridorSimulation
+from abmarl.examples.sim.traffic_corridor import WallAgent, TargetAgent, TrafficAgent, \
+    TrafficCorridorSimulation
 
 grid_1_lane_2_teams = np.array([
     ['G', 'W', 'W', 'W', 'R'],
@@ -24,13 +25,13 @@ object_registry = {
         render_color='green',
     ),
     'r': lambda n: TargetAgent(
-        id=f'red_target',
+        id='red_target',
         encoding=1,
         render_color='red',
         render_shape='s'
     ),
     'g': lambda n: TargetAgent(
-        id=f'green_target',
+        id='green_target',
         encoding=2,
         render_color='green',
         render_shape='s'
@@ -55,7 +56,7 @@ sim = MultiAgentWrapper(
             states={"PositionState"},
             dones={"TargetAgentDone"},
             observers={'PositionCenteredEncodingObserver'},
-            target_mapping = {
+            target_mapping={
                 'red4': 'red_target',
                 'red11': 'red_target',
                 'green0': 'green_target',
@@ -84,6 +85,7 @@ policies = {
         {}
     ),
 }
+
 
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('red'):

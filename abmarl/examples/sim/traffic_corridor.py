@@ -5,9 +5,12 @@ from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent
 from abmarl.sim.gridworld.actor import MoveActor
 
+
 class WallAgent(GridWorldAgent): pass
 
+
 class TargetAgent(GridWorldAgent): pass
+
 
 class TrafficAgent(MovingAgent, GridObservingAgent):
     def __init__(self, **kwargs):
@@ -16,6 +19,7 @@ class TrafficAgent(MovingAgent, GridObservingAgent):
             move_range=1,
             **kwargs
         )
+
 
 class TrafficCorridorSimulation(SmartGridWorldSimulation):
     """
