@@ -7,7 +7,7 @@ from .observer import ObserverBaseComponent, AbsoluteEncodingObserver, \
     PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
     AbsolutePositionObserver, AmmoObserver
 from .state import StateBaseComponent, PositionState, TargetBarriersFreePlacementState, \
-    MazePlacementState, HealthState, AmmoState
+    MazePlacementState, HealthState, AmmoState, OrientationState
 
 
 _subclass_check_mapping = {
@@ -41,7 +41,8 @@ _registered_components = {
         TargetBarriersFreePlacementState,
         MazePlacementState,
         HealthState,
-        AmmoState
+        AmmoState,
+        OrientationState
     }
 }
 

@@ -355,5 +355,6 @@ class OrientationAgent(GridWorldAgent):
 
     @initial_orientation.setter
     def initial_orientation(self, value):
-        assert value in range(1, 5), "Initial orientation must be 1, 2, 3, or 4."
+        if value is not None:
+            assert value in range(1, 5), "Initial orientation must be 1, 2, 3, or 4."
         self._initial_orientation = value

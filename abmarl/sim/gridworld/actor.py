@@ -221,12 +221,12 @@ class DriftMoveActor(CrossMoveActor):
             cross_action = action_dict[self.key]
             if cross_action != 0:
                 # Agent has attempted to change directions, let the super process
-                if super.process_action(agent, action_dict, **kwargs):
+                if super().process_action(agent, action_dict, **kwargs):
                     agent.orientation = cross_action
                     return True
             # Agent has given no action or change direction action failed. We attempt a drift.
-            action_dict[self.key] = self.grid_action(agent.orientation)
-            return super.process_action(agent, action_dict, **kwargs)
+            action_dict[self.key] = agent.orientation
+            return super().process_action(agent, action_dict, **kwargs)
 
 
 class AttackActorBaseComponent(ActorBaseComponent, ABC):
