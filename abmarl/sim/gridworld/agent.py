@@ -324,3 +324,36 @@ class AmmoObservingAgent(AmmoAgent, ObservingAgent, metaclass=AmmoObservingAgent
     Boilterplate class required to work with the AmmoObserver.
     """
     pass
+
+
+class OrientationAgent(GridWorldAgent):
+    """
+    Agent that has an orientation, either 1: North, 2: East, 3: South, 4: West.
+    """
+    def __init__(self, initial_orientation=None, **kwargs):
+        super().__init__(**kwargs)
+        self.initial_orientation = initial_orientation
+
+    @property
+    def orientation(self):
+        """
+        The agent's orientation.
+        """
+        return self._orientation
+
+    @orientation.setter
+    def orientation(self, value):
+        assert value in range(1, 5), "Orientation must be 1, 2, 3, or 4."
+        self._orientation = value
+
+    @property
+    def initial_orientation(self):
+        """
+        The agent's starting orientation at the beginning of the simulation.
+        """
+        return self._initial_orientation
+
+    @initial_orientation.setter
+    def initial_orientation(self, value):
+        assert value in range(1, 5), "Initial orientation must be 1, 2, 3, or 4."
+        self._initial_orientation = value
