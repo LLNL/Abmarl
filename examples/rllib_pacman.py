@@ -1,5 +1,5 @@
 
-from abmarl.examples.sim.pacman import PacmanSim, PacmanAgent, WallAgent
+from abmarl.examples.sim.pacman import PacmanSim, PacmanAgent, WallAgent, FoodAgent
 from abmarl.managers import AllStepManager
 
 
@@ -15,6 +15,11 @@ object_registry = {
         encoding=2,
         # blocking=True,
         render_shape='s'
+    ),
+    'F': lambda n: FoodAgent(
+        id=f'food_{n}',
+        encoding=3,
+        render_color='g'
     )
 }
 file_name = '/g/g13/rusu1/abmarl/examples/pacman_simple.txt'
@@ -24,7 +29,8 @@ sim = AllStepManager(
         object_registry,
         states={'PositionState', 'OrientationState'},
         dones={'ActiveDone'},
-        observers={'PositionCenteredEncodingObserver'}
+        observers={'PositionCenteredEncodingObserver'},
+        overlapping={1: {3}}
     )
 )
 
