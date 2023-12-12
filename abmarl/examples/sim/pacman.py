@@ -15,7 +15,9 @@ class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent, HealthAgent
 class WallAgent(GridWorldAgent): pass
 
 
-class FoodAgent(HealthAgent): pass
+class FoodAgent(HealthAgent):
+    def __init__(self, **kwargs):
+        super().__init__(render_size=50, initial_health=1, **kwargs)
 
 
 class BaddieAgent(MovingAgent, OrientationAgent, GridObservingAgent):
@@ -106,52 +108,12 @@ class PacmanSim(SmartGridWorldSimulation):
             # No food left
             return True
 
-    def render(self, fig=None, **kwargs):
+    def render(self, **kwargs):
         """
         Draw the state of the pacman game.
-
-        Args:
-            fig: The figure on which to draw the grid. It's important
-                to provide this figure because the same figure must be used when drawing
-                each state of the simulation. Otherwise, a ton of figures will pop up,
-                which is very annoying.
         """
-        draw_now = fig is None
-        if draw_now:
-            from matplotlib import pyplot as plt
-            fig = plt.gcf()
-
-        fig.clear()
-        ax = fig.gca()
-        ax.set_facecolor('k')
-
-        # TODO: Update mscatter command to adjust size by agent.
-        # TODO: Update sim render command to take args for background color and grid off
-        # Draw the food
-        food_x = [
-            food.position[1] + 0.5 for food in self.agents.values()
-            if isinstance(food, FoodAgent) and food.active
-        ]
-        food_y = [
-            self.grid.rows - 0.5 - food.position[0] for food in self.agents.values()
-            if isinstance(food, FoodAgent) and food.active
-        ]
-        food_shape = [food.render_shape for food in self.agents.values() if food.active and isinstance(food, FoodAgent)]
-        food_color = [food.render_color for food in self.agents.values() if food.active and isinstance(food, FoodAgent)]
-        mscatter(food_x, food_y, ax=ax, m=food_shape, s=50, facecolor=food_color)
-
-        # Draw the rest
-        agents_x = [
-            agent.position[1] + 0.5 for agent in self.agents.values() if agent.active and not isinstance(agent, FoodAgent)
-        ]
-        agents_y = [
-            self.grid.rows - 0.5 - agent.position[0]
-            for agent in self.agents.values() if agent.active and not isinstance(agent, FoodAgent)
-        ]
-        shape = [agent.render_shape for agent in self.agents.values() if agent.active and not isinstance(agent, FoodAgent)]
-        color = [agent.render_color for agent in self.agents.values() if agent.active and not isinstance(agent, FoodAgent)]
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
-
-        if draw_now:
-            plt.plot()
-            plt.pause(1e-17)
+        super().render(
+            gridlines=False,
+            background_color='k',
+            **kwargs
+        )
