@@ -21,6 +21,7 @@ def test_grid_world_agent():
     assert agent.encoding == 4
     assert agent.render_shape == 'o'
     assert agent.render_color == 'gray'
+    assert agent.render_size == 200
     assert agent.configured
 
     # Encoding
@@ -74,6 +75,13 @@ def test_grid_world_agent():
         agent = GridWorldAgent(
             id='agent',
             render_shape='circle'
+        )
+
+    # Render size
+    with pytest.raises(AssertionError):
+        agent = GridWorldAgent(
+            id='agent',
+            render_size=-3
         )
 
 
