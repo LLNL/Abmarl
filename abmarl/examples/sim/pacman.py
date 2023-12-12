@@ -38,6 +38,12 @@ class PacmanSim(SmartGridWorldSimulation):
             self.rewards['pacman'] -= 0.1
         else:
             self.rewards['pacman'] += 0.01
+        if np.array_equal(self.pacman.position, np.array([9, 0])):
+            self.grid.remove(self.pacman, (9, 0))
+            self.grid.place(self.pacman, (9, 20))
+        elif np.array_equal(self.pacman.position, np.array([9, 20])):
+            self.grid.remove(self.pacman, (9, 20))
+            self.grid.place(self.pacman, (9, 0))
 
         # Compute overlaps with pacman
         candidate_agents = self.grid[self.pacman.position[0], self.pacman.position[1]]
@@ -56,11 +62,18 @@ class PacmanSim(SmartGridWorldSimulation):
         # Now move the baddies and compute overlaps with pacman
         for agent_id, action in action_dict.items():
             if agent_id == 'pacman': continue
-            move_result = self.move_actor.process_action(self.agents[agent_id], action, **kwargs)
+            agent = self.agents[agent_id]
+            move_result = self.move_actor.process_action(agent, action, **kwargs)
             if not move_result:
                 self.rewards[agent_id] -= 0.1
             else:
                 self.rewards[agent_id] += 0.01
+            if np.array_equal(agent.position, np.array([9, 0])):
+                self.grid.remove(agent, (9, 0))
+                self.grid.place(agent, (9, 20))
+            elif np.array_equal(agent.position, np.array([9, 20])):
+                self.grid.remove(agent, (9, 20))
+                self.grid.place(agent, (9, 0))
 
         # Compute overlaps with pacman
         candidate_agents = self.grid[self.pacman.position[0], self.pacman.position[1]]

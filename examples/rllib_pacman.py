@@ -20,7 +20,7 @@ object_registry = {
     'F': lambda n: FoodAgent(
         id=f'food_{n}',
         encoding=3,
-        render_color='g'
+        render_color='white'
     ),
     'B': lambda n: BaddieAgent(
         id=f'baddie_{n}',
