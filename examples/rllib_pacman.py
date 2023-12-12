@@ -28,7 +28,7 @@ object_registry = {
         render_color='r'
     ),
 }
-file_name = '/g/g13/rusu1/abmarl/examples/pacman_simple.txt'
+file_name = 'pacman_simple.txt'
 sim = AllStepManager(
     PacmanSim.build_sim_from_file(
         file_name,
