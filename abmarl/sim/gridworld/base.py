@@ -209,6 +209,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                 each state of the simulation. Otherwise, a ton of figures will pop up,
                 which is very annoying.
             gridlines: If true, then draw the gridlines.
+            background_color: The background color of the grid, default is white.
         """
         draw_now = fig is None
         if draw_now:
