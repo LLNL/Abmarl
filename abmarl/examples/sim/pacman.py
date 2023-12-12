@@ -112,6 +112,14 @@ class PacmanSim(SmartGridWorldSimulation):
         """
         Draw the state of the pacman game.
         """
+        for agent in self.agents.values():
+            if isinstance(agent, OrientationAgent):
+                agent.render_shape = {
+                    1: '<',
+                    2: 'v',
+                    3: '>',
+                    4: '^'
+                }[agent.orientation]
         super().render(
             gridlines=False,
             background_color='k',
