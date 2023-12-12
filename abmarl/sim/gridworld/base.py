@@ -197,7 +197,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         grid = Grid(rows, cols, **kwargs)
         return cls(grid=grid, **kwargs)
 
-    def render(self, fig=None, **kwargs):
+    def render(self, fig=None, gridlines=True, background_color='w', **kwargs):
         """
         Draw the grid and all active agents in the grid.
 
@@ -208,6 +208,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                 to provide this figure because the same figure must be used when drawing
                 each state of the simulation. Otherwise, a ton of figures will pop up,
                 which is very annoying.
+            gridlines: If true, then draw the gridlines.
         """
         draw_now = fig is None
         if draw_now:
@@ -216,12 +217,14 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
 
         fig.clear()
         ax = fig.gca()
+        ax.set_facecolor(background_color)
 
         # Draw the gridlines
         ax.set(xlim=(0, self.grid.cols), ylim=(0, self.grid.rows))
         ax.set_xticks(np.arange(0, self.grid.cols, 1))
         ax.set_yticks(np.arange(0, self.grid.rows, 1))
-        ax.grid()
+        if gridlines:
+            ax.grid()
 
         # Draw the agents
         agents_x = [
@@ -233,7 +236,8 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
         ]
         shape = [agent.render_shape for agent in self.agents.values() if agent.active]
         color = [agent.render_color for agent in self.agents.values() if agent.active]
-        mscatter(agents_x, agents_y, ax=ax, m=shape, s=200, facecolor=color)
+        size = [agent.render_size for agent in self.agents.values() if agent.active]
+        mscatter(agents_x, agents_y, ax=ax, m=shape, s=size, facecolor=color)
 
         if draw_now:
             plt.plot()

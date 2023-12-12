@@ -9,13 +9,14 @@ class GridWorldAgent(PrincipleAgent):
     The base agent in the GridWorld.
     """
     def __init__(self, initial_position=None, blocking=False, encoding=None, render_shape='o',
-                 render_color='gray', **kwargs):
+                 render_color='gray', render_size=200, **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position
         self.blocking = blocking
         self.render_shape = render_shape
         self.render_color = render_color
+        self.render_size = render_size
 
     @property
     def encoding(self):
@@ -100,10 +101,22 @@ class GridWorldAgent(PrincipleAgent):
         self._render_color = value
 
     @property
+    def render_size(self):
+        """
+        The agent's size in the rendered grid.
+        """
+        return self._render_size
+
+    @render_size.setter
+    def render_size(self, value):
+        assert type(value) is int and value > 0, "Render size must be nonnegative integer."
+        self._render_size = value
+
+    @property
     def configured(self):
         return super().configured and self.encoding is not None and \
             self.blocking is not None and self.render_shape is not None and \
-            self.render_color is not None
+            self.render_size is not None
 
 
 class GridObservingAgent(ObservingAgent, GridWorldAgent):
