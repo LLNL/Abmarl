@@ -6,7 +6,7 @@ from abmarl.sim.gridworld.actor import DriftMoveActor
 
 class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent):
     def __init__(self, **kwargs):
-        super().__init__(move_range=1, view_range=1, **kwargs)
+        super().__init__(move_range=1, view_range=100, **kwargs)
 
 
 class WallAgent(GridWorldAgent): pass

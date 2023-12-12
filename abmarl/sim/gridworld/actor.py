@@ -152,10 +152,10 @@ class CrossMoveActor(ActorBaseComponent):
         assert cross_action in [0, 1, 2, 3, 4], "Cross action must be 0, 1, 2, 3, or 4."
         return {
             0: np.array((0, 0)), # Stay
-            1: np.array([0, -1]), # Up
-            2: np.array([1, 0]), # Right
-            3: np.array([0, 1]), # Down
-            4: np.array([-1, 0]), # Left
+            1: np.array([0, -1]), # Left
+            2: np.array([1, 0]), # Down
+            3: np.array([0, 1]), # Right
+            4: np.array([-1, 0]), # Up
         }[cross_action]
 
     def process_action(self, agent, action_dict, **kwargs):
