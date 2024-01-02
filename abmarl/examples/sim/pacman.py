@@ -93,7 +93,7 @@ class PacmanSim(SmartGridWorldSimulation):
             self.grid.remove(self.pacman, tuple(self.pacman.position))
 
     def get_done(self, agent_id, **kwargs):
-        self.get_all_done(**kwargs)
+        return self.get_all_done(**kwargs)
 
     def get_all_done(self, **kwargs):
         """

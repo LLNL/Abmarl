@@ -1,6 +1,7 @@
 
 from abmarl.examples.sim.pacman import PacmanSim, PacmanAgent, WallAgent, FoodAgent, BaddieAgent
 from abmarl.managers import AllStepManager
+from abmarl.external import MultiAgentWrapper
 
 
 object_registry = {
@@ -29,23 +30,73 @@ object_registry = {
     ),
 }
 file_name = 'pacman_simple.txt'
-sim = AllStepManager(
-    PacmanSim.build_sim_from_file(
-        file_name,
-        object_registry,
-        states={'PositionState', 'OrientationState', 'HealthState'},
-        dones={'ActiveDone'},
-        observers={'PositionCenteredEncodingObserver'},
-        overlapping={1: {3, 4}, 4: {3, 4}}
+sim = MultiAgentWrapper(
+    AllStepManager(
+        PacmanSim.build_sim_from_file(
+            file_name,
+            object_registry,
+            states={'PositionState', 'OrientationState', 'HealthState'},
+            observers={'AbsoluteEncodingObserver'},
+            overlapping={1: {3, 4}, 4: {3, 4}}
+        )
     )
 )
 
+sim_name = "Pacman"
+from ray.tune.registry import register_env
+register_env(sim_name, lambda sim_config: sim)
 
-from abmarl.trainers import DebugTrainer
-# Setup the Debugger
-debugger = DebugTrainer(
-    sim=sim,
-    output_dir="output_dir",
-    name="Pacman_simple_demo"
-)
-debugger.train(iterations=4, render=True, horizon=200)
+policies = {
+    'pacman': (None, sim.sim.agents['pacman'].observation_space, sim.sim.agents['pacman'].action_space, {}),
+    'baddie': (None, sim.sim.agents['baddie_157'].observation_space, sim.sim.agents['baddie_157'].action_space, {}),
+}
+def policy_mapping_fn(agent_id):
+    if agent_id.startswith('pacman'):
+        return 'pacman'
+    else:
+        return 'baddie'
+
+params = {
+    'experiment': {
+        'title': f'{sim_name}',
+        'sim_creator': lambda config=None: sim,
+    },
+    'ray_tune': {
+        'run_or_experiment': 'A2C',
+        'checkpoint_freq': 50,
+        'checkpoint_at_end': True,
+        'stop': {
+            'episodes_total': 200_000,
+        },
+        'verbose': 2,
+        'config': {
+            # --- Simulation ---
+            'disable_env_checking': False,
+            'env': sim_name,
+            'horizon': 200,
+            'env_config': {},
+            # --- Multiagent ---
+            'multiagent': {
+                'policies': policies,
+                'policy_mapping_fn': policy_mapping_fn,
+                'policies_to_train': ['pacman'],
+            },
+            # "lr": 0.0001,
+            # --- Parallelism ---
+            # Number of workers per experiment: int
+            "num_workers": 71,
+            # Number of simulations that each worker starts: int
+            "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
+        },
+    }
+}
+
+
+# from abmarl.trainers import DebugTrainer
+# # Setup the Debugger
+# debugger = DebugTrainer(
+#     sim=sim,
+#     output_dir="output_dir",
+#     name="Pacman_simple_demo"
+# )
+# debugger.train(iterations=4, render=True, horizon=200)
