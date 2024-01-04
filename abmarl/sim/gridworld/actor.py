@@ -200,6 +200,11 @@ class DriftMoveActor(CrossMoveActor):
 
     If the agent chooses to stay in place or if its attempt to change directions
     is unsuccessful, then we attempt to drift it in the direction of its orientation.
+    For example, if the agent is moving right in a corridor and attempts to move
+    up, that move will fail and it will continue drifting. Again, if the agent is
+    in the corner and attempts to change orientation (but still in the corner),
+    that change will fail and it will keep its current orientation, even though
+    it is blocked that way too.
     """
     def process_action(self, agent, action_dict, **kwargs):
         """
