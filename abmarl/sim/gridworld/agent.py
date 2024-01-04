@@ -341,7 +341,7 @@ class AmmoObservingAgent(AmmoAgent, ObservingAgent, metaclass=AmmoObservingAgent
 
 class OrientationAgent(GridWorldAgent):
     """
-    Agent that has an orientation, either 1: North, 2: East, 3: South, 4: West.
+    Agent that has an orientation, either 1: Left, 2: Down, 3: Right, 4: Up.
     """
     def __init__(self, initial_orientation=None, **kwargs):
         super().__init__(**kwargs)

@@ -64,7 +64,6 @@ class PacmanSim(SmartGridWorldSimulation):
         candidate_agents = self.grid[self.pacman.position[0], self.pacman.position[1]]
         for agent in candidate_agents.copy().values():
             if agent.id == self.pacman.id: continue
-            # TODO: Actor/event handler that processes overlaps
             if isinstance(agent, FoodAgent): # Pacman eats food
                 self.rewards['pacman'] += 0.1
                 self.grid.remove(agent, tuple(self.pacman.position))
@@ -94,7 +93,6 @@ class PacmanSim(SmartGridWorldSimulation):
         candidate_agents = self.grid[self.pacman.position[0], self.pacman.position[1]]
         for agent in candidate_agents.copy().values():
             if agent.id == self.pacman.id: continue
-            # TODO: Actor/event handler that processes overlaps
             if isinstance(agent, BaddieAgent): # Baddie eats pacman and game over
                 self.rewards['pacman'] -= 1
                 self.rewards[agent.id] += 1
