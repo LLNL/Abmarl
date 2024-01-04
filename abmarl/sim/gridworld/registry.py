@@ -1,6 +1,7 @@
 
 from .actor import ActorBaseComponent, MoveActor, CrossMoveActor, BinaryAttackActor, \
-    EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor
+    EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor, \
+    DriftMoveActor
 from .done import DoneBaseComponent, ActiveDone, TargetAgentDone, OneTeamRemainingDone, \
     TargetDestroyedDone
 from .observer import ObserverBaseComponent, AbsoluteEncodingObserver, \
@@ -21,6 +22,7 @@ _registered_components = {
     'actor': {
         MoveActor,
         CrossMoveActor,
+        DriftMoveActor,
         BinaryAttackActor,
         EncodingBasedAttackActor,
         RestrictedSelectiveAttackActor,
