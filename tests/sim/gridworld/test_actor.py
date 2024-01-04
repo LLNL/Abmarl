@@ -6,9 +6,11 @@ import pytest
 from abmarl.tools import Box
 from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, BinaryAttackActor, \
     SelectiveAttackActor, EncodingBasedAttackActor, RestrictedSelectiveAttackActor, \
-    ActorBaseComponent
-from abmarl.sim.gridworld.state import PositionState, HealthState, AmmoState
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, HealthAgent, AmmoAgent
+    ActorBaseComponent, DriftMoveActor
+from abmarl.sim.gridworld.state import PositionState, HealthState, AmmoState, OrientationState
+from abmarl.sim.gridworld.agent import (
+    MovingAgent, AttackingAgent, HealthAgent, AmmoAgent, OrientationAgent, GridWorldAgent
+)
 from abmarl.sim.gridworld.grid import Grid
 
 grid = Grid(5,6)
@@ -239,6 +241,214 @@ def test_cross_move_actor_with_overlap():
     np.testing.assert_array_equal(agents['agent1'].position, np.array([2, 3]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 3]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 3]))
+
+
+def test_drift_move_actor():
+    class DriftingAgent(MovingAgent, OrientationAgent): pass
+
+    # Three drfiters will move towards center and bump into barrier. Only one will
+    # pass through it and keep going. The other two will change directions to check
+    # that movement updates orientation.
+    # The fourth agent will start in BR corner with orientation downard, then it
+    # it will try right, then down, then finally up.
+    init_coords = [
+        np.array([0, 2]),
+        np.array([2, 0]),
+        np.array([2, 4]),
+        np.array([4, 4]),
+    ]
+    init_orient = [2, 3, 1, 2]
+    agents = {
+        **{
+            f'agent_{o}': DriftingAgent(
+                id=f'agent_{o}',
+                encoding=o + 1,
+                initial_position = init_coords[o],
+                initial_orientation=init_orient[o],
+                move_range=1
+            ) for o in range(4)
+        },
+        'wall_agent': GridWorldAgent(
+            id='wall_agent',
+            encoding=2,
+            initial_position=np.array([2, 2])
+        )
+    }
+    grid = Grid(5, 5, overlapping={2: {1}, 1: {1}})
+    orientation_state = OrientationState(agents=agents, grid=grid)
+    position_state = PositionState(agents=agents, grid=grid)
+    actor = DriftMoveActor(agents=agents, grid=grid)
+
+    orientation_state.reset()
+    position_state.reset()
+    np.testing.assert_array_equal(
+        agents['agent_0'].position,
+        np.array([0, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_1'].position,
+        np.array([2, 0])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_2'].position,
+        np.array([2, 4])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_3'].position,
+        np.array([4, 4])
+    )
+    assert agents['agent_0'].orientation == 2
+    assert agents['agent_1'].orientation == 3
+    assert agents['agent_2'].orientation == 1
+    assert agents['agent_3'].orientation == 2
+
+
+    # 3 Agents move towards center, one attempts to move down fails
+    assert actor.process_action(agents['agent_0'], {'move': 0})
+    assert actor.process_action(agents['agent_1'], {'move': 0})
+    assert actor.process_action(agents['agent_2'], {'move': 0})
+    assert not actor.process_action(agents['agent_3'], {'move': 0})
+
+    np.testing.assert_array_equal(
+        agents['agent_0'].position,
+        np.array([1, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_1'].position,
+        np.array([2, 1])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_2'].position,
+        np.array([2, 3])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_3'].position,
+        np.array([4, 4])
+    )
+    assert agents['agent_0'].orientation == 2
+    assert agents['agent_1'].orientation == 3
+    assert agents['agent_2'].orientation == 1
+    assert agents['agent_3'].orientation == 2
+
+
+    # 3 agents drift center, two fail, one passes through barrier. Corner agent
+    # again cannot move.
+    assert actor.process_action(agents['agent_0'], {'move': 0})
+    assert not actor.process_action(agents['agent_1'], {'move': 0})
+    assert not actor.process_action(agents['agent_2'], {'move': 0})
+    assert not actor.process_action(agents['agent_3'], {'move': 3})
+
+    np.testing.assert_array_equal(
+        agents['agent_0'].position,
+        np.array([2, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_1'].position,
+        np.array([2, 1])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_2'].position,
+        np.array([2, 3])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_3'].position,
+        np.array([4, 4])
+    )
+    assert agents['agent_0'].orientation == 2
+    assert agents['agent_1'].orientation == 3
+    assert agents['agent_2'].orientation == 1
+    assert agents['agent_3'].orientation == 2
+    # TODO: Intersting to note that agent stuck in bad position will not change
+    # orientation to a new bad position.
+
+
+    # One agent drifts past barrier
+    # Another changes direction
+    # Another changes direction
+    # Corner one still bad move
+    assert actor.process_action(agents['agent_0'], {'move': 0})
+    assert actor.process_action(agents['agent_1'], {'move': 1})
+    assert actor.process_action(agents['agent_2'], {'move': 4})
+    assert not actor.process_action(agents['agent_3'], {'move': 2})
+
+    np.testing.assert_array_equal(
+        agents['agent_0'].position,
+        np.array([3, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_1'].position,
+        np.array([2, 0])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_2'].position,
+        np.array([1, 3])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_3'].position,
+        np.array([4, 4])
+    )
+    assert agents['agent_0'].orientation == 2
+    assert agents['agent_1'].orientation == 1
+    assert agents['agent_2'].orientation == 4
+    assert agents['agent_3'].orientation == 2
+
+
+    # 2 agents issue move commands in their current direction
+    # One agent turns along wall
+    # Corner one moves up out of corner
+    assert actor.process_action(agents['agent_0'], {'move': 2})
+    assert actor.process_action(agents['agent_1'], {'move': 2})
+    assert actor.process_action(agents['agent_2'], {'move': 4})
+    assert actor.process_action(agents['agent_3'], {'move': 4})
+
+    np.testing.assert_array_equal(
+        agents['agent_0'].position,
+        np.array([4, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_1'].position,
+        np.array([3, 0])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_2'].position,
+        np.array([0, 3])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_3'].position,
+        np.array([3, 4])
+    )
+    assert agents['agent_0'].orientation == 2
+    assert agents['agent_1'].orientation == 2
+    assert agents['agent_2'].orientation == 4
+    assert agents['agent_3'].orientation == 4
+
+
+    # Two agents attempt to turn into wall, failes, continue on trajectory
+    assert not actor.process_action(agents['agent_0'], {'move': 0})
+    assert actor.process_action(agents['agent_1'], {'move': 1})
+    assert not actor.process_action(agents['agent_2'], {'move': 0})
+    assert actor.process_action(agents['agent_3'], {'move': 3})
+
+    np.testing.assert_array_equal(
+        agents['agent_0'].position,
+        np.array([4, 2])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_1'].position,
+        np.array([4, 0])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_2'].position,
+        np.array([0, 3])
+    )
+    np.testing.assert_array_equal(
+        agents['agent_3'].position,
+        np.array([2, 4])
+    )
+    assert agents['agent_0'].orientation == 2
+    assert agents['agent_1'].orientation == 2
+    assert agents['agent_2'].orientation == 4
+    assert agents['agent_3'].orientation == 4
 
 
 def test_binary_attack_actor():
