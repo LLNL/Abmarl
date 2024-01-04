@@ -29,7 +29,7 @@ object_registry = {
         render_color='r'
     ),
 }
-file_name = 'pacman_simple.txt'
+file_name = 'pacman.txt'
 sim = MultiAgentWrapper(
     AllStepManager(
         PacmanSim.build_sim_from_file(
