@@ -1,10 +1,11 @@
 
 import numpy as np
 
-from abmarl.sim.gridworld.agent import MovingAgent, OrientationAgent, GridWorldAgent, GridObservingAgent, HealthAgent
+from abmarl.sim.gridworld.agent import (
+    MovingAgent, OrientationAgent, GridWorldAgent, GridObservingAgent, HealthAgent
+)
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.actor import DriftMoveActor
-from abmarl.tools.matplotlib_utils import mscatter
 
 
 class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent, HealthAgent):
@@ -26,6 +27,18 @@ class BaddieAgent(MovingAgent, OrientationAgent, GridObservingAgent):
 
 
 class PacmanSim(SmartGridWorldSimulation):
+    """
+    The Pacman Simulation is the familiar pacman arcade game.
+
+    The simulation expects as single Pacman agent named "pacman". Food pieces should
+    be "FoodAgents" and the baddies are "BaddieAgents", of which there can be multiple
+    baddies. Pacman "consumes" the food as it overlaps them, and baddies "consume"
+    pacman, ending the game, when it overlaps the pacman. All entities move according
+    to the DriftMoveActor.
+
+    We also assume that the grid is composed like the standard pacman grid; specifically,
+    we hardcode the corridor-teleportation feature.
+    """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.pacman = self.agents['pacman']

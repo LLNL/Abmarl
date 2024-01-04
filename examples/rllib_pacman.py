@@ -47,14 +47,23 @@ from ray.tune.registry import register_env
 register_env(sim_name, lambda sim_config: sim)
 
 policies = {
-    'pacman': (None, sim.sim.agents['pacman'].observation_space, sim.sim.agents['pacman'].action_space, {}),
-    'baddie': (None, sim.sim.agents['baddie_157'].observation_space, sim.sim.agents['baddie_157'].action_space, {}),
+    'pacman': (
+        None, sim.sim.agents['pacman'].observation_space, sim.sim.agents['pacman'].action_space, {}
+    ),
+    'baddie': (
+        None,
+        sim.sim.agents['baddie_157'].observation_space,
+        sim.sim.agents['baddie_157'].action_space, {}
+    ),
 }
+
+
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('pacman'):
         return 'pacman'
     else:
         return 'baddie'
+
 
 params = {
     'experiment': {
@@ -90,13 +99,3 @@ params = {
         },
     }
 }
-
-
-# from abmarl.trainers import DebugTrainer
-# # Setup the Debugger
-# debugger = DebugTrainer(
-#     sim=sim,
-#     output_dir="output_dir",
-#     name="Pacman_simple_demo"
-# )
-# debugger.train(iterations=4, render=True, horizon=200)
