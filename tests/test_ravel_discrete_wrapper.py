@@ -1,5 +1,6 @@
 
 from gym.spaces import MultiDiscrete, Discrete, MultiBinary, Dict, Tuple
+from gym.spaces import Box as GymBox
 import numpy as np
 import pytest
 
@@ -14,7 +15,7 @@ def test_ravel():
     my_space = Dict({
         'a': MultiDiscrete([5, 3]),
         'b': MultiBinary(4),
-        'c': Box(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
+        'c': GymBox(np.array([[-2, 6, 3],[0, 0, 1]]), np.array([[2, 12, 5],[2, 4, 2]]), dtype=int),
         'd': Dict({
             1: Discrete(3),
             2: Box(1, 3, (2,), int)

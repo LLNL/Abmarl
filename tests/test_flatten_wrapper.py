@@ -186,6 +186,7 @@ def test_flatten_space():
         int
     )
 
+
 # --- Test flatten wrappers --- #
 def test_flatten_wrapper():
     sim = MultiAgentContinuousGymSpaceSim()
