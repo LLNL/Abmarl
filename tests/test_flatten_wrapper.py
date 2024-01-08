@@ -1,4 +1,5 @@
 from gym.spaces import Dict, Tuple, Discrete, MultiDiscrete, MultiBinary
+from gym.spaces import Box as GymBox
 import numpy as np
 
 from abmarl.tools import Box
@@ -9,7 +10,7 @@ from abmarl.examples import MultiAgentContinuousGymSpaceSim
 # --- Test flatten helper commands --- #
 
 box = Box(2, 16, (3,4), int)
-box2 = Box(2.4, 16.1, (3,4))
+box2 = GymBox(2.4, 16.1, (3,4))
 discrete = Discrete(11)
 multi_binary = MultiBinary(7)
 multi_discrete = MultiDiscrete([2, 6, 4])
@@ -184,7 +185,6 @@ def test_flatten_space():
         (20,),
         int
     )
-
 
 # --- Test flatten wrappers --- #
 def test_flatten_wrapper():
