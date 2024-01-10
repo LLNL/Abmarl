@@ -2,9 +2,9 @@ import itertools
 
 import numpy as np
 from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Dict, Tuple
+from gym.spaces import Box as GymBox
 from gym.spaces.box import get_inf
 
-from abmarl.tools import Box
 from abmarl.sim import Agent
 
 from .sar_wrapper import SARWrapper
@@ -17,7 +17,7 @@ def _ravel_helper(space, point):
         return np.ravel_multi_index(point, space.nvec), np.prod(space.nvec)
     if isinstance(space, MultiBinary):
         return np.ravel_multi_index(point, [2] * space.n), 2 ** space.n
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         space_helper = (space.high + 1 - space.low).flatten()
         return np.ravel_multi_index((point - space.low).flatten(), space_helper), \
             np.prod(space_helper)
@@ -46,7 +46,7 @@ def _nested_dim_helper(space):
         return [np.prod(space.nvec)]
     elif isinstance(space, MultiBinary):
         return [2 ** space.n]
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         return [np.prod(space.high + 1 - space.low)]
     elif isinstance(space, Dict):
         return [np.prod([_nested_dim_helper(s) for s in space.spaces.values()])]
@@ -87,7 +87,7 @@ def unravel(space, point):
         return [*np.unravel_index(point, space.nvec)]
     if isinstance(space, MultiBinary):
         return [*np.unravel_index(point, [2] * space.n)]
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         space_helper = (space.high + 1 - space.low).flatten()
         return np.reshape(np.unravel_index(point, space_helper), space.shape) + space.low
     elif isinstance(space, Dict):
@@ -134,7 +134,7 @@ def check_space(space):
     if isinstance(space, Discrete) or isinstance(space, MultiDiscrete) or \
             isinstance(space, MultiBinary):
         return True
-    elif isinstance(space, Box) and np.issubdtype(space, int) and _isbounded(space):
+    elif isinstance(space, GymBox) and np.issubdtype(space, int) and _isbounded(space):
         return True
     elif isinstance(space, Dict):
         return all([check_space(sub_space) for sub_space in space.spaces.values()])

@@ -1,5 +1,6 @@
 
 from gym.spaces import Discrete, Tuple, Dict, MultiDiscrete, MultiBinary
+from gym.spaces import Box as GymBox
 import numpy as np
 
 from abmarl.tools import Box
@@ -19,7 +20,7 @@ def flatdim(space):
     Returns:
         The number of dimensions in the flattened space.
     """
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         return int(np.prod(space.shape))
     elif isinstance(space, Discrete):
         return 1
@@ -47,7 +48,7 @@ def flatten(space, point):
     Returns:
         A flattened representation of the point.
     """
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         return np.asarray(point, dtype=space.dtype).flatten()
     elif isinstance(space, Discrete):
         return np.array([point], dtype=int)
@@ -76,7 +77,7 @@ def unflatten(space, point):
     Returns:
         An unflattened representation of the point.
     """
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         return np.asarray(point, dtype=space.dtype).reshape(space.shape)
     elif isinstance(space, Discrete):
         return point[0]
@@ -118,7 +119,7 @@ def flatten_space(space):
     Returns:
         Box with type and dimension according to the flattening.
     """
-    if isinstance(space, Box):
+    if isinstance(space, GymBox):
         return Box(space.low.flatten(), space.high.flatten(), dtype=space.dtype)
     if isinstance(space, Discrete):
         return Box(low=0, high=space.n - 1, shape=(1, ), dtype=int)
