@@ -32,8 +32,8 @@ object_registry = {
 file_name = 'pacman.txt'
 sim = MultiAgentWrapper(
     AllStepManager(
-        PacmanSim.build_sim_from_file(
-            file_name,
+        PacmanSim.build_sim_from_array(
+            PacmanSim.example_grid,
             object_registry,
             states={'PositionState', 'OrientationState', 'HealthState'},
             observers={'AbsoluteEncodingObserver'},
@@ -48,6 +48,11 @@ sim = MultiAgentWrapper(
         )
     )
 )
+
+for agent in sim.sim.agents.values():
+    if agent.id.startswith('baddie'):
+        print(f'{agent.id} at {agent.initial_position}')
+import sys; sys.exit()
 
 sim_name = "Pacman"
 from ray.tune.registry import register_env
