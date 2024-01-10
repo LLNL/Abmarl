@@ -38,7 +38,7 @@ sim = MultiAgentWrapper(
             states={'PositionState', 'OrientationState', 'HealthState'},
             observers={'AbsoluteEncodingObserver'},
             overlapping={1: {3, 4}, 4: {3, 4}},
-            reward_scheme = {
+            reward_scheme={
                 'bad_move': 0,
                 'entropy': -0.01,
                 'eat_food': 0.05,

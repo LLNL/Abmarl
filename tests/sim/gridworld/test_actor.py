@@ -263,7 +263,7 @@ def test_drift_move_actor():
             f'agent_{o}': DriftingAgent(
                 id=f'agent_{o}',
                 encoding=o + 1,
-                initial_position = init_coords[o],
+                initial_position=init_coords[o],
                 initial_orientation=init_orient[o],
                 move_range=1
             ) for o in range(4)
