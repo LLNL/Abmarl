@@ -3,8 +3,8 @@ import numpy as np
 
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.state import PositionState, MazePlacementState, HealthState, \
-    TargetBarriersFreePlacementState, StateBaseComponent, AmmoState
-from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent, AmmoAgent
+    TargetBarriersFreePlacementState, StateBaseComponent, AmmoState, OrientationState
+from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent, AmmoAgent, OrientationAgent
 import pytest
 
 
@@ -987,3 +987,21 @@ def test_target_barrier_free_placement_state_random_order():
         if 'barrier_agent0' in grid[0, 1]:
             count_0_closest += 1
     assert count_0_closest < 10
+
+
+def test_orientation_state():
+    agents = {
+        f'agent_{o}': OrientationAgent(
+            id=f'agent_{o}',
+            encoding=o,
+            initial_orientation=o
+        ) for o in range(1, 5)
+    }
+    grid = Grid(1, 4)
+    state = OrientationState(agents=agents, grid=grid)
+    assert isinstance(state, OrientationState)
+    assert isinstance(state, StateBaseComponent)
+
+    state.reset()
+    for agent in agents.values():
+        assert agent.orientation == agent.initial_orientation

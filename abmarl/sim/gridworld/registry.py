@@ -1,13 +1,14 @@
 
 from .actor import ActorBaseComponent, MoveActor, CrossMoveActor, BinaryAttackActor, \
-    EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor
+    EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor, \
+    DriftMoveActor
 from .done import DoneBaseComponent, ActiveDone, TargetAgentDone, OneTeamRemainingDone, \
     TargetDestroyedDone
 from .observer import ObserverBaseComponent, AbsoluteEncodingObserver, \
     PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
     AbsolutePositionObserver, AmmoObserver
 from .state import StateBaseComponent, PositionState, TargetBarriersFreePlacementState, \
-    MazePlacementState, HealthState, AmmoState
+    MazePlacementState, HealthState, AmmoState, OrientationState
 
 
 _subclass_check_mapping = {
@@ -21,6 +22,7 @@ _registered_components = {
     'actor': {
         MoveActor,
         CrossMoveActor,
+        DriftMoveActor,
         BinaryAttackActor,
         EncodingBasedAttackActor,
         RestrictedSelectiveAttackActor,
@@ -41,7 +43,8 @@ _registered_components = {
         TargetBarriersFreePlacementState,
         MazePlacementState,
         HealthState,
-        AmmoState
+        AmmoState,
+        OrientationState
     }
 }
 

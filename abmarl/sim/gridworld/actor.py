@@ -6,7 +6,7 @@ from gym.spaces import Discrete, MultiDiscrete, Dict
 
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -152,10 +152,10 @@ class CrossMoveActor(ActorBaseComponent):
         assert cross_action in [0, 1, 2, 3, 4], "Cross action must be 0, 1, 2, 3, or 4."
         return {
             0: np.array((0, 0)), # Stay
-            1: np.array([0, -1]), # Up
-            2: np.array([1, 0]), # Right
-            3: np.array([0, 1]), # Down
-            4: np.array([-1, 0]), # Left
+            1: np.array([0, -1]), # Left
+            2: np.array([1, 0]), # Down
+            3: np.array([0, 1]), # Right
+            4: np.array([-1, 0]), # Up
         }[cross_action]
 
     def process_action(self, agent, action_dict, **kwargs):
@@ -192,6 +192,46 @@ class CrossMoveActor(ActorBaseComponent):
                     return False
             else:
                 return False
+
+
+class DriftMoveActor(CrossMoveActor):
+    """
+    Agents can move up, down, left, right, or stay in place.
+
+    If the agent chooses to stay in place or if its attempt to change directions
+    is unsuccessful, then we attempt to drift it in the direction of its orientation.
+    For example, if the agent is moving right in a corridor and attempts to move
+    up, that move will fail and it will continue drifting. Again, if the agent is
+    in the corner and attempts to change orientation (but still in the corner),
+    that change will fail and it will keep its current orientation, even though
+    it is blocked that way too.
+    """
+    def process_action(self, agent, action_dict, **kwargs):
+        """
+        The agent can move up, down, left, right, or stay in place.
+
+        If the agent chooses to stay in place or if its attempt to change directions
+        is unsuccessful, then we attempt to drift it in the direction of its orientation.
+
+        Args:
+            agent: Move the agent if it is a MovingAgent and OrientationAgent.
+            action_dict: The action dictionary for this agent in this step. If
+                the agent is a MovingAgent, then the action dictionary will contain
+                the "move" entry.
+
+        Returns:
+            True if the move is successful, False otherwise.
+        """
+        if isinstance(agent, OrientationAgent) and isinstance(agent, MovingAgent):
+            cross_action = action_dict[self.key]
+            if cross_action != 0:
+                # Agent has attempted to change directions, let the super process
+                if super().process_action(agent, action_dict, **kwargs):
+                    agent.orientation = cross_action
+                    return True
+            # Agent has given no action or change direction action failed. We attempt a drift.
+            action_dict[self.key] = agent.orientation
+            return super().process_action(agent, action_dict, **kwargs)
 
 
 class AttackActorBaseComponent(ActorBaseComponent, ABC):

@@ -6,7 +6,7 @@ import random
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent, GridWorldAgent
-from abmarl.sim.gridworld.agent import HealthAgent, AmmoAgent
+from abmarl.sim.gridworld.agent import HealthAgent, AmmoAgent, OrientationAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -654,3 +654,22 @@ class AmmoState(StateBaseComponent):
         for agent in self.agents.values():
             if isinstance(agent, AmmoAgent):
                 agent.ammo = agent.initial_ammo
+
+
+class OrientationState(StateBaseComponent):
+    """
+    Manages the state of the agent's orientation.
+
+    Orientation determines not only which way the agent is "facing" but also includes
+    drift, which will move the agent one cell away in the direction that it is moving.
+    """
+    def reset(self, **kwargs):
+        """
+        Give OrientationAgents their initial orientation (or random if not assigned).
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, OrientationAgent):
+                if agent.initial_orientation:
+                    agent.orientation = agent.initial_orientation
+                else:
+                    agent.orientation = np.random.randint(1, 5)

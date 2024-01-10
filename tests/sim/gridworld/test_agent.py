@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
-    HealthAgent, AttackingAgent, AmmoAgent, AmmoObservingAgent
+    HealthAgent, AttackingAgent, AmmoAgent, AmmoObservingAgent, OrientationAgent
 from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
@@ -247,4 +247,50 @@ def test_ammo_observing_agent():
             id='agent',
             encoding=1,
             initial_ammo=2.4
+        )
+
+
+def test_orientation_agent():
+    agent = OrientationAgent(
+        id='agent',
+        encoding=1,
+        initial_orientation=3
+    )
+    assert isinstance(agent, OrientationAgent)
+    assert isinstance(agent, GridWorldAgent)
+    assert agent.initial_orientation == 3
+
+    agent.orientation = 2
+    assert agent.orientation == 2
+
+    with pytest.raises(AssertionError):
+        OrientationAgent(
+            id='agent',
+            encoding=1,
+            initial_orientation='left'
+        )
+        OrientationAgent(
+            id='agent',
+            encoding=1,
+            initial_orientation='N'
+        )
+        OrientationAgent(
+            id='agent',
+            encoding=1,
+            initial_orientation=0
+        )
+        OrientationAgent(
+            id='agent',
+            encoding=1,
+            orientation='left'
+        )
+        OrientationAgent(
+            id='agent',
+            encoding=1,
+            orientation='N'
+        )
+        OrientationAgent(
+            id='agent',
+            encoding=1,
+            orientation=0
         )
