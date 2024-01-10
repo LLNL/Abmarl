@@ -1,5 +1,8 @@
 
-from abmarl.examples.sim.pacman import PacmanSim, PacmanAgent, WallAgent, FoodAgent, BaddieAgent
+from abmarl.examples.sim.pacman import (
+    PacmanSimSimple as PacmanSim,
+    PacmanAgent, WallAgent, FoodAgent, BaddieAgent
+)
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 
@@ -29,7 +32,6 @@ object_registry = {
         render_color='r'
     ),
 }
-file_name = 'pacman.txt'
 sim = MultiAgentWrapper(
     AllStepManager(
         PacmanSim.build_sim_from_array(
@@ -42,17 +44,11 @@ sim = MultiAgentWrapper(
                 'bad_move': 0,
                 'entropy': -0.01,
                 'eat_food': 0.05,
-                'kill': 0,
                 'die': -1
             }
         )
     )
 )
-
-for agent in sim.sim.agents.values():
-    if agent.id.startswith('baddie'):
-        print(f'{agent.id} at {agent.initial_position}')
-import sys; sys.exit()
 
 sim_name = "Pacman"
 from ray.tune.registry import register_env
@@ -62,19 +58,12 @@ policies = {
     'pacman': (
         None, sim.sim.agents['pacman'].observation_space, sim.sim.agents['pacman'].action_space, {}
     ),
-    'baddie': (
-        None,
-        sim.sim.agents['baddie_157'].observation_space,
-        sim.sim.agents['baddie_157'].action_space, {}
-    ),
 }
 
 
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('pacman'):
         return 'pacman'
-    else:
-        return 'baddie'
 
 
 params = {
