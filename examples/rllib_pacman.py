@@ -58,12 +58,19 @@ policies = {
     'pacman': (
         None, sim.sim.agents['pacman'].observation_space, sim.sim.agents['pacman'].action_space, {}
     ),
+    'baddie': (
+        None,
+        sim.sim.agents['baddie_157'].observation_space,
+        sim.sim.agents['baddie_157'].action_space, {}
+    ),
 }
 
 
 def policy_mapping_fn(agent_id):
     if agent_id.startswith('pacman'):
         return 'pacman'
+    else:
+        return 'baddie'
 
 
 params = {
