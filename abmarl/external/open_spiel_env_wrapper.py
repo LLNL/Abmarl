@@ -121,6 +121,16 @@ try:
                 "Current player must be an agent in the simulation."
             self._current_player = value
 
+        @property
+        def unwrapped(self):
+            """
+            Fall through all the wrappers and obtain the original, completely unwrapped simulation.
+            """
+            try:
+                return self.sim.unwrapped
+            except AttributeError:
+                return self.sim
+
         def reset(self, **kwargs):
             """
             Reset the simulation.

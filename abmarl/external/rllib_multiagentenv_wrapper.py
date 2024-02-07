@@ -38,6 +38,16 @@ try:
             })
             self._spaces_in_preferred_format = True
 
+        @property
+        def unwrapped(self):
+            """
+            Fall through all the wrappers and obtain the original, completely unwrapped simulation.
+            """
+            try:
+                return self.sim.unwrapped
+            except AttributeError:
+                return self.sim
+
         def reset(self):
             """See SimulationManager."""
             return self.sim.reset()
