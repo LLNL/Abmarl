@@ -34,6 +34,16 @@ class GymWrapper(GymEnv):
         """
         return self.agent.observation_space
 
+    @property
+    def unwrapped(self):
+        """
+        Fall through all the wrappers and obtain the original, completely unwrapped simulation.
+        """
+        try:
+            return self.sim.unwrapped
+        except AttributeError:
+            return self.sim
+
     def reset(self, **kwargs):
         """
         Return the observation from the single agent.
@@ -58,13 +68,3 @@ class GymWrapper(GymEnv):
         Forward render calls to the composed simulation.
         """
         self.sim.render(**kwargs)
-
-    @property
-    def unwrapped(self):
-        """
-        Fall through all the wrappers and obtain the original, completely unwrapped simulation.
-        """
-        try:
-            return self.sim.unwrapped
-        except AttributeError:
-            return self.sim
