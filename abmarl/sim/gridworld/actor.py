@@ -6,7 +6,7 @@ from gym.spaces import Discrete, MultiDiscrete, Dict
 
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent, HealthAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -369,6 +369,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         2. The candidate must be active.
         3. The candidate's encoding must be in the attacker's attack mapping.
         4. The attacker's accuracy must be higher than a random number.
+        5. The candidate must have health.
 
         If each of these criteria's is met, then the attack is succesful.
 
@@ -387,6 +388,8 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             return False
         elif np.random.uniform() > attacking_agent.attack_accuracy:
             # Failed attack
+            return False
+        elif not isinstance(candidate, HealthAgent):
             return False
         else:
             return True
