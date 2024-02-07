@@ -121,6 +121,8 @@ def tally_rewards(sim, trainer):
         trainer:
             Trainer that computes actions using the trained policies.
     """
+    from abmarl.managers import SimulationManager
+    assert isinstance(sim, SimulationManager), "sim must be a SimulationManager."
     # Run the simulation with actions chosen from the trained policies
     policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
     for episode in range(5):
