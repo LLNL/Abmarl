@@ -6,7 +6,9 @@ from gym.spaces import Discrete, MultiDiscrete, Dict
 
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent, HealthAgent
+from abmarl.sim.gridworld.agent import (
+    MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent, HealthAgent
+)
 import abmarl.sim.gridworld.utils as gu
 
 
