@@ -158,12 +158,12 @@ def visualize(
         )
         if record:
             anim.save(
-                os.path.join(params['ray_tune']['local_dir'], 'Episode_{}.gif'.format(episode))
+                os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode))
             )
             plt.show(block=False)
         elif record_only:
             anim.save(
-                os.path.join(params['ray_tune']['local_dir'], 'Episode_{}.gif'.format(episode))
+                os.path.join(full_trained_directory, 'Episode_{}.gif'.format(episode))
             )
 
         while not all_done:
