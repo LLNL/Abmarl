@@ -374,6 +374,9 @@ Abmarl supports integration with several training libraries through its external
 wrappers. Each wrapper automatically handles the interaction between the external
 library and the underlying simulation.
 
+.. WARNING::
+   In order to use external libraries, the corresponding dependencies must be installed.
+   See the :ref:`installation instructions <installation>` for more details.
 
 .. _gym_external:
 

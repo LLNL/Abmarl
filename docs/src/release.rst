@@ -3,12 +3,14 @@
 What's New in Abmarl
 ====================
 
-Abmarl version 0.2.8 features a new :ref:`use case <jcats_nav>`, showcasing Abmarl's
+Abmarl version 0.2.8 features
+a new :ref:`use case <jcats_nav>`, showcasing Abmarl's
 usage as a proxy simulator to inform reinforcement learning training in an external
-simulator; a refactored cli scripting interface, allowing each Abmarl module (debug,
-train, visualize, an analyze) to be used
-:ref:`in a python script <modules_in_python_script>` in addition to being run from
-the terminal; 
+simulator;
+a refactored cli scripting interface, allowing each Abmarl module (debug, train,
+visualize, an analyze) to be used :ref:`in a python script <modules_in_python_script>`
+in addition to being run from the terminal;
+
 
 
 
@@ -24,6 +26,9 @@ Interface changes
 
 Other Features
 ``````````````
+
+* Support for :ref:`installing Abmarl <installation>` with various extras: core,
+  develop, workflow, and all.
 
 
 Bug fixes
