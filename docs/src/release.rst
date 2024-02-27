@@ -13,6 +13,12 @@ in addition to being run from the terminal;
 
 
 
+Simulations
+-----------
+
+* :ref:`Traffic corridor <simulations_traffic_corridor>` simulates agents navigating
+  a tight corridor. They must cooperate by taking turns in order for all of them
+  to make it through.
 
 
 Miscellaneous
@@ -31,6 +37,7 @@ Other Features
   develop, workflow, and all.
 * :ref:`Ranomize placement order <api_gridworld_state_position>` parameter for randomly
   iterating through dictionary of agents when initially placing them in the grid.
+* Gridworld agents have customizable ``render_size``, which defaults to 200.
 
 
 Bug fixes
@@ -38,10 +45,7 @@ Bug fixes
 
 * The :ref:`gridworld component registry <>` includes all built-in components.
   agents, that is, entities in the simulation that are not observing or acting.
-* Inactive agents no longer :ref:`block <gridworld_blocking>`.
-* The :ref:`Debug command line interface <debugging>` now makes use of the ``-s``
-  argument, which specifies simulation horizon (i.e. max steps to take in a single
-  run).
+
 
 
 

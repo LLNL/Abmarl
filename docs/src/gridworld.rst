@@ -114,13 +114,14 @@ Agent
 ~~~~~
 
 Every entity in the simulation is a :ref:`GridWorldAgent <api_gridworld_agent>`
-(e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_principle_agent>` with specific parameters
+(e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are
+:ref:`PrincipleAgents <api_principle_agent>` with specific parameters
 that work with their respective components. Agents must be given
 an `encoding`, which is a positive integer that correlates to the type of agent and simplifies
 the logic for many components of the framework. GridWorldAgents can also be configured
 with an :ref:`initial position <gridworld_position>`, the ability to
 :ref:`block <gridworld_blocking>` other agents' abilities, and visualization
-parameters such as `shape` and `color`.
+parameters such as `shape`, `color`, and `size`.
 
 Following the dataclass model, additional agent classes can be defined that allow
 them to work with various components. For example,
