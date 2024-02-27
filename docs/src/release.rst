@@ -19,6 +19,7 @@ Simulations
 * :ref:`Traffic corridor <simulations_traffic_corridor>` simulates agents navigating
   a tight corridor. They must cooperate by taking turns in order for all of them
   to make it through.
+* :ref:`Pacman` variation simulates the Pacman arcade game.
 
 
 Miscellaneous

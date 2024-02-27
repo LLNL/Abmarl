@@ -16,4 +16,5 @@ them.
    maze
    team_battle
    traffic_corridor
+   pacman
    ...
