@@ -29,6 +29,8 @@ Other Features
 
 * Support for :ref:`installing Abmarl <installation>` with various extras: core,
   develop, workflow, and all.
+* :ref:`Ranomize placement order <api_gridworld_state_position>` parameter for randomly
+  iterating through dictionary of agents when initially placing them in the grid.
 
 
 Bug fixes
