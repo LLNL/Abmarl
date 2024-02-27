@@ -173,6 +173,12 @@ Agents
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_agent_orientation:
+
+.. autoclass:: abmarl.sim.gridworld.agent.OrientationAgent
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_agent_health:
 
 .. autoclass:: abmarl.sim.gridworld.agent.HealthAgent
@@ -250,6 +256,12 @@ Actors
 .. _api_gridworld_actor_cross_move:
 
 .. autoclass:: abmarl.sim.gridworld.actor.CrossMoveActor
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_drift_move:
+
+.. autoclass:: abmarl.sim.gridworld.actor.DriftMoveActor
 	:members:
 	:undoc-members:
 

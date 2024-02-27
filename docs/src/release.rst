@@ -39,6 +39,9 @@ Other Features
 * :ref:`Ranomize placement order <api_gridworld_state_position>` parameter for randomly
   iterating through dictionary of agents when initially placing them in the grid.
 * Gridworld agents have customizable ``render_size``, which defaults to 200.
+* :ref:`OrientationAgent <gridworld_orientation_drifting>` and
+  :ref:`DriftMoveActor <gridworld_orientation_drifting>` support moving an agent
+  through the grid by drifting it in the direction it is facing.
 
 
 Bug fixes
@@ -46,6 +49,7 @@ Bug fixes
 
 * The :ref:`gridworld component registry <>` includes all built-in components.
   agents, that is, entities in the simulation that are not observing or acting.
+* :ref:`Ravel <ravel_wrapper>` and :ref:`flatten <flatten_wrapper>`
 
 
 
