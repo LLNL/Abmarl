@@ -3,6 +3,44 @@
 What's New in Abmarl
 ====================
 
+Abmarl version 0.2.8 features a new :ref:`use case <jcats_nav>`, showcasing Abmarl's
+usage as a proxy simulator to inform reinforcement learning training in an external
+simulator; a refactored cli scripting interface, allowing each Abmarl module (debug,
+train, visualize, an analyze) to be used
+:ref:`in a python script <modules_in_python_script>` in addition to being run from
+the terminal; 
+
+
+
+
+Miscellaneous
+-------------
+
+Interface changes
+`````````````````
+
+* Exploration is off by default during visualization and can be turned on with the
+  ``--explore`` flag.
+
+Other Features
+``````````````
+
+
+Bug fixes
+`````````
+
+* The :ref:`gridworld component registry <>` includes all built-in components.
+  agents, that is, entities in the simulation that are not observing or acting.
+* Inactive agents no longer :ref:`block <gridworld_blocking>`.
+* The :ref:`Debug command line interface <debugging>` now makes use of the ``-s``
+  argument, which specifies simulation horizon (i.e. max steps to take in a single
+  run).
+
+
+
+
+
+
 Abmarl version 0.2.7 features the new
 :ref:`Smart Simulation and Registry <gridworld_smart_sim>`,
 which streamlines creating simulations by allowing components to be specified at the

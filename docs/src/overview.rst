@@ -545,6 +545,7 @@ The experiment parameters also contains information that will be passed directly
 to RLlib via the `ray_tune` parameter. See RLlib's documentation for a
 `list of common configuration parameters <https://docs.ray.io/en/releases-2.0.0/rllib/rllib-training.html#common-parameters>`_.
 
+
 Command Line
 ````````````
 With the configuration file complete, we can utilize the command line interface
@@ -663,6 +664,42 @@ Analysis can then be performed using the command line interface:
 .. code-block::
 
    abmarl analyze ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
+
+
+.. _modules_in_python_script:
+
+Python Script
+`````````````
+All of Abmarl's modules can be used directly in a python script instead of relying
+on the CLI by importing those moodules and running them with the experiment configuration.
+For example, if we append the following to the configruation file defined above
+
+.. code-block:: python
+
+   # parameters defined here ...
+
+   from abmarl.debug import debug
+   from abmarl.train import train
+   from abmarl.visualize import visualize
+
+   print("\n\n\n# --- Debugging --- #\n\n\n")
+   debug(params) # Debug the simulation with random policies
+
+   print("\n\n\n# --- Training --- #\n\n\n")
+   output_dir = train(params) # Train the policies with RLlib
+
+   print("\n\n\n# --- Visualizing --- #\n\n\n")
+   visualize(params, output_dir) # Visualize the trained policies in the simulation
+
+we can run the file directly with 
+
+.. code-block::
+
+   python3 rllib_multi_corridor.py
+
+which will debug, train, and visualize the setup. See the
+`full workflow example <https://github.com/LLNL/Abmarl/blob/main/examples/full_workflow.py>`_
+for more details.
 
 
 .. _trainer:
