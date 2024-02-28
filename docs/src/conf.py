@@ -9,11 +9,11 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 # -- Project information -----------------------------------------------------
 
 project = 'Abmarl'
-copyright = '2021, LLNL'
+copyright = '2024, LLNL'
 author = 'Ephraim Rusu'
 
 # The full version, including alpha/beta/rc tags
-release = '0.2.7'
+release = '0.2.8'
 
 
 # -- General configuration ---------------------------------------------------
