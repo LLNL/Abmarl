@@ -27,13 +27,10 @@ for pre-existing projects to prototype RL as a potential solution.
    release
    overview
    gridworld
-   simulations/simulations
    featured_usage/featured_usage
    install
    tutorials/tutorials
    api
-
-.. TODO: Move featured usage to the top?
 
 Citation
 --------

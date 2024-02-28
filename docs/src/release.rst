@@ -52,16 +52,6 @@ it is facing. We foresee many applications of this type of movement, including
 usage in our new :ref:`pacman game <simulation_pacman>`.
 
 
-Simulations
------------
-
-.. # TODO: Need to fill this out
-* :ref:`Traffic corridor <simulations_traffic_corridor>` simulates agents navigating
-  a tight corridor. They must cooperate by taking turns in order for all of them
-  to make it through.
-* :ref:`Pacman <simulation_pacman>` variation simulates the Pacman arcade game.
-
-
 Miscellaneous
 -------------
 
@@ -81,6 +71,11 @@ Other Features
 * :ref:`Ranomize placement order <api_gridworld_state_position>` parameter for randomly
   iterating through dictionary of agents when initially placing them in the grid.
 * Gridworld agents have customizable ``render_size``, which defaults to 200.
+* :ref:`Traffic corridor <simulations_traffic_corridor>` simulates agents navigating
+  a tight corridor. They must cooperate by taking turns in order for all of them
+  to make it through.
+* :ref:`Pacman <simulation_pacman>` variation simulates the Pacman arcade game,
+  with support for training the "baddie" agents too.
 
 Bug fixes
 `````````
