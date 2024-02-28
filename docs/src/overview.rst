@@ -672,7 +672,7 @@ Analysis can then be performed using the command line interface:
 .. _commands_in_python_script:
 
 Python Script
-`````````````
+-------------
 All of Abmarl's commands can be used directly in a python script instead of relying
 on the CLI by importing those moodules and running them with the experiment configuration.
 For example, if we append the following to the configruation file defined above
