@@ -78,6 +78,14 @@ Abmarl Simulation Managers
 Abmarl Wrappers
 ---------------
 
+.. autoclass:: abmarl.sim.wrappers.Wrapper
+	:members:
+	:undoc-members:
+
+.. autoclass:: abmarl.sim.wrappers.SARWrapper
+	:members:
+	:undoc-members:
+
 .. _api_ravel_wrapper:
 
 .. autoclass:: abmarl.sim.wrappers.RavelDiscreteWrapper
@@ -234,6 +242,14 @@ State
 .. _api_gridworld_state_health:
 
 .. autoclass:: abmarl.sim.gridworld.state.HealthState
+	:members:
+	:undoc-members:
+
+.. autoclass:: abmarl.sim.gridworld.state.AmmoState
+	:members:
+	:undoc-members:
+
+.. autoclass:: abmarl.sim.gridworld.state.OrientationState
 	:members:
 	:undoc-members:
 
