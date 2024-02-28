@@ -669,11 +669,11 @@ Analysis can then be performed using the command line interface:
    abmarl analyze ~/abmarl_results/MultiCorridor-2020-08-25_09-30/ my_analysis_script.py
 
 
-.. _modules_in_python_script:
+.. _commands_in_python_script:
 
 Python Script
 `````````````
-All of Abmarl's modules can be used directly in a python script instead of relying
+All of Abmarl's commands can be used directly in a python script instead of relying
 on the CLI by importing those moodules and running them with the experiment configuration.
 For example, if we append the following to the configruation file defined above
 
