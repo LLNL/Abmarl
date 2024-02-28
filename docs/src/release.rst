@@ -21,7 +21,7 @@ Using Abmarl as a Proxy Simulation
 Abmarl's :ref:`GridWorld Simulation Framework <gridworld>` has shown promise as
 a proxy simulation to iterate the training experience in a reinforcement learning
 experiment using an external simulator. In this experiment, researchers used Abmarl's
-:ref:`simulation interface <ism-man>` to connect a C++ based conflict simulation
+:ref:`simulation interface <sim-man>` to connect a C++ based conflict simulation
 JCATS to reinforcement learning algorithms in order to train an agent to navigate
 to a waypoint. All state updates are controlled by the JCATS simulation itself.
 Positional observations are reported to the RL policy, which in turn issues movement
@@ -48,8 +48,7 @@ The combination of the :ref:`OrientationAgent <gridworld_orientation_drifting>` 
 :ref:`DriftMoveActor <gridworld_orientation_drifting>` allows us to move an agent
 through the grid by drifting it in the direction it is facing. An agent can attempt
 to change its direction, and the Actor will attempt to move it in whatever direction
-it is facing. We foresee many applications of this type of movement, including
-usage in our new :ref:`pacman game <simulation_pacman>`.
+it is facing.
 
 
 Miscellaneous
@@ -71,10 +70,10 @@ Other Features
 * :ref:`Ranomize placement order <api_gridworld_state_position>` parameter for randomly
   iterating through dictionary of agents when initially placing them in the grid.
 * Gridworld agents have customizable ``render_size``, which defaults to 200.
-* :ref:`Traffic corridor <simulations_traffic_corridor>` simulates agents navigating
+* Traffic corridor simulates agents navigating
   a tight corridor. They must cooperate by taking turns in order for all of them
   to make it through.
-* :ref:`Pacman <simulation_pacman>` variation simulates the Pacman arcade game,
+* Pacman variation simulates the Pacman arcade game,
   with support for training the "baddie" agents too.
 
 Bug fixes
