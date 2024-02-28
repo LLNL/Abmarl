@@ -637,7 +637,7 @@ configuration. For example, consider the following setup:
    position_state.reset()
 
 `agent0` is configured with an `initial position`. At the start of each episode,
-`agent0` will be placed at (2, 4) and `agent1` and `agent` will be placed
+`agent0` will be placed at (2, 4) and `agent1` and `agent2` will be placed
 anywhere in the grid without overlapping. Because `randomize_placement_order` is
 off by default, `agent1` will be randomly placed before `agent2` because
 it appears in the `agents` dictionary first.
