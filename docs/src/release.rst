@@ -16,7 +16,7 @@ the grid by drifting it in the direction it is facing.
 
 
 Using Abmarl as a Proxy Simulation
-``````````````````````````````````
+----------------------------------
 
 Abmarl's :ref:`GridWorld Simulation Framework <gridworld>` has shown promise as
 a proxy simulation to iterate the training experience in a reinforcement learning
@@ -33,7 +33,7 @@ to rapidly find a warm start configuration. Training is performed on a cluster o
 
 
 Abmarl Commands in a Python Script
-``````````````````````````````````
+----------------------------------
 
 All of Abmarl's CLI commands can be :ref:`used directly in a python script <commands_in_python_script>`
 instead of relying on the CLI by importing those moodules and running them with
@@ -43,7 +43,7 @@ for more details.
 
 
 Drifting Agents
-```````````````
+---------------
 The combination of the :ref:`OrientationAgent <gridworld_orientation_drifting>` and
 :ref:`DriftMoveActor <gridworld_orientation_drifting>` allows us to move an agent
 through the grid by drifting it in the direction it is facing. An agent can attempt
