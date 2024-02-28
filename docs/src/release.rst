@@ -80,8 +80,6 @@ Other Features
 Bug fixes
 `````````
 
-* The :ref:`gridworld component registry <>` includes all built-in components.
-  agents, that is, entities in the simulation that are not observing or acting.
 * :ref:`Ravel <ravel_wrapper>` and :ref:`flatten <flatten_wrapper>` support Gym Boxes.
 * :ref:`AttackActors <gridworld_attacking>` check to see if the attackable agent
   has health.
