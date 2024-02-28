@@ -114,13 +114,14 @@ Agent
 ~~~~~
 
 Every entity in the simulation is a :ref:`GridWorldAgent <api_gridworld_agent>`
-(e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are :ref:`PrincipleAgents <api_principle_agent>` with specific parameters
+(e.g. walls, foragers, resources, fighters, etc.). GridWorldAgents are
+:ref:`PrincipleAgents <api_principle_agent>` with specific parameters
 that work with their respective components. Agents must be given
 an `encoding`, which is a positive integer that correlates to the type of agent and simplifies
 the logic for many components of the framework. GridWorldAgents can also be configured
 with an :ref:`initial position <gridworld_position>`, the ability to
 :ref:`block <gridworld_blocking>` other agents' abilities, and visualization
-parameters such as `shape` and `color`.
+parameters such as `shape`, `color`, and `size`.
 
 Following the dataclass model, additional agent classes can be defined that allow
 them to work with various components. For example,
@@ -604,8 +605,10 @@ Position
 that are managed by the :ref:`PositionState <api_gridworld_state_position>`. Agents
 can be configured with an `initial position`, which is where they will start at the
 beginning of each episode. If they are not given an `initial position`, then they
-will start at a random cell in the grid. Agents can overlap according to the
-:ref:`Grid's <gridworld_grid>` `overlapping` configuration. For example, consider the following setup:
+will start at a random cell in the grid. The order in which agents are placed at
+the beginning of an episode can be randomized with the `randomize_placement_order`
+parameter. Agents can overlap according to the :ref:`Grid's <gridworld_grid>` `overlapping`
+configuration. For example, consider the following setup:
 
 .. code-block:: python
 
@@ -623,22 +626,28 @@ will start at a random cell in the grid. Agents can overlap according to the
        id='agent1',
        encoding=1
    )
+   agent2 = GridWorldAgent(
+       id='agent2',
+       encoding=1
+   )
    position_state = PositionState(
-       agents={'agent0': agent0, 'agent1': agent1},
+       agents={'agent0': agent0, 'agent1': agent1, 'agent2': agent2},
        grid=Grid(4, 5)
    )
    position_state.reset()
 
-`agent0` is configured with an `initial position` and `agent1` is not. At the
-start of each episode, `agent0` will be placed at (2, 4) and `agent1` will be placed
-anywhere in the grid (except for (2,4) because they cannot overlap).
+`agent0` is configured with an `initial position`. At the start of each episode,
+`agent0` will be placed at (2, 4) and `agent1` and `agent2` will be placed
+anywhere in the grid without overlapping. Because `randomize_placement_order` is
+off by default, `agent1` will be randomly placed before `agent2` because
+it appears in the `agents` dictionary first.
 
 .. figure:: .images/gridworld_positioning.png
    :width: 100 %
    :alt: Agents starting positions
 
    agent0 in green starts at the same cell in every episode, and agent1 in blue
-   starts at a random cell each time.
+   and agent2 in red start at random cells each time.
 
 
 .. _gridworld_position_maze_placement:
@@ -673,7 +682,6 @@ that all paths to the target are not blocked.
    of each episode. Barriers (gray squares) are clustered near the target without
    blocking all paths to it. Free agents (blue) are scattered far from the target.
 
-
 .. _gridworld_barricade_placement:
 
 Target Barriers Free Placement State
@@ -701,6 +709,13 @@ enclose a target with barrier agents and scatter the free agents away from it.
    Animation showing a target (green) starting at random positions at the beginning
    of each episode. Barriers (gray squares) completely enclose the target. Free
    agents (blue and red) are scattered far from the target.
+
+.. Note::
+   If clustering/scattering is turned on, the state component will loop through the
+   viable agents in order. You can take advantage of this order to place certain types
+   of agents at different distances from the target. You can also randomize the ordering
+   by setting `randomize_placement_order` to True.
+
 
 .. _gridworld_movement:
 
@@ -764,6 +779,26 @@ can move either up, down, left, right, or stay in place. The ``move_range`` para
 is ignored. The CrossMoveActor automatically assigns a `null_action` of 0, indicating
 the agent stays in place.
 
+
+.. _gridworld_orientation_drifting:
+
+Orientation and Drifting
+````````````````````````
+
+:ref:`OrientationAgents <api_gridworld_agent_orientation>` have a direction which
+can be used with the :ref:`DriftMoveActor <api_gridworld_actor_drift_move>` to move
+the agent around the grid by "drifting" it in the direction it is facing. As in the
+:ref:`CrossMoveActor <gridworld_movement_cross>`, agents can choose to move up,
+down, left, right, or "no change". If an agent chooses "no change" it will continue
+drifting in the direction of its orientation until it bumps into another agent with
+which it cannot overlap. If it chooses to change directions, the Actor will first
+check if the change is valid, and if so, it will reorient the agent to that direction
+and move it one cell. If the change is not valid, then the agent will continue in its
+current orientation and drift if possible. For example, if the agent is moving right
+in a corridor and attempts to move up, that move will fail and it will continue
+drifting. Again, if the agent is in the corner and attempts to change orientation
+(but still in the corner), that change will fail and it will keep its current orientation,
+even though it is blocked that way too.
 
 .. _gridworld_absolute_position_observer:
 

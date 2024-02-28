@@ -78,6 +78,14 @@ Abmarl Simulation Managers
 Abmarl Wrappers
 ---------------
 
+.. autoclass:: abmarl.sim.wrappers.Wrapper
+	:members:
+	:undoc-members:
+
+.. autoclass:: abmarl.sim.wrappers.SARWrapper
+	:members:
+	:undoc-members:
+
 .. _api_ravel_wrapper:
 
 .. autoclass:: abmarl.sim.wrappers.RavelDiscreteWrapper
@@ -173,6 +181,12 @@ Agents
 	:members:
 	:undoc-members:
 
+.. _api_gridworld_agent_orientation:
+
+.. autoclass:: abmarl.sim.gridworld.agent.OrientationAgent
+	:members:
+	:undoc-members:
+
 .. _api_gridworld_agent_health:
 
 .. autoclass:: abmarl.sim.gridworld.agent.HealthAgent
@@ -231,6 +245,14 @@ State
 	:members:
 	:undoc-members:
 
+.. autoclass:: abmarl.sim.gridworld.state.AmmoState
+	:members:
+	:undoc-members:
+
+.. autoclass:: abmarl.sim.gridworld.state.OrientationState
+	:members:
+	:undoc-members:
+
 
 Actors
 ``````
@@ -250,6 +272,12 @@ Actors
 .. _api_gridworld_actor_cross_move:
 
 .. autoclass:: abmarl.sim.gridworld.actor.CrossMoveActor
+	:members:
+	:undoc-members:
+
+.. _api_gridworld_actor_drift_move:
+
+.. autoclass:: abmarl.sim.gridworld.actor.DriftMoveActor
 	:members:
 	:undoc-members:
 
