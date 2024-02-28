@@ -30,6 +30,8 @@ Interface changes
 
 * Exploration is off by default during visualization and can be turned on with the
   ``--explore`` flag.
+* :ref:`External wrappers <external>` now support the ``unwrapped`` property, which
+  returns the underlying :ref:`Simulation Manager <sim-man>` object.
 
 Other Features
 ``````````````
