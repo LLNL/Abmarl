@@ -793,8 +793,12 @@ down, left, right, or "no change". If an agent chooses "no change" it will conti
 drifting in the direction of its orientation until it bumps into another agent with
 which it cannot overlap. If it chooses to change directions, the Actor will first
 check if the change is valid, and if so, it will reorient the agent to that direction
-and take a step. If the change is not valid, then the agent will continue in its
-current orientation and drift if possible. For example, if the agent is moving right in a corridor and attempts to move up, that move will fail and it will continue drifting. Again, if the agent is in the corner and attempts to change orientation (but still in the corner), that change will fail and it will keep its current orientation, even though it is blocked that way too.
+and move it one cell. If the change is not valid, then the agent will continue in its
+current orientation and drift if possible. For example, if the agent is moving right
+in a corridor and attempts to move up, that move will fail and it will continue
+drifting. Again, if the agent is in the corner and attempts to change orientation
+(but still in the corner), that change will fail and it will keep its current orientation,
+even though it is blocked that way too.
 
 .. _gridworld_absolute_position_observer:
 
