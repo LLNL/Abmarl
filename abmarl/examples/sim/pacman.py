@@ -9,21 +9,34 @@ from abmarl.sim.gridworld.actor import DriftMoveActor
 
 
 class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent, HealthAgent):
-    def __init__(self, **kwargs):
-        super().__init__(move_range=1, view_range=100, initial_health=1, **kwargs)
+    def __init__(self, move_range=1, view_range=100, initial_health=1, **kwargs):
+        super().__init__(
+            move_range=move_range,
+            view_range=view_range,
+            initial_health=initial_health,
+            **kwargs
+        )
 
 
 class WallAgent(GridWorldAgent): pass
 
 
 class FoodAgent(HealthAgent):
-    def __init__(self, **kwargs):
-        super().__init__(render_size=50, initial_health=1, **kwargs)
+    def __init__(self, render_size=50, initial_health=1, **kwargs):
+        super().__init__(
+            render_size=render_size,
+            initial_health=initial_health,
+            **kwargs
+        )
 
 
 class BaddieAgent(MovingAgent, OrientationAgent, GridObservingAgent):
-    def __init__(self, **kwargs):
-        super().__init__(move_range=1, view_range=100, **kwargs)
+    def __init__(self, move_range=1, view_range=100, **kwargs):
+        super().__init__(
+            move_range=move_range,
+            view_range=view_range,
+            **kwargs
+        )
 
 
 class PacmanSim(SmartGridWorldSimulation):
