@@ -162,7 +162,7 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
             assert type(value) is bool, "Value must be True or False."
             self._sim_ends_if_one_done = value
         else:
-            self._sim_ends_if_one_done = False
+            self._sim_ends_if_one_done = True
 
     @property
     def target_mapping(self):
