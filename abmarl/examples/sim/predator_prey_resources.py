@@ -27,7 +27,8 @@ class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
         encoding=2,
         render_color='b',
         move_range=1,
-        attack_range=0,
+        attack_range=1,
+        view_range=3,
         **kwargs
     ):
         super().__init__(
@@ -35,6 +36,7 @@ class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
             render_color=render_color,
             move_range=move_range,
             attack_range=attack_range,
+            view_range=view_range,
             **kwargs
         )
 
@@ -46,7 +48,8 @@ class PredatorAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent
         render_color='r',
         render_shape='d',
         move_range=1,
-        attack_range=1,
+        attack_range=2,
+        view_range=3,
         **kwargs
     ):
         super().__init__(
@@ -55,6 +58,7 @@ class PredatorAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent
             render_shape=render_shape,
             move_range=move_range,
             attack_range=attack_range,
+            view_range=view_range,
             **kwargs
         )
 
