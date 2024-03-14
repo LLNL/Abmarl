@@ -6,7 +6,7 @@ from abmarl.sim.gridworld.agent import HealthAgent, MovingAgent, GridWorldAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, TargetDestroyedDone, \
-    TargetEncodingDestroyedDone, DoneBaseComponent
+    TargetEncodingInactiveDone, DoneBaseComponent
 from abmarl.sim.gridworld.grid import Grid
 
 
@@ -196,7 +196,7 @@ def test_target_encoding_destroyed_done():
         f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
     state = PositionState(grid=grid, agents=agents)
-    done = TargetEncodingDestroyedDone(
+    done = TargetEncodingInactiveDone(
         grid=grid,
         agents=agents,
         target_mapping={2: 1, 3: 1, 4:2}
@@ -237,7 +237,7 @@ def test_target_encoding_destroyed_done():
     agents = {
         f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
-    done = TargetEncodingDestroyedDone(
+    done = TargetEncodingInactiveDone(
         grid=grid,
         agents=agents,
         target_mapping={2: 1, 3: 1, 4:2},
@@ -280,7 +280,7 @@ def test_target_encoding_destroyed_done():
     agents = {
         f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
-    done = TargetEncodingDestroyedDone(
+    done = TargetEncodingInactiveDone(
         grid=grid,
         agents=agents,
         target_mapping={2: {1, 3}, 3: 1, 4:2},
@@ -313,7 +313,7 @@ def test_target_encoding_destroyed_done():
     agents = {
         f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
-    done = TargetEncodingDestroyedDone(
+    done = TargetEncodingInactiveDone(
         grid=grid,
         agents=agents,
         target_mapping={2: {1, 3}, 3: 1, 4:2},
@@ -366,24 +366,24 @@ def test_target_encoding_destroyed_done():
 
     # Test failures
     with pytest.raises(AssertionError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
             target_mapping={2: 1, 3: 1, 4:2},
             sim_ends_if_one_done="True"
         )
     with pytest.raises(AssertionError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
         )
     with pytest.raises(AssertionError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
         )
     with pytest.raises(AssertionError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
             target_mapping={
@@ -391,7 +391,7 @@ def test_target_encoding_destroyed_done():
             }
         )
     with pytest.raises(TypeError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
             target_mapping={
@@ -399,7 +399,7 @@ def test_target_encoding_destroyed_done():
             }
         )
     with pytest.raises(AssertionError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
             target_mapping={
@@ -407,7 +407,7 @@ def test_target_encoding_destroyed_done():
             }
         )
     with pytest.raises(AssertionError):
-        TargetEncodingDestroyedDone(
+        TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
             target_mapping={

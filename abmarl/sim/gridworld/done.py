@@ -137,7 +137,7 @@ class TargetDestroyedDone(DoneBaseComponent):
         ])
 
 
-class TargetEncodingDestroyedDone(DoneBaseComponent):
+class TargetEncodingInactiveDone(DoneBaseComponent):
     """
     Target encoding mapping indicates which encodings map to each other.
 
@@ -197,10 +197,7 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
             return False
         active_encodings = {agent.encoding for agent in self.agents.values() if agent.active}
         target_encodings = self.target_mapping[agent.encoding]
-        for target_encoding in target_encodings:
-            if target_encoding in active_encodings:
-                return False
-        return True
+        return False if set.intersection(active_encodings, target_encodings) else True
 
     def get_all_done(self, **kwargs):
         active_encodings = {agent.encoding for agent in self.agents.values() if agent.active}
