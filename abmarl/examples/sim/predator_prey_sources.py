@@ -1,7 +1,62 @@
 
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, \
+    GridObservingAgent, HealthAgent
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.actor import MoveActor, RestrictedSelectiveAttackActor
-from abmarl.sim.gridworld.done import ActiveDone
+
+
+class ResourcesAgent(HealthAgent):
+    def __init__(
+        self,
+        encoding=1,
+        render_shape='s',
+        render_color='g',
+        **kwargs
+    ):
+        super().__init__(
+            encoding=encoding,
+            render_shape=render_shape,
+            render_color=render_color,
+            **kwargs
+        )
+
+
+class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
+    def __init__(
+        self,
+        encoding=2,
+        render_color='b',
+        move_range=1,
+        attack_range=0,
+        **kwargs
+    ):
+        super().__init__(
+            encoding=encoding,
+            render_color=render_color,
+            move_range=move_range,
+            attack_range=attack_range,
+            **kwargs
+        )
+
+
+class PredatorAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
+    def __init__(
+        self,
+        encoding=3,
+        render_color='r',
+        render_shape='d',
+        move_range=1,
+        attack_range=1,
+        **kwargs
+    ):
+        super().__init__(
+            encoding=encoding,
+            render_color=render_color,
+            render_shape=render_shape,
+            move_range=move_range,
+            attack_range=attack_range,
+            **kwargs
+        )
 
 
 class PredatorPreyResourcesSim(SmartGridWorldSimulation):
@@ -43,9 +98,4 @@ class PredatorPreyResourcesSim(SmartGridWorldSimulation):
 
         # Entropy penalty
         for agent_id in action_dict:
-                self.rewards[agent_id] -= 0.01
-
-    def get_all_done(self, **kwargs):
-        return False
-        # TODO: Need 394, encoding target destruction
-        
+                self.rewards[agent_id] -= 0.01        
