@@ -155,7 +155,7 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
         Specify if the simulation ends of one team is done.
         """
         return self._sim_ends_if_one_done
-    
+
     @sim_ends_if_one_done.setter
     def sim_ends_if_one_done(self, value):
         if value is not None:

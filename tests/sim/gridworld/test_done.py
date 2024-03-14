@@ -193,7 +193,7 @@ def test_target_destroyed_done():
 def test_target_encoding_destroyed_done():
     grid = Grid(3, 9)
     agents = {
-        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n%4+1) for n in range(12)
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
     state = PositionState(grid=grid, agents=agents)
     done = TargetEncodingDestroyedDone(
@@ -235,7 +235,7 @@ def test_target_encoding_destroyed_done():
 
     # Test with sim not done
     agents = {
-        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n%4+1) for n in range(12)
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
     done = TargetEncodingDestroyedDone(
         grid=grid,
@@ -278,7 +278,7 @@ def test_target_encoding_destroyed_done():
 
     # Test agents targeting two encodings
     agents = {
-        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n%4+1) for n in range(12)
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
     done = TargetEncodingDestroyedDone(
         grid=grid,
@@ -311,7 +311,7 @@ def test_target_encoding_destroyed_done():
 
     # Test agents targeting two encodings with sim not done
     agents = {
-        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n%4+1) for n in range(12)
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
     }
     done = TargetEncodingDestroyedDone(
         grid=grid,
@@ -414,4 +414,3 @@ def test_target_encoding_destroyed_done():
                 3: {3}
             }
         )
-
