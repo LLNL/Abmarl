@@ -201,7 +201,6 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
             if target_encoding in active_encodings:
                 return False
         return True
-    # TODO: Set the done agent's active property to False or do that in the manager?
 
     def get_all_done(self, **kwargs):
         active_encodings = {agent.encoding for agent in self.agents.values() if agent.active}
