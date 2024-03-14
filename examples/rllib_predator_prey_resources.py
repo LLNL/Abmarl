@@ -32,7 +32,7 @@ attack_map = {
 sim = MultiAgentWrapper(
     AllStepManager(
         PredatorPreyResourcesSim.build_sim(
-            8, 8,
+            20, 20,
             agents=agents,
             overlapping=overlap_map,
             attack_mapping=attack_map,

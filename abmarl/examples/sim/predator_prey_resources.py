@@ -3,7 +3,7 @@ from abmarl.sim import Agent
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, \
     GridObservingAgent, HealthAgent
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
-from abmarl.sim.gridworld.actor import MoveActor, RestrictedSelectiveAttackActor
+from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
 
 
 class ResourceAgent(HealthAgent):
@@ -77,7 +77,7 @@ class PredatorPreyResourcesSim(SmartGridWorldSimulation):
         super().__init__(**kwargs)
 
         self.move_actor = MoveActor(**kwargs)
-        self.attack_actor = RestrictedSelectiveAttackActor(**kwargs)
+        self.attack_actor = BinaryAttackActor(**kwargs)
 
         self.finalize()
 
