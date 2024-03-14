@@ -10,7 +10,7 @@ from abmarl.external import MultiAgentWrapper
 # 11 resources
 
 resources = {
-    f'resource_{i}': ResourceAgent(id=f'resource_agent{i}') for i in range(11)
+    f'resource_{i}': ResourceAgent(id=f'resource_{i}') for i in range(11)
 }
 prey = {
     f'prey_{i}': PreyAgent(id=f'prey_{i}') for i in range(5)
