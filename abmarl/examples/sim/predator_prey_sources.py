@@ -5,7 +5,7 @@ from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.actor import MoveActor, RestrictedSelectiveAttackActor
 
 
-class ResourcesAgent(HealthAgent):
+class ResourceAgent(HealthAgent):
     def __init__(
         self,
         encoding=1,

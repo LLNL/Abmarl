@@ -7,5 +7,5 @@ from .multi_agent_sim import EmptyABS, MultiAgentSim, MultiAgentGymSpacesSim, \
 from .multi_agent_grid_sim import MultiAgentGridSim
 from .reach_the_target import ReachTheTargetSim, RunningAgent, TargetAgent, BarrierAgent
 from .predator_prey_sources import (
-    PredatorPreyResourcesSim, ResourcesAgent, PreyAgent, PredatorAgent
+    PredatorPreyResourcesSim, ResourceAgent, PreyAgent, PredatorAgent
 )
