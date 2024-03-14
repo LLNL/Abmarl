@@ -36,6 +36,7 @@ sim = MultiAgentWrapper(
             agents=agents,
             overlapping=overlap_map,
             attack_mapping=attack_map,
+            target_mapping=attack_map,
             states={'PositionState', 'HealthState'},
             observers={'PositionCenteredEncodingObserver'},
             dones={'ActiveDone', 'TargetEncodingInactiveDone'}
