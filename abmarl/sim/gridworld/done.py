@@ -143,11 +143,11 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
 
     An agent or simulation is done if all its target encodings are inactive.
     """
-    def __init__(self, target_mapping=None, sim_ends_if_one_done=False, **kwargs):
+    def __init__(self, target_mapping=None, sim_ends_if_one_done=True, **kwargs):
         super().__init__(**kwargs)
+        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.target_mapping = target_mapping
         self.sim_ends_if_one_done = sim_ends_if_one_done
-        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
 
     @property
     def sim_ends_if_one_done(self):
@@ -193,6 +193,8 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
         self._target_mapping = value
 
     def get_done(self, agent, **kwarg):
+        if agent.encoding not in self.target_mapping:
+            return False
         active_encodings = {agent.encoding for agent in self.agents.values() if agent.active}
         target_encodings = self.target_mapping[agent.encoding]
         for target_encoding in target_encodings:
@@ -204,7 +206,7 @@ class TargetEncodingDestroyedDone(DoneBaseComponent):
     def get_all_done(self, **kwargs):
         active_encodings = {agent.encoding for agent in self.agents.values() if agent.active}
         done_encodings = {
-            encoding: True if self.intersection(active_encodings, target_encodings) else False
+            encoding: False if set.intersection(active_encodings, target_encodings) else True
             for encoding, target_encodings in self.target_mapping.items()
         }
         if self.sim_ends_if_one_done:
