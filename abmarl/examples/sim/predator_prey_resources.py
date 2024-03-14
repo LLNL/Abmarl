@@ -28,6 +28,8 @@ class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
         render_color='b',
         move_range=1,
         attack_range=1,
+        attack_strength=1,
+        attack_accuracy=1,
         view_range=3,
         **kwargs
     ):
@@ -36,6 +38,8 @@ class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
             render_color=render_color,
             move_range=move_range,
             attack_range=attack_range,
+            attack_strength=attack_strength,
+            attack_accuracy=attack_accuracy,
             view_range=view_range,
             **kwargs
         )
@@ -49,6 +53,8 @@ class PredatorAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent
         render_shape='d',
         move_range=1,
         attack_range=2,
+        attack_strength=1,
+        attack_accuracy=1,
         view_range=3,
         **kwargs
     ):
@@ -58,6 +64,8 @@ class PredatorAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent
             render_shape=render_shape,
             move_range=move_range,
             attack_range=attack_range,
+            attack_strength=attack_strength,
+            attack_accuracy=attack_accuracy,
             view_range=view_range,
             **kwargs
         )
