@@ -13,7 +13,10 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
 
     The SmartGridWorldSimulation supports varying some components of a simluation
     at initialzation without changing simulation code. Actor components and the
-    step function must still be implemented by the sub class.
+    step function must still be implemented by the sub class. Observations from
+    multiple observers are appended together in a dictionary based on their keys.
+    If there are multiple done components, we report True if any of them reports
+    True.
 
     Args:
         states: A set of state components. It could be the component class or the
@@ -106,13 +109,13 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
     def get_done(self, agent_id, **kwargs):
         assert hasattr(self, '_dones'), "Smart Simulation requires '_dones' attribute."
         agent = self.agents[agent_id]
-        return all(
+        return any(
             done.get_done(agent, **kwargs) for done in self._dones
         )
 
     def get_all_done(self, **kwargs):
         assert hasattr(self, '_dones'), "Smart Simulation requires '_dones' attribute."
-        return all(
+        return any(
             done.get_all_done(**kwargs) for done in self._dones
         )
 
