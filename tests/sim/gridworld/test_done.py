@@ -1,11 +1,12 @@
 
 import numpy as np
+import pytest
 
 from abmarl.sim.gridworld.agent import HealthAgent, MovingAgent, GridWorldAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, TargetDestroyedDone, \
-    DoneBaseComponent
+    TargetEncodingInactiveDone, DoneBaseComponent
 from abmarl.sim.gridworld.grid import Grid
 
 
@@ -187,3 +188,229 @@ def test_target_destroyed_done():
     assert target_done.get_done(agents['agent2'])
     assert target_done.get_done(agents['agent3'])
     assert target_done.get_all_done()
+
+
+def test_target_encoding_destroyed_done():
+    grid = Grid(3, 9)
+    agents = {
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
+    }
+    state = PositionState(grid=grid, agents=agents)
+    done = TargetEncodingInactiveDone(
+        grid=grid,
+        agents=agents,
+        target_mapping={2: 1, 3: 1, 4:2}
+    )
+    assert isinstance(done, DoneBaseComponent)
+    assert done.target_mapping == {2: {1}, 3: {1}, 4: {2}}
+    assert done.sim_ends_if_one_done
+
+    # Test reset state
+    state.reset()
+    for agent in agents.values():
+        assert not done.get_done(agent)
+    assert not done.get_all_done()
+
+    # Test encodings that are targeting 0 are done
+    agents['agent0'].active = False
+    assert not done.get_done(agents['agent1'])
+    assert not done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    agents['agent4'].active = False
+    agents['agent8'].active = False
+    assert not done.get_done(agents['agent0'])
+    assert done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_done(agents['agent4'])
+    assert done.get_done(agents['agent5'])
+    assert done.get_done(agents['agent6'])
+    assert not done.get_done(agents['agent7'])
+    assert not done.get_done(agents['agent8'])
+    assert done.get_done(agents['agent9'])
+    assert done.get_done(agents['agent10'])
+    assert not done.get_done(agents['agent11'])
+    assert done.get_all_done()
+
+
+    # Test with sim not done
+    agents = {
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
+    }
+    done = TargetEncodingInactiveDone(
+        grid=grid,
+        agents=agents,
+        target_mapping={2: 1, 3: 1, 4:2},
+        sim_ends_if_one_done=False
+    )
+    assert not done.sim_ends_if_one_done
+
+    state.reset()
+    for agent in agents.values():
+        assert not done.get_done(agent)
+    assert not done.get_all_done()
+
+    agents['agent0'].active = False
+    agents['agent4'].active = False
+    agents['agent8'].active = False
+    assert not done.get_done(agents['agent0'])
+    assert done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_done(agents['agent4'])
+    assert done.get_done(agents['agent5'])
+    assert done.get_done(agents['agent6'])
+    assert not done.get_done(agents['agent7'])
+    assert not done.get_done(agents['agent8'])
+    assert done.get_done(agents['agent9'])
+    assert done.get_done(agents['agent10'])
+    assert not done.get_done(agents['agent11'])
+    assert not done.get_all_done()
+
+    agents['agent1'].active = False
+    agents['agent5'].active = False
+    agents['agent9'].active = False
+    assert done.get_done(agents['agent3'])
+    assert done.get_done(agents['agent7'])
+    assert done.get_done(agents['agent11'])
+    assert done.get_all_done()
+
+
+    # Test agents targeting two encodings
+    agents = {
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
+    }
+    done = TargetEncodingInactiveDone(
+        grid=grid,
+        agents=agents,
+        target_mapping={2: {1, 3}, 3: 1, 4:2},
+    )
+
+    state.reset()
+    for agent in agents.values():
+        assert not done.get_done(agent)
+    assert not done.get_all_done()
+
+    agents['agent0'].active = False
+    agents['agent4'].active = False
+    agents['agent8'].active = False
+    assert not done.get_done(agents['agent0'])
+    assert not done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_done(agents['agent4'])
+    assert not done.get_done(agents['agent5'])
+    assert done.get_done(agents['agent6'])
+    assert not done.get_done(agents['agent7'])
+    assert not done.get_done(agents['agent8'])
+    assert not done.get_done(agents['agent9'])
+    assert done.get_done(agents['agent10'])
+    assert not done.get_done(agents['agent11'])
+    assert done.get_all_done()
+
+
+    # Test agents targeting two encodings with sim not done
+    agents = {
+        f'agent{n}': GridWorldAgent(id=f'agent{n}', encoding=n % 4 + 1) for n in range(12)
+    }
+    done = TargetEncodingInactiveDone(
+        grid=grid,
+        agents=agents,
+        target_mapping={2: {1, 3}, 3: 1, 4:2},
+        sim_ends_if_one_done=False
+    )
+
+    state.reset()
+    for agent in agents.values():
+        assert not done.get_done(agent)
+    assert not done.get_all_done()
+
+    agents['agent0'].active = False
+    agents['agent4'].active = False
+    agents['agent8'].active = False
+    assert not done.get_done(agents['agent0'])
+    assert not done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_done(agents['agent4'])
+    assert not done.get_done(agents['agent5'])
+    assert done.get_done(agents['agent6'])
+    assert not done.get_done(agents['agent7'])
+    assert not done.get_done(agents['agent8'])
+    assert not done.get_done(agents['agent9'])
+    assert done.get_done(agents['agent10'])
+    assert not done.get_done(agents['agent11'])
+    assert not done.get_all_done()
+
+
+    agents['agent0'].active = False
+    agents['agent2'].active = False
+    agents['agent4'].active = False
+    agents['agent6'].active = False
+    agents['agent8'].active = False
+    agents['agent10'].active = False
+    assert not done.get_done(agents['agent0'])
+    assert done.get_done(agents['agent1'])
+    assert done.get_done(agents['agent2'])
+    assert not done.get_done(agents['agent3'])
+    assert not done.get_done(agents['agent4'])
+    assert done.get_done(agents['agent5'])
+    assert done.get_done(agents['agent6'])
+    assert not done.get_done(agents['agent7'])
+    assert not done.get_done(agents['agent8'])
+    assert done.get_done(agents['agent9'])
+    assert done.get_done(agents['agent10'])
+    assert not done.get_done(agents['agent11'])
+    assert not done.get_all_done()
+
+
+    # Test failures
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+            target_mapping={2: 1, 3: 1, 4:2},
+            sim_ends_if_one_done="True"
+        )
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+        )
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+        )
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+            target_mapping={
+                5: [1, 2]
+            }
+        )
+    with pytest.raises(TypeError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+            target_mapping={
+                3: [1, 2]
+            }
+        )
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+            target_mapping={
+                3: 3
+            }
+        )
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
+            target_mapping={
+                3: {3}
+            }
+        )
