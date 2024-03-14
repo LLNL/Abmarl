@@ -38,7 +38,7 @@ sim = MultiAgentWrapper(
             attack_mapping=attack_map,
             states={'PositionState', 'HealthState'},
             observers={'PositionCenteredEncodingObserver'},
-            dones={'ActiveDone, TargetEncodingInactiveDone'}
+            dones={'ActiveDone', 'TargetEncodingInactiveDone'}
         )
     )
 )
