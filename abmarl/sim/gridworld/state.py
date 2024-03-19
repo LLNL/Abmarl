@@ -6,7 +6,8 @@ import random
 import numpy as np
 
 from abmarl.sim.gridworld.base import GridWorldBaseComponent, GridWorldAgent
-from abmarl.sim.gridworld.agent import HealthAgent, AmmoAgent, OrientationAgent
+from abmarl.sim.gridworld.agent import HealthAgent, AmmoAgent, OrientationAgent, \
+    BuyerAgent, SellerAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -639,6 +640,27 @@ class HealthState(StateBaseComponent):
                     agent.health = agent.initial_health
                 else:
                     agent.health = np.random.uniform(0, 1)
+
+
+class BuyerSellerState(StateBaseComponent):
+    """
+    Manage the state of the buyers and sellers.
+
+    Every BuyerAgent and SellerAgent has money. Buyers also have a preference,
+    and Sellers have a price and income.
+    """
+    def reset(self, **kwargs):
+        """
+        Give agents their starting properties.
+        """
+        for agent in self.agents.values():
+            if isinstance(agent, (BuyerAgent, SellerAgent)):
+                if agent.initial_money is not None:
+                    agent.money = agent.initial_money
+            if isinstance(agent, SellerAgent):
+                agent.price = agent.initial_price
+            if isinstance(agent, BuyerAgent):
+                agent.preference = None
 
 
 class AmmoState(StateBaseComponent):

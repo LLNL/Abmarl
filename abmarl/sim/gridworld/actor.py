@@ -7,7 +7,7 @@ from gym.spaces import Discrete, MultiDiscrete, Dict
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
 from abmarl.sim.gridworld.agent import (
-    MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent, HealthAgent
+    MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent, HealthAgent, SellerAgent
 )
 import abmarl.sim.gridworld.utils as gu
 
@@ -731,3 +731,33 @@ class SelectiveAttackActor(AttackActorBaseComponent):
                     )
 
         return True, attacked_agents
+
+
+class PriceChangeActor(ActorBaseComponent):
+    """
+    Agent change the prices for the goods they are selling.
+    """
+    def __init__(self, **kwargs):
+        for agent in self.agents.values():
+            if isinstance(agent, self.supported_agent_type):
+                agent.action_space[self.key] = Box(-np.inf, np.inf, (1,))
+                agent.null_action[self.key] = 0
+
+    @property
+    def key(self):
+        """
+        This Actor's key is "price_change".
+        """
+        return "price_change"
+    
+    @property
+    def supported_agent_type(self):
+        """
+        This Actor works with SellerAgents.
+        """
+        return SellerAgent
+
+    def process_action(self, agent, action_dict, **kwargs):
+        if isinstance(agent, self.supported_agent_type):
+            action = action_dict[self.key]
+            agent.price += action

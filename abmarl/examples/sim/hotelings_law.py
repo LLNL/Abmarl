@@ -6,7 +6,7 @@ import numpy as np
 from abmarl.sim import Agent
 from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, BuyerAgent, SellerAgent
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
-from abmarl.sim.gridworld.actor import CrossMoveActor, PriceSettingActor
+from abmarl.sim.gridworld.actor import CrossMoveActor, PriceChangeActor
 
 
 class HotelingsBuyerAgent(BuyerAgent):
@@ -45,7 +45,7 @@ class HotelingsLawSim(SmartGridWorldSimulation):
         self.costs = costs
 
         self.move_actor = CrossMoveActor(**kwargs)
-        self.price_actor = PriceSettingActor(**kwargs)
+        self.price_actor = PriceChangeActor(**kwargs)
 
         self.finalize()
 

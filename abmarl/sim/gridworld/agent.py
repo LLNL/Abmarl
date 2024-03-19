@@ -461,7 +461,8 @@ class BuyerAgent(GridWorldAgent):
     
     @preference.setter
     def preference(self, value):
-        assert isinstance(value, SellerAgent), "Buyer's preference must be a SellerAgent."
+        if value is not None:
+            assert isinstance(value, SellerAgent), "Buyer's preference must be a SellerAgent."
         self._preference = value
 
     @property
