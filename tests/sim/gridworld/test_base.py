@@ -19,6 +19,7 @@ def test_build():
     assert isinstance(sim.grid, Grid)
     assert sim.grid.rows == 3
     assert sim.grid.cols == 4
+    assert sim._encodings_in_sim == {1}
     np.testing.assert_array_equal(sim.grid._internal, np.empty((3, 4), dtype=object))
 
     sim.reset()
@@ -60,6 +61,7 @@ def test_build_from_grid():
     sim = MultiAgentGridSim.build_sim_from_grid(grid)
     assert sim.grid.rows == 2
     assert sim.grid.cols == 2
+    assert sim._encodings_in_sim == {1}
     np.testing.assert_array_equal(sim.grid._internal, np.empty((2, 2), dtype=object))
 
     sim.reset()
@@ -129,6 +131,7 @@ def test_build_from_grid_with_extra_agents():
         extra_agents=extra_agents,
         overlapping={1: {3, 4}, 3: {1}, 4: {1}}
     )
+    assert sim._encodings_in_sim == {1, 3, 4, 5}
     sim.reset()
     assert sim.agents == {
         'agent0': agents['agent0'], # We use the agent already in the grid, not from extra agents.
@@ -206,6 +209,7 @@ def test_build_sim_from_array():
     sim = MultiAgentGridSim.build_sim_from_array(array, obj_registry)
     assert sim.grid.rows == 2
     assert sim.grid.cols == 5
+    assert sim._encodings_in_sim == {1, 2, 3}
     np.testing.assert_array_equal(sim.grid._internal, np.empty((2, 5), dtype=object))
 
     sim.reset()
@@ -252,6 +256,7 @@ def test_build_sim_from_array():
     sim = MultiAgentGridSim.build_sim_from_array(array, obj_registry)
     assert sim.grid.rows == 2
     assert sim.grid.cols == 5
+    assert sim._encodings_in_sim == {1, 2}
 
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
@@ -356,6 +361,7 @@ def test_build_sim_from_array_with_extra_agents():
         extra_agents=extra_agents,
         overlapping={1: {5}, 5: {1, 5}}
     )
+    assert sim._encodings_in_sim == {1, 2, 3, 5, 6}
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
     assert 'extra_agent0' in sim.grid[0, 0]
@@ -454,6 +460,7 @@ def test_build_sim_from_file():
     sim = MultiAgentGridSim.build_sim_from_file(file_name, obj_registry)
     assert sim.grid.rows == 2
     assert sim.grid.cols == 5
+    assert sim._encodings_in_sim == {1, 2, 3}
     np.testing.assert_array_equal(sim.grid._internal, np.empty((2, 5), dtype=object))
 
     sim.reset()
@@ -500,6 +507,7 @@ def test_build_sim_from_file():
     sim = MultiAgentGridSim.build_sim_from_file(file_name, obj_registry)
     assert sim.grid.rows == 2
     assert sim.grid.cols == 5
+    assert sim._encodings_in_sim == {1, 2}
 
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
@@ -604,6 +612,7 @@ def test_build_sim_from_file_with_extra_agents():
         extra_agents=extra_agents,
         overlapping={1: {5}, 5: {1, 5}}
     )
+    assert sim._encodings_in_sim == {1, 2, 3, 5, 6}
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
     assert 'extra_agent0' in sim.grid[0, 0]
