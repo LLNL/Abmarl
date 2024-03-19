@@ -54,14 +54,21 @@ class Grid:
     def overlapping(self, value):
         if value is not None:
             assert type(value) is dict, "Overlaping must be dictionary."
-            symmetric_value = copy.deepcopy(value)
             for ndx, overlap_set in value.items():
                 assert type(ndx) is int, "All keys in overlapping dict must be integers."
-                assert type(overlap_set) is set, "All values in overlapping dict must be sets."
+                if type(overlap_set) is int: # Overlap provided as integer
+                    value[ndx] = {overlap_set} # Upgrade to set for ease
+                elif type(overlap_set) is set:
+                    for overlap_ndx in overlap_set:
+                        assert type(overlap_ndx) is int, \
+                            "All elements in overlapping dict values must be integers."
+                else:
+                    raise TypeError("Values in overlapping dictionary must be integer or set.")
+            # Force symmetry in the overlapping must happen here after all the
+            # values have been made sets
+            symmetric_value = copy.deepcopy(value)
+            for ndx, overlap_set in value.items():
                 for overlap_ndx in overlap_set:
-                    assert type(overlap_ndx) is int, \
-                        "All elements in overlapping dict values must be integers."
-                    # Force symmetry in the overlapping
                     if overlap_ndx not in symmetric_value:
                         symmetric_value[overlap_ndx] = {ndx}
                     else:
