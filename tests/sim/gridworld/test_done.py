@@ -376,6 +376,12 @@ def test_target_encoding_destroyed_done():
         TargetEncodingInactiveDone(
             grid=grid,
             agents=agents,
+            target_mapping={11: 1, 3: 1, 4:2},
+        )
+    with pytest.raises(AssertionError):
+        TargetEncodingInactiveDone(
+            grid=grid,
+            agents=agents,
         )
     with pytest.raises(AssertionError):
         TargetEncodingInactiveDone(
