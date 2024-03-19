@@ -776,7 +776,7 @@ def test_target_barrier_free_placement_failures():
             free_encodings={1, 3}
         )
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         # Fails because free is list
         TargetBarriersFreePlacementState(
             grid=grid,

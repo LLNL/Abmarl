@@ -229,7 +229,7 @@ class TargetBarriersFreePlacementState(PositionState):
     @barrier_encodings.setter
     def barrier_encodings(self, value):
         if value is not None:
-            if type(value) is int: # Barrier encodigns provided as integer
+            if type(value) is int: # Barrier encodings provided as integer
                 assert value in self._encodings_in_sim, \
                     f"Encoding {value} must be an encoding in the sim."
                 value = {value} # Upgrade to set for ease of use
@@ -253,9 +253,16 @@ class TargetBarriersFreePlacementState(PositionState):
     @free_encodings.setter
     def free_encodings(self, value):
         if value is not None:
-            assert type(value) is set, "Free encodings must be a set."
-            for encoding in value:
-                assert type(encoding) is int, "Each free encoding must be an integer."
+            if type(value) is int: # Free encodings provided as integer
+                assert value in self._encodings_in_sim, \
+                    f"Encoding {value} must be an encoding in the sim."
+                value = {value} # Upgrade to set for ease
+            elif type(value) is set:
+                for encoding in value:
+                    assert encoding in self._encodings_in_sim, \
+                        f"Encoding {encoding} must be an encoding in the sim."
+            else:
+                raise TypeError("Free encodings must be a set or integer.")
             self._free_encodings = value
         else:
             self._free_encodings = set()
