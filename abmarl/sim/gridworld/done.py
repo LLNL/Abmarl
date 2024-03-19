@@ -175,7 +175,6 @@ class TargetEncodingInactiveDone(DoneBaseComponent):
     def target_mapping(self, value):
         assert type(value) is dict, "Target mapping must be a dictionary."
         for encoding, target_encoding in value.items():
-            assert type(encoding) is int, "Encodings are integers."
             assert encoding in self._encodings_in_sim, \
                 f"Encoding {encoding} not in the simulation."
             if type(target_encoding) is int: # Target provided as integer

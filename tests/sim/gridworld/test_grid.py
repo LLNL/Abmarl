@@ -31,6 +31,9 @@ def test_grid_overlapping():
     grid = Grid(3, 3, overlapping={1: {1, 2}, 3: {1, 2}})
     assert grid.overlapping == {1: {1, 2, 3}, 2: {1, 3}, 3: {1, 2}}
 
+    grid = Grid(3, 3, overlapping={1: 2, 2: 3, 3: 1})
+    assert grid.overlapping == {1:{2, 3}, 2:{1, 3}, 3:{1, 2}}
+
     with pytest.raises(AssertionError):
         # This fails because overlapping must be a dictionary
         Grid(2, 2, overlapping=[1, 2, 3])
@@ -39,9 +42,9 @@ def test_grid_overlapping():
         # This fails because the keys must be integers
         Grid(2, 2, overlapping={'1': {3}, 2.0: {6}})
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         # This fails because all the values must be sets
-        Grid(2, 2, overlapping={1: 3, 2: {6}})
+        Grid(2, 2, overlapping={1: 3, 2: [6]})
 
     with pytest.raises(AssertionError):
         # This fails because all the elements in the sets must be integers

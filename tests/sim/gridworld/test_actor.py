@@ -468,11 +468,12 @@ def test_binary_attack_actor():
 
     position_state = PositionState(grid=grid, agents=agents)
     health_state = HealthState(grid=grid, agents=agents)
-    attack_actor = BinaryAttackActor(attack_mapping={1: {1}}, grid=grid, agents=agents)
+    attack_actor = BinaryAttackActor(attack_mapping={1: 1}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
     assert attack_actor.supported_agent_type == AttackingAgent
     assert agents['agent1'].action_space['attack'] == Discrete(2)
+    assert attack_actor.attack_mapping == {1: {1}}
 
     agents['agent1'].finalize()
     assert agents['agent1'].null_action == {'attack': 0}
@@ -512,17 +513,20 @@ def test_binary_attack_actor_attack_mapping():
             attack_accuracy=1
         ),
         'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
-        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=3),
     }
 
     with pytest.raises(AssertionError):
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping=[1, 2, 3])
 
     with pytest.raises(AssertionError):
-        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={'1': {3}, 2.0: {6}})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={'1': {3}, 2.0: {1}})
+
+    with pytest.raises(TypeError):
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: 3, 2: [1]})
 
     with pytest.raises(AssertionError):
-        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: 3, 2: [6]})
+        BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: 3, 2: 6})
 
     with pytest.raises(AssertionError):
         BinaryAttackActor(agents=agents, grid=grid, attack_mapping={1: {'2', 3}, 2: {2, 3}})

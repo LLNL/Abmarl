@@ -247,6 +247,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     """
     def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
+        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.attack_mapping = attack_mapping
         self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
@@ -280,12 +281,19 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     @attack_mapping.setter
     def attack_mapping(self, value):
         assert type(value) is dict, "Attack mapping must be dictionary."
-        for k, v in value.items():
-            assert type(k) is int, "All keys in attack mapping must be an integer."
-            assert type(v) is set, "All values in attack mapping must be a set."
-            for i in v:
-                assert type(i) is int, \
-                    "All elements in the attack mapping values must be integers."
+        for encoding, attack_encoding in value.items():
+            assert encoding in self._encodings_in_sim, \
+                f"Encoding {encoding} not in the simulation."
+            if type(attack_encoding) is int: # Attackable provided as integer
+                assert attack_encoding in self._encodings_in_sim, \
+                    f"Encoding {attack_encoding} not in the simulation."
+                value[encoding] = {attack_encoding} # Upgrade to set for ease
+            elif type(attack_encoding) is set:
+                for ae in attack_encoding:
+                    assert ae in self._encodings_in_sim, \
+                        f"Attackable encoding {ae} not in the simulation."
+            else:
+                raise TypeError("Attackable encodings must be a set or integer.")
         self._attack_mapping = value
 
     @property
