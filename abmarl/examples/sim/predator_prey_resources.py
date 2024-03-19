@@ -108,4 +108,4 @@ class PredatorPreyResourcesSim(SmartGridWorldSimulation):
 
         # Entropy penalty
         for agent_id in action_dict:
-                self.rewards[agent_id] -= 0.01        
+            self.rewards[agent_id] -= 0.01

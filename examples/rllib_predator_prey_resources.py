@@ -1,13 +1,7 @@
 
-import numpy as np
-
 from abmarl.examples import ResourceAgent, PreyAgent, PredatorAgent, PredatorPreyResourcesSim
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
-
-# 2 predators
-# 5 prey
-# 11 resources
 
 resources = {
     f'resource_{i}': ResourceAgent(id=f'resource_{i}') for i in range(11)
@@ -21,9 +15,9 @@ predators = {
 agents = {**resources, **prey, **predators}
 
 overlap_map = {
-    1: {1},
-    2: {2},
-    3: {3},
+    1: {2, 3},
+    2: {1, 2, 3},
+    3: {1, 2},
 }
 attack_map = {
     2: {1},
@@ -40,7 +34,8 @@ sim = MultiAgentWrapper(
             states={'PositionState', 'HealthState'},
             observers={'PositionCenteredEncodingObserver'},
             dones={'ActiveDone', 'TargetEncodingInactiveDone'}
-        )
+        ),
+        randomize_action_input=True
     )
 )
 
