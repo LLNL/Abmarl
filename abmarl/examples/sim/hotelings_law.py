@@ -4,12 +4,12 @@ import random
 import numpy as np
 
 from abmarl.sim import Agent
-from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, MoneyAgent, PricingAgent
+from abmarl.sim.gridworld.agent import MovingAgent, GridObservingAgent, BuyerAgent, SellerAgent
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.actor import CrossMoveActor, PriceSettingActor
 
 
-class BuyerAgent(MoneyAgent):
+class HotelingsBuyerAgent(BuyerAgent):
     def __init__(
         self,
         encoding=1,
@@ -23,12 +23,12 @@ class BuyerAgent(MoneyAgent):
         )
 
 
-class SellerAgent(MoneyAgent, MovingAgent, GridObservingAgent, PricingAgent):
+class HotelingsSellerAgent(SellerAgent, MovingAgent, GridObservingAgent):
     def __init__(
         self,
         encoding=2,
         move_range=1,
-        view_range="FULL",
+        view_range="FULL", # TODO: Add this feature
         **kwargs
     ):
         super().__init__(
@@ -71,8 +71,8 @@ class HotelingsLawSim(SmartGridWorldSimulation):
                 'entropy': -10,
             }
 
-    def score_seller(self, buyer_position, seller_position, seller_price):
-        return np.linalg.norm(buyer_position - seller_position) + seller_price
+    def score_seller(self, buyer, seller):
+        return np.linalg.norm(buyer.position - seller.position) + seller.price
 
     def step(self, action_dict, **kwargs):
         for agent_id, action in action_dict.items():
@@ -90,7 +90,7 @@ class HotelingsLawSim(SmartGridWorldSimulation):
         for buyer in self.agents.values():
             if isinstance(buyer, BuyerAgent):
                 preference = {
-                    seller.id: self.score_seller(buyer.position, seller.position, seller.price)
+                    seller.id: self.score_seller(buyer, seller)
                     for seller in self.agents.values() if isinstance(seller, SellerAgent)
                 }
                 min_value = min(preference.values())
@@ -110,6 +110,4 @@ class HotelingsLawSim(SmartGridWorldSimulation):
                 seller.money += seller.income
                 seller.income = 0
                 if seller.money <= 0:
-                    seller.active = False
                     self.grid.remove(seller, seller.position)
-        
