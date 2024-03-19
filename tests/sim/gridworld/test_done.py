@@ -23,6 +23,7 @@ def test_active_done():
 
     active_done = ActiveDone(agents=agents, grid=grid)
     assert isinstance(active_done, DoneBaseComponent)
+    assert active_done._encodings_in_sim == {1}
 
     assert agents['agent0'].active
     assert agents['agent1'].active
@@ -69,6 +70,7 @@ def test_target_overlap_done():
     state = PositionState(grid=grid, agents=agents)
     actor = MoveActor(grid=grid, agents=agents)
     target_done = TargetAgentDone(grid=grid, agents=agents, target_mapping=target_mapping)
+    assert target_done._encodings_in_sim == {1, 2}
     state.reset()
     for agent in agents.values():
         agent.finalize()
@@ -143,6 +145,7 @@ def test_target_destroyed_done():
     }
     state = PositionState(grid=grid, agents=agents)
     target_done = TargetDestroyedDone(grid=grid, agents=agents, target_mapping=target_mapping)
+    assert target_done._encodings_in_sim == {1, 2}
     state.reset()
 
     assert not target_done.get_done(agents['agent0'])
@@ -204,6 +207,7 @@ def test_target_encoding_destroyed_done():
     assert isinstance(done, DoneBaseComponent)
     assert done.target_mapping == {2: {1}, 3: {1}, 4: {2}}
     assert done.sim_ends_if_one_done
+    assert done._encodings_in_sim == {1, 2, 3, 4}
 
     # Test reset state
     state.reset()

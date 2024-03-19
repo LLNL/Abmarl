@@ -18,6 +18,7 @@ def test_position_state():
 
     position_state = PositionState(grid=grid, agents=agents)
     assert isinstance(position_state, StateBaseComponent)
+    assert position_state._encodings_in_sim == {1}
     position_state.reset()
 
     np.testing.assert_equal(agents['agent0'].position, np.array([0, 1]))
@@ -120,6 +121,7 @@ def test_health_state():
 
     health_state = HealthState(agents=agents, grid=grid)
     assert isinstance(health_state, StateBaseComponent)
+    assert health_state._encodings_in_sim == {1}
     health_state.reset()
 
     assert agents['agent0'].health == 0.24
@@ -140,6 +142,7 @@ def test_ammo_state():
 
     ammo_state = AmmoState(agents=agents, grid=grid)
     assert isinstance(ammo_state, StateBaseComponent)
+    assert ammo_state._encodings_in_sim == {1}
     ammo_state.reset()
 
     assert agents['agent0'].ammo == 40
@@ -185,6 +188,7 @@ def test_maze_placement_state():
         free_encodings={1, 3}
     )
     assert isinstance(state, PositionState)
+    assert state._encodings_in_sim == {1, 2, 3}
     assert state.target_agent == target_agent
     assert state.barrier_encodings == {2}
     assert state.free_encodings == {1, 3}
@@ -661,6 +665,7 @@ def test_target_barrier_free_placement_state():
         barrier_encodings=2,
         free_encodings={1, 3}
     )
+    assert state._encodings_in_sim == {1, 2, 3}
     assert isinstance(state, PositionState)
     assert state.target_agent == target_agent
     assert state.barrier_encodings == {2}
@@ -1000,6 +1005,7 @@ def test_orientation_state():
     }
     grid = Grid(1, 4)
     state = OrientationState(agents=agents, grid=grid)
+    assert state._encodings_in_sim == {1, 2, 3, 4}
     assert isinstance(state, OrientationState)
     assert isinstance(state, StateBaseComponent)
 

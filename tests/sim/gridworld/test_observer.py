@@ -23,6 +23,7 @@ def test_ammo_observer():
     state = AmmoState(grid=grid, agents=agents)
     observer = AmmoObserver(grid=grid, agents=agents)
     assert isinstance(observer, ObserverBaseComponent)
+    assert observer._encodings_in_sim == {1}
     state.reset()
 
     assert observer.get_obs(agents['agent1'])['ammo'] == agents['agent1'].ammo
@@ -69,6 +70,7 @@ def test_absolute_encoding_observer():
     position_state = PositionState(grid=grid, agents=agents)
     observer = AbsoluteEncodingObserver(agents=agents, grid=grid)
     assert isinstance(observer, ObserverBaseComponent)
+    assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     position_state.reset()
 
     np.testing.assert_array_equal(
@@ -210,6 +212,7 @@ def test_single_grid_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = PositionCenteredEncodingObserver(agents=agents, grid=grid)
+    assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     assert observer.key == 'position_centered_encoding'
     assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
@@ -375,6 +378,7 @@ def test_multi_grid_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = StackedPositionCenteredEncodingObserver(agents=agents, grid=grid)
+    assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     assert observer.key == 'stacked_position_centered_encoding'
     assert observer.supported_agent_type == GridObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
@@ -861,9 +865,11 @@ def test_observe_self():
     position_state = PositionState(grid=grid, agents=agents)
     position_state.reset()
     self_observer = PositionCenteredEncodingObserver(agents=agents, grid=grid)
+    assert self_observer._encodings_in_sim == {1, 2}
     no_self_observer = PositionCenteredEncodingObserver(
         agents=agents, grid=grid, observe_self=False
     )
+    assert no_self_observer._encodings_in_sim == {1, 2}
 
     np.testing.assert_array_equal(
         self_observer.get_obs(agents['agent0'])['position_centered_encoding'],
@@ -941,6 +947,7 @@ def test_absolute_position_observer():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = AbsolutePositionObserver(agents=agents, grid=grid)
+    assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     assert observer.key == 'position'
     assert observer.supported_agent_type == ObservingAgent
     assert isinstance(observer, ObserverBaseComponent)
@@ -1017,7 +1024,9 @@ def test_grid_and_absolute_position_observer_combined():
 
     position_state = PositionState(grid=grid, agents=agents)
     grid_observer = PositionCenteredEncodingObserver(grid=grid, agents=agents)
+    assert grid_observer._encodings_in_sim == {1, 2, 3, 4, 5}
     position_observer = AbsolutePositionObserver(grid=grid, agents=agents)
+    assert position_observer._encodings_in_sim == {1, 2, 3, 4, 5}
 
     agent = agents['agent0']
     agent.finalize()
