@@ -658,7 +658,7 @@ def test_target_barrier_free_placement_state():
         grid=grid,
         agents=agents,
         target_agent=target_agent,
-        barrier_encodings={2},
+        barrier_encodings=2,
         free_encodings={1, 3}
     )
     assert isinstance(state, PositionState)
@@ -704,6 +704,7 @@ def test_target_barrier_free_placement_state_target_by_id():
     )
     assert isinstance(state, PositionState)
     assert state.target_agent == target_agent
+    assert state.barrier_encodings == {2}
 
     with pytest.raises(AssertionError):
         state = TargetBarriersFreePlacementState(
@@ -765,7 +766,7 @@ def test_target_barrier_free_placement_failures():
             free_encodings={1, 3}
         )
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         # Fails because barrier is list
         TargetBarriersFreePlacementState(
             grid=grid,
