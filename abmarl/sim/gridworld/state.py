@@ -428,6 +428,7 @@ class MazePlacementState(PositionState):
                  scatter_free_agents=False,
                  **kwargs):
         super().__init__(**kwargs)
+        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.target_agent = target_agent
         self.barrier_encodings = barrier_encodings
         self.free_encodings = free_encodings
@@ -464,9 +465,16 @@ class MazePlacementState(PositionState):
     @barrier_encodings.setter
     def barrier_encodings(self, value):
         if value is not None:
-            assert type(value) is set, "Barrier encodings must be a set."
-            for encoding in value:
-                assert type(encoding) is int, "Each barrier encoding must be an integer."
+            if type(value) is int: # Barrier encodings provided as integer
+                assert value in self._encodings_in_sim, \
+                    f"Encoding {value} must be an encoding in the sim."
+                value = {value} # Upgrade to set for ease of use
+            elif type(value) is set:
+                for encoding in value:
+                    assert encoding in self._encodings_in_sim, \
+                        f"Encoding {encoding} must be an encoding in the sim."
+            else:
+                raise TypeError("Barrier encodings must be a set or integer.")
             self._barrier_encodings = value
         else:
             self._barrier_encodings = set()
@@ -481,9 +489,16 @@ class MazePlacementState(PositionState):
     @free_encodings.setter
     def free_encodings(self, value):
         if value is not None:
-            assert type(value) is set, "Free encodings must be a set."
-            for encoding in value:
-                assert type(encoding) is int, "Each free encoding must be an integer."
+            if type(value) is int: # Free encodings provided as integer
+                assert value in self._encodings_in_sim, \
+                    f"Encoding {value} must be an encoding in the sim."
+                value = {value} # Upgrade to set for ease
+            elif type(value) is set:
+                for encoding in value:
+                    assert encoding in self._encodings_in_sim, \
+                        f"Encoding {encoding} must be an encoding in the sim."
+            else:
+                raise TypeError("Free encodings must be a set or integer.")
             self._free_encodings = value
         else:
             self._free_encodings = set()

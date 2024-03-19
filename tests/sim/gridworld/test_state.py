@@ -395,7 +395,7 @@ def test_maze_placement_failures():
             free_encodings={1, 3}
         )
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         # Fails because barrier is list
         MazePlacementState(
             grid=grid,
@@ -405,7 +405,7 @@ def test_maze_placement_failures():
             free_encodings={1, 3}
         )
 
-    with pytest.raises(AssertionError):
+    with pytest.raises(TypeError):
         # Fails because free is list
         MazePlacementState(
             grid=grid,
