@@ -194,7 +194,6 @@ class TargetBarriersFreePlacementState(PositionState):
                  scatter_free_agents=False,
                  **kwargs):
         super().__init__(**kwargs)
-        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.target_agent = target_agent
         self.barrier_encodings = barrier_encodings
         self.free_encodings = free_encodings
@@ -428,7 +427,6 @@ class MazePlacementState(PositionState):
                  scatter_free_agents=False,
                  **kwargs):
         super().__init__(**kwargs)
-        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.target_agent = target_agent
         self.barrier_encodings = barrier_encodings
         self.free_encodings = free_encodings

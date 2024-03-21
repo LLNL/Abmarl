@@ -254,6 +254,7 @@ class GridWorldBaseComponent(ABC):
     def __init__(self, agents=None, grid=None, **kwargs):
         self.agents = agents
         self.grid = grid
+        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
 
     @property
     def rows(self):

@@ -145,7 +145,6 @@ class TargetEncodingInactiveDone(DoneBaseComponent):
     """
     def __init__(self, target_mapping=None, sim_ends_if_one_done=True, **kwargs):
         super().__init__(**kwargs)
-        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.target_mapping = target_mapping
         self.sim_ends_if_one_done = sim_ends_if_one_done
 

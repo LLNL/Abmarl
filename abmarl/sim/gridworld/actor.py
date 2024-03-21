@@ -247,7 +247,6 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
     """
     def __init__(self, attack_mapping=None, stacked_attacks=False, **kwargs):
         super().__init__(**kwargs)
-        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
         self.attack_mapping = attack_mapping
         self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
