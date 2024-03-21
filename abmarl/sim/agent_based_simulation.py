@@ -204,7 +204,6 @@ class AgentBasedSimulation(ABC):
     """
     def __init__(self, agents=None, **kwargs):
         self.agents = agents
-        self._encodings_in_sim = {agent.encoding for agent in self.agents.values()}
 
     @property
     def agents(self):
