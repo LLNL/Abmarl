@@ -68,7 +68,7 @@ class AbsoluteEncodingObserver(ObserverBaseComponent):
     """
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        max_encoding = max([agent.encoding for agent in self.agents.values()])
+        max_encoding = max(self._encodings_in_sim)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
@@ -162,7 +162,7 @@ class PositionCenteredEncodingObserver(ObserverBaseComponent):
     def __init__(self, observe_self=True, **kwargs):
         super().__init__(**kwargs)
         self.observe_self = observe_self
-        max_encoding = max([agent.encoding for agent in self.agents.values()])
+        max_encoding = max(self._encodings_in_sim)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
                 agent.observation_space[self.key] = Box(
