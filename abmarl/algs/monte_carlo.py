@@ -1,5 +1,5 @@
 # 5.1 Monte Carlo prediction p92.
-from gym.spaces import Discrete
+from gymnasium.spaces import Discrete
 import numpy as np
 
 from abmarl.managers import SimulationManager

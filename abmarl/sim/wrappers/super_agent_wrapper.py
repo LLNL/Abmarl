@@ -1,7 +1,7 @@
 
 import warnings
 
-from gym.spaces import Dict, MultiBinary
+from gymnasium.spaces import Dict, MultiBinary
 
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.wrappers import Wrapper

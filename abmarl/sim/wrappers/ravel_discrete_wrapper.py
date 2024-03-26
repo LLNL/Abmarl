@@ -1,9 +1,9 @@
 import itertools
 
 import numpy as np
-from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Dict, Tuple
-from gym.spaces import Box as GymBox
-from gym.spaces.box import get_inf
+from gymnasium.spaces import Discrete, MultiDiscrete, MultiBinary, Dict, Tuple
+from gymnasium.spaces import Box as GymBox
+from gymnasium.spaces.box import get_inf
 
 from abmarl.sim import Agent
 

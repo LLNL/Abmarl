@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from gym.spaces import Space
+from gymnasium.spaces import Space
 
 
 class Policy(ABC):

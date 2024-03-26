@@ -1,5 +1,5 @@
 
-from gym.spaces import Discrete
+from gymnasium.spaces import Discrete
 import pytest
 
 from abmarl.policies.policy import RandomPolicy

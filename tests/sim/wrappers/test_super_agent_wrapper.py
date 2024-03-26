@@ -1,7 +1,7 @@
 
 import warnings
 
-from gym.spaces import MultiBinary, Dict
+from gymnasium.spaces import MultiBinary, Dict
 import pytest
 
 from abmarl.sim.wrappers import SuperAgentWrapper

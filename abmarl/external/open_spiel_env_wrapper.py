@@ -1,5 +1,5 @@
 
-from gym.spaces import Discrete
+from gymnasium.spaces import Discrete
 
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.managers import TurnBasedManager, SimulationManager

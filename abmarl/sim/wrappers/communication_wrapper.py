@@ -1,6 +1,6 @@
 from .wrapper import Wrapper
 
-from gym.spaces import Discrete, Dict
+from gymnasium.spaces import Discrete, Dict
 
 from abmarl.sim import Agent
 

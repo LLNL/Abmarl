@@ -1,7 +1,7 @@
 
 from abc import abstractmethod
 
-from gym.spaces import Discrete, Dict
+from gymnasium.spaces import Discrete, Dict
 
 from abmarl.sim.gridworld.actor import ActorBaseComponent
 from abmarl.sim.gridworld.observer import ObserverBaseComponent

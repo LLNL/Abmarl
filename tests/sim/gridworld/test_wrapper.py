@@ -1,5 +1,5 @@
 
-from gym.spaces import Discrete, Dict
+from gymnasium.spaces import Discrete, Dict
 import numpy as np
 import pytest
 
