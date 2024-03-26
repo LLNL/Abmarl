@@ -211,14 +211,14 @@ def test_build_sim_from_array():
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
     assert sim.grid[0, 1] == {}
-    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert 'B-class-barrier0' in sim.grid[0, 2]
     assert sim.grid[0, 3] == {}
     assert sim.grid[0, 4] == {}
-    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert 'B-class-barrier1' in sim.grid[1, 0]
     assert sim.grid[1, 1] == {}
     assert sim.grid[1, 2] == {}
-    assert 'C-class-barrier3' in sim.grid[1, 3]
-    assert 'A-class-barrier4' in sim.grid[1, 4]
+    assert 'C-class-barrier0' in sim.grid[1, 3]
+    assert 'A-class-barrier1' in sim.grid[1, 4]
 
     assert len(sim.agents) == 5
     assert sim.agents['A-class-barrier0'].encoding == 1
@@ -226,24 +226,24 @@ def test_build_sim_from_array():
         sim.agents['A-class-barrier0'].initial_position,
         np.array([0, 0])
     )
+    assert sim.agents['B-class-barrier0'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier0'].initial_position,
+        np.array([0, 2])
+    )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])
-    )
-    assert sim.agents['B-class-barrier2'].encoding == 2
-    np.testing.assert_array_equal(
-        sim.agents['B-class-barrier2'].initial_position,
         np.array([1, 0])
     )
-    assert sim.agents['C-class-barrier3'].encoding == 3
+    assert sim.agents['C-class-barrier0'].encoding == 3
     np.testing.assert_array_equal(
-        sim.agents['C-class-barrier3'].initial_position,
+        sim.agents['C-class-barrier0'].initial_position,
         np.array([1, 3])
     )
-    assert sim.agents['A-class-barrier4'].encoding == 1
+    assert sim.agents['A-class-barrier1'].encoding == 1
     np.testing.assert_array_equal(
-        sim.agents['A-class-barrier4'].initial_position,
+        sim.agents['A-class-barrier1'].initial_position,
         np.array([1, 4])
     )
 
@@ -256,35 +256,35 @@ def test_build_sim_from_array():
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
     assert sim.grid[0, 1] == {}
-    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert 'B-class-barrier0' in sim.grid[0, 2]
     assert sim.grid[0, 3] == {}
     assert sim.grid[0, 4] == {}
-    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert 'B-class-barrier1' in sim.grid[1, 0]
     assert sim.grid[1, 1] == {}
     assert sim.grid[1, 2] == {}
     assert sim.grid[1, 3] == {}
-    assert 'A-class-barrier3' in sim.grid[1, 4]
+    assert 'A-class-barrier1' in sim.grid[1, 4]
 
     assert len(sim.agents) == 4
-    assert 'C-class-barrier3' not in sim.agents
+    assert 'C-class-barrier0' not in sim.agents
     assert sim.agents['A-class-barrier0'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier0'].initial_position,
         np.array([0, 0])
     )
+    assert sim.agents['B-class-barrier0'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier0'].initial_position,
+        np.array([0, 2])
+    )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])
-    )
-    assert sim.agents['B-class-barrier2'].encoding == 2
-    np.testing.assert_array_equal(
-        sim.agents['B-class-barrier2'].initial_position,
         np.array([1, 0])
     )
-    assert sim.agents['A-class-barrier3'].encoding == 1
+    assert sim.agents['A-class-barrier1'].encoding == 1
     np.testing.assert_array_equal(
-        sim.agents['A-class-barrier3'].initial_position,
+        sim.agents['A-class-barrier1'].initial_position,
         np.array([1, 4])
     )
 
@@ -324,13 +324,13 @@ def test_build_sim_from_array_with_extra_agents():
             encoding=3,
         ),
     }
-    # B-class-barrier2 exists in the array, so the builder should not use the one
+    # B-class-barrier1 exists in the array, so the builder should not use the one
     # in extra_agents
     # extra_agent0 and 1 will exist because they can overlap
     # extra_agent2 will exist because it occupies an empty space
     extra_agents = {
-        'B-class-barrier2': GridWorldAgent(
-            id='B-class-barrier2',
+        'B-class-barrier1': GridWorldAgent(
+            id='B-class-barrier1',
             encoding=4,
             initial_position=np.array([1, 0])
         ),
@@ -361,15 +361,15 @@ def test_build_sim_from_array_with_extra_agents():
     assert 'extra_agent0' in sim.grid[0, 0]
     assert 'extra_agent1' in sim.grid[0, 0]
     assert sim.grid[0, 1] == {}
-    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert 'B-class-barrier0' in sim.grid[0, 2]
     assert sim.grid[0, 3] == {}
     assert next(iter(sim.grid[0, 4].values())) == extra_agents['extra_agent2']
-    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert 'B-class-barrier1' in sim.grid[1, 0]
     assert next(iter(sim.grid[1, 0].values())).encoding == 2
     assert sim.grid[1, 1] == {}
     assert sim.grid[1, 2] == {}
-    assert 'C-class-barrier3' in sim.grid[1, 3]
-    assert 'A-class-barrier4' in sim.grid[1, 4]
+    assert 'C-class-barrier0' in sim.grid[1, 3]
+    assert 'A-class-barrier1' in sim.grid[1, 4]
 
     assert len(sim.agents) == 8
     assert sim.agents['A-class-barrier0'].encoding == 1
@@ -377,24 +377,24 @@ def test_build_sim_from_array_with_extra_agents():
         sim.agents['A-class-barrier0'].initial_position,
         np.array([0, 0])
     )
+    assert sim.agents['B-class-barrier0'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier0'].initial_position,
+        np.array([0, 2])
+    )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])
-    )
-    assert sim.agents['B-class-barrier2'].encoding == 2
-    np.testing.assert_array_equal(
-        sim.agents['B-class-barrier2'].initial_position,
         np.array([1, 0])
     )
-    assert sim.agents['C-class-barrier3'].encoding == 3
+    assert sim.agents['C-class-barrier0'].encoding == 3
     np.testing.assert_array_equal(
-        sim.agents['C-class-barrier3'].initial_position,
+        sim.agents['C-class-barrier0'].initial_position,
         np.array([1, 3])
     )
-    assert sim.agents['A-class-barrier4'].encoding == 1
+    assert sim.agents['A-class-barrier1'].encoding == 1
     np.testing.assert_array_equal(
-        sim.agents['A-class-barrier4'].initial_position,
+        sim.agents['A-class-barrier1'].initial_position,
         np.array([1, 4])
     )
     assert sim.agents['extra_agent0'].encoding == 5
@@ -459,14 +459,14 @@ def test_build_sim_from_file():
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
     assert sim.grid[0, 1] == {}
-    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert 'B-class-barrier0' in sim.grid[0, 2]
     assert sim.grid[0, 3] == {}
     assert sim.grid[0, 4] == {}
-    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert 'B-class-barrier1' in sim.grid[1, 0]
     assert sim.grid[1, 1] == {}
     assert sim.grid[1, 2] == {}
-    assert 'C-class-barrier3' in sim.grid[1, 3]
-    assert 'A-class-barrier4' in sim.grid[1, 4]
+    assert 'C-class-barrier0' in sim.grid[1, 3]
+    assert 'A-class-barrier1' in sim.grid[1, 4]
 
     assert len(sim.agents) == 5
     assert sim.agents['A-class-barrier0'].encoding == 1
@@ -474,24 +474,24 @@ def test_build_sim_from_file():
         sim.agents['A-class-barrier0'].initial_position,
         np.array([0, 0])
     )
+    assert sim.agents['B-class-barrier0'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier0'].initial_position,
+        np.array([0, 2])
+    )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])
-    )
-    assert sim.agents['B-class-barrier2'].encoding == 2
-    np.testing.assert_array_equal(
-        sim.agents['B-class-barrier2'].initial_position,
         np.array([1, 0])
     )
-    assert sim.agents['C-class-barrier3'].encoding == 3
+    assert sim.agents['C-class-barrier0'].encoding == 3
     np.testing.assert_array_equal(
-        sim.agents['C-class-barrier3'].initial_position,
+        sim.agents['C-class-barrier0'].initial_position,
         np.array([1, 3])
     )
-    assert sim.agents['A-class-barrier4'].encoding == 1
+    assert sim.agents['A-class-barrier1'].encoding == 1
     np.testing.assert_array_equal(
-        sim.agents['A-class-barrier4'].initial_position,
+        sim.agents['A-class-barrier1'].initial_position,
         np.array([1, 4])
     )
 
@@ -504,35 +504,35 @@ def test_build_sim_from_file():
     sim.reset()
     assert 'A-class-barrier0' in sim.grid[0, 0]
     assert sim.grid[0, 1] == {}
-    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert 'B-class-barrier0' in sim.grid[0, 2]
     assert sim.grid[0, 3] == {}
     assert sim.grid[0, 4] == {}
-    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert 'B-class-barrier1' in sim.grid[1, 0]
     assert sim.grid[1, 1] == {}
     assert sim.grid[1, 2] == {}
     assert sim.grid[1, 3] == {}
-    assert 'A-class-barrier3' in sim.grid[1, 4]
+    assert 'A-class-barrier1' in sim.grid[1, 4]
 
     assert len(sim.agents) == 4
-    assert 'C-class-barrier3' not in sim.agents
+    assert 'C-class-barrier0' not in sim.agents
     assert sim.agents['A-class-barrier0'].encoding == 1
     np.testing.assert_array_equal(
         sim.agents['A-class-barrier0'].initial_position,
         np.array([0, 0])
     )
+    assert sim.agents['B-class-barrier0'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier0'].initial_position,
+        np.array([0, 2])
+    )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])
-    )
-    assert sim.agents['B-class-barrier2'].encoding == 2
-    np.testing.assert_array_equal(
-        sim.agents['B-class-barrier2'].initial_position,
         np.array([1, 0])
     )
-    assert sim.agents['A-class-barrier3'].encoding == 1
+    assert sim.agents['A-class-barrier1'].encoding == 1
     np.testing.assert_array_equal(
-        sim.agents['A-class-barrier3'].initial_position,
+        sim.agents['A-class-barrier1'].initial_position,
         np.array([1, 4])
     )
 
@@ -572,13 +572,13 @@ def test_build_sim_from_file_with_extra_agents():
             encoding=3,
         ),
     }
-    # B-class-barrier2 exists in the file, so the builder should not use the one
+    # B-class-barrier1 exists in the file, so the builder should not use the one
     # in extra_agents
     # extra_agent0 and 1 will exist because they can overlap
     # extra_agent2 will exist because it occupies an empty space
     extra_agents = {
-        'B-class-barrier2': GridWorldAgent(
-            id='B-class-barrier2',
+        'B-class-barrier1': GridWorldAgent(
+            id='B-class-barrier1',
             encoding=4,
             initial_position=np.array([1, 0])
         ),
@@ -609,15 +609,15 @@ def test_build_sim_from_file_with_extra_agents():
     assert 'extra_agent0' in sim.grid[0, 0]
     assert 'extra_agent1' in sim.grid[0, 0]
     assert sim.grid[0, 1] == {}
-    assert 'B-class-barrier1' in sim.grid[0, 2]
+    assert 'B-class-barrier0' in sim.grid[0, 2]
     assert sim.grid[0, 3] == {}
     assert next(iter(sim.grid[0, 4].values())) == extra_agents['extra_agent2']
-    assert 'B-class-barrier2' in sim.grid[1, 0]
+    assert 'B-class-barrier1' in sim.grid[1, 0]
     assert next(iter(sim.grid[1, 0].values())).encoding == 2
     assert sim.grid[1, 1] == {}
     assert sim.grid[1, 2] == {}
-    assert 'C-class-barrier3' in sim.grid[1, 3]
-    assert 'A-class-barrier4' in sim.grid[1, 4]
+    assert 'C-class-barrier0' in sim.grid[1, 3]
+    assert 'A-class-barrier1' in sim.grid[1, 4]
 
     assert len(sim.agents) == 8
     assert sim.agents['A-class-barrier0'].encoding == 1
@@ -625,24 +625,24 @@ def test_build_sim_from_file_with_extra_agents():
         sim.agents['A-class-barrier0'].initial_position,
         np.array([0, 0])
     )
+    assert sim.agents['B-class-barrier0'].encoding == 2
+    np.testing.assert_array_equal(
+        sim.agents['B-class-barrier0'].initial_position,
+        np.array([0, 2])
+    )
     assert sim.agents['B-class-barrier1'].encoding == 2
     np.testing.assert_array_equal(
         sim.agents['B-class-barrier1'].initial_position,
-        np.array([0, 2])
-    )
-    assert sim.agents['B-class-barrier2'].encoding == 2
-    np.testing.assert_array_equal(
-        sim.agents['B-class-barrier2'].initial_position,
         np.array([1, 0])
     )
-    assert sim.agents['C-class-barrier3'].encoding == 3
+    assert sim.agents['C-class-barrier0'].encoding == 3
     np.testing.assert_array_equal(
-        sim.agents['C-class-barrier3'].initial_position,
+        sim.agents['C-class-barrier0'].initial_position,
         np.array([1, 3])
     )
-    assert sim.agents['A-class-barrier4'].encoding == 1
+    assert sim.agents['A-class-barrier1'].encoding == 1
     np.testing.assert_array_equal(
-        sim.agents['A-class-barrier4'].initial_position,
+        sim.agents['A-class-barrier1'].initial_position,
         np.array([1, 4])
     )
     assert sim.agents['extra_agent0'].encoding == 5
