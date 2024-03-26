@@ -4,7 +4,7 @@ import numpy as np
 from abmarl.sim.agent_based_simulation import Agent
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, MovingAgent, AttackingAgent, \
-    GridObservingAgent, HealthAgent
+    GridObservingAgent
 from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.actor import SelectiveAttackActor, MoveActor
 from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
@@ -78,7 +78,7 @@ class TargetAgent(AttackingAgent, GridObservingAgent):
         )
 
 
-class RunningAgent(MovingAgent, GridObservingAgent, HealthAgent):
+class RunningAgent(MovingAgent, GridObservingAgent):
     def __init__(self, **kwargs):
         super().__init__(
             encoding=3,

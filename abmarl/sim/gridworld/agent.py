@@ -9,7 +9,7 @@ class GridWorldAgent(PrincipleAgent):
     The base agent in the GridWorld.
     """
     def __init__(self, initial_position=None, blocking=False, encoding=None, render_shape='o',
-                 render_color='gray', render_size=200, **kwargs):
+                 render_color='gray', render_size=200, initial_health=None, **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position
@@ -17,6 +17,7 @@ class GridWorldAgent(PrincipleAgent):
         self.render_shape = render_shape
         self.render_color = render_color
         self.render_size = render_size
+        self.initial_health = initial_health
 
     @property
     def encoding(self):
@@ -113,6 +114,35 @@ class GridWorldAgent(PrincipleAgent):
         self._render_size = value
 
     @property
+    def health(self):
+        """
+        The agent's health throughout the simulation trajectory.
+
+        The health will always be between 0 and 1.
+        """
+        return self._health
+
+    @health.setter
+    def health(self, value):
+        assert type(value) in [int, float], "Health must be a numeric value."
+        self._health = min(max(value, 0), 1)
+        self.active = self.health > 0
+
+    @property
+    def initial_health(self):
+        """
+        The agent's initial health between 0 and 1.
+        """
+        return self._initial_health
+
+    @initial_health.setter
+    def initial_health(self, value):
+        if value is not None:
+            assert type(value) in [int, float], "Initial health must be a numeric value."
+            assert 0 < value <= 1, "Initial health must be between 0 and 1."
+        self._initial_health = value
+
+    @property
     def configured(self):
         return super().configured and self.encoding is not None and \
             self.blocking is not None and self.render_shape is not None and \
@@ -167,47 +197,6 @@ class MovingAgent(ActingAgent, GridWorldAgent):
     @property
     def configured(self):
         return super().configured and self.move_range is not None
-
-
-class HealthAgent(GridWorldAgent):
-    """
-    Agents have health points and can die.
-
-    Health is bounded between 0 and 1. Agents become inactive when the health
-    falls to 0.
-    """
-    def __init__(self, initial_health=None, **kwargs):
-        super().__init__(**kwargs)
-        self.initial_health = initial_health
-
-    @property
-    def health(self):
-        """
-        The agent's health throughout the simulation trajectory.
-
-        The health will always be between 0 and 1.
-        """
-        return self._health
-
-    @health.setter
-    def health(self, value):
-        assert type(value) in [int, float], "Health must be a numeric value."
-        self._health = min(max(value, 0), 1)
-        self.active = self.health > 0
-
-    @property
-    def initial_health(self):
-        """
-        The agent's initial health between 0 and 1.
-        """
-        return self._initial_health
-
-    @initial_health.setter
-    def initial_health(self, value):
-        if value is not None:
-            assert type(value) in [int, float], "Initial health must be a numeric value."
-            assert 0 < value <= 1, "Initial health must be between 0 and 1."
-        self._initial_health = value
 
 
 class AttackingAgent(ActingAgent, GridWorldAgent):

@@ -4,7 +4,7 @@ import numpy as np
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.state import PositionState, MazePlacementState, HealthState, \
     TargetBarriersFreePlacementState, StateBaseComponent, AmmoState, OrientationState
-from abmarl.sim.gridworld.agent import HealthAgent, GridWorldAgent, AmmoAgent, OrientationAgent
+from abmarl.sim.gridworld.agent import GridWorldAgent, AmmoAgent, OrientationAgent
 import pytest
 
 
@@ -114,9 +114,9 @@ def test_position_state_small_grid():
 def test_health_state():
     grid = Grid(3, 3)
     agents = {
-        'agent0': HealthAgent(id='agent0', encoding=1, initial_health=0.24),
-        'agent1': HealthAgent(id='agent1', encoding=1),
-        'agent2': HealthAgent(id='agent2', encoding=1)
+        'agent0': GridWorldAgent(id='agent0', encoding=1, initial_health=0.24),
+        'agent1': GridWorldAgent(id='agent1', encoding=1),
+        'agent2': GridWorldAgent(id='agent2', encoding=1)
     }
 
     health_state = HealthState(agents=agents, grid=grid)

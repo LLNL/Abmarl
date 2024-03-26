@@ -9,7 +9,7 @@ from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, BinaryAttackAc
     ActorBaseComponent, DriftMoveActor
 from abmarl.sim.gridworld.state import PositionState, HealthState, AmmoState, OrientationState
 from abmarl.sim.gridworld.agent import (
-    MovingAgent, AttackingAgent, HealthAgent, AmmoAgent, OrientationAgent, GridWorldAgent
+    MovingAgent, AttackingAgent, AmmoAgent, OrientationAgent, GridWorldAgent
 )
 from abmarl.sim.gridworld.grid import Grid
 
@@ -456,7 +456,7 @@ def test_drift_move_actor():
 
 def test_binary_attack_actor():
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(
             id='agent1',
             initial_position=np.array([2, 2]),
@@ -465,8 +465,8 @@ def test_binary_attack_actor():
             attack_strength=1,
             attack_accuracy=1
         ),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
-        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
+        'agent3': GridWorldAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -507,7 +507,7 @@ def test_binary_attack_actor():
 
 def test_binary_attack_actor_attack_mapping():
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(
             id='agent1',
             initial_position=np.array([2, 2]),
@@ -516,8 +516,8 @@ def test_binary_attack_actor_attack_mapping():
             attack_strength=1,
             attack_accuracy=1
         ),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
-        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=3),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
+        'agent3': GridWorldAgent(id='agent3', initial_position=np.array([3, 2]), encoding=3),
     }
 
     with pytest.raises(AssertionError):
@@ -547,13 +547,13 @@ def test_binary_attack_actor_simultaneous_attacks():
             attack_accuracy=1,
             simultaneous_attacks=3
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([2, 3]), encoding=2, initial_health=1
         ),
-        'agent3': HealthAgent(
+        'agent3': GridWorldAgent(
             id='agent3', initial_position=np.array([3, 2]), encoding=1, initial_health=1
         ),
     }
@@ -611,13 +611,13 @@ def test_binary_attack_actor_ammo():
             simultaneous_attacks=3,
             initial_ammo=5
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([2, 3]), encoding=2, initial_health=1
         ),
-        'agent3': HealthAgent(
+        'agent3': GridWorldAgent(
             id='agent3', initial_position=np.array([3, 2]), encoding=1, initial_health=1
         ),
     }
@@ -665,13 +665,13 @@ def test_binary_attack_actor_stacked_attack():
             attack_accuracy=1,
             simultaneous_attacks=2
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([4, 4]), encoding=1, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([2, 3]), encoding=2, initial_health=1
         ),
-        'agent3': HealthAgent(
+        'agent3': GridWorldAgent(
             id='agent3', initial_position=np.array([3, 2]), encoding=1, initial_health=1
         ),
     }
@@ -731,7 +731,7 @@ def test_binary_attack_actor_stacked_attack():
 
 def test_selective_attack_actor():
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackingAgent(
             id='agent1',
             initial_position=np.array([2, 2]),
@@ -740,8 +740,8 @@ def test_selective_attack_actor():
             attack_strength=1,
             attack_accuracy=1
         ),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
-        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
+        'agent3': GridWorldAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -893,7 +893,7 @@ def test_selective_attack_actor():
 
 def test_selective_attack_actor_ammo():
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([4, 4]), encoding=1),
         'agent1': AttackerWithAmmo(
             id='agent1',
             initial_position=np.array([2, 2]),
@@ -903,8 +903,8 @@ def test_selective_attack_actor_ammo():
             attack_accuracy=1,
             initial_ammo=3
         ),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
-        'agent3': HealthAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
+        'agent3': GridWorldAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -1006,16 +1006,16 @@ def test_selective_attack_actor_simultaneous_attacks():
             attack_accuracy=1,
             simultaneous_attacks=3
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([0, 0]), encoding=1, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([1, 1]), encoding=2, initial_health=1
         ),
-        'agent3': HealthAgent(
+        'agent3': GridWorldAgent(
             id='agent3', initial_position=np.array([1, 1]), encoding=2, initial_health=1
         ),
-        'agent4': HealthAgent(
+        'agent4': GridWorldAgent(
             id='agent4', initial_position=np.array([1, 1]), encoding=1, initial_health=1
         ),
     }
@@ -1107,16 +1107,16 @@ def test_selective_attack_actor_stacked_attack():
             attack_accuracy=1,
             simultaneous_attacks=3
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([0, 0]), encoding=1, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([1, 1]), encoding=2, initial_health=1
         ),
-        'agent3': HealthAgent(
+        'agent3': GridWorldAgent(
             id='agent3', initial_position=np.array([1, 1]), encoding=2, initial_health=1
         ),
-        'agent4': HealthAgent(
+        'agent4': GridWorldAgent(
             id='agent4', initial_position=np.array([1, 1]), encoding=1, initial_health=1
         ),
     }
@@ -1140,9 +1140,9 @@ def test_selective_attack_actor_stacked_attack():
     attack_status, attacked_agents = attack_actor.process_action(agents['agent0'], attack)
     assert attack_status
     assert len(attacked_agents) == 2
-    assert agents['agent2'] in attacked_agents
+    assert agents['agent3'] in attacked_agents
     assert agents['agent4'] in attacked_agents
-    assert not agents['agent2'].active
+    assert not agents['agent3'].active
     assert not agents['agent4'].active
 
     agents['agent0'].attack_strength = 0.5
@@ -1160,11 +1160,11 @@ def test_selective_attack_actor_stacked_attack():
     assert attack_status
     assert len(attacked_agents) == 4
     assert attacked_agents[0] == agents['agent1']
-    assert attacked_agents[1] == agents['agent3']
-    assert attacked_agents[2] == agents['agent3']
-    assert attacked_agents[3] == agents['agent3']
+    assert attacked_agents[1] == agents['agent2']
+    assert attacked_agents[2] == agents['agent2']
+    assert attacked_agents[3] == agents['agent2']
     assert agents['agent1'].active
-    assert not agents['agent3'].active
+    assert not agents['agent2'].active
 
     attack = {'attack': np.array([
         [3, 3, 3],
@@ -1184,9 +1184,9 @@ def test_selective_attack_actor_stacked_attack():
 def test_encoding_based_attack_actor():
     grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
-        'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
+        'agent1': GridWorldAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
         'agent3': AttackingAgent(
             id='agent3',
             initial_position=np.array([1, 1]),
@@ -1195,7 +1195,7 @@ def test_encoding_based_attack_actor():
             attack_strength=0,
             attack_accuracy=1
         ),
-        'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
+        'agent4': GridWorldAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -1260,9 +1260,9 @@ def test_encoding_based_attack_actor():
 def test_encoding_based_attack_actor_ammo():
     grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
-        'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
+        'agent1': GridWorldAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
         'agent3': AttackerWithAmmo(
             id='agent3',
             initial_position=np.array([1, 1]),
@@ -1272,7 +1272,7 @@ def test_encoding_based_attack_actor_ammo():
             attack_accuracy=1,
             initial_ammo=4
         ),
-        'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
+        'agent4': GridWorldAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -1334,9 +1334,9 @@ def test_encoding_based_attack_actor_ammo():
 def test_encoding_based_attack_actor_simultaneous_attacks():
     grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
-        'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
+        'agent1': GridWorldAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
         'agent3': AttackingAgent(
             id='agent3',
             initial_position=np.array([1, 1]),
@@ -1346,7 +1346,7 @@ def test_encoding_based_attack_actor_simultaneous_attacks():
             attack_accuracy=1,
             simultaneous_attacks=2
         ),
-        'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
+        'agent4': GridWorldAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -1449,9 +1449,9 @@ def test_encoding_based_attack_actor_simultaneous_attacks():
 def test_encoding_based_attack_actor_stacked_attack():
     grid = Grid(2, 2, overlapping={1: {3}, 3: {1}})
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
-        'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
+        'agent1': GridWorldAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
         'agent3': AttackingAgent(
             id='agent3',
             initial_position=np.array([1, 1]),
@@ -1461,7 +1461,7 @@ def test_encoding_based_attack_actor_stacked_attack():
             attack_accuracy=1,
             simultaneous_attacks=2
         ),
-        'agent4': HealthAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
+        'agent4': GridWorldAgent(id='agent4', initial_position=np.array([1, 1]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -1515,9 +1515,9 @@ def test_encoding_based_attack_actor_stacked_attack():
 def test_restricted_selective_attack_actor():
     grid = Grid(2, 2, overlapping={1: {1}})
     agents = {
-        'agent0': HealthAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
-        'agent1': HealthAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
-        'agent2': HealthAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
+        'agent0': GridWorldAgent(id='agent0', initial_position=np.array([0, 0]), encoding=1),
+        'agent1': GridWorldAgent(id='agent1', initial_position=np.array([0, 1]), encoding=2),
+        'agent2': GridWorldAgent(id='agent2', initial_position=np.array([1, 0]), encoding=2),
         'agent3': AttackingAgent(
             id='agent3',
             initial_position=np.array([1, 1]),
@@ -1527,7 +1527,7 @@ def test_restricted_selective_attack_actor():
             attack_accuracy=1,
             simultaneous_attacks=2
         ),
-        'agent4': HealthAgent(id='agent4', initial_position=np.array([0, 0]), encoding=1),
+        'agent4': GridWorldAgent(id='agent4', initial_position=np.array([0, 0]), encoding=1),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -1587,13 +1587,13 @@ def test_restricted_selective_attack_actor():
 def test_restricted_selective_attack_actor_stacked_attacks():
     grid = Grid(2, 2, overlapping={1: {1}})
     agents = {
-        'agent0': HealthAgent(
+        'agent0': GridWorldAgent(
             id='agent0', initial_position=np.array([0, 0]), encoding=1, initial_health=1
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([0, 1]), encoding=2, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([1, 0]), encoding=2, initial_health=1
         ),
         'agent3': AttackingAgent(
@@ -1659,13 +1659,13 @@ def test_restricted_selective_attack_actor_stacked_attacks():
 def test_restricted_selective_attack_actor_ammo():
     grid = Grid(2, 2, overlapping={1: {1}})
     agents = {
-        'agent0': HealthAgent(
+        'agent0': GridWorldAgent(
             id='agent0', initial_position=np.array([0, 0]), encoding=1, initial_health=1
         ),
-        'agent1': HealthAgent(
+        'agent1': GridWorldAgent(
             id='agent1', initial_position=np.array([0, 1]), encoding=2, initial_health=1
         ),
-        'agent2': HealthAgent(
+        'agent2': GridWorldAgent(
             id='agent2', initial_position=np.array([1, 0]), encoding=2, initial_health=1
         ),
         'agent3': AttackerWithAmmo(

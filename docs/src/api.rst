@@ -187,12 +187,6 @@ Agents
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_agent_health:
-
-.. autoclass:: abmarl.sim.gridworld.agent.HealthAgent
-	:members:
-	:undoc-members:
-
 .. _api_gridworld_agent_attack:
 
 .. autoclass:: abmarl.sim.gridworld.agent.AttackingAgent
