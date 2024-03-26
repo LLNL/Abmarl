@@ -45,7 +45,7 @@ Simulation itself, like so:
 
    from enum import IntEnum
 
-   from gym.spaces import Discrete, MultiBinary
+   from gymnasium.spaces import Discrete, MultiBinary
    import numpy as np
 
    from abmarl.tools import Box
@@ -76,7 +76,7 @@ Simulation itself, like so:
            self.finalize()
 
 Here, notice how the agents' `observation_space` is a `dict` rather than a
-`gym.space.Dict`. That's okay because our `Agent` class can convert a `dict of gym spaces`
+`gymnasium.space.Dict`. That's okay because our `Agent` class can convert a `dict of gym spaces`
 into a `Dict` when ``finalize`` is called at the end of ``__init__``.
 
 

@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 
 import numpy as np
-from gym.spaces import Discrete, MultiDiscrete, Dict
+from gymnasium.spaces import Discrete, MultiDiscrete, Dict
 
 from abmarl.tools import Box
 from abmarl.sim.gridworld.base import GridWorldBaseComponent

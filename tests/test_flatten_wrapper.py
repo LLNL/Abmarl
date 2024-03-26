@@ -1,5 +1,5 @@
-from gym.spaces import Dict, Tuple, Discrete, MultiDiscrete, MultiBinary
-from gym.spaces import Box as GymBox
+from gymnasium.spaces import Dict, Tuple, Discrete, MultiDiscrete, MultiBinary
+from gymnasium.spaces import Box as GymBox
 import numpy as np
 
 from abmarl.tools import Box

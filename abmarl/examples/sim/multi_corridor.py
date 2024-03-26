@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-from gym.spaces import Discrete, MultiBinary
+from gymnasium.spaces import Discrete, MultiBinary
 import numpy as np
 
 from abmarl.tools import Box

@@ -1,4 +1,4 @@
-from gym.spaces import MultiBinary, Discrete, Dict
+from gymnasium.spaces import MultiBinary, Discrete, Dict
 import numpy as np
 
 from abmarl.tools import Box

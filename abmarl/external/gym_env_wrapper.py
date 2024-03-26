@@ -1,4 +1,4 @@
-from gym import Env as GymEnv
+from gymnasium import Env as GymEnv
 
 from abmarl.sim import is_agent
 

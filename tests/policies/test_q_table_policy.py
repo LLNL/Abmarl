@@ -1,5 +1,5 @@
 
-from gym.spaces import Discrete, MultiBinary
+from gymnasium.spaces import Discrete, MultiBinary
 import numpy as np
 import pytest
 

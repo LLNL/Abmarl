@@ -1,5 +1,5 @@
 
-from gym.spaces import Dict
+from gymnasium.spaces import Dict
 
 from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent, is_agent
 

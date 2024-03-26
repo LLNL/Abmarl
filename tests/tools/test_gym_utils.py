@@ -1,4 +1,4 @@
-from gym.spaces import Discrete, Dict, Box as GymBox
+from gymnasium.spaces import Discrete, Dict, Box as GymBox
 import pytest
 
 from abmarl.tools import gym_utils as gu

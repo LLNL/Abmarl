@@ -1,4 +1,4 @@
-from gym.spaces import Discrete
+from gymnasium.spaces import Discrete
 import numpy as np
 
 from abmarl.sim.wrappers import CommunicationHandshakeWrapper

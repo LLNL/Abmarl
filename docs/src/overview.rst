@@ -54,7 +54,7 @@ An agent can be created like so:
 
 .. code-block:: python
 
-   from gym.spaces import Discrete
+   from gymnasium.spaces import Discrete
    from abmarl.tools import Box
    from abmarl.sim import Agent
    agent = Agent(
@@ -199,7 +199,7 @@ is ravelled to a Discrete space:
 
 .. code-block:: python
 
-   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
+   from gymnasium.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
    import numpy as np
    from abmarl.tools import Box
    from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, ravel
@@ -255,7 +255,7 @@ it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
 
-   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
+   from gymnasium.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
    import numpy as np
    from abmarl.tools import Box
    from abmarl.sim.wrappers.flatten_wrapper import flatten_space, flatten
