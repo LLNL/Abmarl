@@ -3,7 +3,7 @@ import numpy as np
 
 from abmarl.tools import Box
 from abmarl.sim import Agent
-from abmarl.examples import MultiCorridor
+from abmarl.examples.sim.multi_corridor import MultiCorridor
 
 
 def test_corridor_attributes():

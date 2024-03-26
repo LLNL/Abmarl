@@ -7,7 +7,7 @@ from abmarl.sim.agent_based_simulation import Agent
 from abmarl.trainers import SinglePolicyTrainer
 from abmarl.policies.policy import RandomPolicy
 from abmarl.managers import AllStepManager, TurnBasedManager
-from abmarl.examples import MultiAgentSameSpacesSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentSameSpacesSim
 
 
 class NoTrainer(SinglePolicyTrainer):

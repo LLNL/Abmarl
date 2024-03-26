@@ -2,7 +2,7 @@
 import numpy as np
 
 from abmarl.algs.monte_carlo import off_policy
-from abmarl.examples import MultiCorridor
+from abmarl.examples.sim.multi_corridor import MultiCorridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.external import GymWrapper

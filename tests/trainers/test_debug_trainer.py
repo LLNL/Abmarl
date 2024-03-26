@@ -6,7 +6,7 @@ from abmarl.policies.policy import RandomPolicy
 
 from abmarl.trainers import DebugTrainer
 from abmarl.managers import AllStepManager, TurnBasedManager
-from abmarl.examples import MultiAgentGymSpacesSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentGymSpacesSim
 
 
 sim = AllStepManager(MultiAgentGymSpacesSim())

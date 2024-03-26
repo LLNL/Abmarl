@@ -3,7 +3,7 @@ import numpy as np
 
 from abmarl.sim.wrappers import CommunicationHandshakeWrapper
 from abmarl.sim import Agent
-from abmarl.examples import MultiAgentGymSpacesSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentGymSpacesSim
 
 
 class CommsSimulation(MultiAgentGymSpacesSim):

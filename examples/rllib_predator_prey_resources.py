@@ -1,5 +1,7 @@
 
-from abmarl.examples import ResourceAgent, PreyAgent, PredatorAgent, PredatorPreyResourcesSim
+from abmarl.examples.sim.predator_prey_resources import (
+    ResourceAgent, PreyAgent, PredatorAgent, PredatorPreyResourcesSim
+)
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 

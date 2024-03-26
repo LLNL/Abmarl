@@ -1,7 +1,7 @@
 import numpy as np
 
 from abmarl.managers import TurnBasedManager, AllStepManager
-from abmarl.examples import MultiCorridor
+from abmarl.examples.sim.multi_corridor import MultiCorridor
 
 
 def test_managers_are_same_for_single_agent():

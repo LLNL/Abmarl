@@ -5,7 +5,7 @@ from gym.spaces import MultiBinary, Dict
 import pytest
 
 from abmarl.sim.wrappers import SuperAgentWrapper
-from abmarl.examples import MultiAgentGymSpacesSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentGymSpacesSim
 
 
 sim = SuperAgentWrapper(
