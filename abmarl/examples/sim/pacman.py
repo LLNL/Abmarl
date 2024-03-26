@@ -2,13 +2,13 @@
 import numpy as np
 
 from abmarl.sim.gridworld.agent import (
-    MovingAgent, OrientationAgent, GridWorldAgent, GridObservingAgent, HealthAgent
+    MovingAgent, OrientationAgent, GridWorldAgent, GridObservingAgent
 )
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.actor import DriftMoveActor
 
 
-class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent, HealthAgent):
+class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent):
     def __init__(self, move_range=1, view_range=100, initial_health=1, **kwargs):
         super().__init__(
             move_range=move_range,
@@ -21,7 +21,7 @@ class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent, HealthAgent
 class WallAgent(GridWorldAgent): pass
 
 
-class FoodAgent(HealthAgent):
+class FoodAgent(GridWorldAgent):
     def __init__(self, render_size=50, initial_health=1, **kwargs):
         super().__init__(
             render_size=render_size,

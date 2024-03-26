@@ -2,13 +2,12 @@ from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.agent import (
     GridObservingAgent,
     MovingAgent,
-    AttackingAgent,
-    HealthAgent,
+    AttackingAgent
 )
 from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
 
 
-class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
+class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent):
     def __init__(self, **kwargs):
         super().__init__(
             move_range=1,

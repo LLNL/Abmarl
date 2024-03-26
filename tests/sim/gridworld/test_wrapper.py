@@ -9,10 +9,10 @@ from abmarl.sim.gridworld.state import PositionState, HealthState
 from abmarl.sim.gridworld.wrapper import RavelActionWrapper, ExclusiveChannelActionWrapper, \
     ActorWrapper
 from abmarl.sim.gridworld.grid import Grid
-from abmarl.sim.gridworld.agent import MovingAgent, HealthAgent, AttackingAgent
+from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent
 
 
-class WrappingTestAgent(MovingAgent, HealthAgent, AttackingAgent):
+class WrappingTestAgent(MovingAgent, AttackingAgent):
     def __init__(self, **kwargs):
         super().__init__(
             attack_strength=0.5,

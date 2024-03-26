@@ -1,12 +1,12 @@
 
 from abmarl.sim import Agent
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, \
-    GridObservingAgent, HealthAgent
+    GridObservingAgent, GridWorldAgent
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
 from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
 
 
-class ResourceAgent(HealthAgent):
+class ResourceAgent(GridWorldAgent):
     def __init__(
         self,
         encoding=1,
@@ -22,7 +22,7 @@ class ResourceAgent(HealthAgent):
         )
 
 
-class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
+class PreyAgent(MovingAgent, AttackingAgent, GridObservingAgent):
     def __init__(
         self,
         encoding=2,
@@ -46,7 +46,7 @@ class PreyAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
         )
 
 
-class PredatorAgent(HealthAgent, MovingAgent, AttackingAgent, GridObservingAgent):
+class PredatorAgent(MovingAgent, AttackingAgent, GridObservingAgent):
     def __init__(
         self,
         encoding=3,

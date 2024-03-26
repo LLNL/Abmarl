@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
-    HealthAgent, AttackingAgent, AmmoAgent, AmmoObservingAgent, OrientationAgent
+    AttackingAgent, AmmoAgent, AmmoObservingAgent, OrientationAgent
 from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
@@ -122,8 +122,8 @@ def test_moving_agent():
         )
 
 
-def test_health_agent():
-    agent = HealthAgent(
+def test_agent_health():
+    agent = GridWorldAgent(
         id='agent',
         encoding=1,
         initial_health=0.45
@@ -133,7 +133,7 @@ def test_health_agent():
     assert agent.configured
 
     with pytest.raises(AssertionError):
-        agent = HealthAgent(
+        agent = GridWorldAgent(
             id='agent',
             encoding=1,
             initial_health=2

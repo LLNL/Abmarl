@@ -199,47 +199,6 @@ class MovingAgent(ActingAgent, GridWorldAgent):
         return super().configured and self.move_range is not None
 
 
-class HealthAgent(GridWorldAgent):
-    """
-    Agents have health points and can die.
-
-    Health is bounded between 0 and 1. Agents become inactive when the health
-    falls to 0.
-    """
-    def __init__(self, initial_health=None, **kwargs):
-        super().__init__(**kwargs)
-        self.initial_health = initial_health
-
-    @property
-    def health(self):
-        """
-        The agent's health throughout the simulation trajectory.
-
-        The health will always be between 0 and 1.
-        """
-        return self._health
-
-    @health.setter
-    def health(self, value):
-        assert type(value) in [int, float], "Health must be a numeric value."
-        self._health = min(max(value, 0), 1)
-        self.active = self.health > 0
-
-    @property
-    def initial_health(self):
-        """
-        The agent's initial health between 0 and 1.
-        """
-        return self._initial_health
-
-    @initial_health.setter
-    def initial_health(self, value):
-        if value is not None:
-            assert type(value) in [int, float], "Initial health must be a numeric value."
-            assert 0 < value <= 1, "Initial health must be between 0 and 1."
-        self._initial_health = value
-
-
 class AttackingAgent(ActingAgent, GridWorldAgent):
     """
     Agents that can attack other agents.

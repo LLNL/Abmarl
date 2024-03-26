@@ -29,7 +29,7 @@ First, we import the components that we need. Each component is
    import numpy as np
 
    from abmarl.sim.gridworld.base import GridWorldSimulation
-   from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent
+   from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent, AttackingAgent
    from abmarl.sim.gridworld.state import HealthState, PositionState
    from abmarl.sim.gridworld.actor import MoveActor, BinaryAttackActor
    from abmarl.sim.gridworld.observer import PositionCenteredEncodingObserver
@@ -41,7 +41,7 @@ the class definition to save us time when we create the agents later on.
 
 .. code-block:: python
 
-   class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent, HealthAgent):
+   class BattleAgent(GridObservingAgent, MovingAgent, AttackingAgent):
        def __init__(self, **kwargs):
            super().__init__(
                move_range=1,

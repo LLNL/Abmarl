@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from abmarl.sim.gridworld.agent import HealthAgent, MovingAgent, GridWorldAgent
+from abmarl.sim.gridworld.agent import MovingAgent, GridWorldAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor
 from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, TargetDestroyedDone, \
@@ -13,9 +13,9 @@ from abmarl.sim.gridworld.grid import Grid
 def test_active_done():
     grid = Grid(2, 3)
     agents = {
-        'agent0': HealthAgent(id='agent0', encoding=1),
-        'agent1': HealthAgent(id='agent1', encoding=1),
-        'agent2': HealthAgent(id='agent2', encoding=1),
+        'agent0': GridWorldAgent(id='agent0', encoding=1),
+        'agent1': GridWorldAgent(id='agent1', encoding=1),
+        'agent2': GridWorldAgent(id='agent2', encoding=1),
     }
 
     health_state = HealthState(agents=agents, grid=grid)
