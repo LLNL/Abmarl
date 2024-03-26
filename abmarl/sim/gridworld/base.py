@@ -127,17 +127,22 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             agents = extra_agents
         else:
             agents = {}
-        n = 0
+        ndx = {}
         rows = array.shape[0]
         cols = array.shape[1]
         for r in range(rows):
             for c in range(cols):
                 char = array[r, c]
                 if char in object_registry:
+                    try:
+                        n = ndx[char]
+                    except KeyError:
+                        ndx[char] = 0
+                        n = 0
                     agent = object_registry[char](n)
                     agent.initial_position = np.array([r, c])
                     agents[agent.id] = agent
-                    n += 1
+                    ndx[char] += 1
 
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
 
@@ -175,7 +180,7 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
             agents = extra_agents
         else:
             agents = {}
-        n = 0
+        ndx = {}
         with open(file_name, 'r') as fp:
             lines = fp.read().splitlines()
             cols = len(lines[0].split(' '))
@@ -185,10 +190,15 @@ class GridWorldSimulation(AgentBasedSimulation, ABC):
                 assert len(chars) == cols, f"Mismatched number of columns per row in {file_name}"
                 for col, char in enumerate(chars):
                     if char in object_registry:
+                        try:
+                            n = ndx[char]
+                        except KeyError:
+                            ndx[char] = 0
+                            n = 0
                         agent = object_registry[char](n)
                         agent.initial_position = np.array([row, col])
                         agents[agent.id] = agent
-                        n += 1
+                        ndx[char] += 1
 
         return cls._build_sim(rows, cols, agents=agents, **kwargs)
 
