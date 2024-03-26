@@ -1018,7 +1018,7 @@ Blocking works with any of the built-in grid observers.
 Health
 ``````
 
-:ref:`HealthAgents <api_gridworld_agent_health>` track their `health` throughout the simulation. `Health` is always bounded
+HealthAgents track their `health` throughout the simulation. `Health` is always bounded
 between 0 and 1. Agents whose `health` falls to 0 are marked as `inactive`. They can be given an
 `initial health`, which they start with at the beginning of the episode. Otherwise,
 their `health` will be a random number between 0 and 1, as managed by the :ref:`HealthState <api_gridworld_state_health>`.
