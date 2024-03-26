@@ -1140,9 +1140,9 @@ def test_selective_attack_actor_stacked_attack():
     attack_status, attacked_agents = attack_actor.process_action(agents['agent0'], attack)
     assert attack_status
     assert len(attacked_agents) == 2
-    assert agents['agent2'] in attacked_agents
+    assert agents['agent3'] in attacked_agents
     assert agents['agent4'] in attacked_agents
-    assert not agents['agent2'].active
+    assert not agents['agent3'].active
     assert not agents['agent4'].active
 
     agents['agent0'].attack_strength = 0.5
@@ -1160,11 +1160,11 @@ def test_selective_attack_actor_stacked_attack():
     assert attack_status
     assert len(attacked_agents) == 4
     assert attacked_agents[0] == agents['agent1']
-    assert attacked_agents[1] == agents['agent3']
-    assert attacked_agents[2] == agents['agent3']
-    assert attacked_agents[3] == agents['agent3']
+    assert attacked_agents[1] == agents['agent2']
+    assert attacked_agents[2] == agents['agent2']
+    assert attacked_agents[3] == agents['agent2']
     assert agents['agent1'].active
-    assert not agents['agent3'].active
+    assert not agents['agent2'].active
 
     attack = {'attack': np.array([
         [3, 3, 3],
