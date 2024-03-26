@@ -260,60 +260,60 @@ class PacmanSimSimple(PacmanSim):
 
         # Define baddie actions
         action_dict = {
-            'baddie_20': {'move': 0},
-            'baddie_36': {'move': 0},
-            'baddie_156': {'move': 0},
-            'baddie_157': {'move': 1},
-            'baddie_159': {'move': np.random.randint(0, 5)},
-            'baddie_161': {'move': 3},
-            'baddie_162': {'move': 0},
-            'baddie_206': {'move': 0},
-            'baddie_222': {'move': 0},
-            'baddie_328': {'move': 0},
+            'baddie_0': {'move': 0},
+            'baddie_1': {'move': 0},
+            'baddie_2': {'move': 0},
+            'baddie_3': {'move': 1},
+            'baddie_4': {'move': np.random.randint(0, 5)},
+            'baddie_5': {'move': 3},
+            'baddie_6': {'move': 0},
+            'baddie_7': {'move': 0},
+            'baddie_8': {'move': 0},
+            'baddie_9': {'move': 0},
         }
         if self.step_count == 0:
-            action_dict['baddie_156']['move'] = 4
-            action_dict['baddie_162']['move'] = 4
-            action_dict['baddie_328']['move'] = 3
+            action_dict['baddie_2']['move'] = 4
+            action_dict['baddie_6']['move'] = 4
+            action_dict['baddie_9']['move'] = 3
         if self.step_count % 10 == 0:
-            action_dict['baddie_20']['move'] = 3
-            action_dict['baddie_36']['move'] = 1
+            action_dict['baddie_0']['move'] = 3
+            action_dict['baddie_1']['move'] = 1
         elif self.step_count % 10 == 3:
-            action_dict['baddie_20']['move'] = 2
-            action_dict['baddie_36']['move'] = 2
+            action_dict['baddie_0']['move'] = 2
+            action_dict['baddie_1']['move'] = 2
         elif self.step_count % 10 == 5:
-            action_dict['baddie_20']['move'] = 1
-            action_dict['baddie_36']['move'] = 3
+            action_dict['baddie_0']['move'] = 1
+            action_dict['baddie_1']['move'] = 3
         elif self.step_count % 10 == 8:
-            action_dict['baddie_20']['move'] = 4
-            action_dict['baddie_36']['move'] = 4
+            action_dict['baddie_0']['move'] = 4
+            action_dict['baddie_1']['move'] = 4
         if (self.step_count - 8) % 16 == 0:
-            if self.agents['baddie_156'].orientation == 4:
-                action_dict['baddie_156']['move'] = 2
-                action_dict['baddie_162']['move'] = 2
-                action_dict['baddie_328']['move'] = 3
+            if self.agents['baddie_2'].orientation == 4:
+                action_dict['baddie_2']['move'] = 2
+                action_dict['baddie_6']['move'] = 2
+                action_dict['baddie_9']['move'] = 3
             else:
-                action_dict['baddie_156']['move'] = 4
-                action_dict['baddie_162']['move'] = 4
-                action_dict['baddie_328']['move'] = 1
+                action_dict['baddie_2']['move'] = 4
+                action_dict['baddie_6']['move'] = 4
+                action_dict['baddie_9']['move'] = 1
         if self.step_count % 14 == 0:
-            action_dict['baddie_206']['move'] = 3
-            action_dict['baddie_222']['move'] = 1
+            action_dict['baddie_7']['move'] = 3
+            action_dict['baddie_8']['move'] = 1
         elif self.step_count % 14 == 3:
-            action_dict['baddie_206']['move'] = 2
-            action_dict['baddie_222']['move'] = 2
+            action_dict['baddie_7']['move'] = 2
+            action_dict['baddie_8']['move'] = 2
         elif self.step_count % 14 == 7:
-            action_dict['baddie_206']['move'] = 1
-            action_dict['baddie_222']['move'] = 3
+            action_dict['baddie_7']['move'] = 1
+            action_dict['baddie_8']['move'] = 3
         elif self.step_count % 14 == 9:
-            action_dict['baddie_206']['move'] = 4
-            action_dict['baddie_222']['move'] = 4
+            action_dict['baddie_7']['move'] = 4
+            action_dict['baddie_8']['move'] = 4
         elif self.step_count % 14 == 11:
-            action_dict['baddie_206']['move'] = 1
-            action_dict['baddie_222']['move'] = 3
+            action_dict['baddie_7']['move'] = 1
+            action_dict['baddie_8']['move'] = 3
         elif self.step_count % 14 == 12:
-            action_dict['baddie_206']['move'] = 4
-            action_dict['baddie_222']['move'] = 4
+            action_dict['baddie_7']['move'] = 4
+            action_dict['baddie_8']['move'] = 4
 
         # Now move the baddies and compute overlaps with pacman
         for agent_id, action in action_dict.items():
