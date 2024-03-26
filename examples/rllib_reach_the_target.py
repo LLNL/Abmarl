@@ -1,7 +1,9 @@
 
 import numpy as np
 
-from abmarl.examples import ReachTheTargetSim, RunningAgent, TargetAgent, BarrierAgent
+from abmarl.examples.sim.reach_the_target import (
+    ReachTheTargetSim, RunningAgent, TargetAgent, BarrierAgent
+)
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
 

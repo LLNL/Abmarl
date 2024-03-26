@@ -3,7 +3,7 @@ import pytest
 
 from abmarl.sim import PrincipleAgent, DynamicOrderSimulation
 from abmarl.managers import DynamicOrderManager
-from abmarl.examples import MultiAgentSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentSim
 
 
 class SequentiallyFinishingSim(DynamicOrderSimulation):

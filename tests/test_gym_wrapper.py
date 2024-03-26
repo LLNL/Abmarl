@@ -2,7 +2,7 @@ import pytest
 
 from abmarl.managers import AllStepManager
 from abmarl.external import GymWrapper
-from abmarl.examples import MultiAgentSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentSim
 
 
 def test_gym_init_multi_agent_error():

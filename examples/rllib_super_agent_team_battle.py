@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from abmarl.examples import BattleAgent, TeamBattleSim
+from abmarl.examples.sim.team_battle_example import BattleAgent, TeamBattleSim
 from abmarl.sim.wrappers import SuperAgentWrapper
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper

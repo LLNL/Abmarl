@@ -6,7 +6,7 @@ import pytest
 
 from abmarl.sim.gridworld.grid import Grid
 from abmarl.sim.gridworld.agent import GridWorldAgent
-from abmarl.examples.sim import MultiAgentGridSim
+from abmarl.examples.sim.multi_agent_grid_sim import MultiAgentGridSim
 
 
 def test_build():

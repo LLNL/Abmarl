@@ -1,5 +1,7 @@
 
-from abmarl.examples import MultiMazeNavigationAgent, MultiMazeNavigationSim
+from abmarl.examples.sim.multi_maze_navigation import (
+    MultiMazeNavigationAgent, MultiMazeNavigationSim
+)
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper

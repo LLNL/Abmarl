@@ -3,7 +3,7 @@ import random
 import numpy as np
 import pytest
 
-from abmarl.examples import MultiCorridor
+from abmarl.examples.sim.multi_corridor import MultiCorridor
 from abmarl.managers import AllStepManager
 
 

@@ -1,5 +1,5 @@
 from abmarl.sim.wrappers import SARWrapper
-from abmarl.examples import MultiAgentSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentSim
 
 
 # Individual wrappers

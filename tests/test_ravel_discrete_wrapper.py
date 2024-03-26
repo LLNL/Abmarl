@@ -8,7 +8,7 @@ from abmarl.tools import Box
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.sim import Agent
-from abmarl.examples import EmptyABS, MultiAgentGymSpacesSim
+from abmarl.examples.sim.multi_agent_sim import EmptyABS, MultiAgentGymSpacesSim
 
 
 def test_ravel():

@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from abmarl.examples import MultiCorridor
+from abmarl.examples.sim.multi_corridor import MultiCorridor
 from abmarl.managers import AllStepManager
 from abmarl.sim.wrappers import RavelDiscreteWrapper
 from abmarl.policies.q_table_policy import EpsilonSoftPolicy

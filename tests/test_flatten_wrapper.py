@@ -5,7 +5,7 @@ import numpy as np
 from abmarl.tools import Box
 from abmarl.sim.wrappers import FlattenWrapper, FlattenActionWrapper
 from abmarl.sim.wrappers.flatten_wrapper import flatdim, flatten, unflatten, flatten_space
-from abmarl.examples import MultiAgentContinuousGymSpaceSim
+from abmarl.examples.sim.multi_agent_sim import MultiAgentContinuousGymSpaceSim
 
 # --- Test flatten helper commands --- #
 
