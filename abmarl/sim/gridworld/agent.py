@@ -9,7 +9,7 @@ class GridWorldAgent(PrincipleAgent):
     The base agent in the GridWorld.
     """
     def __init__(self, initial_position=None, blocking=False, encoding=None, render_shape='o',
-                 render_color='gray', render_size=200, **kwargs):
+                 render_color='gray', render_size=200, initial_health=None, **kwargs):
         super().__init__(**kwargs)
         self.encoding = encoding
         self.initial_position = initial_position
@@ -17,6 +17,7 @@ class GridWorldAgent(PrincipleAgent):
         self.render_shape = render_shape
         self.render_color = render_color
         self.render_size = render_size
+        self.initial_health = initial_health
 
     @property
     def encoding(self):
@@ -111,6 +112,35 @@ class GridWorldAgent(PrincipleAgent):
     def render_size(self, value):
         assert type(value) is int and value > 0, "Render size must be nonnegative integer."
         self._render_size = value
+
+    @property
+    def health(self):
+        """
+        The agent's health throughout the simulation trajectory.
+
+        The health will always be between 0 and 1.
+        """
+        return self._health
+
+    @health.setter
+    def health(self, value):
+        assert type(value) in [int, float], "Health must be a numeric value."
+        self._health = min(max(value, 0), 1)
+        self.active = self.health > 0
+
+    @property
+    def initial_health(self):
+        """
+        The agent's initial health between 0 and 1.
+        """
+        return self._initial_health
+
+    @initial_health.setter
+    def initial_health(self, value):
+        if value is not None:
+            assert type(value) in [int, float], "Initial health must be a numeric value."
+            assert 0 < value <= 1, "Initial health must be between 0 and 1."
+        self._initial_health = value
 
     @property
     def configured(self):
