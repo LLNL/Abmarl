@@ -60,8 +60,8 @@ policies = {
     ),
     'baddie': (
         None,
-        sim.sim.agents['baddie_157'].observation_space,
-        sim.sim.agents['baddie_157'].action_space, {}
+        sim.sim.agents['baddie_0'].observation_space,
+        sim.sim.agents['baddie_0'].action_space, {}
     ),
 }
 

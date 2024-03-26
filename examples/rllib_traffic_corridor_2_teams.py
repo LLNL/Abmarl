@@ -54,10 +54,10 @@ sim = MultiAgentWrapper(
             dones={"TargetAgentDone"},
             observers={'PositionCenteredEncodingObserver'},
             target_mapping={
-                'red4': 'red_target',
-                'red11': 'red_target',
+                'red0': 'red_target',
+                'red1': 'red_target',
                 'green0': 'green_target',
-                'green7': 'green_target',
+                'green1': 'green_target',
             }
         ),
         randomize_action_input=True,
@@ -71,8 +71,8 @@ register_env(sim_name, lambda sim_config: sim)
 policies = {
     'red': (
         None,
-        sim.sim.agents['red4'].observation_space,
-        sim.sim.agents['red4'].action_space,
+        sim.sim.agents['red0'].observation_space,
+        sim.sim.agents['red0'].action_space,
         {}
     ),
     'green': (
