@@ -51,7 +51,7 @@ def test_absolute_encoding_observer():
             id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
         ),
         'agent2': GridObservingAgent(
-            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+            id='agent2', encoding=3, view_range="FULL", initial_position=np.array([4, 4])
         ),
         'agent3': GridWorldAgent(
             id='agent3', encoding=5, initial_position=np.array([3, 3])
@@ -93,6 +93,7 @@ def test_absolute_encoding_observer():
             [-2, -2, -2, -2, -2]
         ])
     )
+    assert agents['agent2'].view_range == 4
     np.testing.assert_array_equal(
         observer.get_obs(agents['agent2'])['absolute_encoding'],
         np.array([
@@ -116,7 +117,7 @@ def test_absolute_encoding_observer_blocking():
             id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
         ),
         'agent2': GridObservingAgent(
-            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+            id='agent2', encoding=3, view_range="FULL", initial_position=np.array([4, 4])
         ),
         'agent3': GridWorldAgent(
             id='agent3', encoding=5, initial_position=np.array([3, 3]), blocking=True
@@ -157,6 +158,7 @@ def test_absolute_encoding_observer_blocking():
             [-2, -2, -2, -2, -2]
         ])
     )
+    assert agents['agent2'].view_range == 4
     np.testing.assert_array_equal(
         observer.get_obs(agents['agent2'])['absolute_encoding'],
         np.array([
@@ -203,7 +205,7 @@ def test_single_grid_observer():
             id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
         ),
         'agent2': GridObservingAgent(
-            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+            id='agent2', encoding=3, view_range='FULL', initial_position=np.array([4, 4])
         ),
         'agent3': GridWorldAgent(id='agent3', encoding=5, initial_position=np.array([3, 3])),
         'agent4': GridWorldAgent(id='agent4', encoding=4, initial_position=np.array([1, 1])),
@@ -222,6 +224,7 @@ def test_single_grid_observer():
     assert agents['agent1'].observation_space['position_centered_encoding'] == Box(
         -2, 6, (3, 3), int
     )
+    assert agents['agent2'].view_range == 4
     assert agents['agent2'].observation_space['position_centered_encoding'] == Box(
         -2, 6, (9, 9), int
     )
@@ -278,7 +281,7 @@ def test_single_grid_observer():
             [-1, -1, -1, -1, -1, -1, -1, -1, -1]
         ])
     )
-
+test_single_grid_observer()
 
 def test_single_grid_observer_blocking():
     grid = Grid(5, 5)
@@ -290,7 +293,7 @@ def test_single_grid_observer_blocking():
             id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
         ),
         'agent2': GridObservingAgent(
-            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+            id='agent2', encoding=3, view_range='FULL', initial_position=np.array([4, 4])
         ),
         'agent3': GridWorldAgent(
             id='agent3', encoding=5, initial_position=np.array([3, 3]), blocking=True
@@ -326,6 +329,7 @@ def test_single_grid_observer_blocking():
             [-1,  0,  4]
         ])
     )
+    assert agents['agent2'].view_range == 4
     np.testing.assert_array_equal(
         observer.get_obs(agents['agent2'])['position_centered_encoding'],
         np.array([
@@ -353,7 +357,7 @@ def test_multi_grid_observer():
             id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
         ),
         'agent2': GridObservingAgent(
-            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+            id='agent2', encoding=3, view_range="FULL", initial_position=np.array([4, 4])
         ),
         'agent6': HackAgent(
             id='agent6', encoding=2, view_range=1, initial_position=np.array([4, 4]), move_range=1
@@ -389,6 +393,7 @@ def test_multi_grid_observer():
     assert agents['agent1'].observation_space['stacked_position_centered_encoding'] == Box(
         -2, 9, (3, 3, 6), int
     )
+    assert agents['agent2'].view_range == 4
     assert agents['agent2'].observation_space['stacked_position_centered_encoding'] == Box(
         -2, 9, (9, 9, 6), int
     )
@@ -621,7 +626,7 @@ def test_multi_grid_observer_blocking():
             id='agent1', encoding=2, view_range=1, initial_position=np.array([0, 0])
         ),
         'agent2': GridObservingAgent(
-            id='agent2', encoding=3, view_range=4, initial_position=np.array([4, 4])
+            id='agent2', encoding=3, view_range="FULL", initial_position=np.array([4, 4])
         ),
         'agent6': HackAgent(
             id='agent6', encoding=2, view_range=1, initial_position=np.array([4, 4]), move_range=1
@@ -646,6 +651,7 @@ def test_multi_grid_observer_blocking():
 
     position_state = PositionState(grid=grid, agents=agents)
     observer = StackedPositionCenteredEncodingObserver(agents=agents, grid=grid)
+    assert agents['agent2'].view_range == 4
     assert isinstance(observer, ObserverBaseComponent)
     position_state.reset()
 
