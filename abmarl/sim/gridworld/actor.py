@@ -253,6 +253,8 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
+                if agent.attack_range == "FULL":
+                    agent.attack_range = max(self.rows, self.cols) - 1
                 self._assign_space(agent)
 
     @property

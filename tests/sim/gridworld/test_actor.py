@@ -484,6 +484,14 @@ def test_binary_attack_actor():
         ),
         'agent2': GridWorldAgent(id='agent2', initial_position=np.array([2, 3]), encoding=2),
         'agent3': GridWorldAgent(id='agent3', initial_position=np.array([3, 2]), encoding=1),
+        'agent4': AttackingAgent(
+            id='agent4',
+            initial_position=np.array([0, 0]),
+            encoding=2,
+            attack_range="FULL",
+            attack_strength=1,
+            attack_accuracy=1
+        ),
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -495,6 +503,7 @@ def test_binary_attack_actor():
     assert agents['agent1'].action_space['attack'] == Discrete(2)
     assert attack_actor.attack_mapping == {1: {1}}
     assert attack_actor._encodings_in_sim == {1, 2}
+    assert agents['agent4'].attack_range == 5
 
     agents['agent1'].finalize()
     assert agents['agent1'].null_action == {'attack': 0}

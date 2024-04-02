@@ -281,7 +281,7 @@ def test_single_grid_observer():
             [-1, -1, -1, -1, -1, -1, -1, -1, -1]
         ])
     )
-test_single_grid_observer()
+
 
 def test_single_grid_observer_blocking():
     grid = Grid(5, 5)

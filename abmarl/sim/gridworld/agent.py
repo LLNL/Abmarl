@@ -224,7 +224,8 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
 
     @attack_range.setter
     def attack_range(self, value):
-        assert type(value) is int and 0 <= value, "Attack range must be a nonnegative integer."
+        assert (value == "FULL") or (type(value) is int and 0 <= value), \
+            "Attack range must be 'FULL' or a nonnegative integer."
         self._attack_range = value
 
     @property
