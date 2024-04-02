@@ -161,12 +161,15 @@ class GridObservingAgent(ObservingAgent, GridWorldAgent):
     def view_range(self):
         """
         The number of cells away this agent can observe in each step.
+
+        "FULL" means the agent will be able to observe the full grid.
         """
         return self._view_range
 
     @view_range.setter
     def view_range(self, value):
-        assert type(value) is int and 0 <= value, "View range must be a nonnegative integer."
+        assert (value == "FULL") or (type(value) is int and 0 <= value), \
+            "View range must be a nonnegative integer or 'FULL'."
         self._view_range = value
 
     @property
@@ -191,7 +194,8 @@ class MovingAgent(ActingAgent, GridWorldAgent):
 
     @move_range.setter
     def move_range(self, value):
-        assert type(value) is int and 0 <= value, "Move range must be a nonnegative integer."
+        assert (value == "FULL") or (type(value) is int and 0 <= value), \
+            "Move range must be 'FULL' or a nonnegative integer."
         self._move_range = value
 
     @property
@@ -220,7 +224,8 @@ class AttackingAgent(ActingAgent, GridWorldAgent):
 
     @attack_range.setter
     def attack_range(self, value):
-        assert type(value) is int and 0 <= value, "Attack range must be a nonnegative integer."
+        assert (value == "FULL") or (type(value) is int and 0 <= value), \
+            "Attack range must be 'FULL' or a nonnegative integer."
         self._attack_range = value
 
     @property

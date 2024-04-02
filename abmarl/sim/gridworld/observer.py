@@ -71,6 +71,8 @@ class AbsoluteEncodingObserver(ObserverBaseComponent):
         max_encoding = max(self._encodings_in_sim)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
+                if agent.view_range == "FULL":
+                    agent.view_range = max(self.rows, self.cols) - 1
                 agent.observation_space[self.key] = Box(
                     -2, max_encoding, (self.rows, self.cols), int
                 )
@@ -165,6 +167,8 @@ class PositionCenteredEncodingObserver(ObserverBaseComponent):
         max_encoding = max(self._encodings_in_sim)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
+                if agent.view_range == "FULL":
+                    agent.view_range = max(self.rows, self.cols) - 1
                 agent.observation_space[self.key] = Box(
                     -2, max_encoding, (agent.view_range * 2 + 1, agent.view_range * 2 + 1), int
                 )
@@ -264,6 +268,8 @@ class StackedPositionCenteredEncodingObserver(ObserverBaseComponent):
         self.number_of_encodings = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
+                if agent.view_range == "FULL":
+                    agent.view_range = max(self.rows, self.cols) - 1
                 agent.observation_space[self.key] = Box(
                     -2,
                     len(self.agents),
