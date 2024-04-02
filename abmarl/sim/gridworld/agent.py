@@ -194,7 +194,8 @@ class MovingAgent(ActingAgent, GridWorldAgent):
 
     @move_range.setter
     def move_range(self, value):
-        assert type(value) is int and 0 <= value, "Move range must be a nonnegative integer."
+        assert (value == "FULL") or (type(value) is int and 0 <= value), \
+            "Move range must be 'FULL' or a nonnegative integer."
         self._move_range = value
 
     @property

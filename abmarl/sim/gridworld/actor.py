@@ -62,6 +62,8 @@ class MoveActor(ActorBaseComponent):
         super().__init__(**kwargs)
         for agent in self.agents.values():
             if isinstance(agent, self.supported_agent_type):
+                if agent.move_range == "FULL":
+                    agent.move_range = max(self.rows, self.cols) - 1
                 agent.action_space[self.key] = Box(
                     -agent.move_range, agent.move_range, (2,), int
                 )

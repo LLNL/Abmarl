@@ -33,6 +33,9 @@ def test_move_actor():
         'agent3': MovingAgent(
             id='agent3', initial_position=np.array([3, 1]), encoding=3, move_range=3
         ),
+        'agent4': MovingAgent(
+            id='agent4', initial_position=np.array([0, 0]), encoding=2, move_range="FULL"
+        )
     }
 
     position_state = PositionState(grid=grid, agents=agents)
@@ -45,6 +48,8 @@ def test_move_actor():
     assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), int)
     assert agents['agent2'].action_space['move'] == Box(-1, 1, (2,), int)
     assert agents['agent3'].action_space['move'] == Box(-3, 3, (2,), int)
+    assert agents['agent4'].action_space['move'] == Box(-5, 5, (2,), int)
+    assert agents['agent4'].move_range == 5
 
     for agent in agents.values():
         agent.finalize()
@@ -57,6 +62,7 @@ def test_move_actor():
         'agent1': {'move': np.array([-1, 0])},
         'agent2': {'move': np.array([0, 1])},
         'agent3': {'move': np.array([-1, 1])},
+        'agent4': {'move': np.array([5, 5])}
     }
     for agent_id, action in action.items():
         move_actor.process_action(agents[agent_id], action)
@@ -64,12 +70,14 @@ def test_move_actor():
     np.testing.assert_array_equal(agents['agent1'].position, np.array([1, 2]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 2]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+    np.testing.assert_array_equal(agents['agent4'].position, np.array([0, 0]))
 
     action = {
         'agent0': {'move': np.array([1, 1])},
         'agent1': {'move': np.array([0, 0])},
         'agent2': {'move': np.array([-1, 1])},
         'agent3': {'move': np.array([-1, 0])},
+        'agent4': {'move': np.array([4, 0])}
     }
     for agent_id, action in action.items():
         move_actor.process_action(agents[agent_id], action)
@@ -77,6 +85,7 @@ def test_move_actor():
     np.testing.assert_array_equal(agents['agent1'].position, np.array([1, 2]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([0, 2]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+    np.testing.assert_array_equal(agents['agent4'].position, np.array([4, 0]))
 
 
 def test_move_actor_with_overlap():
@@ -99,10 +108,14 @@ def test_move_actor_with_overlap():
         'agent3': MovingAgent(
             id='agent3', initial_position=np.array([3, 2]), encoding=3, move_range=3
         ),
+        'agent4': MovingAgent(
+            id='agent4', initial_position=np.array([0, 0]), encoding=2, move_range="FULL"
+        )
     }
 
     position_state = PositionState(grid=grid, agents=agents)
     move_actor = MoveActor(grid=grid, agents=agents)
+    assert agents['agent4'].move_range == 5
 
     position_state.reset()
     action = {
@@ -110,6 +123,7 @@ def test_move_actor_with_overlap():
         'agent1': {'move': np.array([0, 0])},
         'agent2': {'move': np.array([1, 0])},
         'agent3': {'move': np.array([-1, 0])},
+        'agent4': {'move': np.array([4, 5])}
     }
     for agent_id, action in action.items():
         move_actor.process_action(agents[agent_id], action)
@@ -117,12 +131,14 @@ def test_move_actor_with_overlap():
     np.testing.assert_array_equal(agents['agent1'].position, np.array([2, 2]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 4]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+    np.testing.assert_array_equal(agents['agent4'].position, np.array([4, 5]))
 
     action = {
         'agent0': {'move': np.array([-1, 0])},
         'agent1': {'move': np.array([0, 2])},
         'agent2': {'move': np.array([0, -1])},
         'agent3': {'move': np.array([1, 1])},
+        'agent4': {'move': np.array([0, -5])}
     }
     for agent_id, action in action.items():
         move_actor.process_action(agents[agent_id], action)
@@ -130,6 +146,7 @@ def test_move_actor_with_overlap():
     np.testing.assert_array_equal(agents['agent1'].position, np.array([2, 2]))
     np.testing.assert_array_equal(agents['agent2'].position, np.array([3, 3]))
     np.testing.assert_array_equal(agents['agent3'].position, np.array([2, 2]))
+    np.testing.assert_array_equal(agents['agent4'].position, np.array([4, 0]))
 
 
 def test_cross_move_actor():
