@@ -2,7 +2,7 @@
 from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Tuple, Dict
 
 from abmarl.tools import Box
-from abmarl.sim import PrincipleAgent, AgentBasedSimulation, is_agent
+from abmarl.sim import PrincipleAgent, AgentBasedSimulation, is_agent, Agent
 
 
 class EmptyABS(AgentBasedSimulation):

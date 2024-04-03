@@ -171,6 +171,15 @@ class ObservingAgent(PrincipleAgent):
                 "The null observation must be in the observation space."
 
 
+class Agent(ObservingAgent, ActingAgent):
+    """
+    Class for quickly defining an Observing and Acting Agent.
+
+    If checking an object's instance, it is better to use the is_agent function.
+    """
+    pass
+
+
 def is_agent(agent):
     """
     An Agent is both an ObservingAgent and an ActingAgent.

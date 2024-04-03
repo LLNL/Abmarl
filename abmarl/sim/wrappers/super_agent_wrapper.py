@@ -3,7 +3,7 @@ import warnings
 
 from gym.spaces import Dict, MultiBinary
 
-from abmarl.sim.agent_based_simulation import is_agent
+from abmarl.sim.agent_based_simulation import is_agent, Agent
 from abmarl.sim.wrappers import Wrapper
 from abmarl.tools import gym_utils as gu
 

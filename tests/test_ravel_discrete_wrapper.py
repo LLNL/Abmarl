@@ -7,7 +7,7 @@ import pytest
 from abmarl.tools import Box
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
 from abmarl.sim.wrappers import RavelDiscreteWrapper
-from abmarl.sim import is_agent
+from abmarl.sim import is_agent, Agent
 from abmarl.examples.sim.multi_agent_sim import EmptyABS, MultiAgentGymSpacesSim
 
 
