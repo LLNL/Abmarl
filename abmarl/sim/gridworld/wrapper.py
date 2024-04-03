@@ -106,10 +106,10 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
         self.from_space = {
             agent.id: agent.action_space[self.key]
             for agent in self.agents.values()
-            if isinstance(agent, self.supported_agent_type)
+            if self._supported_agent(agent)
         }
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 assert self.check_space(agent.action_space[self.key]), \
                     f"Cannot wrap {self.key} action channel for agent {agent.id}"
                 agent.action_space[self.key] = self.wrap_space(agent.action_space[self.key])
@@ -133,12 +133,11 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
         """
         return self.wrapped_component.key
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
-        The supported agent type is the same as the wrapped actor's supported agent type.
+        The supported agent is the same as the wrapped actor's supported agent.
         """
-        return self.wrapped_component.supported_agent_type
+        return self.wrapped_component._supported_agent(agent)
 
     def process_action(self, agent, action_dict, **kwargs):
         """
@@ -149,7 +148,7 @@ class ActorWrapper(ComponentWrapper, ActorBaseComponent):
             action_dict: The action dictionary for this agent in this step. The
                 action in this channel comes in the wrapped space.
         """
-        if isinstance(agent, self.supported_agent_type):
+        if self._supported_agent(agent):
             action = action_dict[self.key]
             unwrapped_action = self.wrap_point(self.from_space[agent.id], action)
             return self.wrapped_component.process_action(
