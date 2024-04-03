@@ -367,9 +367,9 @@ Done
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_done_target_agent:
+.. _api_gridworld_done_target_agent_overlap:
 
-.. autoclass:: abmarl.sim.gridworld.done.TargetAgentDone
+.. autoclass:: abmarl.sim.gridworld.done.TargetAgentOverlapDone
 	:members:
 	:undoc-members:
 

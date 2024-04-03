@@ -5,8 +5,8 @@ import pytest
 from abmarl.sim.gridworld.agent import MovingAgent, GridWorldAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor
-from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, TargetAgentInactiveDone, \
-    TargetEncodingInactiveDone, DoneBaseComponent
+from abmarl.sim.gridworld.done import ActiveDone, TargetAgentOverlapDone, \
+    TargetAgentInactiveDone, TargetEncodingInactiveDone, DoneBaseComponent
 from abmarl.sim.gridworld.grid import Grid
 
 
@@ -69,7 +69,7 @@ def test_target_overlap_done():
     }
     state = PositionState(grid=grid, agents=agents)
     actor = MoveActor(grid=grid, agents=agents)
-    target_done = TargetAgentDone(grid=grid, agents=agents, target_mapping=target_mapping)
+    target_done = TargetAgentOverlapDone(grid=grid, agents=agents, target_mapping=target_mapping)
     assert target_done._encodings_in_sim == {1, 2}
     state.reset()
     for agent in agents.values():

@@ -4,7 +4,7 @@ import pytest
 from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, \
     BinaryAttackActor, EncodingBasedAttackActor, RestrictedSelectiveAttackActor, \
     SelectiveAttackActor, DriftMoveActor
-from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, \
+from abmarl.sim.gridworld.done import ActiveDone, TargetAgentOverlapDone, \
     OneTeamRemainingDone, TargetEncodingInactiveDone, TargetAgentInactiveDone
 from abmarl.sim.gridworld.observer import AbsoluteEncodingObserver, \
     PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
@@ -28,7 +28,7 @@ def test_built_in_registry():
     assert DriftMoveActor in registry['actor'].values()
 
     assert ActiveDone in registry['done'].values()
-    assert TargetAgentDone in registry['done'].values()
+    assert TargetAgentOverlapDone in registry['done'].values()
     assert TargetAgentInactiveDone in registry['done'].values()
     assert OneTeamRemainingDone in registry['done'].values()
     assert TargetEncodingInactiveDone in registry['done'].values()

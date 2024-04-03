@@ -1414,10 +1414,10 @@ does not report done for individual agents.
 
 .. _gridworld_done_target_overlap:
 
-Target Agent Done
-`````````````````
+Target Agent Overlap Done
+`````````````````````````
 
-The :ref:`TargetAgentDone <api_gridworld_done_target_agent>` component takes
+The :ref:`TargetAgentOverlapDone <api_gridworld_done_target_agent_overlap>` component takes
 a ``target_mapping``, which maps agents to their targets by id. If an agent *overlaps*
 its target, then that agent is done. If all of the agents have overlapped their
 targets, then the simulation is done.
@@ -1425,7 +1425,7 @@ targets, then the simulation is done.
 .. _gridworld_done_target_destroyed:
 
 Target Agent Inactive Done
-`````````````````````
+``````````````````````````
 
 The :ref:`TargetAgentInactiveDone <api_gridworld_done_target_agent_inactive>` component takes
 a ``target_mapping``, which maps agents to their targets by id. If an agent's target

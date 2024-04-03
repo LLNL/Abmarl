@@ -56,7 +56,7 @@ class ActiveDone(DoneBaseComponent):
         return True
 
 
-class TargetAgentDone(DoneBaseComponent):
+class TargetAgentOverlapDone(DoneBaseComponent):
     """
     Agents are done when they overlap their target.
 
