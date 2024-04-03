@@ -211,6 +211,12 @@ class DriftMoveActor(CrossMoveActor):
     that change will fail and it will keep its current orientation, even though
     it is blocked that way too.
     """
+    def _supported_agent(self, agent):
+        """
+        This Actor works with MovingAgent and OrientationAgent.
+        """
+        return isinstance(agent, MovingAgent) and isinstance(agent, OrientationAgent)
+
     def process_action(self, agent, action_dict, **kwargs):
         """
         The agent can move up, down, left, right, or stay in place.
@@ -227,7 +233,7 @@ class DriftMoveActor(CrossMoveActor):
         Returns:
             True if the move is successful, False otherwise.
         """
-        if isinstance(agent, OrientationAgent) and isinstance(agent, MovingAgent):
+        if self._supported_agent(agent):
             cross_action = action_dict[self.key]
             if cross_action != 0:
                 # Agent has attempted to change directions, let the super process

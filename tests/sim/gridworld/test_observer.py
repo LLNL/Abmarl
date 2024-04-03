@@ -188,7 +188,8 @@ def test_single_grid_observer():
     observer = PositionCenteredEncodingObserver(agents=agents, grid=grid)
     assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     assert observer.key == 'position_centered_encoding'
-    assert observer.supported_agent_type == GridObservingAgent
+    assert observer._supported_agent(agents['agent0'])
+    assert not observer._supported_agent(agents['agent3'])
     assert isinstance(observer, ObserverBaseComponent)
     assert agents['agent0'].observation_space['position_centered_encoding'] == Box(
         -2, 6, (5, 5), int
@@ -356,7 +357,8 @@ def test_multi_grid_observer():
     observer = StackedPositionCenteredEncodingObserver(agents=agents, grid=grid)
     assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     assert observer.key == 'stacked_position_centered_encoding'
-    assert observer.supported_agent_type == GridObservingAgent
+    assert observer._supported_agent(agents['agent0'])
+    assert not observer._supported_agent(agents['agent5'])
     assert isinstance(observer, ObserverBaseComponent)
     assert observer.number_of_encodings == 6
     assert agents['agent0'].observation_space['stacked_position_centered_encoding'] == Box(
@@ -927,7 +929,7 @@ def test_absolute_position_observer():
     observer = AbsolutePositionObserver(agents=agents, grid=grid)
     assert observer._encodings_in_sim == {1, 2, 3, 4, 5, 6}
     assert observer.key == 'position'
-    assert observer.supported_agent_type == ObservingAgent
+    assert observer._supported_agent(agents['agent0'])
     assert isinstance(observer, ObserverBaseComponent)
     for agent in agents.values():
         agent.finalize()

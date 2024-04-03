@@ -6,7 +6,7 @@ import numpy as np
 from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoAgent, GridWorldAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -188,7 +188,6 @@ class PositionCenteredEncodingObserver(ObserverBaseComponent):
         """
         return 'position_centered_encoding'
 
-    @property
     def _supported_agent(self, agent):
         """
         This Observer works with GridObservingAgents.
@@ -292,7 +291,6 @@ class StackedPositionCenteredEncodingObserver(ObserverBaseComponent):
         """
         return 'stacked_position_centered_encoding'
 
-    @property
     def _supported_agent(self, agent):
         """
         This Observer works with GridObservingAgents.
@@ -366,12 +364,11 @@ class AbsolutePositionObserver(ObserverBaseComponent):
         """
         return 'position'
 
-    @property
     def _supported_agent(self, agent):
         """
-        This Observer works with ObservingAgents
+        This Observer works with agents that are both GridWorldAgents and ObservingAgents.
         """
-        return isinstance(agent, ObservingAgent)
+        return isinstance(agent, ObservingAgent) and isinstance(agent, GridWorldAgent)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -406,7 +403,6 @@ class AmmoObserver(ObserverBaseComponent):
         """
         return 'ammo'
 
-    @property
     def _supported_agent(self, agent):
         """
         This Observer works with agents that are both AmmoAgents and ObservingAgents.
