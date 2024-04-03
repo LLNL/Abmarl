@@ -1,7 +1,8 @@
 
 import pytest
 
-from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent, Agent, DynamicOrderSimulation
+from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent, Agent, is_agent, \
+    DynamicOrderSimulation
 
 from abmarl.examples.sim.multi_agent_sim import EmptyABS
 
@@ -138,8 +139,10 @@ def test_agent_instance():
     agent_2 = Agent(id='agent2')
     assert isinstance(agent_1, ObservingAgent)
     assert isinstance(agent_1, ActingAgent)
-    assert isinstance(agent_1, Agent)
+    assert not isinstance(agent_1, Agent)
+    assert is_agent(agent_1)
     assert isinstance(agent_2, Agent)
+    assert is_agent(agent_2)
 
 
 def test_agent_based_simulation_agents():

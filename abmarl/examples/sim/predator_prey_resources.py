@@ -1,5 +1,5 @@
 
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 from abmarl.sim.gridworld.agent import MovingAgent, AttackingAgent, \
     GridObservingAgent, GridWorldAgent
 from abmarl.sim.gridworld.smart import SmartGridWorldSimulation
@@ -95,7 +95,7 @@ class PredatorPreyResourcesSim(SmartGridWorldSimulation):
                         for attacked_agent in attacked_agents:
                             if not attacked_agent.active: # Agent has died
                                 self.rewards[agent_id] += 1
-                                if isinstance(attacked_agent, Agent):
+                                if is_agent(attacked_agent):
                                     self.rewards[attacked_agent.id] -= 1
 
         # Process the moves

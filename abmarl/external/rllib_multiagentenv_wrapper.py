@@ -1,7 +1,7 @@
 
 from gym.spaces import Dict
 
-from abmarl.sim.agent_based_simulation import ActingAgent, Agent, ObservingAgent
+from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent, is_agent
 
 try:
     from ray.rllib import MultiAgentEnv
@@ -24,7 +24,7 @@ try:
 
             self._agent_ids = set(
                 agent.id for agent in self.sim.agents.values()
-                if isinstance(agent, Agent)
+                if is_agent(agent)
             )
             self.observation_space = Dict({
                 agent.id: agent.observation_space

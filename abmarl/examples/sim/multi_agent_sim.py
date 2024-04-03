@@ -2,7 +2,7 @@
 from gym.spaces import Discrete, MultiBinary, MultiDiscrete, Tuple, Dict
 
 from abmarl.tools import Box
-from abmarl.sim import PrincipleAgent, Agent, AgentBasedSimulation
+from abmarl.sim import PrincipleAgent, AgentBasedSimulation, is_agent, Agent
 
 
 class EmptyABS(AgentBasedSimulation):
@@ -52,7 +52,7 @@ class MultiAgentSim(EmptyABS):
     def reset(self):
         self.step_count = 0
         self.action = {
-            agent.id: None for agent in self.agents.values() if isinstance(agent, Agent)
+            agent.id: None for agent in self.agents.values() if is_agent(agent)
         }
 
     def step(self, action_dict):
@@ -140,7 +140,7 @@ class MultiAgentGymSpacesSim(MultiAgentSim):
 
     def get_all_done(self, **kwargs):
         for agent in self.agents.values():
-            if not isinstance(agent, Agent): continue
+            if not is_agent(agent): continue
             if not self.get_done(agent.id):
                 return False
         return True
@@ -269,7 +269,7 @@ class MultiAgentSameSpacesSim(AgentBasedSimulation):
 
     def get_all_done(self, **kwargs):
         for agent in self.agents.values():
-            if not isinstance(agent, Agent): continue
+            if not is_agent(agent): continue
             if not self.get_done(agent.id):
                 return False
         return True
