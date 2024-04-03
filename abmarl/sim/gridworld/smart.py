@@ -1,7 +1,7 @@
 
 from abc import ABC
 
-from abmarl.sim.agent_based_simulation import Agent
+from abmarl.sim.agent_based_simulation import is_agent
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.registry import registry, DoneBaseComponent, \
     ObserverBaseComponent, StateBaseComponent
@@ -91,7 +91,7 @@ class SmartGridWorldSimulation(GridWorldSimulation, ABC):
         for state in self._states:
             state.reset(**kwargs)
 
-        self.rewards = {agent.id: 0 for agent in self.agents.values() if isinstance(agent, Agent)}
+        self.rewards = {agent.id: 0 for agent in self.agents.values() if is_agent(agent)}
 
     def get_obs(self, agent_id, **kwargs):
         assert hasattr(self, '_observers'), "Smart Simulation requires '_observers' attribute."

@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridObservingAgent, MovingAgent
 from abmarl.sim.gridworld.state import MazePlacementState
@@ -34,7 +34,7 @@ class MultiMazeNavigationSim(GridWorldSimulation):
 
         # Track the rewards
         self.reward = {
-            agent.id: 0 for agent in self.agents.values() if isinstance(agent, Agent)
+            agent.id: 0 for agent in self.agents.values() if is_agent(agent)
         }
 
     def step(self, action_dict, **kwargs):

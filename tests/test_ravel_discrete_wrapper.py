@@ -7,7 +7,7 @@ import pytest
 from abmarl.tools import Box
 from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel, unravel
 from abmarl.sim.wrappers import RavelDiscreteWrapper
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 from abmarl.examples.sim.multi_agent_sim import EmptyABS, MultiAgentGymSpacesSim
 
 
@@ -138,7 +138,7 @@ def test_ravel_wrapper():
     wrapped_sim = RavelDiscreteWrapper(sim)
     assert wrapped_sim.unwrapped == sim
     for agent_id in wrapped_sim.agents:
-        if not isinstance(wrapped_sim.agents[agent_id], Agent): continue
+        if not is_agent(wrapped_sim.agents[agent_id]): continue
         assert isinstance(wrapped_sim.agents[agent_id].observation_space, Discrete)
         assert isinstance(wrapped_sim.agents[agent_id].action_space, Discrete)
     sim = wrapped_sim

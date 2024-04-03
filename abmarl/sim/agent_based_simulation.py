@@ -171,19 +171,11 @@ class ObservingAgent(PrincipleAgent):
                 "The null observation must be in the observation space."
 
 
-class AgentMeta(type):
+def is_agent(agent):
     """
-    AgentMeta class defines an Agent as an instance of ObservingAgent and ActingAgent.
+    An Agent is both an ObservingAgent and an ActingAgent.
     """
-    def __instancecheck__(self, instance):
-        return isinstance(instance, ObservingAgent) and isinstance(instance, ActingAgent)
-
-
-class Agent(ObservingAgent, ActingAgent, metaclass=AgentMeta):
-    """
-    An Agent that can both observe and act.
-    """
-    pass
+    return isinstance(agent, ObservingAgent) and isinstance(agent, ActingAgent)
 
 
 class AgentBasedSimulation(ABC):

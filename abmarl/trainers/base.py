@@ -5,7 +5,7 @@ from pprint import pprint
 
 from abmarl.policies.policy import Policy
 from abmarl.managers import SimulationManager
-from abmarl.sim.agent_based_simulation import Agent
+from abmarl.sim.agent_based_simulation import is_agent
 
 
 class MultiPolicyTrainer(ABC):
@@ -214,7 +214,7 @@ class MultiPolicyTrainer(ABC):
         """
         # Quick assertion that all the spaces lines up
         for agent in self.sim.agents.values():
-            if not isinstance(agent, Agent): continue
+            if not is_agent(agent): continue
             policy_id = self.policy_mapping_fn(agent.id)
             policy = self.policies[policy_id]
             assert agent.action_space == policy.action_space, \

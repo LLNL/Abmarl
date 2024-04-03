@@ -3,7 +3,7 @@ from gym.spaces import Discrete, MultiBinary, Dict, Tuple
 import pytest
 
 from abmarl.tools import Box
-from abmarl.sim.agent_based_simulation import Agent
+from abmarl.sim.agent_based_simulation import is_agent
 from abmarl.trainers import SinglePolicyTrainer
 from abmarl.policies.policy import RandomPolicy
 from abmarl.managers import AllStepManager, TurnBasedManager
@@ -109,7 +109,7 @@ def test_trainer_generate_episode_check_lengths():
     )
     observations, actions, rewards, dones = trainer.generate_episode(horizon=20)
     for agent_id, agent in sim.agents.items():
-        if not isinstance(agent, Agent): continue
+        if not is_agent(agent): continue
         obs = observations[agent_id]
         action = actions[agent_id]
         reward = rewards[agent_id]

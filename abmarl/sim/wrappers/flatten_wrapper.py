@@ -4,7 +4,7 @@ from gym.spaces import Box as GymBox
 import numpy as np
 
 from abmarl.tools import Box
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 
 from .sar_wrapper import SARWrapper
 
@@ -175,7 +175,7 @@ class FlattenWrapper(SARWrapper):
     def __init__(self, sim):
         super().__init__(sim)
         for agent_id, wrapped_agent in self.sim.agents.items(): # Wrap the agents' spaces
-            if not isinstance(wrapped_agent, Agent): continue
+            if not is_agent(wrapped_agent): continue
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
             self.agents[agent_id].observation_space = flatten_space(
                 wrapped_agent.observation_space
@@ -211,7 +211,7 @@ class FlattenActionWrapper(SARWrapper):
     def __init__(self, sim):
         super().__init__(sim)
         for agent_id, wrapped_agent in self.sim.agents.items():
-            if not isinstance(wrapped_agent, Agent): continue
+            if not is_agent(wrapped_agent): continue
             # Wrap the action spaces of the agents
             self.agents[agent_id].action_space = flatten_space(wrapped_agent.action_space)
             if self.agents[agent_id].null_action:

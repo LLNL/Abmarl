@@ -1,7 +1,7 @@
 
 import numpy as np
 
-from abmarl.sim.agent_based_simulation import Agent
+from abmarl.sim import is_agent
 from abmarl.sim.gridworld.base import GridWorldSimulation
 from abmarl.sim.gridworld.agent import GridWorldAgent, MovingAgent, AttackingAgent, \
     GridObservingAgent
@@ -48,7 +48,7 @@ class OnlyAgentLeftDone(DoneBaseComponent):
     def _agents_remaining(self):
         # Return the number of active Agents remaining in the game.
         return sum([
-            1 for agent in self.agents.values() if agent.active and isinstance(agent, Agent)
+            1 for agent in self.agents.values() if agent.active and is_agent(agent)
         ])
 
     def get_done(self, agent_id, **kwargs):
@@ -114,7 +114,7 @@ class ReachTheTargetSim(GridWorldSimulation):
         self.health_state.reset(**kwargs)
         self.position_state.reset(**kwargs)
 
-        self.rewards = {agent.id: 0 for agent in self.agents.values() if isinstance(agent, Agent)}
+        self.rewards = {agent.id: 0 for agent in self.agents.values() if is_agent(agent)}
 
     def step(self, action_dict, **kwargs):
         # Process the attacks

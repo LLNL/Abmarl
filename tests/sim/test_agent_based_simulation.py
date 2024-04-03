@@ -1,7 +1,7 @@
 
 import pytest
 
-from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent, Agent, DynamicOrderSimulation
+from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent, Agent, DynamicOrderSimulation, is_agent
 
 from abmarl.examples.sim.multi_agent_sim import EmptyABS
 

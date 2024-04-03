@@ -5,7 +5,7 @@ from gym.spaces import Discrete, MultiDiscrete, MultiBinary, Dict, Tuple
 from gym.spaces import Box as GymBox
 from gym.spaces.box import get_inf
 
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 
 from .sar_wrapper import SARWrapper
 
@@ -160,7 +160,7 @@ class RavelDiscreteWrapper(SARWrapper):
     def __init__(self, sim):
         super().__init__(sim)
         for agent_id, wrapped_agent in self.agents.items():
-            if not isinstance(wrapped_agent, Agent): continue
+            if not is_agent(wrapped_agent): continue
             assert check_space(wrapped_agent.observation_space), \
                 f"{agent_id}: observation must be discretizable."
             assert check_space(wrapped_agent.action_space), \
