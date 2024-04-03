@@ -12,6 +12,35 @@ from abmarl.sim.gridworld.state import PositionState, AmmoState
 from abmarl.sim.gridworld.grid import Grid
 
 
+def test_ammo_observer():
+    class AmmoObservingAgent(AmmoAgent, ObservingAgent): pass
+    grid = Grid(3, 3)
+    agents = {
+        'agent0': AmmoAgent(id='agent0', encoding=1, initial_ammo=10),
+        'agent1': AmmoObservingAgent(id='agent1', encoding=1, initial_ammo=-3),
+        'agent2': AmmoObservingAgent(id='agent2', encoding=1, initial_ammo=14),
+        'agent3': AmmoObservingAgent(id='agent3', encoding=1, initial_ammo=12),
+    }
+    state = AmmoState(grid=grid, agents=agents)
+    observer = AmmoObserver(grid=grid, agents=agents)
+    assert isinstance(observer, ObserverBaseComponent)
+    assert observer._encodings_in_sim == {1}
+    state.reset()
+
+    assert observer.get_obs(agents['agent1'])['ammo'] == agents['agent1'].ammo
+    assert observer.get_obs(agents['agent2'])['ammo'] == agents['agent2'].ammo
+    assert observer.get_obs(agents['agent3'])['ammo'] == agents['agent3'].ammo
+
+    agents['agent0'].ammo -= 16
+    agents['agent1'].ammo += 7
+    agents['agent2'].ammo -= 15
+    assert observer.get_obs(agents['agent1'])['ammo'] == agents['agent1'].ammo
+    assert observer.get_obs(agents['agent2'])['ammo'] == agents['agent2'].ammo
+    assert observer.get_obs(agents['agent3'])['ammo'] == agents['agent3'].ammo
+
+    assert not observer.get_obs(agents['agent0'])
+
+
 def test_absolute_encoding_observer():
     np.random.seed(24)
     grid = Grid(5, 5, overlapping={1: {6}, 6: {1}})

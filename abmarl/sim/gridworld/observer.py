@@ -35,7 +35,7 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         For example, Grid Observers require the agent to be a Grid Observing Agent.
         Ammo Observer requires the agent to be an AmmoAgent and to be an Observing
         Agent.
-        
+
         Args:
             agent: The agent to inspect.
         Returns:
