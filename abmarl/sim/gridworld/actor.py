@@ -42,14 +42,17 @@ class ActorBaseComponent(GridWorldBaseComponent, ABC):
         """
         pass
 
-    @property
     @abstractmethod
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
-        The type of Agent that this Actor works with.
+        The qualifications that the agent must satisfy in order to work with this Actor.
 
-        If an agent is this type, the Actor will add its entry to the
-        agent's action space and will process actions for this agent.
+        For example, Attack Actors require the agent to be an Attacking Agent.
+
+        Args:
+            agent: The agent to inspect.
+        Returns:
+            True if agent satisfies qualities, otherwise False.
         """
         pass
 
@@ -61,7 +64,7 @@ class MoveActor(ActorBaseComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 if agent.move_range == "FULL":
                     agent.move_range = max(self.rows, self.cols) - 1
                 agent.action_space[self.key] = Box(
@@ -76,12 +79,11 @@ class MoveActor(ActorBaseComponent):
         """
         return "move"
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
         This Actor works with MovingAgents.
         """
-        return MovingAgent
+        return isinstance(agent, MovingAgent)
 
     def process_action(self, agent, action_dict, **kwargs):
         """
@@ -99,7 +101,7 @@ class MoveActor(ActorBaseComponent):
         Returns:
             True if the move is successful, False otherwise.
         """
-        if isinstance(agent, self.supported_agent_type):
+        if self._supported_agent(agent):
             action = action_dict[self.key]
             new_position = agent.position + action
             if 0 <= new_position[0] < self.rows and \
@@ -125,7 +127,7 @@ class CrossMoveActor(ActorBaseComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 agent.action_space[self.key] = Discrete(5)
                 agent.null_action[self.key] = 0
 
@@ -136,12 +138,11 @@ class CrossMoveActor(ActorBaseComponent):
         """
         return "move"
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
         This Actor works with MovingAgent, but the move_range parameter is ignored.
         """
-        return MovingAgent
+        return isinstance(agent, MovingAgent)
 
     def grid_action(self, cross_action):
         """
@@ -178,7 +179,7 @@ class CrossMoveActor(ActorBaseComponent):
         Returns:
             True if the move is successful, False otherwise.
         """
-        if isinstance(agent, self.supported_agent_type):
+        if self._supported_agent(agent):
             cross_action = action_dict[self.key]
             action = self.grid_action(cross_action)
             new_position = agent.position + action
@@ -252,7 +253,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         self.attack_mapping = attack_mapping
         self.stacked_attacks = stacked_attacks
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 if agent.attack_range == "FULL":
                     agent.attack_range = max(self.rows, self.cols) - 1
                 self._assign_space(agent)
@@ -264,12 +265,11 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
         """
         return 'attack'
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
         This Actor works with AttackingAgents.
         """
-        return AttackingAgent
+        return isinstance(agent, AttackingAgent)
 
     @property
     def attack_mapping(self):
@@ -349,7 +349,7 @@ class AttackActorBaseComponent(ActorBaseComponent, ABC):
             2. An attack failed: True, []
             3. An attack was successful: True, [non-empty]
         """
-        if isinstance(attacking_agent, self.supported_agent_type):
+        if self._supported_agent(attacking_agent):
             action = action_dict[self.key]
             attack_status, attacked_agents = self._determine_attack(attacking_agent, action)
 
