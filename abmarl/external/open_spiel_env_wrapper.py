@@ -1,7 +1,7 @@
 
 from gym.spaces import Discrete
 
-from abmarl.sim.agent_based_simulation import Agent
+from abmarl.sim.agent_based_simulation import is_agent
 from abmarl.managers import TurnBasedManager, SimulationManager
 
 
@@ -44,7 +44,7 @@ try:
             # observations and rewards for each of these agents. OpenSpiel expects
             # them to all be present in every time_step.
             self._learning_agents = {
-                agent.id: agent for agent in sim.agents.values() if isinstance(agent, Agent)
+                agent.id: agent for agent in sim.agents.values() if is_agent(agent)
             }
 
             # The wrapper assumes that each space is discrete, so we check for that.

@@ -1,6 +1,6 @@
 from gym import Env as GymEnv
 
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 
 
 class GymWrapper(GymEnv):
@@ -14,7 +14,7 @@ class GymWrapper(GymEnv):
         assert isinstance(sim, SimulationManager)
         learning_agents = {
             agent.id: agent for agent in sim.agents.values()
-            if isinstance(agent, Agent)
+            if is_agent(agent)
         }
         assert len(learning_agents) == 1 # Can only work with single agents
         self.sim = sim

@@ -1,6 +1,6 @@
 import random
 
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 
 from .simulation_manager import SimulationManager
 
@@ -40,7 +40,7 @@ class AllStepManager(SimulationManager):
         """
         self.done_agents = set(
             agent.id for agent in self.agents.values()
-            if not isinstance(agent, Agent)
+            if not is_agent(agent)
         )
         self.sim.reset(**kwargs)
         return {

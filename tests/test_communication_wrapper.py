@@ -2,7 +2,7 @@ from gym.spaces import Discrete
 import numpy as np
 
 from abmarl.sim.wrappers import CommunicationHandshakeWrapper
-from abmarl.sim import Agent
+from abmarl.sim import is_agent
 from abmarl.examples.sim.multi_agent_sim import MultiAgentGymSpacesSim
 
 
@@ -38,7 +38,7 @@ def test_communication_wrapper_init():
     assert wrapped_sim.unwrapped == sim
 
     for agent_id, agent in wrapped_sim.agents.items():
-        if not isinstance(agent, Agent): continue
+        if not is_agent(agent): continue
         assert agent.action_space['action'] == sim.agents[agent_id].action_space
         assert agent.observation_space['obs'] == sim.agents[agent_id].observation_space
 
@@ -92,7 +92,7 @@ def test_communication_wrapper_step():
     }
     sim.step(action_0)
     for agent_id, agent in sim.agents.items():
-        if not isinstance(agent, Agent): continue
+        if not is_agent(agent): continue
         agent_info = sim.get_info(agent_id)
         assert 'send' not in agent_info and 'receive' not in agent_info
     assert sim.get_obs('agent0')['obs'] == [0, 0, 0, 1]

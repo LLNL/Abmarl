@@ -3,7 +3,7 @@ import warnings
 
 from gym.spaces import Dict, MultiBinary
 
-from abmarl.sim.agent_based_simulation import Agent
+from abmarl.sim.agent_based_simulation import is_agent, Agent
 from abmarl.sim.wrappers import Wrapper
 from abmarl.tools import gym_utils as gu
 
@@ -70,7 +70,7 @@ class SuperAgentWrapper(Wrapper):
                     "The covered agent must be an agent in the underlying sim."
                 assert covered_agent not in self._covered_agents, \
                     "The agent is already covered by another super agent."
-                assert isinstance(self.sim.agents[covered_agent], Agent), \
+                assert is_agent(self.sim.agents[covered_agent]), \
                     "Covered agents must be learning Agents."
                 self._covered_agents.add(covered_agent)
         self._uncovered_agents = self.sim.agents.keys() - self._covered_agents
