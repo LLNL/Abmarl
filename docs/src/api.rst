@@ -373,7 +373,7 @@ Done
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_done_target_destroyed:
+.. _api_gridworld_done_target_agent_inactive:
 
 .. autoclass:: abmarl.sim.gridworld.done.TargetDestroyedDone
 	:members:

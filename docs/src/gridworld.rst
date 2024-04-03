@@ -1424,10 +1424,10 @@ targets, then the simulation is done.
 
 .. _gridworld_done_target_destroyed:
 
-Target Destroyed Done
+Target Agent Inactive Done
 `````````````````````
 
-The :ref:`TargetDestroyedDone <api_gridworld_done_target_destroyed>` component takes
+The :ref:`TargetAgentInactiveDone <api_gridworld_done_target_agent_inactive>` component takes
 a ``target_mapping``, which maps agents to their targets by id. If an agent's target
 becomes *inactive*, then that agent is done, regardless of its own involvement in
 that change. If all target agents become inactive, then the simulation is done.

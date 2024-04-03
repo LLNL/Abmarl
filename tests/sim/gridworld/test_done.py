@@ -5,7 +5,7 @@ import pytest
 from abmarl.sim.gridworld.agent import MovingAgent, GridWorldAgent
 from abmarl.sim.gridworld.state import HealthState, PositionState
 from abmarl.sim.gridworld.actor import MoveActor
-from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, TargetDestroyedDone, \
+from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, TargetAgentInactiveDone, \
     TargetEncodingInactiveDone, DoneBaseComponent
 from abmarl.sim.gridworld.grid import Grid
 
@@ -144,7 +144,7 @@ def test_target_destroyed_done():
         'agent3': 'agent0'
     }
     state = PositionState(grid=grid, agents=agents)
-    target_done = TargetDestroyedDone(grid=grid, agents=agents, target_mapping=target_mapping)
+    target_done = TargetAgentInactiveDone(grid=grid, agents=agents, target_mapping=target_mapping)
     assert target_done._encodings_in_sim == {1, 2}
     state.reset()
 

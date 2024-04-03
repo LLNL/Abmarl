@@ -3,7 +3,7 @@ from .actor import ActorBaseComponent, MoveActor, CrossMoveActor, BinaryAttackAc
     EncodingBasedAttackActor, RestrictedSelectiveAttackActor, SelectiveAttackActor, \
     DriftMoveActor
 from .done import DoneBaseComponent, ActiveDone, TargetAgentDone, OneTeamRemainingDone, \
-    TargetDestroyedDone, TargetEncodingInactiveDone
+    TargetAgentInactiveDone, TargetEncodingInactiveDone
 from .observer import ObserverBaseComponent, AbsoluteEncodingObserver, \
     PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
     AbsolutePositionObserver, AmmoObserver
@@ -30,7 +30,7 @@ _registered_components = {
     }, 'done': {
         ActiveDone,
         TargetAgentDone,
-        TargetDestroyedDone,
+        TargetAgentInactiveDone,
         OneTeamRemainingDone,
         TargetEncodingInactiveDone
     }, 'observer': {

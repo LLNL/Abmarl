@@ -5,7 +5,7 @@ from abmarl.sim.gridworld.actor import MoveActor, CrossMoveActor, \
     BinaryAttackActor, EncodingBasedAttackActor, RestrictedSelectiveAttackActor, \
     SelectiveAttackActor, DriftMoveActor
 from abmarl.sim.gridworld.done import ActiveDone, TargetAgentDone, \
-    OneTeamRemainingDone, TargetEncodingInactiveDone, TargetDestroyedDone
+    OneTeamRemainingDone, TargetEncodingInactiveDone, TargetAgentInactiveDone
 from abmarl.sim.gridworld.observer import AbsoluteEncodingObserver, \
     PositionCenteredEncodingObserver, StackedPositionCenteredEncodingObserver, \
     AbsolutePositionObserver, AmmoObserver
@@ -29,7 +29,7 @@ def test_built_in_registry():
 
     assert ActiveDone in registry['done'].values()
     assert TargetAgentDone in registry['done'].values()
-    assert TargetDestroyedDone in registry['done'].values()
+    assert TargetAgentInactiveDone in registry['done'].values()
     assert OneTeamRemainingDone in registry['done'].values()
     assert TargetEncodingInactiveDone in registry['done'].values()
 

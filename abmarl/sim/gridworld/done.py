@@ -99,7 +99,7 @@ class TargetAgentDone(DoneBaseComponent):
         ])
 
 
-class TargetDestroyedDone(DoneBaseComponent):
+class TargetAgentInactiveDone(DoneBaseComponent):
     """
     Agents are done when their target agent becomes inactive.
     """
