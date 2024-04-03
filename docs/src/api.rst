@@ -199,12 +199,6 @@ Agents
 	:members:
 	:undoc-members:
 
-.. _api_gridworld_agent_ammo_observing:
-
-.. autoclass:: abmarl.sim.gridworld.agent.AmmoObservingAgent
-	:members:
-	:undoc-members:
-
 
 State
 `````

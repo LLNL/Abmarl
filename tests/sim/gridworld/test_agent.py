@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from abmarl.sim.gridworld.agent import GridWorldAgent, GridObservingAgent, MovingAgent, \
-    AttackingAgent, AmmoAgent, AmmoObservingAgent, OrientationAgent
+    AttackingAgent, AmmoAgent, OrientationAgent
 from abmarl.sim import PrincipleAgent, ActingAgent, ObservingAgent
 
 
@@ -220,33 +220,6 @@ def test_ammo_agent():
         agent = AmmoAgent(
             id='agent',
             encoding=1,
-        )
-
-
-def test_ammo_observing_agent():
-    class CustomAmmoObservingAgent(AmmoAgent, ObservingAgent): pass
-
-    agent = AmmoObservingAgent(
-        id='agent',
-        encoding=1,
-        initial_ammo=4
-    )
-    assert isinstance(agent, AmmoAgent)
-    assert isinstance(agent, ObservingAgent)
-    assert isinstance(agent, GridWorldAgent)
-
-    agent = CustomAmmoObservingAgent(
-        id='agent',
-        encoding=1,
-        initial_ammo=2
-    )
-    assert isinstance(agent, AmmoObservingAgent)
-
-    with pytest.raises(AssertionError):
-        agent = AmmoObservingAgent(
-            id='agent',
-            encoding=1,
-            initial_ammo=2.4
         )
 
 

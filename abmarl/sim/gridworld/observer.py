@@ -6,7 +6,7 @@ import numpy as np
 from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoObservingAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -409,9 +409,9 @@ class AmmoObserver(ObserverBaseComponent):
     @property
     def _supported_agent(self, agent):
         """
-        This Observer works with AmmoObservingAgents.
+        This Observer works with agents that are both AmmoAgents and ObservingAgents.
         """
-        raise RuntimeError("FIX THIS!")
+        return isinstance(agent, AmmoAgent) and isinstance(agent, ObservingAgent)
 
     def get_obs(self, agent, **kwargs):
         """
