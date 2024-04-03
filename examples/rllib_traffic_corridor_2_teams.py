@@ -51,7 +51,7 @@ sim = MultiAgentWrapper(
             object_registry,
             overlapping={1: {1}, 2: {2}},
             states={"PositionState"},
-            dones={"TargetAgentDone"},
+            dones={"TargetAgentOverlapDone"},
             observers={'PositionCenteredEncodingObserver'},
             target_mapping={
                 'red0': 'red_target',

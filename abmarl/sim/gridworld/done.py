@@ -56,7 +56,7 @@ class ActiveDone(DoneBaseComponent):
         return True
 
 
-class TargetAgentDone(DoneBaseComponent):
+class TargetAgentOverlapDone(DoneBaseComponent):
     """
     Agents are done when they overlap their target.
 
@@ -99,7 +99,7 @@ class TargetAgentDone(DoneBaseComponent):
         ])
 
 
-class TargetDestroyedDone(DoneBaseComponent):
+class TargetAgentInactiveDone(DoneBaseComponent):
     """
     Agents are done when their target agent becomes inactive.
     """
