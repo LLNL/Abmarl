@@ -375,7 +375,7 @@ Done
 
 .. _api_gridworld_done_target_agent_inactive:
 
-.. autoclass:: abmarl.sim.gridworld.done.TargetDestroyedDone
+.. autoclass:: abmarl.sim.gridworld.done.TargetAgentInactiveDone
 	:members:
 	:undoc-members:
 
