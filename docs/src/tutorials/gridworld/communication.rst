@@ -176,7 +176,7 @@ to each agent's message.
            # Tracks agents receiving messages from other agents
            self.receiving_state = {
                agent.id: [] for agent in self.agents.values() if isinstance(agent, BroadcastingAgent)
-           })
+           }
        
        def update_receipients(self, from_agent, to_agents):
            """
