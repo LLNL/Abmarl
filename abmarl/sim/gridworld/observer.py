@@ -6,7 +6,7 @@ import numpy as np
 from abmarl.tools import Box
 from abmarl.sim.agent_based_simulation import ObservingAgent
 from abmarl.sim.gridworld.base import GridWorldBaseComponent
-from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoObservingAgent
+from abmarl.sim.gridworld.agent import GridObservingAgent, AmmoAgent, GridWorldAgent
 import abmarl.sim.gridworld.utils as gu
 
 
@@ -27,14 +27,19 @@ class ObserverBaseComponent(GridWorldBaseComponent, ABC):
         """
         pass
 
-    @property
     @abstractmethod
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
-        The type of Agent that this Observer works with.
+        The qualifications that the agent must satisfy in order to work with this Actor.
 
-        If an agent is this type, the Observer will add its entry to the
-        agent's observation space and will produce observations for this agent.
+        For example, Grid Observers require the agent to be a Grid Observing Agent.
+        Ammo Observer requires the agent to be an AmmoAgent and to be an Observing
+        Agent.
+
+        Args:
+            agent: The agent to inspect.
+        Returns:
+            True if agent satisfies qualities, otherwise False.
         """
         pass
 
@@ -70,7 +75,7 @@ class AbsoluteEncodingObserver(ObserverBaseComponent):
         super().__init__(**kwargs)
         max_encoding = max(self._encodings_in_sim)
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 if agent.view_range == "FULL":
                     agent.view_range = max(self.rows, self.cols) - 1
                 agent.observation_space[self.key] = Box(
@@ -87,12 +92,11 @@ class AbsoluteEncodingObserver(ObserverBaseComponent):
         """
         return 'absolute_encoding'
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
         This Observer work with GridObservingAgents
         """
-        return GridObservingAgent
+        return isinstance(agent, GridObservingAgent)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -103,7 +107,7 @@ class AbsoluteEncodingObserver(ObserverBaseComponent):
         masked cells indicated as -2, which are masked either because they are
         too far away or because they are blocked from view by view-blocking agents.
         """
-        if not isinstance(agent, self.supported_agent_type):
+        if not self._supported_agent(agent):
             return {}
 
         # To generate the observation, we first create a local grid and mask using
@@ -166,7 +170,7 @@ class PositionCenteredEncodingObserver(ObserverBaseComponent):
         self.observe_self = observe_self
         max_encoding = max(self._encodings_in_sim)
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 if agent.view_range == "FULL":
                     agent.view_range = max(self.rows, self.cols) - 1
                 agent.observation_space[self.key] = Box(
@@ -184,12 +188,11 @@ class PositionCenteredEncodingObserver(ObserverBaseComponent):
         """
         return 'position_centered_encoding'
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
         This Observer works with GridObservingAgents.
         """
-        return GridObservingAgent
+        return isinstance(agent, GridObservingAgent)
 
     @property
     def observe_self(self):
@@ -215,7 +218,7 @@ class PositionCenteredEncodingObserver(ObserverBaseComponent):
         Returns:
             The observation as a dictionary.
         """
-        if not isinstance(agent, self.supported_agent_type):
+        if not self._supported_agent(agent):
             return {}
 
         # Generate a local grid and an observation mask
@@ -267,7 +270,7 @@ class StackedPositionCenteredEncodingObserver(ObserverBaseComponent):
         super().__init__(**kwargs)
         self.number_of_encodings = max([agent.encoding for agent in self.agents.values()])
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 if agent.view_range == "FULL":
                     agent.view_range = max(self.rows, self.cols) - 1
                 agent.observation_space[self.key] = Box(
@@ -288,12 +291,11 @@ class StackedPositionCenteredEncodingObserver(ObserverBaseComponent):
         """
         return 'stacked_position_centered_encoding'
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
         This Observer works with GridObservingAgents.
         """
-        return GridObservingAgent
+        return isinstance(agent, GridObservingAgent)
 
     def get_obs(self, agent, **kwargs):
         """
@@ -307,7 +309,7 @@ class StackedPositionCenteredEncodingObserver(ObserverBaseComponent):
         Returns:
             The observation as a dictionary.
         """
-        if not isinstance(agent, self.supported_agent_type):
+        if not self._supported_agent(agent):
             return {}
 
         # Generate a local grid and an observation mask.
@@ -347,7 +349,7 @@ class AbsolutePositionObserver(ObserverBaseComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 agent.observation_space[self.key] = Box(
                     np.array([0, 0], dtype=int),
                     np.array([self.grid.rows - 1, self.grid.cols - 1], dtype=int),
@@ -362,18 +364,17 @@ class AbsolutePositionObserver(ObserverBaseComponent):
         """
         return 'position'
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
-        This Observer works with ObservingAgents
+        This Observer works with agents that are both GridWorldAgents and ObservingAgents.
         """
-        return ObservingAgent
+        return isinstance(agent, ObservingAgent) and isinstance(agent, GridWorldAgent)
 
     def get_obs(self, agent, **kwargs):
         """
         Agents observe their absolute position.
         """
-        if not isinstance(agent, self.supported_agent_type):
+        if not self._supported_agent(agent):
             return {}
         else:
             return {self.key: agent.position}
@@ -386,7 +387,7 @@ class AmmoObserver(ObserverBaseComponent):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 agent.observation_space[self.key] = Box(
                     0,
                     agent.initial_ammo,
@@ -402,18 +403,17 @@ class AmmoObserver(ObserverBaseComponent):
         """
         return 'ammo'
 
-    @property
-    def supported_agent_type(self):
+    def _supported_agent(self, agent):
         """
-        This Observer works with AmmoObservingAgents.
+        This Observer works with agents that are both AmmoAgents and ObservingAgents.
         """
-        return AmmoObservingAgent
+        return isinstance(agent, AmmoAgent) and isinstance(agent, ObservingAgent)
 
     def get_obs(self, agent, **kwargs):
         """
         Agents observe their own ammo
         """
-        if not isinstance(agent, self.supported_agent_type):
+        if not self._supported_agent(agent):
             return {}
         else:
             return {self.key: agent.ammo}

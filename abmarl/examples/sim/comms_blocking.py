@@ -63,16 +63,15 @@ class BroadcastingActor(ActorBaseComponent):
         super().__init__(**kwargs)
         self.broadcast_mapping = broadcast_mapping
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 agent.action_space[self.key] = Discrete(2)
 
     @property
     def key(self):
         return 'broadcast'
 
-    @property
-    def supported_agent_type(self):
-        return BroadcastingAgent
+    def _supported_agent(self, agent):
+        return isinstance(agent, BroadcastingAgent)
 
     @property
     def broadcast_mapping(self):
@@ -138,7 +137,7 @@ class BroadcastingActor(ActorBaseComponent):
                                     receiving_agents.append(other)
             return receiving_agents
 
-        if isinstance(broadcasting_agent, self.supported_agent_type):
+        if self._supported_agent(broadcasting_agent):
             action = action_dict[self.key]
             if action: # Agent has chosen to attack
                 return determine_broadcast(broadcasting_agent)
@@ -182,23 +181,22 @@ class BroadcastObserver(ObserverBaseComponent):
         self._broadcasting_state = broadcasting_state
 
         for agent in self.agents.values():
-            if isinstance(agent, self.supported_agent_type):
+            if self._supported_agent(agent):
                 agent.observation_space[self.key] = Dict({
                     other.id: Box(-1, 1, (1,))
                     for other in self.agents.values()
-                    if isinstance(other, self.supported_agent_type)
+                    if self._supported_agent(other)
                 })
 
     @property
     def key(self):
         return 'message'
 
-    @property
-    def supported_agent_type(self):
-        return BroadcastingAgent
+    def _supported_agent(self, agent):
+        return isinstance(agent, BroadcastingAgent)
 
     def get_obs(self, agent, **kwargs):
-        if not isinstance(agent, self.supported_agent_type):
+        if not self._supported_agent(agent):
             return {}
 
         obs = {other: 0 for other in agent.observation_space[self.key]}

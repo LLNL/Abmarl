@@ -60,7 +60,6 @@ def test_ravelled_move_wrapper_properties():
     assert ravelled_move_actor.agents == move_actor.agents
     assert ravelled_move_actor.grid == move_actor.grid
     assert ravelled_move_actor.key == move_actor.key
-    assert ravelled_move_actor.supported_agent_type == move_actor.supported_agent_type
 
 
 def test_ravelled_move_wrapper_agent_spaces():
@@ -158,7 +157,6 @@ def test_exclusive_attack_wrapper_properties():
     assert exclusive_attack_actor.agents == attack_actor.agents
     assert exclusive_attack_actor.grid == attack_actor.grid
     assert exclusive_attack_actor.key == attack_actor.key
-    assert exclusive_attack_actor.supported_agent_type == attack_actor.supported_agent_type
 
 
 def test_exclusive_attack_wrapper_agent_spaces():

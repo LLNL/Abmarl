@@ -1049,10 +1049,6 @@ Each :ref:`Attack Actor <gridworld_attacking>` interprets the ammo, but the gene
 idea is that when the attacking agent runs out of ammo, its attacks are no longer
 successful.
 
-:ref:`AmmoObservingAgents <api_gridworld_agent_ammo_observing>` work in conjuction
-with the :ref:`AmmoObserver <api_gridworld_observer_ammo>` to observe their own
-ammo.
-
 
 .. _gridworld_attacking:
 

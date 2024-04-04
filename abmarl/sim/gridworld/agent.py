@@ -315,24 +315,6 @@ class AmmoAgent(GridWorldAgent):
         self._initial_ammo = value
 
 
-class AmmoObservingAgentMeta(type):
-    """
-    AmmoObservingAgentMeta class defines an AmmoObservingAgent as an instance of
-    AmmoAgent and ObservingAgent. Then, when we check if an agent is an instance
-    of AmmoObservingAgent, it doesn't have to directly derive from it; it just has
-    to derive from both AmmoAgent and ObservingAgent.
-    """
-    def __instancecheck__(self, instance):
-        return isinstance(instance, ObservingAgent) and isinstance(instance, AmmoAgent)
-
-
-class AmmoObservingAgent(AmmoAgent, ObservingAgent, metaclass=AmmoObservingAgentMeta):
-    """
-    Boilterplate class required to work with the AmmoObserver.
-    """
-    pass
-
-
 class OrientationAgent(GridWorldAgent):
     """
     Agent that has an orientation, either 1: Left, 2: Down, 3: Right, 4: Up.

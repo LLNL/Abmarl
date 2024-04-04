@@ -42,7 +42,7 @@ def test_move_actor():
     move_actor = MoveActor(grid=grid, agents=agents)
     assert isinstance(move_actor, ActorBaseComponent)
     assert move_actor.key == 'move'
-    assert move_actor.supported_agent_type == MovingAgent
+    assert move_actor._supported_agent(agents['agent0'])
     assert move_actor._encodings_in_sim == {1, 2, 3}
     assert agents['agent0'].action_space['move'] == Box(-1, 1, (2,), int)
     assert agents['agent1'].action_space['move'] == Box(-2, 2, (2,), int)
@@ -169,7 +169,7 @@ def test_cross_move_actor():
     move_actor = CrossMoveActor(grid=grid, agents=agents)
     assert isinstance(move_actor, ActorBaseComponent)
     assert move_actor.key == 'move'
-    assert move_actor.supported_agent_type == MovingAgent
+    assert move_actor._supported_agent(agents['agent0'])
     assert move_actor._encodings_in_sim == {1, 2, 3}
     assert agents['agent0'].action_space['move'] == Discrete(5)
     assert agents['agent1'].action_space['move'] == Discrete(5)
@@ -499,7 +499,8 @@ def test_binary_attack_actor():
     attack_actor = BinaryAttackActor(attack_mapping={1: 1}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert not attack_actor._supported_agent(agents['agent0'])
+    assert attack_actor._supported_agent(agents['agent1'])
     assert agents['agent1'].action_space['attack'] == Discrete(2)
     assert attack_actor.attack_mapping == {1: {1}}
     assert attack_actor._encodings_in_sim == {1, 2}
@@ -776,7 +777,8 @@ def test_selective_attack_actor():
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor._encodings_in_sim == {1, 2}
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent1'])
+    assert not attack_actor._supported_agent(agents['agent0'])
     assert agents['agent1'].action_space['attack'] == Box(0, 1, (5, 5), int)
 
     agents['agent1'].finalize()
@@ -939,7 +941,8 @@ def test_selective_attack_actor_ammo():
     attack_actor = SelectiveAttackActor(attack_mapping={1: {1}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent1'])
+    assert not attack_actor._supported_agent(agents['agent0'])
     assert agents['agent1'].action_space['attack'] == Box(0, 1, (5, 5), int)
 
     agents['agent1'].finalize()
@@ -1051,7 +1054,8 @@ def test_selective_attack_actor_simultaneous_attacks():
     attack_actor = SelectiveAttackActor(attack_mapping={3: {1, 2}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent0'])
+    assert not attack_actor._supported_agent(agents['agent1'])
     assert agents['agent0'].action_space['attack'] == Box(0, 3, (3, 3), int)
     agents['agent0'].finalize()
     np.testing.assert_array_equal(
@@ -1230,7 +1234,8 @@ def test_encoding_based_attack_actor():
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor._encodings_in_sim == {1, 2, 3}
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent3'])
+    assert not attack_actor._supported_agent(agents['agent1'])
     assert agents['agent3'].action_space['attack'] == Dict({
         1: Discrete(2),
         2: Discrete(2)
@@ -1307,7 +1312,8 @@ def test_encoding_based_attack_actor_ammo():
     attack_actor = EncodingBasedAttackActor(attack_mapping={3: {1, 2}}, grid=grid, agents=agents)
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent3'])
+    assert not attack_actor._supported_agent(agents['agent1'])
     assert agents['agent3'].action_space['attack'] == Dict({
         1: Discrete(2),
         2: Discrete(2)
@@ -1497,7 +1503,8 @@ def test_encoding_based_attack_actor_stacked_attack():
     )
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent3'])
+    assert not attack_actor._supported_agent(agents['agent1'])
     assert agents['agent3'].action_space['attack'] == Dict({
         1: Discrete(3),
         2: Discrete(3)
@@ -1564,7 +1571,8 @@ def test_restricted_selective_attack_actor():
     assert isinstance(attack_actor, ActorBaseComponent)
     assert attack_actor._encodings_in_sim == {1, 2, 3}
     assert attack_actor.key == 'attack'
-    assert attack_actor.supported_agent_type == AttackingAgent
+    assert attack_actor._supported_agent(agents['agent3'])
+    assert not attack_actor._supported_agent(agents['agent1'])
     assert agents['agent3'].action_space['attack'] == MultiDiscrete([10, 10])
 
     agents['agent3'].finalize()
