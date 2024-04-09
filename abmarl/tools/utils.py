@@ -30,7 +30,7 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
     if checkpoint_desired is not None: # checkpoint specified
         for checkpoint in checkpoint_dirs:
             if checkpoint_desired == int(checkpoint.split('/')[-1].split('_')[-1]):
-                return checkpoint, checkpoint_desired
+                return checkpoint
         import warnings
         warnings.warn(
             f'Could not find checkpoint_{checkpoint_desired}. Attempting to load the last '
@@ -49,7 +49,7 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
     if max_checkpoint is None:
         raise FileNotFoundError("Did not find a checkpoint file in the given directory.")
 
-    return max_checkpoint, max_checkpoint_value
+    return max_checkpoint
 
 
 def find_dirs_in_dir(pattern, path):

@@ -16,7 +16,7 @@ def _stage_setup(params, full_trained_directory, seed=None, checkpoint=None):
     params['ray_tune']['config']['num_envs_per_worker'] = 1
     params['ray_tune']['config']['seed'] = seed
 
-    checkpoint_dir, checkpoint_value = adu.checkpoint_from_trained_directory(
+    checkpoint_dir = adu.checkpoint_from_trained_directory(
         full_trained_directory, checkpoint
     )
     print(checkpoint_dir)
@@ -27,7 +27,7 @@ def _stage_setup(params, full_trained_directory, seed=None, checkpoint=None):
         env=params['ray_tune']['config']['env'],
         config=params['ray_tune']['config']
     )
-    trainer.restore(os.path.join(checkpoint_dir, 'checkpoint-' + str(checkpoint_value)))
+    trainer.restore(checkpoint_dir)
 
     # Get the simulation
     sim = params['experiment']['sim_creator'](
