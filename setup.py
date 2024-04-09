@@ -31,16 +31,13 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(exclude=['tests']),
     install_requires=[
-        # 'importlib-metadata<5.0',
-        # 'numpy<1.24',
-        # 'gym',
-        # 'matplotlib',
-        # 'seaborn',
+        'matplotlib',
+        'gymnasium'
     ],
     extras_require={
         "rllib": [
-            'tensorflow',
-            'ray[rllib]==2.0.0',
+            'torch',
+            'ray[rllib]==2.9.3',
         ],
         "open-spiel": [
             'open-spiel'
