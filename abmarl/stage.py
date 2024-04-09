@@ -98,14 +98,14 @@ def visualize(
         for agent_id, agent_obs in obs.items():
             if done[agent_id]: continue # Don't get actions for done agents
             policy_id = policy_agent_mapping(agent_id)
-            action = trainer.compute_action(
+            action = trainer.compute_single_action(
                 agent_obs, policy_id=policy_id, explore=explore
             )
             joint_action[agent_id] = action
         return joint_action
 
     def _single_get_action(obs, trainer=None, **kwargs):
-        return trainer.compute_action(obs, explore=explore)
+        return trainer.compute_single_action(obs, explore=explore)
 
     def _multi_get_done(done):
         return done['__all__']
@@ -115,7 +115,7 @@ def visualize(
 
     policy_agent_mapping = None
     if isinstance(sim, MultiAgentEnv):
-        policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
+        policy_agent_mapping = trainer.config['policy_mapping_fn']
         _get_action = _multi_get_action
         _get_done = _multi_get_done
     else:
@@ -124,7 +124,7 @@ def visualize(
 
     for episode in range(episodes):
         print('Episode: {}'.format(episode))
-        obs = sim.reset()
+        obs, _ = sim.reset()
         done = None
         all_done = False
         fig = plt.figure()
@@ -144,7 +144,7 @@ def visualize(
             action = _get_action(
                 obs, done=done, sim=sim, trainer=trainer, policy_agent_mapping=policy_agent_mapping
             )
-            obs, _, done, _ = sim.step(action)
+            obs, _, done, _, _ = sim.step(action)
             if _get_done(done) or i >= steps_per_episode:
                 nonlocal all_done
                 all_done = True
