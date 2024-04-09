@@ -54,9 +54,9 @@ policies = {
 
 
 def policy_mapping_fn(agent_id, *args, **kwargs):
-    if agents[agent_id].encoding == 1:
-        return 'prey'
     if agents[agent_id].encoding == 2:
+        return 'prey'
+    if agents[agent_id].encoding == 3:
         return 'predator'
 
 # Experiment parameters
@@ -67,10 +67,10 @@ params = {
     },
     'ray_tune': {
         'run_or_experiment': 'PPO',
-        'checkpoint_freq': 50,
+        'checkpoint_freq': 1,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 20_000,
+            'episodes_total': 100,
         },
         'verbose': 2,
         'storage_path': 'output_dir',
