@@ -48,11 +48,11 @@ try:
             except AttributeError:
                 return self.sim
 
-        def reset(self):
+        def reset(self, *args, **kwargs):
             """See SimulationManager."""
-            return self.sim.reset()
+            return self.sim.reset(), {}
 
-        def step(self, actions):
+        def step(self, actions, *args, **kwargs):
             """See SimulationManager."""
             return self.sim.step(actions)
 
