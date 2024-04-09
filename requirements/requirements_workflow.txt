@@ -2,3 +2,4 @@ matplotlib
 ray[rllib]==2.9.3
 open-spiel
 torch
+tensorboard

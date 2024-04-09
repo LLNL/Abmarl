@@ -2,6 +2,7 @@ matplotlib
 ray[rllib]==2.9.3
 open-spiel
 torch
+tensorboard
 sphinx
 sphinx-rtd-theme
 flake8
