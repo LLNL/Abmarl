@@ -12,7 +12,7 @@ if __name__ == "__main__":
             params['experiment']['title'], time.strftime('%Y-%m-%d_%H-%M')
         )
     )
-    params['ray_tune']['local_dir'] = output_dir
+    params['ray_tune']['storage_path'] = output_dir
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 

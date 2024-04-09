@@ -86,7 +86,7 @@ params = {
             'episodes_total': 200_000,
         },
         'verbose': 2,
-        'local_dir': '../../',
+        'storage_path': 'output_dir',
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,

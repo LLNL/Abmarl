@@ -31,12 +31,11 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(exclude=['tests']),
     install_requires=[
-        'importlib-metadata<5.0',
-        'numpy<1.24',
-        'gymnasium',
+        # 'importlib-metadata<5.0',
+        # 'numpy<1.24',
         # 'gym',
-        'matplotlib',
-        'seaborn',
+        # 'matplotlib',
+        # 'seaborn',
     ],
     extras_require={
         "rllib": [

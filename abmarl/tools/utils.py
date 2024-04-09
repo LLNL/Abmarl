@@ -112,11 +112,11 @@ def set_output_directory(params):
     import os
     import time
     title = params['experiment']['title']
-    base = params['ray_tune'].get('local_dir', os.path.expanduser("~"))
+    base = params['ray_tune'].get('storage_path', os.path.expanduser("~"))
     output_dir = os.path.join(
-        base, 'abmarl_results/{}_{}'.format(
+        os.getcwd(), base, 'abmarl_results/{}_{}'.format(
             title, time.strftime('%Y-%m-%d_%H-%M')
         )
     )
-    params['ray_tune']['local_dir'] = output_dir
+    params['ray_tune']['storage_path'] = output_dir
     return output_dir
