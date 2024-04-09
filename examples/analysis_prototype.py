@@ -10,7 +10,7 @@ def run(sim, trainer):
             Trainer that computes actions using the trained policies.
     """
     # Run the simulation with actions chosen from the trained policies
-    policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
+    policy_agent_mapping = trainer.config['policy_mapping_fn']
     for episode in range(5):
         episode_reward = 0
         print('Episode: {}'.format(episode))
@@ -22,10 +22,10 @@ def run(sim, trainer):
             for agent_id, agent_obs in obs.items():
                 if done[agent_id]: continue # Don't get actions for done agents
                 policy_id = policy_agent_mapping(agent_id)
-                action = trainer.compute_action(agent_obs, policy_id=policy_id)
+                action = trainer.compute_single_action(agent_obs, policy_id=policy_id)
                 joint_action[agent_id] = action
             # Step the simulation
-            obs, reward, done, info = sim.step(joint_action)
+            obs, reward, done, _ = sim.step(joint_action)
             episode_reward += sum(reward.values())
             if done['__all__']:
                 break
