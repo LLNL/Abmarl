@@ -61,6 +61,7 @@ def policy_mapping_fn(agent_id, *args, **kwargs):
     if agents[agent_id].encoding == 3:
         return 'predator'
 
+
 # Experiment parameters
 params = {
     'experiment': {
