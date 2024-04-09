@@ -54,7 +54,8 @@ try:
 
         def step(self, actions, *args, **kwargs):
             """See SimulationManager."""
-            return self.sim.step(actions)
+            obs, rewards, dones, infos = self.sim.step(actions)
+            return obs, rewards, dones, {"__all__": False}, infos
 
         def render(self, *args, **kwargs):
             """See SimulationManager."""
