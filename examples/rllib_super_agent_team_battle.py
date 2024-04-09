@@ -78,11 +78,11 @@ params = {
         'sim_creator': lambda config=None: sim,
     },
     'ray_tune': {
-        'run_or_experiment': 'A2C',
-        'checkpoint_freq': 50,
+        'run_or_experiment': 'PPO',
+        'checkpoint_freq': 1,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2000,
+            'episodes_total': 1000,
         },
         'verbose': 2,
         'storage_path': 'output_dir',

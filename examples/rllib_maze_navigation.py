@@ -65,7 +65,7 @@ params = {
     },
     'ray_tune': {
         'run_or_experiment': 'PPO',
-        'checkpoint_freq': 1,
+        'checkpoint_freq': 5,
         'checkpoint_at_end': True,
         'stop': {
             'episodes_total': 2000,

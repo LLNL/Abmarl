@@ -39,7 +39,7 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
 
     # Load the last checkpoint
     max_checkpoint = None
-    max_checkpoint_value = 0
+    max_checkpoint_value = -1
     for checkpoint in checkpoint_dirs:
         checkpoint_value = int(checkpoint.split('/')[-1].split('_')[-1])
         if checkpoint_value > max_checkpoint_value:
