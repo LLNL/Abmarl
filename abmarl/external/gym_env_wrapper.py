@@ -49,7 +49,7 @@ class GymWrapper(GymEnv):
         Return the observation from the single agent.
         """
         obs = self.sim.reset(**kwargs)
-        return obs[self.agent_id]
+        return obs[self.agent_id], {}
 
     def step(self, action, **kwargs):
         """
@@ -61,6 +61,7 @@ class GymWrapper(GymEnv):
         return obs[self.agent_id], \
             reward[self.agent_id], \
             done[self.agent_id], \
+            False, \
             info[self.agent_id]
 
     def render(self, **kwargs):
