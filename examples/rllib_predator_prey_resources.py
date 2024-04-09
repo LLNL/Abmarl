@@ -59,7 +59,6 @@ def policy_mapping_fn(agent_id):
     if agents[agent_id].encoding == 2:
         return 'predator'
 
-
 # Experiment parameters
 params = {
     'experiment': {
@@ -74,7 +73,7 @@ params = {
             'episodes_total': 20_000,
         },
         'verbose': 2,
-        'local_dir': 'output_dir',
+        'storage_path': 'output_dir',
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,

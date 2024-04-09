@@ -21,7 +21,7 @@ def debug(params, episodes=1, steps_per_episode=200, render=False, **kwargs):
     trainer = DebugTrainer(
         sim=sim.sim,
         name=title,
-        output_dir=params['ray_tune'].get('local_dir')
+        output_dir=params['ray_tune'].get('storage_path')
     )
 
     trainer.train(

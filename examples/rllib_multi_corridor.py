@@ -33,7 +33,7 @@ params = {
             'episodes_total': 2000,
         },
         'verbose': 2,
-        'local_dir': 'output_dir',
+        'storage_path': 'output_dir',
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,
@@ -48,7 +48,7 @@ params = {
             # "lr": 0.0001,
             # --- Parallelism ---
             # Number of workers per experiment: int
-            "num_workers": 7,
+            "num_workers": 0,
             # Number of simulations that each worker starts: int
             "num_envs_per_worker": 1, # This must be 1 because we are not "threadsafe"
         },
