@@ -84,7 +84,7 @@ policies = {
 }
 
 
-def policy_mapping_fn(agent_id):
+def policy_mapping_fn(agent_id, *args, **kwargs):
     if agent_id.startswith('red'):
         return "red"
     elif agent_id.startswith('green'):

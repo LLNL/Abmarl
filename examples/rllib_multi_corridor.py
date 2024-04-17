@@ -1,3 +1,4 @@
+
 from abmarl.examples.sim.multi_corridor import MultiCorridor
 from abmarl.managers import TurnBasedManager
 from abmarl.external import MultiAgentWrapper
@@ -15,7 +16,7 @@ policies = {
 }
 
 
-def policy_mapping_fn(agent_id):
+def policy_mapping_fn(agent_id, *args, **kwargs):
     return 'corridor'
 
 

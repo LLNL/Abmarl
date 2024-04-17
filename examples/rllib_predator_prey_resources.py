@@ -55,7 +55,7 @@ policies = {
 }
 
 
-def policy_mapping_fn(agent_id):
+def policy_mapping_fn(agent_id, *args, **kwargs):
     if agents[agent_id].encoding == 1:
         return 'prey'
     if agents[agent_id].encoding == 2:
