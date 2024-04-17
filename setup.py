@@ -31,22 +31,20 @@ setuptools.setup(
     },
     packages=setuptools.find_packages(exclude=['tests']),
     install_requires=[
-        'importlib-metadata<5.0',
-        'numpy<1.24',
-        'gym',
         'matplotlib',
-        'seaborn',
+        'gymnasium'
     ],
     extras_require={
         "rllib": [
-            'tensorflow',
-            'ray[rllib]==2.0.0',
+            'torch',
+            'tensorboard'
+            'ray[rllib]==2.9.3',
         ],
         "open-spiel": [
             'open-spiel'
         ]
     },
-    python_requires='>=3.7, <3.11',
+    python_requires='>=3.8, <3.12',
     entry_points={
         'console_scripts': [
             'abmarl=abmarl.scripts.scripts:cli'

@@ -54,7 +54,7 @@ An agent can be created like so:
 
 .. code-block:: python
 
-   from gym.spaces import Discrete
+   from gymnasium.spaces import Discrete
    from abmarl.tools import Box
    from abmarl.sim import Agent
    agent = Agent(
@@ -199,7 +199,7 @@ is ravelled to a Discrete space:
 
 .. code-block:: python
 
-   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
+   from gymnasium.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
    import numpy as np
    from abmarl.tools import Box
    from abmarl.sim.wrappers.ravel_discrete_wrapper import ravel_space, ravel
@@ -255,7 +255,7 @@ it will cast up to float. See how the following nested space is flattened:
 
 .. code-block:: python
 
-   from gym.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
+   from gymnasium.spaces import Dict, MultiBinary, MultiDiscrete, Discrete, Tuple
    import numpy as np
    from abmarl.tools import Box
    from abmarl.sim.wrappers.flatten_wrapper import flatten_space, flatten
@@ -507,7 +507,7 @@ simple corridor simulation with multiple agents.
                'episodes_total': 2000,
            },
            'verbose': 2,
-           'local_dir': 'output_dir',
+           'storage_path': 'output_dir',
            'config': {
                # --- simulation ---
                'disable_env_checking': False,
@@ -558,17 +558,17 @@ is the name of our configuration file. This will launch
 Abmarl, which will process the file and launch RLlib according to the
 specified parameters. This particular example should take 1-10 minutes to
 train, depending on your compute capabilities. You can view the performance
-in real time in tensorboard with ``tensorboard --logdir <local_dir>/abmarl_results``.
+in real time in tensorboard with ``tensorboard --logdir <storage_path>/abmarl_results``.
 
 .. NOTE::
 
    By default, the "base" of the output directory is the home directory, and Abmarl will
    create the `abmarl_results` directory there. The base directory can by configured
-   in the `params` under `ray_tune` using the `local_dir` parameter. This value
-   can be a full path, like ``'local_dir': '/usr/local/scratch'``, or it can be
-   a relative path, like ``'local_dir': output_dir``, where the path is relative
+   in the `params` under `ray_tune` using the `storage_path` parameter. This value
+   can be a full path, like ``'storage_path': '/usr/local/scratch'``, or it can be
+   a relative path, like ``'storage_path': output_dir``, where the path is relative
    from the directory where Abmarl was launched, not from the configuration file.
-   If a path is given, the output will be under ``<local_dir>/abmarl_results``.
+   If a path is given, the output will be under ``<storage_path>/abmarl_results``.
 
 
 .. _debugging:

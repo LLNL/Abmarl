@@ -67,7 +67,7 @@ policies = {
 }
 
 
-def policy_mapping_fn(agent_id):
+def policy_mapping_fn(agent_id, *args, **kwargs):
     return agent_id
 
 
@@ -78,14 +78,14 @@ params = {
         'sim_creator': lambda config=None: sim,
     },
     'ray_tune': {
-        'run_or_experiment': 'A2C',
-        'checkpoint_freq': 50,
+        'run_or_experiment': 'PPO',
+        'checkpoint_freq': 1,
         'checkpoint_at_end': True,
         'stop': {
-            'episodes_total': 2000,
+            'episodes_total': 1000,
         },
         'verbose': 2,
-        'local_dir': 'output_dir',
+        'storage_path': 'output_dir',
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,

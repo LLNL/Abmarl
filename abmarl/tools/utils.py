@@ -30,7 +30,7 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
     if checkpoint_desired is not None: # checkpoint specified
         for checkpoint in checkpoint_dirs:
             if checkpoint_desired == int(checkpoint.split('/')[-1].split('_')[-1]):
-                return checkpoint, checkpoint_desired
+                return checkpoint
         import warnings
         warnings.warn(
             f'Could not find checkpoint_{checkpoint_desired}. Attempting to load the last '
@@ -39,7 +39,7 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
 
     # Load the last checkpoint
     max_checkpoint = None
-    max_checkpoint_value = 0
+    max_checkpoint_value = -1
     for checkpoint in checkpoint_dirs:
         checkpoint_value = int(checkpoint.split('/')[-1].split('_')[-1])
         if checkpoint_value > max_checkpoint_value:
@@ -49,7 +49,7 @@ def checkpoint_from_trained_directory(full_trained_directory, checkpoint_desired
     if max_checkpoint is None:
         raise FileNotFoundError("Did not find a checkpoint file in the given directory.")
 
-    return max_checkpoint, max_checkpoint_value
+    return max_checkpoint
 
 
 def find_dirs_in_dir(pattern, path):
@@ -112,11 +112,11 @@ def set_output_directory(params):
     import os
     import time
     title = params['experiment']['title']
-    base = params['ray_tune'].get('local_dir', os.path.expanduser("~"))
+    base = params['ray_tune'].get('storage_path', os.path.expanduser("~"))
     output_dir = os.path.join(
-        base, 'abmarl_results/{}_{}'.format(
+        os.getcwd(), base, 'abmarl_results/{}_{}'.format(
             title, time.strftime('%Y-%m-%d_%H-%M')
         )
     )
-    params['ray_tune']['local_dir'] = output_dir
+    params['ray_tune']['storage_path'] = output_dir
     return output_dir

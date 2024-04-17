@@ -18,10 +18,12 @@ def test_gym_init():
 
 def test_gym_reset_and_step():
     sim = GymWrapper(AllStepManager(MultiAgentSim(num_agents=1)))
-    obs = sim.reset()
+    obs, info = sim.reset()
     assert obs == 'Obs from agent0'
-    obs, reward, done, info = sim.step(0)
+    assert info == {}
+    obs, reward, done, trunc, info = sim.step(0)
     assert obs == 'Obs from agent0'
     assert reward == 'Reward from agent0'
     assert done == 'Done from agent0'
+    assert not trunc
     assert info == {'Action from agent0': 0}

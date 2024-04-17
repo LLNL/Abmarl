@@ -1504,7 +1504,7 @@ force the agent to only attack one encoding per turn, like so:
    from abmarl.sim.gridworld.state import PositionState, HealthState
    from abmarl.sim.gridworld.actor import EncodingBasedAttackActor
    from abmarl.sim.gridworld.wrapper import ExclusiveChannelActionWrapper
-   from gym.spaces import Dict, Discrete
+   from gymnasium.spaces import Dict, Discrete
 
    agents = {
        'agent0': AttackingAgent(

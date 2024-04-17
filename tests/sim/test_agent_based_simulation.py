@@ -56,7 +56,7 @@ def test_acting_agent_action_space():
     agent = ActingAgent(id='agent')
     assert not agent.configured
 
-    from gym.spaces import Discrete
+    from gymnasium.spaces import Discrete
     agent = ActingAgent(id='agent', action_space={'key': Discrete(12)})
     assert not agent.configured
     agent.finalize()
@@ -64,7 +64,7 @@ def test_acting_agent_action_space():
 
 
 def test_acting_agent_null_action():
-    from gym.spaces import MultiBinary
+    from gymnasium.spaces import MultiBinary
     agent1 = ActingAgent(id='agent1', action_space=MultiBinary(4), null_action=[0, 0, 0, 0])
     agent1.finalize()
 
@@ -76,14 +76,14 @@ def test_acting_agent_null_action():
 
 
 def test_acting_agent_seed():
-    from gym.spaces import Discrete
+    from gymnasium.spaces import Discrete
     agent = ActingAgent(id='agent', seed=17, action_space={
         1: Discrete(12),
         2: Discrete(3),
     })
     agent.finalize()
     assert agent.configured
-    assert agent.action_space.sample() == {1: 2, 2: 0}
+    assert agent.action_space.sample() == {1: 1, 2: 1}
 
 
 def test_observing_agent_observation_space():
@@ -96,7 +96,7 @@ def test_observing_agent_observation_space():
     agent = ObservingAgent(id='agent')
     assert not agent.configured
 
-    from gym.spaces import Discrete
+    from gymnasium.spaces import Discrete
     agent = ObservingAgent(id='agent', observation_space={'key': Discrete(12)})
     assert not agent.configured
     agent.finalize()
@@ -104,7 +104,7 @@ def test_observing_agent_observation_space():
 
 
 def test_observing_agent_null_observation():
-    from gym.spaces import MultiBinary
+    from gymnasium.spaces import MultiBinary
     agent1 = ObservingAgent(
         id='agent1', observation_space=MultiBinary(4), null_observation=[0, 0, 0, 0]
     )
@@ -120,7 +120,7 @@ def test_observing_agent_null_observation():
 
 
 def test_agent():
-    from gym.spaces import Discrete
+    from gymnasium.spaces import Discrete
     agent = Agent(
         id='agent', seed=7, observation_space={'obs': Discrete(2)},
         action_space={'act': Discrete(5)}
@@ -129,7 +129,7 @@ def test_agent():
     agent.finalize()
     assert agent.configured
 
-    assert agent.action_space.sample() == {'act': 1}
+    assert agent.action_space.sample() == {'act': 2}
     assert agent.observation_space.sample() == {'obs': 0}
 
 

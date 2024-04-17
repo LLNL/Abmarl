@@ -23,10 +23,10 @@ def test_off_policy():
     assert isinstance(policy, EpsilonSoftPolicy)
 
     policy.epsilon = 0
-    obs = sim.reset()
+    obs, _ = sim.reset()
     for _ in range(10):
         action = policy.compute_action(obs)
-        obs, reward, done, info = sim.step(action)
+        obs, reward, done, _, info = sim.step(action)
         if done:
             break
     assert done

@@ -1,5 +1,5 @@
 
-from gym.spaces import Dict
+from gymnasium.spaces import Dict
 
 from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent, is_agent
 
@@ -48,13 +48,14 @@ try:
             except AttributeError:
                 return self.sim
 
-        def reset(self):
+        def reset(self, *args, **kwargs):
             """See SimulationManager."""
-            return self.sim.reset()
+            return self.sim.reset(), {}
 
-        def step(self, actions):
+        def step(self, actions, *args, **kwargs):
             """See SimulationManager."""
-            return self.sim.step(actions)
+            obs, rewards, dones, infos = self.sim.step(actions)
+            return obs, rewards, dones, {"__all__": False}, infos
 
         def render(self, *args, **kwargs):
             """See SimulationManager."""

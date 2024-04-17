@@ -1,10 +1,8 @@
-importlib-metadata<5.0
-numpy<1.24
-tensorflow
-ray[rllib]==2.0.0
-open-spiel
 matplotlib
-seaborn
+ray[rllib]==2.9.3
+open-spiel
+torch
+tensorboard
 sphinx
 sphinx-rtd-theme
 flake8

@@ -210,7 +210,7 @@ a compatible encoding, and (3) is not blocked.
 
 .. code-block:: python
 
-   from gym.spaces import Discrete
+   from gymnasium.spaces import Discrete
    from abmarl.sim.gridworld.actor import ActorBaseComponent
    import abmarl.sim.gridworld.utils as gu
    
@@ -312,7 +312,7 @@ component, which will have a small impact in how we initialize the simulation.
 
 .. code-block:: python
 
-   from gym.spaces import Dict
+   from gymnasium.spaces import Dict
    from abmarl.tools import Box
    from abmarl.sim.gridworld.observer import ObserverBaseComponent
 

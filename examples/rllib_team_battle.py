@@ -56,7 +56,7 @@ policies = {
 }
 
 
-def policy_mapping_fn(agent_id):
+def policy_mapping_fn(agent_id, *args, **kwargs):
     if agents[agent_id].encoding == 1:
         return 'red'
     if agents[agent_id].encoding == 2:
@@ -74,14 +74,14 @@ params = {
         'sim_creator': lambda config=None: sim,
     },
     'ray_tune': {
-        'run_or_experiment': 'A2C',
-        'checkpoint_freq': 50,
+        'run_or_experiment': 'PPO',
+        'checkpoint_freq': 2,
         'checkpoint_at_end': True,
         'stop': {
             'episodes_total': 2000,
         },
         'verbose': 2,
-        'local_dir': 'output_dir',
+        'storage_path': 'output_dir',
         'config': {
             # --- Simulation ---
             'disable_env_checking': False,

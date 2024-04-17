@@ -1,5 +1,5 @@
 # 5.1 Monte Carlo prediction p92.
-from gym.spaces import Discrete
+from gymnasium.spaces import Discrete
 import numpy as np
 
 from abmarl.managers import SimulationManager
@@ -13,13 +13,13 @@ def generate_episode(sim, policy, horizon=200):
 
     Returns: sequence of state, action, reward.
     """
-    obs = sim.reset()
+    obs, _ = sim.reset()
     policy.reset() # Reset the policy too so that it knows its the beginning of the episode.
     states, actions, rewards = [], [], []
     states.append(obs)
     for _ in range(horizon):
         action = policy.compute_action(obs)
-        obs, reward, done, _ = sim.step(action)
+        obs, reward, done, _, _ = sim.step(action)
         states.append(obs)
         actions.append(action)
         rewards.append(reward)
