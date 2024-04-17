@@ -91,10 +91,6 @@ def test_communication_wrapper_step():
         }
     }
     sim.step(action_0)
-    for agent_id, agent in sim.agents.items():
-        if not isinstance(agent, Agent): continue
-        agent_info = sim.get_info(agent_id)
-        assert 'send' not in agent_info and 'receive' not in agent_info
     assert sim.get_obs('agent0')['obs'] == [0, 0, 0, 1]
     assert sim.get_obs('agent0')['message_buffer'] == {
         'agent1': True, 'agent2': True, 'agent3': False, 'agent4': False

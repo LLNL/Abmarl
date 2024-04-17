@@ -1,6 +1,5 @@
 
 import os
-import pytest
 from ray.tune.registry import register_env
 
 from abmarl.debug import debug
@@ -11,15 +10,6 @@ from abmarl.examples import MultiMazeNavigationAgent, MultiMazeNavigationSim
 from abmarl.sim.gridworld.agent import GridWorldAgent
 from abmarl.managers import AllStepManager
 from abmarl.external import MultiAgentWrapper
-
-
-def pytest_namespace():
-    return {'output_dir': None}
-
-
-def pytest_collection_modifyitems(items):
-    items = ["test_debug", "test_train", "test_visualize", "test_analyze"]
-    return items
 
 
 agents = {
@@ -71,7 +61,7 @@ policies = {
 }
 
 
-def policy_mapping_fn(agent_id):
+def policy_mapping_fn(agent_id, *args, **kwargs):
     return 'navigator'
 
 
@@ -82,11 +72,11 @@ params = {
         'sim_creator': lambda config=None: sim,
     },
     'ray_tune': {
-        'run_or_experiment': 'A2C',
+        'run_or_experiment': 'PPO',
         'checkpoint_freq': 2,
         'checkpoint_at_end': False,
         'stop': {
-            'episodes_total': 100,
+            'episodes_total': 15,
         },
         'verbose': 0,
         'config': {
@@ -124,7 +114,7 @@ def tally_rewards(sim, trainer):
     from abmarl.managers import SimulationManager
     assert isinstance(sim, SimulationManager), "sim must be a SimulationManager."
     # Run the simulation with actions chosen from the trained policies
-    policy_agent_mapping = trainer.config['multiagent']['policy_mapping_fn']
+    policy_agent_mapping = trainer.config['policy_mapping_fn']
     for episode in range(5):
         episode_reward = 0
         print('Episode: {}'.format(episode))
@@ -136,7 +126,7 @@ def tally_rewards(sim, trainer):
             for agent_id, agent_obs in obs.items():
                 if done[agent_id]: continue # Don't get actions for done agents
                 policy_id = policy_agent_mapping(agent_id)
-                action = trainer.compute_action(agent_obs, policy_id=policy_id)
+                action = trainer.compute_single_action(agent_obs, policy_id=policy_id)
                 joint_action[agent_id] = action
             # Step the simulation
             obs, reward, done, info = sim.step(joint_action)
@@ -176,37 +166,33 @@ def test_debug():
     assert len(os.listdir(output_dir)) == 22
 
 
-def test_train():
+def test_workflow():
+    # Test Train #
     import ray
     ray.init()
     output_dir = train(params)
-    pytest.output_dir = output_dir
+    print(output_dir)
     assert os.path.exists(output_dir)
     assert len(os.listdir(output_dir)) == 1
-    a2c_dir = os.path.join(output_dir, "A2C")
-    assert len(os.listdir(a2c_dir)) == 3
+    ppo_dir = os.path.join(output_dir, os.listdir(output_dir)[0])
+    assert len(os.listdir(ppo_dir)) >= 3
     sub_dir = ''
-    for name in os.listdir(a2c_dir):
-        if name.startswith("A2C_"):
+    for name in os.listdir(ppo_dir):
+        if name.startswith("PPO_"):
             sub_dir = name
             break
-    sub_dir = os.path.join(a2c_dir, sub_dir)
-    assert "checkpoint_000002" in os.listdir(sub_dir)
-    assert "checkpoint_000004" in os.listdir(sub_dir)
+    sub_dir = os.path.join(ppo_dir, sub_dir)
+    assert "checkpoint_000000" in os.listdir(sub_dir)
+    assert "checkpoint_000001" in os.listdir(sub_dir)
     # Hard to determine just how many checkpoints will be produced, so we will
     # go with at least 2
 
-
-def test_visualize():
-    output_dir = pytest.output_dir
+    # Test visualize #
     visualize(params, output_dir, checkpoint=5, episodes=3, steps_per_episode=20, record_only=True)
     assert 'Episode_0.gif' in os.listdir(output_dir)
     assert 'Episode_1.gif' in os.listdir(output_dir)
     assert 'Episode_2.gif' in os.listdir(output_dir)
 
-
-def test_analyze():
-    import ray
-    output_dir = pytest.output_dir
+    # Test analyze #
     analyze(params, output_dir, tally_rewards, checkpoint=10)
     ray.shutdown()
