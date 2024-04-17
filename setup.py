@@ -44,7 +44,7 @@ setuptools.setup(
             'open-spiel'
         ]
     },
-    python_requires='>=3.8, <3.11',
+    python_requires='>=3.8, <3.12',
     entry_points={
         'console_scripts': [
             'abmarl=abmarl.scripts.scripts:cli'
