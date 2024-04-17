@@ -4,12 +4,12 @@ from abmarl.algs.monte_carlo import generate_episode
 class Sim:
     def reset(self):
         self.count = 0
-        return self.count
+        return self.count, {}
 
     def step(self, action):
         self.count = action
         done = True if abs(self.count) > 100 else False
-        return self.count, action, done, {}
+        return self.count, action, done, {}, {}
 
 
 class Policy:

@@ -25,5 +25,5 @@ def test_gym_reset_and_step():
     assert obs == 'Obs from agent0'
     assert reward == 'Reward from agent0'
     assert done == 'Done from agent0'
-    assert trunc == False
+    assert not trunc
     assert info == {'Action from agent0': 0}
