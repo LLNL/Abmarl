@@ -37,13 +37,14 @@ setuptools.setup(
     extras_require={
         "rllib": [
             'torch',
+            'tensorboard'
             'ray[rllib]==2.9.3',
         ],
         "open-spiel": [
             'open-spiel'
         ]
     },
-    python_requires='>=3.7, <3.11',
+    python_requires='>=3.8, <3.11',
     entry_points={
         'console_scripts': [
             'abmarl=abmarl.scripts.scripts:cli'
