@@ -67,11 +67,27 @@ try:
         """
         Wraps an RLlib MultiAgentEnv and leverages it for implementing the ABS interface.
         """
-        def __init__(self, multi_agent_env, **kwargs):
-            super().__init__(**kwargs)
+        def __init__(self, multi_agent_env, null_observation=None, null_action=None, **kwargs):
             assert isinstance(multi_agent_env, MultiAgentEnv), \
                 "multi_agent_env must be a MultiAgentEnv."
+            assert multi_agent_env._action_space_in_preferred_format and \
+                multi_agent_env._obs_space_in_preferred_format, \
+                "The action and observation spaces must be in the preferred format."
             self._env = multi_agent_env
+            if not null_action:
+                null_action = {}
+            if not null_observation:
+                null_observation = {}
+            agents = {
+                agent_id: Agent(
+                    id=agent_id,
+                    observation_space=multi_agent_env.observation_space[agent_id],
+                    null_observation=null_observation.get(agent_id),
+                    action_space=multi_agent_env.action_space[agent_id],
+                    null_action=null_action.get(agent_id),
+                ) for agent_id in multi_agent_env._agent_ids
+            }
+            super().__init__(agents=agents, **kwargs)
             # ABS storage
             self._obs = None
             self._reward = None
@@ -133,28 +149,12 @@ try:
             multi_agent_env,
             null_observation=None,
             null_action=None,
-            randomize_action_input=False
             ):
-        assert isinstance(multi_agent_env, MultiAgentEnv), \
-            "multi_agent_env must be a MultiAgentEnv."
-        assert multi_agent_env._action_space_in_preferred_format and \
-            multi_agent_env._obs_space_in_preferred_format, \
-            "The action and observation spaces must be in the preferred format."
-        from abmarl.managers import AllStepManager
-        agents = {
-            agent_id: Agent(
-                id=agent_id,
-                observation_space=multi_agent_env.observation_space[agent_id],
-                null_observation=null_observation[agent_id],
-                action_space=multi_agent_env.action_space[agent_id],
-                null_action=null_action[agent_id],
-            ) for agent_id in multi_agent_env._agent_ids
-        }
-        abs = MultiAgentABS(
+        return MultiAgentABS(
             multi_agent_env,
-            agents=agents,
+            null_observation,
+            null_action
         )
-        return abs, AllStepManager(abs, randomize_action_input=randomize_action_input)
 
 except ImportError:
     class MultiAgentWrapper:

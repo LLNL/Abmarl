@@ -77,18 +77,23 @@ class GymABS(AgentBasedSimulation):
     """
     Wraps a GymEnv and leverages it for implementing the ABS interface.
     """
-    def __init__(self, gym_env, **kwargs):
-        super().__init__(**kwargs)
-        assert len(self.agents) == 1, \
-            "The agents dict in a gym environment should only have one agent."
+    def __init__(self, gym_env, null_observation, null_action, **kwargs):
         assert isinstance(gym_env, GymEnv), "gym_env must be a GymEnv."
         self._gym_env = gym_env
+        agents = {'agent': Agent(
+                id='agent',
+                observation_space=gym_env.observation_space,
+                null_observation=null_observation,
+                action_space=gym_env.action_space,
+                null_action=null_action
+            )
+        }
+        super().__init__(agents=agents, **kwargs)
         # ABS storage
         self._obs = None
         self._reward = None
         self._done = None
         self._info = None
-        self._agent_id = next(iter(self.agents))
 
     def reset(self, **kwargs):
         """
@@ -112,50 +117,40 @@ class GymABS(AgentBasedSimulation):
         """
         Return the stored observation, either from reset or step, whichever was last called.
         """
-        return {self._agent_id: self._obs}
+        return self._obs
 
     def get_reward(self, *args, **kwargs):
         """
         Return the stored reward, either from reset or step, whichever was last called.
         """
-        return {self._agent_id: self._reward}
+        return self._reward
     
     def get_done(self, *args, **kwargs):
         """
         Return the stored done status, either from reset or step, whichever was last called.
         """
-        return {self._agent_id: self._done}
+        return self._done
     
     def get_all_done(self, **kwargs):
         """
         Same thing as get done.
         """
-        return {self._agent_id: self._done, '__all__': self._done}
+        return self.get_done()
     
     def get_info(self, *args, **kwargs):
         """
         Return the stored info, either from reset or step, whichever was last called.
         """
-        return {self._agent_id: self._info}
+        return self._info
 
 
 def gym_to_abmarl(
         gym_env,
         null_observation=None,
         null_action=None,
-        randomize_action_input=False
         ):
-    assert isinstance(gym_env, GymEnv), "gym_env must be a GymEnv."
-    from abmarl.managers import AllStepManager
-    agent = Agent(
-        id='agent',
-        observation_space=gym_env.observation_space,
-        null_observation=null_observation,
-        action_space=gym_env.action_space,
-        null_action=null_action
-    )
-    abs = GymABS(
+    return GymABS(
         gym_env,
-        agents={'agent': agent}
+        null_observation,
+        null_action
     )
-    return abs, AllStepManager(abs, randomize_action_input=randomize_action_input)
