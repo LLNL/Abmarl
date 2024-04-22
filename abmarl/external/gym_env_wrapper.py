@@ -106,7 +106,7 @@ class GymABS(AgentBasedSimulation):
         Step the simulation and store the relevant data.
         """
         self._obs, self._reward, term, trunc, self._info = self._gym_env.step(
-            action, *args, **kwargs
+            action['agent'], *args, **kwargs
         )
         self._done = term or trunc
 
