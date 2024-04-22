@@ -1,7 +1,6 @@
 
 from gymnasium import Env as GymEnv
 from gymnasium.spaces import Discrete
-import numpy as np
 import pytest
 
 from abmarl.examples.sim.multi_agent_sim import MultiAgentSim
@@ -45,11 +44,10 @@ def test_outgoing_gym_wrapper_init():
 
 def test_outgoing_gym_wrapper_reset_and_step():
     sim = MultiAgentSim(1, 4)
-    agent = sim.agents['agent0']
     gym_wrapped = GymWrapper(AllStepManager(sim))
 
     # Build a new sim so that we don't reference the wrapped one
-    sim = AllStepManager(MultiAgentSim(1, 4)) 
+    sim = AllStepManager(MultiAgentSim(1, 4))
     obs = sim.reset()
     gym_obs, gym_info = gym_wrapped.reset()
     assert obs['agent0'] == gym_obs

@@ -62,7 +62,6 @@ try:
             """See SimulationManager."""
             return self.sim.render(*args, **kwargs)
 
-
     class MultiAgentABS(AgentBasedSimulation):
         """
         Wraps an RLlib MultiAgentEnv and leverages it for implementing the ABS interface.
@@ -114,42 +113,37 @@ try:
         def render(self, **kwargs):
             self._env.render(**kwargs)
 
-        def get_obs(self, *args, **kwargs):
+        def get_obs(self, agent_id, **kwargs):
             """
             Return the stored observation, either from reset or step, whichever was last called.
             """
-            return self._obs
+            return self._obs[agent_id]
 
-        def get_reward(self, *args, **kwargs):
+        def get_reward(self, agent_id, **kwargs):
             """
             Return the stored reward, either from reset or step, whichever was last called.
             """
-            return self._reward
+            return self._reward[agent_id]
 
-        def get_done(self, *args, **kwargs):
+        def get_done(self, agent_id, **kwargs):
             """
             Return the stored done status, either from reset or step, whichever was last called.
             """
-            return self._done
+            return self._done[agent_id]
 
         def get_all_done(self, **kwargs):
             """
             Same thing as get done.
             """
-            return self._done
+            return self._done['__all__']
 
-        def get_info(self, *args, **kwargs):
+        def get_info(self, agent_id, **kwargs):
             """
             Return the stored info, either from reset or step, whichever was last called.
             """
-            return self._info
+            return self._info[agent_id]
 
-
-    def multi_agent_to_abmarl(
-            multi_agent_env,
-            null_observation=None,
-            null_action=None,
-            ):
+    def multi_agent_to_abmarl(multi_agent_env, null_observation=None, null_action=None):
         return MultiAgentABS(
             multi_agent_env,
             null_observation,

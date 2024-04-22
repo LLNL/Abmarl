@@ -80,7 +80,8 @@ class GymABS(AgentBasedSimulation):
     def __init__(self, gym_env, null_observation, null_action, **kwargs):
         assert isinstance(gym_env, GymEnv), "gym_env must be a GymEnv."
         self._gym_env = gym_env
-        agents = {'agent': Agent(
+        agents = {
+            'agent': Agent(
                 id='agent',
                 observation_space=gym_env.observation_space,
                 null_observation=null_observation,
@@ -124,19 +125,19 @@ class GymABS(AgentBasedSimulation):
         Return the stored reward, either from reset or step, whichever was last called.
         """
         return self._reward
-    
+
     def get_done(self, *args, **kwargs):
         """
         Return the stored done status, either from reset or step, whichever was last called.
         """
         return self._done
-    
+
     def get_all_done(self, **kwargs):
         """
         Same thing as get done.
         """
         return self.get_done()
-    
+
     def get_info(self, *args, **kwargs):
         """
         Return the stored info, either from reset or step, whichever was last called.
@@ -144,11 +145,7 @@ class GymABS(AgentBasedSimulation):
         return self._info
 
 
-def gym_to_abmarl(
-        gym_env,
-        null_observation=None,
-        null_action=None,
-        ):
+def gym_to_abmarl(gym_env, null_observation=None, null_action=None):
     return GymABS(
         gym_env,
         null_observation,
