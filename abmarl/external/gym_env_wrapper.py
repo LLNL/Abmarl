@@ -1,6 +1,8 @@
+
 from gymnasium import Env as GymEnv
 
 from abmarl.sim import is_agent
+from abmarl.sim import Agent, AgentBasedSimulation
 
 
 class GymWrapper(GymEnv):
@@ -69,3 +71,101 @@ class GymWrapper(GymEnv):
         Forward render calls to the composed simulation.
         """
         self.sim.render(**kwargs)
+
+
+class GymABS(AgentBasedSimulation):
+    """
+    Wraps a GymEnv and leverages it for implementing the ABS interface.
+
+    Args:
+        gym_env: The GymEnv to convert to an AgentBasedSimulation.
+        null_observation: Optional null observation, should be in the observation space.
+        null_action: Optional null action, should be in the action space.
+    """
+    def __init__(self, gym_env, null_observation, null_action, **kwargs):
+        assert isinstance(gym_env, GymEnv), "gym_env must be a GymEnv."
+        self._env = gym_env
+        agents = {
+            'agent': Agent(
+                id='agent',
+                observation_space=gym_env.observation_space,
+                null_observation=null_observation,
+                action_space=gym_env.action_space,
+                null_action=null_action
+            )
+        }
+        super().__init__(agents=agents, **kwargs)
+        # ABS storage
+        self._obs = None
+        self._reward = None
+        self._done = None
+        self._info = None
+
+    def reset(self, **kwargs):
+        """
+        Reset the simulation and store the observation and info.
+        """
+        self._obs, self._info = self._env.reset()
+
+    def step(self, action, *args, **kwargs):
+        """
+        Step the simulation and store the relevant data.
+
+        Args:
+            action: The agent's action. Because this is an AgentBasedSimulation,
+                the action will come in the form of a dictionary mapping the agent's
+                id to its action.
+        """
+        self._obs, self._reward, term, trunc, self._info = self._env.step(
+            action['agent'], *args, **kwargs
+        )
+        self._done = term or trunc
+
+    def render(self, **kwargs):
+        self._env.render(**kwargs)
+
+    def get_obs(self, *args, **kwargs):
+        """
+        Return the stored observation, either from reset or step, whichever was last called.
+        """
+        return self._obs
+
+    def get_reward(self, *args, **kwargs):
+        """
+        Return the stored reward, either from reset or step, whichever was last called.
+        """
+        return self._reward
+
+    def get_done(self, *args, **kwargs):
+        """
+        Return the stored done status, either from reset or step, whichever was last called.
+        """
+        return self._done
+
+    def get_all_done(self, **kwargs):
+        """
+        Same thing as get done.
+        """
+        return self.get_done()
+
+    def get_info(self, *args, **kwargs):
+        """
+        Return the stored info, either from reset or step, whichever was last called.
+        """
+        return self._info
+
+
+def gym_to_abmarl(gym_env, null_observation=None, null_action=None):
+    """
+    Convert a GymEnv to an AgentBasedSimulation.
+
+    Args:
+        gym_env: The GymEnv to be converted.
+        null_observation: Optional null observation, should be in the observation space.
+        null_action: Optional null action, should be in the action space.
+    """
+    return GymABS(
+        gym_env,
+        null_observation,
+        null_action
+    )

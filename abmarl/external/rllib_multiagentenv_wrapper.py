@@ -1,7 +1,8 @@
 
 from gymnasium.spaces import Dict
 
-from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent, is_agent
+from abmarl.sim.agent_based_simulation import ActingAgent, ObservingAgent, Agent, \
+    is_agent, AgentBasedSimulation
 
 try:
     from ray.rllib import MultiAgentEnv
@@ -61,6 +62,116 @@ try:
             """See SimulationManager."""
             return self.sim.render(*args, **kwargs)
 
+    class MultiAgentABS(AgentBasedSimulation):
+        """
+        Wraps an RLlib MultiAgentEnv and leverages it for implementing the ABS interface.
+
+        Args:
+            multi_agent_env: The MultiAgentEnv to convert to an AgentBasedSimulation.
+            null_observation: Optional null observation, should be a dictionary of
+                agents mapping to each one's observation space.
+            null_action: Optional null action, should be a dictionary of
+                agents mapping to each one's action space.
+        """
+        def __init__(self, multi_agent_env, null_observation=None, null_action=None, **kwargs):
+            assert isinstance(multi_agent_env, MultiAgentEnv), \
+                "multi_agent_env must be a MultiAgentEnv."
+            assert multi_agent_env._action_space_in_preferred_format and \
+                multi_agent_env._obs_space_in_preferred_format, \
+                "The action and observation spaces must be in the preferred format."
+            self._env = multi_agent_env
+            if not null_action:
+                null_action = {}
+            if not null_observation:
+                null_observation = {}
+            agents = {
+                agent_id: Agent(
+                    id=agent_id,
+                    observation_space=multi_agent_env.observation_space[agent_id],
+                    null_observation=null_observation.get(agent_id),
+                    action_space=multi_agent_env.action_space[agent_id],
+                    null_action=null_action.get(agent_id),
+                ) for agent_id in multi_agent_env._agent_ids
+            }
+            super().__init__(agents=agents, **kwargs)
+            # ABS storage
+            self._obs = None
+            self._reward = None
+            self._done = None
+            self._info = None
+
+        def reset(self, **kwargs):
+            """
+            Reset the simulation and store the observation and info.
+            """
+            self._obs, self._info = self._env.reset()
+
+        def step(self, action_dict, *args, **kwargs):
+            """
+            Step the simulation and store the relevant data.
+
+            Args:
+                action_dict: The agents' actions. Because this is an AgentBasedSimulation,
+                    the action will come in the form of a dictionary mapping the agents'
+                    ids to their actions.
+            """
+            self._obs, self._reward, term, trunc, self._info = self._env.step(
+                action_dict, *args, **kwargs
+            )
+            self._done = {**term, **trunc}
+            for agent in self._done:
+                self._done[agent] = term.get(agent, False) or trunc.get(agent, False)
+
+        def render(self, **kwargs):
+            self._env.render(**kwargs)
+
+        def get_obs(self, agent_id, **kwargs):
+            """
+            Return the stored observation, either from reset or step, whichever was last called.
+            """
+            return self._obs[agent_id]
+
+        def get_reward(self, agent_id, **kwargs):
+            """
+            Return the stored reward, either from reset or step, whichever was last called.
+            """
+            return self._reward[agent_id]
+
+        def get_done(self, agent_id, **kwargs):
+            """
+            Return the stored done status, either from reset or step, whichever was last called.
+            """
+            return self._done[agent_id]
+
+        def get_all_done(self, **kwargs):
+            """
+            Return the stored done status under "__all__".
+            """
+            return self._done['__all__']
+
+        def get_info(self, agent_id, **kwargs):
+            """
+            Return the stored info, either from reset or step, whichever was last called.
+            """
+            return self._info[agent_id]
+
+    def multi_agent_to_abmarl(multi_agent_env, null_observation=None, null_action=None):
+        """
+        Convert a MultiAgentEnv to an AgentBasedSimulation.
+
+        Args:
+            multi_agent_env: The MultiAgentEnv to be converted.
+            null_observation: Optional null observation, should be a dictionary of
+                agents mapping to each one's observation space.
+            null_action: Optional null action, should be a dictionary of
+                agents mapping to each one's action space.
+        """
+        return MultiAgentABS(
+            multi_agent_env,
+            null_observation,
+            null_action
+        )
+
 except ImportError:
     class MultiAgentWrapper:
         """
@@ -71,3 +182,22 @@ except ImportError:
                 "Cannot use MultiAgentWrapper without RLlib. Please install the "
                 "RLlib extra with, for example, pip install abmarl[rllib]."
             )
+
+    class MultiAgentABS(AgentBasedSimulation):
+        """
+        Stub for MultiAgentABS class, which is not implemented without RLlib.
+        """
+        def __init__(self, sim):
+            raise NotImplementedError(
+                "Cannot use MultiAgentABS without RLlib. Please install the "
+                "RLlib extra with, for example, pip install abmarl[rllib]."
+            )
+
+    def multi_agent_to_abmarl(*args, **kwargs):
+        """
+        Stub for multi_agent_to_abmarl function, which is not implemented without RLlib.
+        """
+        NotImplementedError(
+            "Cannot use multi_agent_to_abmarl without RLlib. Please install the "
+            "RLlib extra with, for example, pip install abmarl[rllib]."
+        )
