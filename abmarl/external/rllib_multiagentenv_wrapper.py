@@ -65,6 +65,13 @@ try:
     class MultiAgentABS(AgentBasedSimulation):
         """
         Wraps an RLlib MultiAgentEnv and leverages it for implementing the ABS interface.
+
+        Args:
+            multi_agent_env: The MultiAgentEnv to convert to an AgentBasedSimulation.
+            null_observation: Optional null observation, should be a dictionary of
+                agents mapping to each one's observation space.
+            null_action: Optional null action, should be a dictionary of
+                agents mapping to each one's action space.
         """
         def __init__(self, multi_agent_env, null_observation=None, null_action=None, **kwargs):
             assert isinstance(multi_agent_env, MultiAgentEnv), \
@@ -102,6 +109,11 @@ try:
         def step(self, action_dict, *args, **kwargs):
             """
             Step the simulation and store the relevant data.
+
+            Args:
+                action_dict: The agents' actions. Because this is an AgentBasedSimulation,
+                    the action will come in the form of a dictionary mapping the agents'
+                    ids to their actions.
             """
             self._obs, self._reward, term, trunc, self._info = self._env.step(
                 action_dict, *args, **kwargs
@@ -133,7 +145,7 @@ try:
 
         def get_all_done(self, **kwargs):
             """
-            Same thing as get done.
+            Return the stored done status under "__all__".
             """
             return self._done['__all__']
 
@@ -144,6 +156,16 @@ try:
             return self._info[agent_id]
 
     def multi_agent_to_abmarl(multi_agent_env, null_observation=None, null_action=None):
+        """
+        Convert a MultiAgentEnv to an AgentBasedSimulation.
+
+        Args:
+            multi_agent_env: The MultiAgentEnv to be converted.
+            null_observation: Optional null observation, should be a dictionary of
+                agents mapping to each one's observation space.
+            null_action: Optional null action, should be a dictionary of
+                agents mapping to each one's action space.
+        """
         return MultiAgentABS(
             multi_agent_env,
             null_observation,
@@ -172,6 +194,9 @@ except ImportError:
             )
 
     def multi_agent_to_abmarl(*args, **kwargs):
+        """
+        Stub for multi_agent_to_abmarl function, which is not implemented without RLlib.
+        """
         NotImplementedError(
             "Cannot use multi_agent_to_abmarl without RLlib. Please install the "
             "RLlib extra with, for example, pip install abmarl[rllib]."

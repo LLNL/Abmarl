@@ -76,10 +76,15 @@ class GymWrapper(GymEnv):
 class GymABS(AgentBasedSimulation):
     """
     Wraps a GymEnv and leverages it for implementing the ABS interface.
+
+    Args:
+        gym_env: The GymEnv to convert to an AgentBasedSimulation.
+        null_observation: Optional null observation, should be in the observation space.
+        null_action: Optional null action, should be in the action space.
     """
     def __init__(self, gym_env, null_observation, null_action, **kwargs):
         assert isinstance(gym_env, GymEnv), "gym_env must be a GymEnv."
-        self._gym_env = gym_env
+        self._env = gym_env
         agents = {
             'agent': Agent(
                 id='agent',
@@ -100,19 +105,24 @@ class GymABS(AgentBasedSimulation):
         """
         Reset the simulation and store the observation and info.
         """
-        self._obs, self._info = self._gym_env.reset()
+        self._obs, self._info = self._env.reset()
 
     def step(self, action, *args, **kwargs):
         """
         Step the simulation and store the relevant data.
+
+        Args:
+            action: The agent's action. Because this is an AgentBasedSimulation,
+                the action will come in the form of a dictionary mapping the agent's
+                id to its action.
         """
-        self._obs, self._reward, term, trunc, self._info = self._gym_env.step(
+        self._obs, self._reward, term, trunc, self._info = self._env.step(
             action['agent'], *args, **kwargs
         )
         self._done = term or trunc
 
     def render(self, **kwargs):
-        self._gym_env.render(**kwargs)
+        self._env.render(**kwargs)
 
     def get_obs(self, *args, **kwargs):
         """
@@ -146,6 +156,14 @@ class GymABS(AgentBasedSimulation):
 
 
 def gym_to_abmarl(gym_env, null_observation=None, null_action=None):
+    """
+    Convert a GymEnv to an AgentBasedSimulation.
+
+    Args:
+        gym_env: The GymEnv to be converted.
+        null_observation: Optional null observation, should be in the observation space.
+        null_action: Optional null action, should be in the action space.
+    """
     return GymABS(
         gym_env,
         null_observation,

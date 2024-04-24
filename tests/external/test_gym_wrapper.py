@@ -66,7 +66,7 @@ def test_outgoing_gym_wrapper_reset_and_step():
 def test_incoming_gym_wrapper_init():
     sim = Corridor()
     abs = gym_to_abmarl(sim)
-    assert abs._gym_env == sim
+    assert abs._env == sim
     assert abs.agents['agent'].observation_space == sim.observation_space
     assert abs.agents['agent'].action_space == sim.action_space
     assert abs.agents['agent'].null_observation == {}
