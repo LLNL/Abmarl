@@ -8,12 +8,12 @@ from abmarl.external import MultiAgentWrapper
 
 
 object_registry = {
-    'P': lambda n: PacmanAgent(
-        id='pacman',
-        encoding=1,
-        view_range=2,
-        render_color='yellow',
-    ),
+    # 'P': lambda n: PacmanAgent(
+    #     id='pacman',
+    #     encoding=1,
+    #     view_range=2,
+    #     render_color='yellow',
+    # ),
     'W': lambda n: WallAgent(
         id=f'wall_{n}',
         encoding=2,
@@ -32,11 +32,20 @@ object_registry = {
         render_color='r'
     ),
 }
+extra_agents = {
+    'pacman': PacmanAgent(
+        id='pacman',
+        encoding=1,
+        view_range=2,
+        render_color='yellow',
+    )
+}
 sim = MultiAgentWrapper(
     AllStepManager(
         PacmanSim.build_sim_from_array(
             PacmanSim.example_grid,
             object_registry,
+            extra_agents=extra_agents,
             states={'PositionState', 'OrientationState', 'HealthState'},
             observers={'AbsoluteEncodingObserver'},
             overlapping={1: {3, 4}, 4: {3, 4}},
