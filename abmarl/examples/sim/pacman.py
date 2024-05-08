@@ -221,7 +221,7 @@ class PacmanSimSimple(PacmanSim):
         else:
             self._reward_scheme = {
                 'bad_move': -0.1,
-                'entropy': 0.01,
+                'entropy': -0.01,
                 'eat_food': 0.1,
                 'die': -1,
             }
