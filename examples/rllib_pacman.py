@@ -52,7 +52,7 @@ sim = MultiAgentWrapper(
             reward_scheme={
                 'bad_move': 0,
                 'entropy': -0.01,
-                'eat_food': 0.05,
+                'eat_food': 0.2,
                 'die': -1
             }
         )
