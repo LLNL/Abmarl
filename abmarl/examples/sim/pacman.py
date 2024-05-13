@@ -9,7 +9,7 @@ from abmarl.sim.gridworld.actor import DriftMoveActor
 
 
 class PacmanAgent(MovingAgent, OrientationAgent, GridObservingAgent):
-    def __init__(self, move_range=1, view_range=100, initial_health=1, **kwargs):
+    def __init__(self, move_range=1, view_range=20, initial_health=1, **kwargs):
         super().__init__(
             move_range=move_range,
             view_range=view_range,
@@ -31,7 +31,7 @@ class FoodAgent(GridWorldAgent):
 
 
 class BaddieAgent(MovingAgent, OrientationAgent, GridObservingAgent):
-    def __init__(self, move_range=1, view_range=100, **kwargs):
+    def __init__(self, move_range=1, view_range=0, **kwargs):
         super().__init__(
             move_range=move_range,
             view_range=view_range,
@@ -84,7 +84,7 @@ class PacmanSim(SmartGridWorldSimulation):
         else:
             self._reward_scheme = {
                 'bad_move': -0.1,
-                'entropy': 0.01,
+                'entropy': -0.01,
                 'eat_food': 0.1,
                 'kill': 1,
                 'die': -1,
@@ -239,9 +239,9 @@ class PacmanSimSimple(PacmanSim):
             self.rewards['pacman'] += self.reward_scheme['entropy']
         if np.array_equal(self.pacman.position, np.array([9, 0])):
             self.grid.remove(self.pacman, (9, 0))
-            self.grid.place(self.pacman, (9, 20))
-        elif np.array_equal(self.pacman.position, np.array([9, 20])):
-            self.grid.remove(self.pacman, (9, 20))
+            self.grid.place(self.pacman, (9, 18))
+        elif np.array_equal(self.pacman.position, np.array([9, 18])):
+            self.grid.remove(self.pacman, (9, 18))
             self.grid.place(self.pacman, (9, 0))
 
         # Compute overlaps with pacman
@@ -263,18 +263,9 @@ class PacmanSimSimple(PacmanSim):
             'baddie_0': {'move': 0},
             'baddie_1': {'move': 0},
             'baddie_2': {'move': 0},
-            'baddie_3': {'move': 1},
-            'baddie_4': {'move': np.random.randint(0, 5)},
-            'baddie_5': {'move': 3},
-            'baddie_6': {'move': 0},
-            'baddie_7': {'move': 0},
-            'baddie_8': {'move': 0},
-            'baddie_9': {'move': 0},
+            'baddie_3': {'move': 0},
+            'baddie_4': {'move': 0},
         }
-        if self.step_count == 0:
-            action_dict['baddie_2']['move'] = 4
-            action_dict['baddie_6']['move'] = 4
-            action_dict['baddie_9']['move'] = 3
         if self.step_count % 10 == 0:
             action_dict['baddie_0']['move'] = 3
             action_dict['baddie_1']['move'] = 1
@@ -287,33 +278,29 @@ class PacmanSimSimple(PacmanSim):
         elif self.step_count % 10 == 8:
             action_dict['baddie_0']['move'] = 4
             action_dict['baddie_1']['move'] = 4
-        if (self.step_count - 8) % 16 == 0:
-            if self.agents['baddie_2'].orientation == 4:
-                action_dict['baddie_2']['move'] = 2
-                action_dict['baddie_6']['move'] = 2
-                action_dict['baddie_9']['move'] = 3
-            else:
-                action_dict['baddie_2']['move'] = 4
-                action_dict['baddie_6']['move'] = 4
-                action_dict['baddie_9']['move'] = 1
         if self.step_count % 14 == 0:
-            action_dict['baddie_7']['move'] = 3
-            action_dict['baddie_8']['move'] = 1
+            action_dict['baddie_3']['move'] = 3
+            action_dict['baddie_4']['move'] = 1
         elif self.step_count % 14 == 3:
-            action_dict['baddie_7']['move'] = 2
-            action_dict['baddie_8']['move'] = 2
+            action_dict['baddie_3']['move'] = 2
+            action_dict['baddie_4']['move'] = 2
         elif self.step_count % 14 == 7:
-            action_dict['baddie_7']['move'] = 1
-            action_dict['baddie_8']['move'] = 3
+            action_dict['baddie_3']['move'] = 1
+            action_dict['baddie_4']['move'] = 3
         elif self.step_count % 14 == 9:
-            action_dict['baddie_7']['move'] = 4
-            action_dict['baddie_8']['move'] = 4
+            action_dict['baddie_3']['move'] = 4
+            action_dict['baddie_4']['move'] = 4
         elif self.step_count % 14 == 11:
-            action_dict['baddie_7']['move'] = 1
-            action_dict['baddie_8']['move'] = 3
+            action_dict['baddie_3']['move'] = 1
+            action_dict['baddie_4']['move'] = 3
         elif self.step_count % 14 == 12:
-            action_dict['baddie_7']['move'] = 4
-            action_dict['baddie_8']['move'] = 4
+            action_dict['baddie_3']['move'] = 4
+            action_dict['baddie_4']['move'] = 4
+        if self.step_count % 13 == 0:
+            if self.agents['baddie_2'].orientation == 3:
+                action_dict['baddie_2']['move'] = 1
+            else:
+                action_dict['baddie_2']['move'] = 3
 
         # Now move the baddies and compute overlaps with pacman
         for agent_id, action in action_dict.items():
@@ -321,9 +308,9 @@ class PacmanSimSimple(PacmanSim):
             move_result = self.move_actor.process_action(agent, action, **kwargs)
             if np.array_equal(agent.position, np.array([9, 0])):
                 self.grid.remove(agent, (9, 0))
-                self.grid.place(agent, (9, 20))
-            elif np.array_equal(agent.position, np.array([9, 20])):
-                self.grid.remove(agent, (9, 20))
+                self.grid.place(agent, (9, 18))
+            elif np.array_equal(agent.position, np.array([9, 18])):
+                self.grid.remove(agent, (9, 18))
                 self.grid.place(agent, (9, 0))
 
         # Compute overlaps with pacman
@@ -345,46 +332,46 @@ class PacmanSimSimple(PacmanSim):
         An example grid for playing the pacman game.
         """
         return np.array([
-            ['_', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W',
-                'W', 'W', 'W', 'W', 'W', 'W', '_'],
-            ['_', 'W', 'B', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
-                'F', 'F', 'F', 'F', 'B', 'W', '_'],
-            ['_', 'W', 'F', 'W', 'W', 'F', 'W', 'W', 'W', 'F', 'W', 'F', 'W', 'W',
-                'W', 'F', 'W', 'W', 'F', 'W', '_'],
-            ['_', 'W', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F',
-                'F', 'F', 'F', 'F', 'F', 'W', '_'],
-            ['_', 'W', 'F', 'W', 'W', 'F', 'W', 'F', 'W', 'W', 'W', 'W', 'W', 'F',
-                'W', 'F', 'W', 'W', 'F', 'W', '_'],
-            ['_', 'W', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
-                'W', 'F', 'F', 'F', 'F', 'W', '_'],
-            ['_', 'W', 'W', 'W', 'W', 'F', 'W', 'W', 'W', '_', 'W', '_', 'W', 'W',
-                'W', 'F', 'W', 'W', 'W', 'W', '_'],
-            ['_', '_', '_', '_', 'W', 'F', 'W', '_', '_', '_', '_', '_', '_', '_',
-                'W', 'F', 'W', '_', '_', '_', '_'],
-            ['W', 'W', 'W', 'W', 'W', 'F', 'W', '_', 'W', 'W', 'F', 'W', 'W', '_',
-                'W', 'F', 'W', 'W', 'W', 'W', 'W'],
-            ['_', '_', '_', '_', '_', 'B', '_', '_', 'B', 'F', 'B', 'F', 'B', '_',
-                '_', 'B', '_', '_', '_', '_', '_'],
-            ['W', 'W', 'W', 'W', 'W', 'F', 'W', '_', 'W', 'W', 'F', 'W', 'W', '_',
-                'W', 'F', 'W', 'W', 'W', 'W', 'W'],
-            ['_', '_', '_', '_', 'W', 'F', 'W', '_', '_', '_', '_', '_', '_', '_',
-                'W', 'F', 'W', '_', '_', '_', '_'],
-            ['_', 'W', 'W', 'W', 'W', 'F', 'W', '_', 'W', 'W', 'W', 'W', 'W', '_',
-                'W', 'F', 'W', 'W', 'W', 'W', '_'],
-            ['_', 'W', 'B', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
-                'F', 'F', 'F', 'F', 'B', 'W', '_'],
-            ['_', 'W', 'F', 'W', 'W', 'F', 'W', 'W', 'W', 'F', 'W', 'F', 'W', 'W',
-                'W', 'F', 'W', 'W', 'F', 'W', '_'],
-            ['_', 'W', 'F', 'F', 'W', 'F', 'F', 'F', 'F', 'F', 'P', 'F', 'F', 'F',
-                'F', 'F', 'W', 'F', 'F', 'W', '_'],
-            ['_', 'W', 'W', 'F', 'W', 'F', 'W', 'F', 'W', 'W', 'W', 'W', 'W', 'F',
-                'W', 'F', 'W', 'F', 'W', 'W', '_'],
-            ['_', 'W', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
-                'W', 'F', 'F', 'F', 'F', 'W', '_'],
-            ['_', 'W', 'F', 'W', 'W', 'W', 'W', 'W', 'W', 'F', 'W', 'F', 'W', 'W',
-                'W', 'W', 'W', 'W', 'F', 'W', '_'],
-            ['_', 'W', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'B', 'F', 'F', 'F',
-                'F', 'F', 'F', 'F', 'F', 'W', '_'],
-            ['_', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W',
-                'W', 'W', 'W', 'W', 'W', 'W', '_'],
+            ['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W',
+                'W', 'W', 'W', 'W', 'W', 'W'],
+            ['W', 'B', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
+                'F', 'F', 'F', 'F', 'B', 'W'],
+            ['W', 'F', 'W', 'W', 'F', 'W', 'W', 'W', 'F', 'W', 'F', 'W', 'W',
+                'W', 'F', 'W', 'W', 'F', 'W'],
+            ['W', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F',
+                'F', 'F', 'F', 'F', 'F', 'W'],
+            ['W', 'F', 'W', 'W', 'F', 'W', 'F', 'W', 'W', 'W', 'W', 'W', 'F',
+                'W', 'F', 'W', 'W', 'F', 'W'],
+            ['W', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
+                'W', 'F', 'F', 'F', 'F', 'W'],
+            ['W', 'W', 'W', 'W', 'F', 'W', 'W', 'W', '_', 'W', '_', 'W', 'W',
+                'W', 'F', 'W', 'W', 'W', 'W'],
+            ['W', 'F', 'F', 'W', 'F', 'W', '_', '_', '_', '_', '_', '_', '_',
+                'W', 'F', 'W', 'F', 'F', 'W'],
+            ['W', 'F', 'F', 'W', 'F', 'W', '_', 'W', 'W', 'F', 'W', 'W', '_',
+                'W', 'F', 'W', 'F', 'F', 'W'],
+            ['_', '_', '_', '_', 'F', '_', '_', 'W', 'F', 'F', 'F', 'W', 'B',
+                '_', 'F', '_', '_', '_', '_'],
+            ['W', 'F', 'F', 'W', 'F', 'W', '_', 'W', 'W', 'W', 'W', 'W', '_',
+                'W', 'F', 'W', 'F', 'F', 'W'],
+            ['W', 'F', 'F', 'W', 'F', 'W', '_', '_', '_', '_', '_', '_', '_',
+                'W', 'F', 'W', 'F', 'F', 'W'],
+            ['W', 'W', 'W', 'W', 'F', 'W', '_', 'W', 'W', 'W', 'W', 'W', '_',
+                'W', 'F', 'W', 'W', 'W', 'W'],
+            ['W', 'B', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
+                'F', 'F', 'F', 'F', 'B', 'W'],
+            ['W', 'F', 'W', 'W', 'F', 'W', 'W', 'W', 'F', 'W', 'F', 'W', 'W',
+                'W', 'F', 'W', 'W', 'F', 'W'],
+            ['W', 'F', 'F', 'W', 'F', 'F', 'F', 'F', 'F', 'P', 'F', 'F', 'F',
+                'F', 'F', 'W', 'F', 'F', 'W'],
+            ['W', 'W', 'F', 'W', 'F', 'W', 'F', 'W', 'W', 'W', 'W', 'W', 'F',
+                'W', 'F', 'W', 'F', 'W', 'W'],
+            ['W', 'F', 'F', 'F', 'F', 'W', 'F', 'F', 'F', 'W', 'F', 'F', 'F',
+                'W', 'F', 'F', 'F', 'F', 'W'],
+            ['W', 'F', 'W', 'W', 'W', 'W', 'W', 'W', 'F', 'W', 'F', 'W', 'W',
+                'W', 'W', 'W', 'W', 'F', 'W'],
+            ['W', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F', 'F',
+                'F', 'F', 'F', 'F', 'F', 'W'],
+            ['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W',
+                'W', 'W', 'W', 'W', 'W', 'W'],
         ])
